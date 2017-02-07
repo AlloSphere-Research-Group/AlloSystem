@@ -1,34 +1,35 @@
 #ifndef INCLUDE_AL_SHADERMANAGER_HPP
 #define INCLUDE_AL_SHADERMANAGER_HPP
 
+#include "allocore/graphics/al_Shader.hpp"
 #include "alloutil/al_ResourceManager.hpp"
 #include <map>
 
-using namespace std;
-
 struct ShaderManager {
-  std::map<std::string, ShaderProgram*> shaderMap;
+  std::map<std::string, al::ShaderProgram*> shaderMap;
   std::string vertLibCode;
   std::string fragLibCode;
-  ResourceManager rm;
+  al::ResourceManager rm;
 
-  ShaderProgram* get(std::string name) {
+  al::SearchPaths& paths(){ return rm.paths;}
+
+  al::ShaderProgram* get(std::string name) {
     return shaderMap[name];
   }
 
-  ShaderProgram* addShaderString(std::string name, std::string vertCode, std::string fragCode) {
+  al::ShaderProgram* addShaderString(std::string name, std::string vertCode, std::string fragCode) {
     // destroy shader if one already exists with same name
     if(shaderMap.count(name)){
       shaderMap[name]->destroy();
     }
 
-    Shader vert, frag;
-    vert.source(vertLibCode + vertCode, Shader::VERTEX).compile();
+    al::Shader vert, frag;
+    vert.source(vertLibCode + vertCode, al::Shader::VERTEX).compile();
     vert.printLog();
-    frag.source(fragLibCode + fragCode, Shader::FRAGMENT).compile();
+    frag.source(fragLibCode + fragCode, al::Shader::FRAGMENT).compile();
     frag.printLog();
 
-    ShaderProgram *s = new ShaderProgram();
+    al::ShaderProgram *s = new al::ShaderProgram();
     s->attach(vert).attach(frag).link();
     s->printLog();
     //s->listParams();
@@ -38,7 +39,7 @@ struct ShaderManager {
     return s;
   }
 
-  ShaderProgram* addShaderFile(std::string pName, std::string vName, std::string fName) {
+  al::ShaderProgram* addShaderFile(std::string pName, std::string vName, std::string fName) {
     // destroy shader if one already exists with same name
     if(shaderMap.count(pName)){
       shaderMap[pName]->destroy();
@@ -51,12 +52,12 @@ struct ShaderManager {
     rm.add(vName);
     rm.add(fName);
 
-    Shader vert, frag;
+    al::Shader vert, frag;
 
-    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), Shader::VERTEX).compile().printLog();
-    if(rm[fName].loaded) frag.source(fragLibCode + rm.data(fName), Shader::FRAGMENT).compile().printLog();
+    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), al::Shader::VERTEX).compile().printLog();
+    if(rm[fName].loaded) frag.source(fragLibCode + rm.data(fName), al::Shader::FRAGMENT).compile().printLog();
 
-    ShaderProgram *s = new ShaderProgram();
+    al::ShaderProgram *s = new al::ShaderProgram();
 
     std::cout << "Attaching Vertex Shader: " << vName << std::endl;
     std::cout << "Attaching Fragment Shader: " << fName << std::endl;
@@ -73,14 +74,14 @@ struct ShaderManager {
     return s;
   }
 
-  ShaderProgram* addShaderFile(std::string pName) {
+  al::ShaderProgram* addShaderFile(std::string pName) {
     std::string vName = pName + ".vert";
     std::string fName = pName + ".frag";
 
     return addShaderFile(pName, vName, fName);
   }
 
-  ShaderProgram* addShaderFile(std::string pName, std::string vName, std::string gName, std::string fName) {
+  al::ShaderProgram* addShaderFile(std::string pName, std::string vName, std::string gName, std::string fName) {
     // destroy shader if one already exists with same name
     if(shaderMap.count(pName)){
       shaderMap[pName]->destroy();
@@ -94,21 +95,21 @@ struct ShaderManager {
     rm.add(fName);
     rm.add(gName);
     
-    Shader vert, frag, geom;
+    al::Shader vert, frag, geom;
 
-    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), Shader::VERTEX).compile().printLog();
-    if(rm[gName].loaded) geom.source(fragLibCode + rm.data(gName), Shader::GEOMETRY).compile().printLog();
-    if(rm[fName].loaded) frag.source(rm.data(fName), Shader::FRAGMENT).compile().printLog();
+    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), al::Shader::VERTEX).compile().printLog();
+    if(rm[gName].loaded) geom.source(fragLibCode + rm.data(gName), al::Shader::GEOMETRY).compile().printLog();
+    if(rm[fName].loaded) frag.source(rm.data(fName), al::Shader::FRAGMENT).compile().printLog();
 
-    ShaderProgram *s = new ShaderProgram();
+    al::ShaderProgram *s = new al::ShaderProgram();
 
     std::cout << "Attaching Vertex Shader: " << vName << std::endl;
     if(rm[vName].loaded) s->attach(vert);
     
     if(rm[gName].loaded) {
       std::cout << "Attaching Geometry Shader: " << gName << std::endl;
-      s->setGeometryInputPrimitive(Graphics::LINES);
-      s->setGeometryOutputPrimitive(Graphics::TRIANGLE_STRIP);
+      s->setGeometryInputPrimitive(al::Graphics::LINES);
+      s->setGeometryOutputPrimitive(al::Graphics::TRIANGLE_STRIP);
       s->setGeometryOutputVertices(18);
       s->attach(geom);
     }
@@ -131,7 +132,7 @@ struct ShaderManager {
   }
 
   void destroy() {
-    for (std::map<std::string, ShaderProgram*>::iterator it = shaderMap.begin(); it != shaderMap.end(); ++it) {
+    for (std::map<std::string, al::ShaderProgram*>::iterator it = shaderMap.begin(); it != shaderMap.end(); ++it) {
       (it->second)->invalidate();
     }
   }
