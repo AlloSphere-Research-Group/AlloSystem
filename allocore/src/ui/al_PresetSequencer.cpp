@@ -35,13 +35,21 @@ void PresetSequencer::playSequence(std::string sequenceName)
 	std::cout << "Preset Sequencer thread id: " << std::hex << seq_thread_id << std::endl;
 }
 
-void PresetSequencer::stopSequence()
+void PresetSequencer::stopSequence(bool triggerCallbacks)
 {
 	mRunning = false;
+	bool mCallbackStatus;
+	if (!triggerCallbacks) {
+		mCallbackStatus = mEndCallbackEnabled;
+		enableEndCallback(false);
+	}
 	if (mSequencerThread) {
 		mSequencerThread->join();
 		delete mSequencerThread;
 		mSequencerThread = nullptr;
+	}
+	if (!triggerCallbacks) {
+		enableEndCallback(mCallbackStatus);
 	}
 }
 

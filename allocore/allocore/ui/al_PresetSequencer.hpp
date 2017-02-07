@@ -131,7 +131,7 @@ public:
 	 */
 	void playSequence(std::string sequenceName);
 
-	void stopSequence();
+	void stopSequence(bool triggerCallbacks = true);
 
 	/**
 	 * @brief Stores a copy of a sequence with its associated presets
