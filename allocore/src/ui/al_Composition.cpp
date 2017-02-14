@@ -31,7 +31,11 @@ void Composition::play()
 	mCompositionSteps = loadCompositionSteps(mCompositionName);
 	mPlaying = true;
 	mPlayerLock.unlock();
-	mPlayThread = new std::thread(Composition::playbackThread, this);
+	{
+		std::unique_lock<std::mutex> lk(mPlayWaitLock);
+		mPlayThread = new std::thread(Composition::playbackThread, this);
+		mPlayWaitVariable.wait(lk);
+	}
 }
 
 void Composition::stop()
@@ -323,25 +327,28 @@ void Composition::waitForSequencerCallback(bool finished, PresetSequencer *, voi
 
 void Composition::playbackThread(Composition *composition)
 {
-	composition->mPlayerLock.lock();
 	size_t index = 0;
 	if (composition->mCompositionSteps.size() == 0) {
 		std::cout << "Composition has no steps. Done." << std::endl;
 		return;
 	}
+	{
+		std::lock_guard<std::mutex> lk(composition->mPlayWaitLock);
+		//FIXME we should remember previous state of callbackd for sequencer to reset when composition is done
+		//TODO this should be an optional parameter whether to disable sequence callbacks
+		composition->mSequencer->enableBeginCallback(false);
+		composition->mSequencer->enableEndCallback(false);
+		if (composition->mBeginCallbackEnabled && composition->mBeginCallback != nullptr) {
+			composition->mBeginCallback(composition, composition->mBeginCallbackData);
+		}
+		composition->mPlayWaitVariable.notify_one();
+	}
 	std::cout << "Composition started." << std::endl;
 
-	//FIXME we should remember previous state of callbackd for sequencer to reset when composition is done
-	//TODO this should be an optional parameter whether to disable sequence callbacks
-	composition->mSequencer->enableBeginCallback(false);
-	composition->mSequencer->enableEndCallback(false);
-	if (composition->mBeginCallbackEnabled && composition->mBeginCallback != nullptr) {
-		composition->mBeginCallback(composition, composition->mBeginCallbackData);
-	}
-
+	const int granularity = 10; // milliseconds
+	composition->mPlayerLock.lock();
 	composition->mSequencerEndCallbackCache = composition->mSequencer->mEndCallback;
 	composition->mSequencerEndCallbackDataCache = composition->mSequencer->mEndCallbackData;
-	const int granularity = 10; // milliseconds
 	auto sequenceStart = std::chrono::high_resolution_clock::now();
 	auto targetTime = sequenceStart;
 	while (composition->mPlaying) {
@@ -369,6 +376,8 @@ void Composition::playbackThread(Composition *composition)
 //		}
 	}
 
+	composition->mPlayerLock.unlock();
+	std::cout << "Composition done." << std::endl;
 	// Defer end callback to sequencer end callback
 	if (composition->mSequencer->running()) { // TODO There is a very small risk of a run condition here if playback stops between the check and the branches
 		composition->mSequencer->registerEndCallback(Composition::waitForSequencerCallback, composition);
@@ -381,6 +390,4 @@ void Composition::playbackThread(Composition *composition)
 	composition->mSequencer->enableBeginCallback(true);
 	composition->mSequencer->enableEndCallback(true);
 
-	composition->mPlayerLock.unlock();
-	std::cout << "Composition done." << std::endl;
 }
