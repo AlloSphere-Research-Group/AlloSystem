@@ -118,6 +118,8 @@ private:
 	bool mPlaying;
 	PresetSequencer *mSequencer;
 	std::mutex mPlayerLock;
+	std::mutex mPlayWaitLock;
+	std::condition_variable mPlayWaitVariable;
 
 	// This interface is shared with PresetSequencer, perhaps this should be abstracted?
 	bool mBeginCallbackEnabled;
