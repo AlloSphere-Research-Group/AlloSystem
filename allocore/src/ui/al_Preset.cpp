@@ -29,7 +29,7 @@ PresetHandler::~PresetHandler()
 {
 	mRunning = false;
 //	std::lock_guard<std::mutex> lk(mTargetLock);
-	mMorphConditionVar.notify_one();
+	mMorphConditionVar.notify_all();
 	mMorphingThread.join();
 }
 

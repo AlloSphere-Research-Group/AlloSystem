@@ -242,6 +242,7 @@ private:
 
 	std::mutex mSequenceLock;
 	std::mutex mPlayWaitLock;
+	std::condition_variable mPlayWaitVariable;
 
 	bool mSequencerActive;
 	bool mRunning;

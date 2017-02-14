@@ -22,14 +22,14 @@ void PresetSequencer::playSequence(std::string sequenceName)
 		std::queue<Step> steps = loadSequence(sequenceName);
 		mSteps = steps;
 	}
+	mSequenceLock.unlock();
 	mRunning = true;
 	mCurrentSequence = sequenceName;
-	mPlayWaitLock.lock();
-	mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
-	mSequenceLock.unlock();
-
-	mPlayWaitLock.lock();
-	mPlayWaitLock.unlock();
+	{
+		std::unique_lock<std::mutex> lk(mPlayWaitLock);
+		mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
+		mPlayWaitVariable.wait(lk);
+	}
 
 	std::thread::id seq_thread_id = mSequencerThread->get_id();
 	std::cout << "Preset Sequencer thread id: " << std::hex << seq_thread_id << std::endl;
@@ -38,15 +38,16 @@ void PresetSequencer::playSequence(std::string sequenceName)
 void PresetSequencer::stopSequence(bool triggerCallbacks)
 {
 	mRunning = false;
-	bool mCallbackStatus;
+	bool mCallbackStatus = false;
 	if (!triggerCallbacks) {
 		mCallbackStatus = mEndCallbackEnabled;
 		enableEndCallback(false);
 	}
 	if (mSequencerThread) {
-		mSequencerThread->join();
-		delete mSequencerThread;
+		std::thread *th = mSequencerThread;
 		mSequencerThread = nullptr;
+		th->join();
+		delete th;
 	}
 	if (!triggerCallbacks) {
 		enableEndCallback(mCallbackStatus);
@@ -133,17 +134,20 @@ std::vector<std::string> al::PresetSequencer::getSequenceList()
 
 void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 {
-	const int granularity = 10; // milliseconds
 	if (sequencer->mPresetHandler == nullptr) {
 		std::cerr << "No preset handler registered. Can't run sequencer." << std::endl;
 		return;
 	}
-	if (sequencer->mBeginCallbackEnabled && sequencer->mBeginCallback != nullptr) {
-		sequencer->mBeginCallback(sequencer, sequencer->mBeginCallbackData);
+	{
+		std::lock_guard<std::mutex> lk(sequencer->mPlayWaitLock);
+		if (sequencer->mBeginCallbackEnabled && sequencer->mBeginCallback != nullptr) {
+			sequencer->mBeginCallback(sequencer, sequencer->mBeginCallbackData);
+		}
+		sequencer->mPlayWaitVariable.notify_one();
 	}
 	auto sequenceStart = std::chrono::high_resolution_clock::now();
 	auto targetTime = sequenceStart;
-	sequencer->mPlayWaitLock.unlock();
+	const int granularity = 10; // milliseconds
 	sequencer->mSequenceLock.lock();
 	while(sequencer->running() && sequencer->mSteps.size() > 0) {
 		Step &step = sequencer->mSteps.front();
@@ -215,7 +219,7 @@ std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequ
 			step.delta = std::stof(delta);
 			step.duration = std::stof(duration);
 			steps.push(step);
-			// std::cout << name  << ":" << delta << ":" << duration << std::endl;
+			std::cout << name  << ":" << delta << ":" << duration << std::endl;
 		}
 	}
 	if (f.bad()) {
