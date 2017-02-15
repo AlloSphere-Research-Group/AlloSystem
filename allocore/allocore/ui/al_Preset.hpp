@@ -140,6 +140,7 @@ public:
 
 
 	void morphTo(ParameterStates &parameterStates, float morphTime);
+	void stopMorph();
 
 	std::map<int, std::string> availablePresets();
 	std::string getPresetName(int index);
@@ -147,7 +148,6 @@ public:
 
 	float getMorphTime();
 	void setMorphTime(float time);
-	void stopMorph();
 
 	void setSubDirectory(std::string directory);
 	std::string getSubDirectory() {return mSubDir;}
@@ -229,6 +229,7 @@ private:
 	float mMorphInterval;
 	Parameter mMorphTime;
 
+	std::mutex mMorphLock;
 	std::mutex mTargetLock;
 	std::condition_variable mMorphConditionVar;
 	std::map<std::string, float> mTargetValues;
@@ -326,7 +327,6 @@ private:
 	bool mAllowStore;
 	bool mStoreMode;
 	bool mNotifyPresetChange;
-
 
 	std::mutex mPresetChangeLock;
 	std::string mPresetChangeSenderAddr;
