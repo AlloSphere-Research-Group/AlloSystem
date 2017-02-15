@@ -108,10 +108,9 @@ public:
 	~PresetSequencer()
 	{
 		mSequencerActive = false;
-		mRunning = false;
-		if (mSequencerThread != NULL) {
-			// mSequenceConditionVar.notify_one();
-			mSequencerThread->join();
+		stopSequence(false);
+		if (mPresetHandler) {
+			mPresetHandler->stopMorph();
 		}
 	}
 
