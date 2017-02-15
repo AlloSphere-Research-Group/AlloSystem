@@ -221,7 +221,7 @@ std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequ
 			step.delta = std::stof(delta);
 			step.duration = std::stof(duration);
 			steps.push(step);
-			std::cout << name  << ":" << delta << ":" << duration << std::endl;
+			// std::cout << name  << ":" << delta << ":" << duration << std::endl;
 		}
 	}
 	if (f.bad()) {
