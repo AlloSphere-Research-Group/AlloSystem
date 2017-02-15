@@ -624,16 +624,16 @@ void PresetServer::onMessage(osc::Message &m)
 	} else if (m.addressPattern() == mOSCpath + "/morphTime" && m.typeTags() == "f")  {
 		float val;
 		m >> val;
-    for (PresetHandler *handler: mPresetHandlers) {
-		  handler->setMorphTime(val);
-    }
+		for (PresetHandler *handler: mPresetHandlers) {
+			handler->setMorphTime(val);
+		}
 	} else if (m.addressPattern() == mOSCpath + "/store" && m.typeTags() == "f")  {
 		float val;
 		m >> val;
 		if (this->mAllowStore) {
-      for (PresetHandler *handler: mPresetHandlers) {
-  		  handler->storePreset(static_cast<int>(val));
-      }
+			for (PresetHandler *handler: mPresetHandlers) {
+				handler->storePreset(static_cast<int>(val));
+			}
 		}
 	} else if (m.addressPattern() == mOSCpath + "/storeMode" && m.typeTags() == "f")  {
 		float val;
@@ -643,6 +643,8 @@ void PresetServer::onMessage(osc::Message &m)
 		} else {
 			std::cout << "Remote storing disabled" << std::endl;
 		}
+	} else if (m.addressPattern() == mOSCpath + "/queryState")  {
+		this->mParameterServer->notifyAll();
 	} else if (m.addressPattern().substr(0, mOSCpath.size() + 1) == mOSCpath + "/") {
 		int index = std::stoi(m.addressPattern().substr(mOSCpath.size() + 1));
 		if (m.typeTags() == "f") {
@@ -650,13 +652,13 @@ void PresetServer::onMessage(osc::Message &m)
 			m >> val;
 			if (static_cast<int>(val) == 1) {
 				if (!this->mStoreMode) {
-          for (PresetHandler *handler: mPresetHandlers) {
-      		  handler->recallPreset(index);
-          }
+					for (PresetHandler *handler: mPresetHandlers) {
+						handler->recallPreset(index);
+					}
 				} else {
-          for (PresetHandler *handler: mPresetHandlers) {
-      		  handler->storePreset(index);
-          }
+					for (PresetHandler *handler: mPresetHandlers) {
+						handler->storePreset(index);
+					}
 					this->mStoreMode = false;
 				}
 			}
