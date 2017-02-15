@@ -37,20 +37,22 @@ void PresetSequencer::playSequence(std::string sequenceName)
 
 void PresetSequencer::stopSequence(bool triggerCallbacks)
 {
-	mRunning = false;
-	bool mCallbackStatus = false;
-	if (!triggerCallbacks) {
-		mCallbackStatus = mEndCallbackEnabled;
-		enableEndCallback(false);
-	}
-	if (mSequencerThread) {
-		std::thread *th = mSequencerThread;
-		mSequencerThread = nullptr;
-		th->join();
-		delete th;
-	}
-	if (!triggerCallbacks) {
-		enableEndCallback(mCallbackStatus);
+	if (mRunning == true) {
+		mRunning = false;
+		bool mCallbackStatus = false;
+		if (!triggerCallbacks) {
+			mCallbackStatus = mEndCallbackEnabled;
+			enableEndCallback(false);
+		}
+		if (mSequencerThread) {
+			std::thread *th = mSequencerThread;
+			mSequencerThread = nullptr;
+			th->join();
+			delete th;
+		}
+		if (!triggerCallbacks) {
+			enableEndCallback(mCallbackStatus);
+		}
 	}
 }
 

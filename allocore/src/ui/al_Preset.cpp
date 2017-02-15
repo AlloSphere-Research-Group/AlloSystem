@@ -27,10 +27,12 @@ PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
 
 PresetHandler::~PresetHandler()
 {
+	stopMorph();
 	mRunning = false;
-//	std::lock_guard<std::mutex> lk(mTargetLock);
 	mMorphConditionVar.notify_all();
+	mMorphLock.lock();
 	mMorphingThread.join();
+	mMorphLock.unlock();
 }
 
 PresetHandler &PresetHandler::registerParameter(Parameter &parameter)
@@ -267,10 +269,12 @@ void PresetHandler::stopMorph()
 	{
 		if (mMorphRemainingSteps.load() >= 0) {
 			mMorphRemainingSteps.store(-1);
-			std::lock_guard<std::mutex> lk(mTargetLock);
 		}
 	}
-	mMorphConditionVar.notify_one();
+	{
+		std::lock_guard<std::mutex> lk(mTargetLock);
+		mMorphConditionVar.notify_all();
+	}
 }
 
 std::string PresetHandler::getCurrentPath()
@@ -402,7 +406,9 @@ void PresetHandler::storeCurrentPresetMap()
 	f.close();
 }
 
-void PresetHandler::morphingFunction(al::PresetHandler *handler) {
+void PresetHandler::morphingFunction(al::PresetHandler *handler)
+{
+	handler->mMorphLock.lock();
 	while(handler->mRunning) {
 		std::unique_lock<std::mutex> lk(handler->mTargetLock);
 		handler->mMorphConditionVar.wait(lk);
@@ -413,7 +419,7 @@ void PresetHandler::morphingFunction(al::PresetHandler *handler) {
 					float difference =  handler->mTargetValues[param->getFullAddress()] - paramValue;
 					int steps = handler->mMorphRemainingSteps.load();
 					if (steps > 0) {
-						difference = difference/(steps + 1);
+						difference = difference/(steps);
 					}
 					float newVal = paramValue + difference;
 					param->set(newVal);
@@ -428,6 +434,7 @@ void PresetHandler::morphingFunction(al::PresetHandler *handler) {
 //			}
 //		}
 	}
+	handler->mMorphLock.unlock();
 }
 
 PresetHandler::ParameterStates PresetHandler::loadPresetValues(std::string name)
