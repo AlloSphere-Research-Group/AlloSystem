@@ -491,6 +491,8 @@ public:
 	 */
 	void registerOSCListener(osc::PacketHandler *handler);
 
+	void notifyAll();
+
 	virtual void onMessage(osc::Message& m);
 
 protected:

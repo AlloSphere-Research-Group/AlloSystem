@@ -204,6 +204,13 @@ void ParameterServer::registerOSCListener(osc::PacketHandler *handler)
 	mParameterLock.unlock();
 }
 
+void ParameterServer::notifyAll()
+{
+	for(Parameter *parameter: mParameters) {
+		notifyListeners(parameter->getFullAddress(), parameter->get());
+	}
+}
+
 void ParameterServer::changeCallback(float value, void *sender, void *userData, void *blockThis)
 {
 	ParameterServer *server = static_cast<ParameterServer *>(userData);
