@@ -39,7 +39,6 @@ public:
     virtual void onDraw(Graphics& g) {
     // Draw VTK stuff
       externalVTKWidget->GetRenderWindow()->Render();
-      glPopAttrib();
       light();
       // say how much lighting you want
       shader().uniform("lighting", 1.0);
