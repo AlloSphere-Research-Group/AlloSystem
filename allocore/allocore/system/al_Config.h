@@ -65,6 +65,16 @@
 	#define AL_API extern
 #endif
 
+#define AL_SNPRINTF snprintf
+#define AL_VSNPRINTF vsnprintf
+
+#ifdef __MINGW32__
+	#undef AL_SNPRINTF
+	#define AL_SNPRINTF _snprintf
+	#undef AL_VSNPRINTF
+	#define AL_VSNPRINTF _vsnprintf
+#endif
+
 /*
 	primitive typedefs
 */
