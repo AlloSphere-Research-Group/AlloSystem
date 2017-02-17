@@ -163,7 +163,7 @@ inline void Font :: renderf(Graphics& g, const char * fmt, ...) {
 	static char line[1024];
 	va_list args;
 	va_start(args, fmt);
-	vsnprintf(line, 1024, fmt, args);
+	AL_VSNPRINTF(line, 1024, fmt, args);
 	va_end(args);
 	render(g, line);
 }
