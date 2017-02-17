@@ -130,7 +130,7 @@ public:
 			// set full screen settings
 			{
 				char buf[32];
-				snprintf(buf, sizeof(buf), "%dx%d:24", sw, sh);
+				AL_SNPRINTF(buf, sizeof(buf), "%dx%d:24", sw, sh);
 				glutGameModeString(buf);
 				//int refresh = glutGameModeGet(GLUT_GAME_MODE_REFRESH_RATE);
 				//printf("%d\n", refresh);

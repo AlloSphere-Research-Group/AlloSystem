@@ -336,7 +336,7 @@ inline void swapBytes(T * data, unsigned count){
 template <class T>
 std::string toString(const char * fmt, const T& v){
 	char buf[32];
-	snprintf(buf, sizeof(buf), fmt, v);
+	AL_SNPRINTF(buf, sizeof(buf), fmt, v);
 	return std::string(buf);
 }
 
