@@ -233,7 +233,7 @@ public:
 	/// For GLSL, the geometry shader must include the line:
 	///		#extension GL_EXT_geometry_shader4 : enable
 	ShaderProgram& setGeometry(Graphics::Primitive inPrim, Graphics::Primitive outPrim, unsigned outVert){
-		mInPrim=inPrim; mOutPrim=outPrim; mOutVertices=i; return *this;
+		mInPrim=inPrim; mOutPrim=outPrim; mOutVertices=outVert; return *this;
 	}
 
 	// These parameters must be set before attaching geometry shaders
