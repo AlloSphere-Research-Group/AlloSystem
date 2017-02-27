@@ -222,10 +222,25 @@ public:
 	bool validateProgram(bool printLog=false) const;
 
 
+	/// Set parameters for geometry shader
+
+	/// @param[in] inPrim	Input primitive to geometry shader
+	/// @param[in] outPrim	Output primitive from geometry shader
+	/// @param[in] outVert	Number of vertices output from geometry shader 
+	///						(note the number of input vertices is always 1)
+	///
+	/// This must be called before attaching the geometry shader.
+	/// For GLSL, the geometry shader must include the line:
+	///		#extension GL_EXT_geometry_shader4 : enable
+	ShaderProgram& setGeometry(Graphics::Primitive inPrim, Graphics::Primitive outPrim, unsigned outVert){
+		mInPrim=inPrim; mOutPrim=outPrim; mOutVertices=i; return *this;
+	}
+
 	// These parameters must be set before attaching geometry shaders
 	ShaderProgram& setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; return *this; }
 	ShaderProgram& setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; return *this; }
-	ShaderProgram& setGeometryOutputVertices(unsigned int i){ mOutVertices = i; return *this; }
+	ShaderProgram& setGeometryOutputVertices(unsigned i){ mOutVertices = i; return *this; }
+
 
 	/// Print out all the input parameters to the shader
 	void listParams() const;
