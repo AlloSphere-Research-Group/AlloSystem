@@ -187,6 +187,9 @@ public:
 
 
 	/// Compile and link shader sources
+
+	/// If called outside of a graphics context, compiling and linking will
+	/// occur once the first time the shader is bound.
 	bool compile(
 		const std::string& vertSource,
 		const std::string& fragSource,
@@ -220,9 +223,9 @@ public:
 
 
 	// These parameters must be set before attaching geometry shaders
-	void setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; }
-	void setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; }
-	void setGeometryOutputVertices(unsigned int i){ mOutVertices = i; }
+	ShaderProgram& setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; return *this; }
+	ShaderProgram& setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; return *this; }
+	ShaderProgram& setGeometryOutputVertices(unsigned int i){ mOutVertices = i; return *this; }
 
 	/// Print out all the input parameters to the shader
 	void listParams() const;
