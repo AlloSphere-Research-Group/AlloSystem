@@ -183,6 +183,10 @@ template <class T> std::string toString(const T& v);
 template <class T>
 std::string toString(const T * v, int num, int stride=1);
 
+/// Convert string to a typed value
+template <class T>
+T fromString(const std::string& v);
+
 /// Convert 32-bit unsigned integer to unit float in [0, 1)
 template<class T> T uintToUnit (uint32_t v);
 
@@ -358,6 +362,14 @@ std::string toString(const T& v){
 	string r;
 	ss >> r;
 	return r;
+}
+
+template <class T>
+T fromString(const std::string& v){
+	T res = T();
+	std::stringstream ss(v);
+	ss >> res;
+	return res;
 }
 
 template<> inline float uintToUnit<float>(uint32_t v){
