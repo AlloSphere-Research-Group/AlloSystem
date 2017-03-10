@@ -349,12 +349,16 @@ void AudioDevice::setImpl(int deviceNum){
 	if (deviceNum >= 0) {
 		initDevices();
 		mImpl = Pa_GetDeviceInfo(deviceNum);
-		mID = deviceNum;
-		strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
-		mName[127] = '\0';
-		mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
-		mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
-		mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
+		if (mImpl) {
+			mID = deviceNum;
+			strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
+			mName[127] = '\0';
+			mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
+			mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
+			mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
+		} else {
+			printf("AudioDevice: Invalid device number %d\n", deviceNum);
+		}
 	}
 }
 AudioDevice AudioDevice::defaultInput(){ return PortAudioBackend::defaultInput(); }
