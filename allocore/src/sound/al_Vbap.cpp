@@ -51,14 +51,28 @@ bool SpeakerTriple::loadVectors(const std::vector<Speaker>& spkrs){
 
 
 
-Vbap::Vbap(const SpeakerLayout &sl)
-    :	Spatializer(sl), mIs3D(true),
-    mNumTriplets(0)
-{}
+Vbap::Vbap(const SpeakerLayout &sl, bool is3D)
+    :	Spatializer(sl), mIs3D(is3D)
+{
+	//Check if 3D...
+	if(mIs3D){
+		printf("Finding triplets\n");
+		findSpeakerTriplets(mSpeakers);
+	}
+	else{
+		printf("Finding pairs\n");
+		findSpeakerPairs(mSpeakers);
+	}
+
+	if (mTriplets.size() == 0 ){
+		printf("No SpeakerSets found. Check mode setting or speaker layout.\n");
+		throw -1;
+	}
+
+}
 
 void Vbap::addTriple(const SpeakerTriple& st) {
 	mTriplets.push_back(st);
-	++mNumTriplets;
 }
 
 Vec3d Vbap::computeGains(const Vec3d& vecA, const SpeakerTriple& speak) {
@@ -158,8 +172,8 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 
 				//Only add triplet if its matrix is invertable
 				if(triplet.loadVectors(spkrs)){
-					triplets.push_back(triplet);
 				}
+				triplets.push_back(triplet);
 			}
 		}
 	}
@@ -383,45 +397,30 @@ void Vbap::makePhantomChannel(int channelIndex, std::vector<int> assignedOutputs
 
 void Vbap::compile(Listener& listener){
 	this->mListener = &listener;
-
-	//Check if 3D...
-	if(mIs3D){
-		printf("Finding triplets\n");
-		findSpeakerTriplets(mSpeakers);
-	}
-	else{
-		printf("Finding pairs\n");
-		findSpeakerPairs(mSpeakers);
-	}
-
-	if (mNumTriplets == 0 ){
-		printf("No SpeakerSets found. Check mode setting or speaker layout.\n");
-		throw -1;
-	}
 }
 
-//Per buffer
-void Vbap::perform(AudioIOData& io,SoundSource& src,Vec3d& relpos,const int& numFrames,float *samples){
-
-	unsigned currentTripletIndex = src.cachedIndex();
+void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float *samples, const int &numFrames)
+{
+	// FIMXE AC use cached index
+//	unsigned currentTripletIndex = src.cachedIndex();
+	unsigned currentTripletIndex = 0;
 	// unsigned currentTripletIndex = mCachedTripletIndex; // Cached source placement, so it starts searching from there.
 
-	Vec3d vec = Vec3d(relpos);
+	Vec3d vec = listeningPose.vec();
 
 	//Rotate vector according to listener-rotation
-	Quatd srcRot = this->mListener->pose().quat();
+	Quatd srcRot = listeningPose.quat();
 	vec = srcRot.rotate(vec);
+	vec = Vec4d(vec.x, vec.z, vec.y);
 
 	//Silent by default
 	Vec3d gains;
-	Vec3d gainsTemp;
 
 	// Search thru the triplets array in search of a match for the source position.
-	for (unsigned count = 0; count < mNumTriplets; ++count) {
-		gainsTemp = computeGains(vec, mTriplets[currentTripletIndex]);
-		if ((gainsTemp[0] >= 0) && (gainsTemp[1] >= 0) && (!mIs3D || (gainsTemp[2] >= 0)) ){
-			gainsTemp.normalize();
-			gains  = gainsTemp/relpos.mag();
+	for (unsigned count = 0; count < mTriplets.size(); ++count) {
+		gains = computeGains(vec, mTriplets[currentTripletIndex]);
+		if ((gains[0] >= 0) && (gains[1] >= 0) && (!mIs3D || (gains[2] >= 0)) ){
+			gains.normalize();
 
 			SpeakerTriple triple = mTriplets[currentTripletIndex];
 
@@ -474,42 +473,43 @@ void Vbap::perform(AudioIOData& io,SoundSource& src,Vec3d& relpos,const int& num
 		}
 
 		++currentTripletIndex;
-		if (currentTripletIndex >= mNumTriplets){
+		if (currentTripletIndex >= mTriplets.size()){
 			currentTripletIndex = 0;
 		}
 	}
-
-	src.cachedIndex(currentTripletIndex);
+	// FIXME AC store cached index
+//	src.cachedIndex(currentTripletIndex);
 	//mCachedTripletIndex = currentTripletIndex; // Store the new index
 }
 
-//per sample
-void Vbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
-
-	unsigned currentTripletIndex = src.cachedIndex();
+void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, const float &sample, const int &frameIndex)
+{
+	// FIXME AC use cached index
+//	unsigned currentTripletIndex = src.cachedIndex();
 	//unsigned currentTripletIndex = mCachedTripletIndex; // Cached source placement, so it starts searching from there.
-
-	Vec3d vec = Vec3d(relpos);
+	unsigned currentTripletIndex = 0;
+	Vec3d vec = listeningPose.vec();
 
 	//Rotate vector according to listener-rotation
-	Quatd srcRot = this->mListener->pose().quat();
-	vec = srcRot.rotate(vec);
+	Quatd srcRot = listeningPose.quat();
+	vec = srcRot.rotate(vec).normalize();
 
+	// now transform to audio positions
+	vec = Vec4d(vec.x, vec.z, vec.y);
 	//Silent by default
 	Vec3d gains;
-	Vec3d gainsTemp;
+//	Vec3d gainsTemp;
 
 	// Search thru the triplets array in search of a match for the source position.
-	for (unsigned count = 0; count < mNumTriplets; ++count) {
-		gainsTemp = computeGains(vec, mTriplets[currentTripletIndex]);
-		if ((gainsTemp[0] >= 0) && (gainsTemp[1] >= 0) && (!mIs3D || (gainsTemp[2] >= 0)) ){
-			gainsTemp.normalize();
-			gains = gainsTemp*sample/relpos.mag();
+	for (unsigned count = 0; count < mTriplets.size(); ++count) {
+		gains = computeGains(vec, mTriplets[currentTripletIndex]);
+		if ((gains[0] >= 0) && (gains[1] >= 0) && (!mIs3D || (gains[2] >= 0)) ){
+			gains.normalize();
 			break;
 		}
 
 		++currentTripletIndex;
-		if (currentTripletIndex >= mNumTriplets){
+		if (currentTripletIndex >= mTriplets.size()){
 			currentTripletIndex = 0;
 		}
 	}
@@ -517,8 +517,8 @@ void Vbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 	SpeakerTriple triple = mTriplets[currentTripletIndex];
 
 	//mCachedTripletIndex = currentTripletIndex; // Store the new index
-
-	src.cachedIndex(currentTripletIndex);
+	// FIXME stored cached index
+//	src.cachedIndex(currentTripletIndex);
 
 	// Check if any of the triplets are phantom channels and
 	// reassign signal
@@ -554,13 +554,32 @@ void Vbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 	}
 }
 
+////Per buffer
+//void Vbap::perform(AudioIOData& io,SoundSource& src,Vec3d& relpos,const int& numFrames,float *samples){
+
+//}
+
+////per sample
+//void Vbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
+
+//}
+
 void Vbap::print() {
 	printf("Number of Triplets: %d\n", (int) mTriplets.size());
-	//    for (unsigned i = 0; i < mNumTriplets; i++) {
 	for (unsigned i = 0; i < mTriplets.size(); i++) {
 		printf("Triple #%02d: %d,%d,%d \n",i,mTriplets[i].s1Chan,mTriplets[i].s2Chan,mTriplets[i].s3Chan);
 		printf("    number: %d,%d,%d \n",mTriplets[i].s1,mTriplets[i].s2,mTriplets[i].s3);
 	}
+}
+
+void Vbap::makeTriple(int s1, int s2, int s3)
+{
+	SpeakerTriple triple;
+	triple.s1 = s1;
+	triple.s2 = s2;
+	triple.s3 = s3;
+	triple.loadVectors(mSpeakers);
+	addTriple(triple);
 }
 
 std::vector<SpeakerTriple> Vbap::triplets() const

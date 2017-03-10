@@ -83,22 +83,7 @@ class Vbap : public Spatializer{
 public:
 
 	/// @param[in] sl	A speaker layout
-	Vbap(const SpeakerLayout &sl);
-
-	/// Add triplet of speakers
-	void addTriple(const SpeakerTriple& st);
-
-	void setIs3D(bool is3D){mIs3D = is3D;}
-
-	Vec3d computeGains(const Vec3d& vecA, const SpeakerTriple& speak);
-
-	/// 2D VBAP, Build internal list of speaker pairs
-	void findSpeakerPairs(const std::vector<Speaker>& spkrs);
-
-	bool isCrossing(Vec3d c, Vec3d li, Vec3d lj, Vec3d ln, Vec3d lm);
-
-	/// 3D VBAP, build list of internal speaker triplets
-	void findSpeakerTriplets(const std::vector<Speaker>& spkrs);
+	Vbap(const SpeakerLayout &sl, bool is3D = false);
 
 	///
 	/// \brief Make an existing channel a phantom channel
@@ -113,13 +98,16 @@ public:
 	///
 	void makePhantomChannel(int channelIndex, std::vector<int> assignedOutputs);
 
-	void compile(Listener& listener);
+	virtual void compile(Listener& listener) override;
 
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
+	virtual void renderSample(AudioIOData& io, const Pose& reldir, const float& sample, const int& frameIndex) override;
+	virtual void renderBuffer(AudioIOData& io, const Pose& reldir, const float *samples, const int& numFrames) override;
 
-	void perform(AudioIOData& io,SoundSource& src,Vec3d& relpos,const int& numFrames,float *samples);
+	virtual void print() override;
 
-	void print();
+	/// Manually add a triple from indeces to speakers
+	void makeTriple(int s1, int s2, int s3 = -1);
+
 
 	//Returns vector of triplets
 	std::vector<SpeakerTriple> triplets() const;
@@ -127,9 +115,24 @@ public:
 private:
 	std::vector<SpeakerTriple> mTriplets;
 	std::map<int, std::vector<int> > mPhantomChannels;
-	unsigned mNumTriplets;
 	Listener* mListener;
 	bool mIs3D;
+
+	//	void setIs3D(bool is3D){mIs3D = is3D;}
+
+	Vec3d computeGains(const Vec3d& vecA, const SpeakerTriple& speak);
+
+	/// 2D VBAP, Build internal list of speaker pairs
+	void findSpeakerPairs(const Speakers& spkrs);
+
+	/// 3D VBAP, build list of internal speaker triplets
+	void findSpeakerTriplets(const Speakers& spkrs);
+
+	bool isCrossing(Vec3d c, Vec3d li, Vec3d lj, Vec3d ln, Vec3d lm);
+
+	/// Manually add triplet of speakers, in case not set automatically
+	void addTriple(const SpeakerTriple& st);
+
 };
 
 } // al::

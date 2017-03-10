@@ -196,5 +196,22 @@ private:
 typedef SpeakerRingLayout<8> OctalSpeakerLayout;
 
 
+/// Generic layout of 8 speakers arranged in a cube with listener in the middle
+///
+/// @ingroup allocore
+class CubeLayout : public SpeakerLayout {
+public:
+
+	CubeLayout(int deviceChannelStart=0)
+	{
+		mSpeakers.reserve(8);
+		for(int i=0; i<4; ++i) {
+			addSpeaker(Speaker(i+deviceChannelStart, 45 + (i * 90), 0));
+			addSpeaker(Speaker(4 + i+deviceChannelStart, 45 + (i * 90), 60, sqrt(5)));
+		}
+	}
+};
+
+
 } // al::
 #endif
