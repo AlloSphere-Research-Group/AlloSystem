@@ -29,6 +29,8 @@ LINK_LIBS_PATH  = $(wildcard $(BUILD_DIR)lib/*.$(SLIB_EXT))
 LINK_LIBS_PATH += $(wildcard $(BUILD_DIR)lib/*.$(DLIB_EXT))
 LINK_LIBS_FLAGS =
 
+ALL_CXXFLAGS := $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
+
 # Compile and run source files in examples/ folder
 # For whatever reason, we need this rule so the objects don't get rm'ed by make
 runobjs: $(RUN_OBJS)
@@ -47,7 +49,7 @@ $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.t
 $(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_PATH="\"$(realpath $(@D))/\""
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	$(CXX) $(RUN_CPPFLAGS) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
+	$(CXX) $(RUN_CPPFLAGS) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
