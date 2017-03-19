@@ -33,6 +33,11 @@ if files_exist /msys.bat; then
 	done
 	#echo $LIBS
 
+else if $(uname) -eq Darwin
+	LIBNAMES="`otool -L $BUILDDIR/bin/${EXENAME} | grep dylib`"
+	echo $LIBNAMES
+	exit
+
 else
 	echo "Error: Could not build standalone. Platform not supported."
 	exit
