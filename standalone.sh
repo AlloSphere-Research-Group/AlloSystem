@@ -14,13 +14,15 @@ files_exist(){
 
 BUILDDIR="build"
 EXENAME=$(basename "$1" | cut -d. -f1)
+BUILDEXEBASE=$BUILDDIR/bin/$EXENAME
 EXEDIR="$BUILDDIR/$EXENAME"
 LIBS=
+COPY=cp -u
 
 # MSYS
 if files_exist /msys.bat; then
 
-	LIBNAMES="`objdump -p $BUILDDIR/bin/${EXENAME}.exe | grep "DLL Name"`"
+	LIBNAMES="`objdump -p ${BUILDEXEBASE}.exe | grep "DLL Name"`"
 	LIBNAMES="${LIBNAMES//DLL Name: /}"
 	#echo $LIBNAMES
 	LIBDIRS="/mingw/bin/ /usr/local/bin/"
@@ -33,10 +35,14 @@ if files_exist /msys.bat; then
 	done
 	#echo $LIBS
 
-else if $(uname) -eq Darwin
-	LIBNAMES="`otool -L $BUILDDIR/bin/${EXENAME} | grep dylib`"
-	echo $LIBNAMES
-	exit
+elif uname | grep -q Darwin; then
+	LIBNAMES="`otool -L $BUILDEXEBASE | grep '/local/' | cut -d " " -f1`"
+	#echo $LIBNAMES
+	for lib in $LIBNAMES; do
+		install_name_tool -change $lib @executable_path/${lib##*/} $BUILDEXEBASE
+	done
+	LIBS=$LIBNAMES
+	COPY=cp
 
 else
 	echo "Error: Could not build standalone. Platform not supported."
@@ -44,7 +50,7 @@ else
 fi
 
 mkdir -p $EXEDIR
-cp -u $LIBS $EXEDIR
-mv $BUILDDIR/bin/$EXENAME $EXEDIR
+$COPY $LIBS $EXEDIR
+mv $BUILDEXEBASE $EXEDIR
 
 echo "Created standalone in $EXEDIR/"
