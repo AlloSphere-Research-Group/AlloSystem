@@ -32,25 +32,23 @@ public:
 
 	static const int Nx = 256, Ny = Nx;
 	float wave[Nx*Ny*2];// Values of wave for current and previous time step
-	int zcurr;			// The current "plane" coordinate representing time
-	float decay;		// Decay factor of waves, in (0, 1]
-	float velocity;		// Velocity of wave propagation, in (0, 0.5]
+	int zcurr=0;		// The current "plane" coordinate representing time
+	float decay=0.96;	// Decay factor of waves, in (0, 1]
+	float velocity=0.5;	// Velocity of wave propagation, in (0, 0.5]
 
 	Mesh mesh;
 	Light light;
 	Material mtrl;
 
 
-	MyApp()
-	:	zcurr(0), decay(0.96), velocity(0.5)
-	{
-		for(int i=0; i<Nx*Ny*2; ++i) wave[i] = 0;
+	MyApp(){
+		for(auto& v : wave) v = 0;
 
 		// Add a tessellated plane
 		addSurface(mesh, Nx,Ny);
 		mesh.color(HSV(0.6, 0.2, 0.9));
 
-		nav().pos(0,0,4);
+		nav().pullBack(4);
 		initWindow();
 	}
 
@@ -94,15 +92,15 @@ public:
 			int jp1 = j!=Nx-1 ? j+1 : 0;
 
 			// Get neighborhood of samples
-			float vp = wave[indexAt(i,j,zprev)];	// previous value
-			float vc = wave[indexAt(i,j,zcurr)];	// current value
-			float vl = wave[indexAt(im1,j,zcurr)];	// neighbor left
-			float vr = wave[indexAt(ip1,j,zcurr)];	// neighbor right
-			float vd = wave[indexAt(i,jm1,zcurr)];	// neighbor up
-			float vu = wave[indexAt(i,jp1,zcurr)];	// neighbor down
+			auto vp = wave[indexAt(i,j,zprev)];		// previous value
+			auto vc = wave[indexAt(i,j,zcurr)];		// current value
+			auto vl = wave[indexAt(im1,j,zcurr)];	// neighbor left
+			auto vr = wave[indexAt(ip1,j,zcurr)];	// neighbor right
+			auto vd = wave[indexAt(i,jm1,zcurr)];	// neighbor up
+			auto vu = wave[indexAt(i,jp1,zcurr)];	// neighbor down
 
 			// Compute next value of wave equation at (i,j)
-			float val = 2*vc - vp + velocity*((vl - 2*vc + vr) + (vd - 2*vc + vu));
+			auto val = 2*vc - vp + velocity*((vl - 2*vc + vr) + (vd - 2*vc + vu));
 
 			// Store in previous value since we don't need it again
 			wave[indexAt(i,j,zprev)] = val * decay;

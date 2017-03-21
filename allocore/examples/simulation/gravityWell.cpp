@@ -22,6 +22,7 @@ public:
 	Vec3f acc;
 
 	void update(double dt){
+		// Semi-implicit Euler method:
 		vel += acc * dt;
 		pos += vel * dt;
 	}
@@ -55,15 +56,15 @@ public:
 	void reset(int preset='1'){
 		switch(preset){
 		case '1': // dust cloud
-			for(int i=0; i<N; ++i){
-				particles[i].pos = rnd::ball<Vec3f>()*0.2 + Vec3f(-0.7,0,0);
-				particles[i].vel = Vec3f(0,-0.3,0);
+			for(auto& p : particles){
+				p.pos = rnd::ball<Vec3f>()*0.2 + Vec3f(-0.7,0,0);
+				p.vel = Vec3f(0,-0.3,0);
 			}
 			break;
 		case '2': // hourglass
-			for(int i=0; i<N; ++i){
-				particles[i].pos = rnd::ball<Vec3f>().mag(1);
-				particles[i].vel = clone(particles[i].pos).rotate(M_PI/2)*Vec3f(1,1,-1)*0.2;
+			for(auto& p : particles){
+				p.pos = rnd::ball<Vec3f>().mag(1);
+				p.vel = clone(p.pos).rotate(M_PI/2)*Vec3f(1,1,-1)*0.2;
 			}
 			break;
 		case '3': // line orbit 1
@@ -97,21 +98,19 @@ public:
 	void onAnimate(double dt){
 
 		// Compute forces
-		for(int i=0; i<N; ++i){
+		for(auto& p : particles){
 			// Newton's law of gravity
-			Vec3f r21 = well.pos - particles[i].pos;
-			float dist = r21.mag();
-			dist = al::max(dist, 0.1f); // prevent high velocities
-			Vec3f F = r21/(dist*dist*dist);
+			auto r21 = well.pos - p.pos;	// distance vector between well and particle
+			auto dist = r21.mag();			// distance between well and particle
+			dist = al::max(dist, 0.1f);		// prevent high velocities
+			auto F = r21/(dist*dist*dist);	// force vector acting on particle
 
-			// Newton's second law of motion, F = ma
-			particles[i].acc = F * 0.1;
+			// Newton's second law of motion, F = ma -> a = F/m
+			p.acc = F * (1./10); // mass of particle is 10
 		}
 
 		// Update particles
-		for(int i=0; i<N; ++i){
-			particles[i].update(dt);
-		}
+		for(auto& p : particles) p.update(dt);
 	}
 
 	void onDraw(Graphics& g){
@@ -130,9 +129,9 @@ public:
 		g.draw(body2);
 
 		// Draw the particles
-		for(int i=0; i<N; ++i){
+		for(auto& p : particles){
 			g.pushMatrix();
-			g.translate(particles[i].pos);
+			g.translate(p.pos);
 			g.draw(body1);
 			g.popMatrix();
 		}

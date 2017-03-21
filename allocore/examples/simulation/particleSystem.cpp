@@ -14,34 +14,33 @@ using namespace al;
 
 struct Particle{
 
-	Particle(): age(0){}
+	Vec3f pos, vel, acc;
+	int age = 0;
 
 	void update(int ageInc){
 		vel += acc;
 		pos += vel;
 		age += ageInc;
 	}
-
-	Vec3f pos, vel, acc;
-	int age;
 };
 
 
 template <int N>
 struct Emitter {
 
-	Emitter(): tap(0){
-		for(int i=0; i<N; ++i) particles[i].age=N;
+	Particle particles[N];
+	int tap = 0;
+
+	Emitter(){
+		for(auto& p : particles) p.age=N;
 	}
 
 	template <int M>
 	void update(){
-		for(int i=0; i<N; ++i){
-			particles[i].update(M);
-		}
+		for(auto& p : particles) p.update(M);
 
 		for(int i=0; i<M; ++i){
-			Particle& p = particles[tap];
+			auto& p = particles[tap];
 
 			// fountain
 			if(rnd::prob(0.95)){
@@ -55,16 +54,12 @@ struct Emitter {
 			}
 			p.pos.set(4,-2,0);
 
-
 			p.age = 0;
 			++tap; if(tap>=N) tap=0;
 		}
 	}
 
 	int size(){ return N; }
-
-	Particle particles[N];
-	int tap;
 };
 
 
@@ -75,7 +70,7 @@ public:
 	Mesh mesh;
 
 	MyApp(){
-		nav().pos(0,0,16);
+		nav().pullBack(16);
 		initWindow();
 	}
 
@@ -90,7 +85,7 @@ public:
 			float age = float(p.age) / em1.size();
 
 			mesh.vertex(p.pos);
-			mesh.color(Color(HSV(0.6, rnd::uniform(), 1-age), 0.4));
+			mesh.color(HSV(0.6, rnd::uniform(), (1-age)*0.4));
 		}
 	}
 
