@@ -15,12 +15,11 @@ using namespace al;
 class MyApp : public App{
 public:
 
-	RingBuffer<Vec3f> A;
+	RingBuffer<Vec3f> A{8000};
 	Mesh vert;
 
-	MyApp(): A(8000)
-	{
-		nav().pos(0,0,4);
+	MyApp(){
+		nav().pullBack(4);
 		initWindow();
 		window().displayMode(window().displayMode() | Window::MULTISAMPLE);
 	}
@@ -28,12 +27,11 @@ public:
 	void onAnimate(double dt){
 
 		for(int i=0; i<4; ++i){
-			Vec3f p;
-			rnd::ball<3>(p.elems());
+			auto p = rnd::ball<Vec3f>();
 
-			float r = p.magSqr();
+			float mm= p.magSqr();
 			float l = 0.04;				// spread of steps; lower is more flighty
-			float v = l/(r+l*l) * 0.1;	// map uniform to Cauchy distribution
+			float v = l/(mm+l*l) * 0.1;	// map uniform to Cauchy distribution
 
 			p = p.normalized() * v;
 			p += A.newest();
