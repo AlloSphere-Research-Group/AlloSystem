@@ -116,6 +116,18 @@ Texture& Texture::filterMin(Filter v){
 }
 
 Texture& Texture::filterMag(Filter v){
+	// Mip-map not sensible for mag filter, so set to best match
+	switch(v){
+	case NEAREST_MIPMAP_NEAREST:
+	case NEAREST_MIPMAP_LINEAR:
+		v = NEAREST;
+		break;
+	case LINEAR_MIPMAP_NEAREST:
+	case LINEAR_MIPMAP_LINEAR:
+		v = LINEAR;
+		break;
+	default:;
+	}
 	return update(v, mFilterMag, mParamsUpdated);
 }
 
