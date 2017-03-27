@@ -668,13 +668,12 @@ LHCS
 
 template<typename T>
 void Quat<T> :: toMatrix(T * m) const {
-	Vec<3,T> ux,uy,uz;
+	auto& ux = Vec<3,T>::pun(m  );
+	auto& uy = Vec<3,T>::pun(m+4);
+	auto& uz = Vec<3,T>::pun(m+8);
 	toCoordinateFrame(ux,uy,uz);
-
-	m[ 0] = ux[0];	m[ 4] = uy[0];	m[ 8] = uz[0];	m[12] = 0;
-	m[ 1] = ux[1];	m[ 5] = uy[1];	m[ 9] = uz[1];	m[13] = 0;
-	m[ 2] = ux[2];	m[ 6] = uy[2];	m[10] = uz[2];	m[14] = 0;
-	m[ 3] = 0;		m[ 7] = 0;		m[11] = 0;		m[15] = 1;
+	m[ 3] = m[ 7] = m[11] = m[12] = m[13] = m[14] = T(0);
+	m[15] = T(1);
 }
 
 // Note: same as toMatrix, but with matrix indices transposed
