@@ -265,6 +265,9 @@ public:
 	/// Set as versor rotated by YXZ Euler angles, in radians
 	Quat& fromEuler(const T& az, const T& el, const T& ba);
 
+	/// Set from coordinate frame unit vectors
+	Quat& fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz);
+
 	/// Set as versor from column-major 4-by-4 projective space transformation matrix
 	Quat& fromMatrix(const T * matrix);
 
@@ -489,75 +492,61 @@ Quat<T>& Quat<T>::fromEuler(const T& az, const T& el, const T& ba){
 }
 
 template<typename T>
-Quat<T>& Quat<T> :: fromMatrix(const T * m) {
-	T trace = m[0]+m[5]+m[10];
-	w = sqrt(1. + trace)*0.5;
+Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz){
+	auto trace = ux[0]+uy[1]+uz[2];
 
-	if(trace > 0.) {
-		x = (m[9] - m[6])/(4.*w);
-		y = (m[2] - m[8])/(4.*w);
-		z = (m[4] - m[1])/(4.*w);
+	if(trace > T(0)) {
+		w = sqrt(T(1) + trace)*T(0.5);
+		auto c = T(1)/(T(4)*w);
+		x = (uz[1] - uy[2])*c;
+		y = (ux[2] - uz[0])*c;
+		z = (uy[0] - ux[1])*c;
 	}
 	else {
-		if(m[0] > m[5] && m[0] > m[10]) {
-			// m[0] is greatest
-			x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
-			w = (m[9] - m[6])/(4.*x);
-			y = (m[4] + m[1])/(4.*x);
-			z = (m[8] + m[2])/(4.*x);
+		if(ux[0] > uy[1] && ux[0] > uz[2]) {
+			// ux[0] is greatest
+			x = sqrt(T(1) + ux[0]-uy[1]-uz[2])*T(0.5);
+			auto c = T(1)/(T(4)*x);
+			w = (uz[1] - uy[2])*c;
+			y = (uy[0] + ux[1])*c;
+			z = (uz[0] + ux[2])*c;
 		}
-		else if(m[5] > m[0] && m[5] > m[10]) {
-			// m[1] is greatest
-			y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
-			w = (m[2] - m[8])/(4.*y);
-			x = (m[4] + m[1])/(4.*y);
-			z = (m[9] + m[6])/(4.*y);
+		else if(uy[1] > ux[0] && uy[1] > uz[2]) {
+			// ux[1] is greatest
+			y = sqrt(T(1) + uy[1]-ux[0]-uz[2])*T(0.5);
+			auto c = T(1)/(T(4)*y);
+			w = (ux[2] - uz[0])*c;
+			x = (uy[0] + ux[1])*c;
+			z = (uz[1] + uy[2])*c;
 		}
-		else { //if(m[10] > m[0] && m[10] > m[5]) {
-			// m[2] is greatest
-			z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
-			w = (m[4] - m[1])/(4.*z);
-			x = (m[8] + m[2])/(4.*z);
-			y = (m[9] + m[6])/(4.*z);
+		else { //if(uz[2] > ux[0] && uz[2] > uy[1]) {
+			// ux[2] is greatest
+			z = sqrt(T(1) + uz[2]-ux[0]-uy[1])*T(0.5);
+			auto c = T(1)/(T(4)*z);
+			w = (uy[0] - ux[1])*c;
+			x = (uz[0] + ux[2])*c;
+			y = (uz[1] + uy[2])*c;
 		}
 	}
 	return *this;
 }
 
 template<typename T>
-Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
-	T trace = m[0]+m[5]+m[10];
-	w = sqrt(1. + trace)*0.5;
+Quat<T>& Quat<T> :: fromMatrix(const T * m) {
+	return fromCoordinateFrame(
+		Vec<3,T>::pun(m  ),
+		Vec<3,T>::pun(m+4),
+		Vec<3,T>::pun(m+8)
+	);
+}
 
-	if(trace > 0.) {
-		x = (m[6] - m[9])/(4.*w);
-		y = (m[8] - m[2])/(4.*w);
-		z = (m[1] - m[4])/(4.*w);
-	}
-	else {
-		if(m[0] > m[5] && m[0] > m[10]) {
-			// m[0] is greatest
-			x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
-			w = (m[6] - m[9])/(4.*x);
-			y = (m[1] + m[4])/(4.*x);
-			z = (m[2] + m[8])/(4.*x);
-		}
-		else if(m[5] > m[0] && m[5] > m[10]) {
-			// m[1] is greatest
-			y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
-			w = (m[8] - m[2])/(4.*y);
-			x = (m[1] + m[4])/(4.*y);
-			z = (m[6] + m[9])/(4.*y);
-		}
-		else { //if(m[10] > m[0] && m[10] > m[5]) {
-			// m[2] is greatest
-			z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
-			w = (m[1] - m[4])/(4.*z);
-			x = (m[2] + m[8])/(4.*z);
-			y = (m[6] + m[9])/(4.*z);
-		}
-	}
-	return *this;
+template<typename T>
+Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
+	return fromCoordinateFrame(
+		Vec<3,T>(m[0],m[4],m[ 8]),
+		Vec<3,T>(m[1],m[5],m[ 9]),
+		Vec<3,T>(m[2],m[6],m[10])
+	);
 }
 
 template<typename T>
