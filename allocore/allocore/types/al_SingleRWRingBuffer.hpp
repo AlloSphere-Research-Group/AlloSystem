@@ -92,7 +92,10 @@ public:
 
     /** Clear any data in the ringbuffer
 	*/
-	void clear();
+    void clear()
+    {
+        mRead = mWrite;
+    }
 
 protected:
 
@@ -199,10 +202,7 @@ inline size_t SingleRWRingBuffer :: peek(char * dst, size_t sz) {
     return sz;
 }
 
-void SingleRWRingBuffer::clear()
-{
-    mRead = mWrite;
-}
+
 
 
 } // al::
