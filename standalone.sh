@@ -17,7 +17,7 @@ EXENAME=$(basename "$1" | cut -d. -f1)
 BUILDEXEBASE=$BUILDDIR/bin/$EXENAME
 EXEDIR="$BUILDDIR/$EXENAME"
 LIBS=
-COPY=cp -u
+COPY="cp -u"
 
 # MSYS
 if files_exist /msys.bat; then
@@ -42,7 +42,7 @@ elif uname | grep -q Darwin; then
 		install_name_tool -change $lib @executable_path/${lib##*/} $BUILDEXEBASE
 	done
 	LIBS=$LIBNAMES
-	COPY=cp
+	COPY="cp"
 
 else
 	echo "Error: Could not build standalone. Platform not supported."
