@@ -242,7 +242,7 @@ void RenderToDisk::stop(){
 
 
 void RenderToDisk::saveScreenshot(unsigned w, unsigned h, unsigned l, unsigned b){
-	makePath();
+	if(mPath.empty()) makePath();
 	saveImage(w,h,l,b, /*usePBO=*/false);
 }
 
