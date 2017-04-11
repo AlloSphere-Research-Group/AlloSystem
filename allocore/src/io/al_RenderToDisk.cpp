@@ -255,7 +255,7 @@ void RenderToDisk::makePath(){
 	// If no user path specified, create default with time string
 	if(mUserPath.empty()){
 		mPath = "./render";
-		mPath += al::toString((unsigned long long)(al::timeNow()*1000) % 31536000000ull);
+		mPath += al::timecodeNow("DHMS");
 	}
 	else{
 		mPath = mUserPath;
