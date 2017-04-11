@@ -524,6 +524,12 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 	Vec<3,T> r;	cross(r,a,b); return r;
 }
 
+/// Returns dot product
+template <class T>
+inline T dot(const Vec<3,T>& a, const Vec<3,T>& b){
+	return a.dot(b);
+}
+
 /// Rotate a vector around a normal vector
 
 /// @param[in,out]	vec		The vector to rotate

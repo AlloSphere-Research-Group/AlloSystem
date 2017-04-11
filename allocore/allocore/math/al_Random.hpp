@@ -121,6 +121,21 @@ public:
 	template <class VecType>
 	VecType ball(){ VecType v; ball(v); return v; }
 
+	/// Returns point within a unit n-cube
+
+	/// \tparam		N		dimensions of cube
+	/// @param[in]	point	an array of size N
+	template <int N, class T>
+	void cube(T * point);
+
+	/// Returns point within a unit n-cube
+	template <template<int,class> class VecType, int N, class T>
+	void cube(VecType<N,T>& point){ cube<N>(&point[0]); }
+
+	/// Returns point within a unit n-cube
+	template <class VecType>
+	VecType cube(){ VecType v; cube(v); return v; }
+
 	/// Returns standard normal variate
 	float normal(){ float r; normal(r,r); return r; }
 
@@ -310,11 +325,26 @@ inline void ball(T * point){ global().ball<N>(point); }
 
 /// Returns point within a unit ball
 template <template<int,class> class VecType, int N, class T>
-inline void ball(VecType<N,T>& point){ ball<N>(&point[0]); }
+inline void ball(VecType<N,T>& point){ global().ball(point); }
 
 /// Returns point within a unit ball
 template <class VecType>
-inline VecType ball(){ VecType v; ball(v); return v; }
+inline VecType ball(){ return global().ball<VecType>(); }
+
+/// Returns point within a unit n-cube
+
+/// \tparam		N		dimensions of cube
+/// @param[in]	point	an array of size N
+template <int N, class T>
+inline void cube(T * point){ global().cube<N>(point); }
+
+/// Returns point within a unit n-cube
+template <template<int,class> class VecType, int N, class T>
+inline void cube(VecType<N,T>& point){ global().cube(point); }
+
+/// Returns point within a unit n-cube
+template <class VecType>
+inline VecType cube(){ return global().cube<VecType>(); }
 
 /// Returns standard normal variate
 inline float normal(){ return global().normal(); }
@@ -396,6 +426,12 @@ void Random<RNG>::ball(T * point){
 			w += v*v;
 		}
 	} while(w >= T(1)); // if on or outside unit ball, try again
+}
+
+template <class RNG>
+template <int N, class T>
+inline void Random<RNG>::cube(T * point){
+	for(int i=0; i<N; ++i) point[i] = uniform();
 }
 
 // Box-Muller transform
