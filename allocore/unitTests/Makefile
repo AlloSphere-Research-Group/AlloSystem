@@ -32,7 +32,7 @@ include ../../Makefile.rules
 test: unitTests.cpp $(LIB_PATH)
 #	@echo $(LINK_LIBS_FLAGS)
 #	@echo LDFLAGS: $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) $^ $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) -o $(BIN_DIR)unitTests
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) -o $(BIN_DIR)unitTests
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./unitTests
 endif
