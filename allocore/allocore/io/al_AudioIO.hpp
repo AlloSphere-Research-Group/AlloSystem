@@ -59,6 +59,13 @@ typedef void (* audioCallback)(AudioIOData& io);
 class AudioDevice: public AudioDeviceInfo {
 public:
 
+	/// Stream mode
+	enum StreamMode{
+		INPUT	= 1,	/**< Input stream */
+		OUTPUT	= 2		/**< Output stream */
+	};
+
+
 	/// @param[in] deviceNum	Device enumeration number
 	AudioDevice(int deviceNum = -1);
 
@@ -84,6 +91,10 @@ protected:
 	const void * mImpl;
 };
 
+inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
+	return static_cast<AudioDevice::StreamMode>(+a|+b);
+}
+
 /// Audio input/output streaming
 ///
 /// @ingroup allocore
@@ -105,7 +116,7 @@ public:
 	AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
 			void (* callback)(AudioIOData &) = 0, void * userData = 0,
 			int outChans = 2, int inChans = 0,
-			int backend = PORTAUDIO
+			AudioIO::Backend backend = PORTAUDIO
 			);
 
 	virtual ~AudioIO();
@@ -115,6 +126,8 @@ public:
 	/// Add an AudioCallback handler (internal callback is always called first)
 	AudioIO& append(AudioCallback& v);
 	AudioIO& prepend(AudioCallback& v);
+	AudioIO& insertBefore(AudioCallback& v);
+	AudioIO& insertAfter(AudioCallback& v);
 
 	/// Remove all input event handlers matching argument
 	AudioIO& remove(AudioCallback& v);
