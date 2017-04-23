@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../allocore/al_Allocore.hpp"
+#include "allocore/al_Allocore.hpp"
 
 #ifdef AL_UT_NOPRINT	/* disable printing to stdout */
 	#define UT_PRINTF	//
