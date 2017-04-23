@@ -206,8 +206,7 @@ Thread& Thread::priority(int v){
 }
 
 bool Thread::start(void * (*threadFunc)(void * userData), void * userData){
-	// FIXME: this can cause crash!!! since pointers are copied???
-	return start([&](){ threadFunc(userData); });
+	return start([threadFunc,userData](){ threadFunc(userData); });
 }
 
 bool Thread::start(std::function<void (void)> func){
