@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "allocore/al_Allocore.hpp"
+#include "../allocore/al_Allocore.hpp"
 
 #ifdef AL_UT_NOPRINT	/* disable printing to stdout */
 	#define UT_PRINTF	//
@@ -16,6 +16,7 @@
 
 using namespace al;
 
+int utAudioScene();
 int utIOAudioIO();
 int utIOSocket();
 int utIOWindowGL();
@@ -32,7 +33,10 @@ int utTypesConversion();
 int utThread();
 int utFile();
 int utAsset();
+int utAmbisonics();
 
 SearchPaths& getSearchPaths();
+
+bool almostEqual(float v1, float v2);
 
 #endif

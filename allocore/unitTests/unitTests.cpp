@@ -1,7 +1,12 @@
 #include "utAllocore.h"
 
+
 SearchPaths searchpaths;
 SearchPaths& getSearchPaths() { return searchpaths; }
+
+bool almostEqual(float v1, float v2) {
+	return abs(v1 -v2) < 0.00001;
+}
 
 int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
@@ -37,8 +42,11 @@ int main (int argc, char * const argv[]) {
 
 #ifndef ALLOCORE_TESTS_NO_AUDIO
 	RUNTEST(IOAudioIO);
+	RUNTEST(AudioScene);
 #endif
 
+	RUNTEST(Ambisonics);
+	
 #ifndef ALLOCORE_TESTS_NO_GUI
 	// This test should always be run last since it calls exit()
 	// This test will not run on headless machines.
