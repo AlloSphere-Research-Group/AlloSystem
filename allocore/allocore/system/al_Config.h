@@ -56,9 +56,7 @@
 #if !defined(AL_WINDOWS) && (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__WINDOWS_MM__))
 	#define AL_WINDOWS 1
 #elif !defined(AL_OSX) && (defined(__APPLE__) && defined(__MACH__))
-	#ifndef AL_OSX
 	#define AL_OSX 1
-	#endif
 #elif !defined(AL_LINUX)
 	#define AL_LINUX 1
 #endif
