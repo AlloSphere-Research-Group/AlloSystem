@@ -165,15 +165,15 @@ al_nsec al_steady_time_nsec(){
 
 
 void al_sleep(al_sec v) {
-	time_t sec = (time_t)v;
-	al_nsec nsec = al_time_s2ns * (v - (al_sec)sec);
-	timespec tspec = { sec, nsec };
+	time_t sec = time_t(v);
+	al_nsec nsec = al_time_s2ns * (v - al_sec(sec));
+	timespec tspec = { sec, long(nsec) };
 	while (nanosleep(&tspec, &tspec) == -1)
 		continue;
 }
 
 void al_sleep_nsec(al_nsec v) {
-	al_sleep((al_sec)v * al_time_ns2s);
+	al_sleep(al_sec(v) * al_time_ns2s);
 }
 
 #endif
