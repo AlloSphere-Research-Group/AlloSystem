@@ -55,6 +55,12 @@ void File::getSize(){
 	mSizeBytes = r;
 }
 
+bool File::open(const std::string& path_, const std::string& mode_){
+	path(path_);
+	mode(mode_);
+	return open();
+}
+
 bool File::open(){
 	if(0 == mFP){
 		mFP = fopen(path().c_str(), mode().c_str());

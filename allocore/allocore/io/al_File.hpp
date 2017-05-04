@@ -116,19 +116,30 @@ class File{
 public:
 
 	/// @param[in] path		path of file
-	/// @param[in] mode		i/o mode w, r, wb, rb
+	/// @param[in] mode		i/o mode "w", "r", "wb", "rb"
 	/// @param[in] open		whether to open the file
-	File(const std::string& path, const std::string& mode="r", bool open=false);
+	File(const std::string& path=".", const std::string& mode="r", bool open=false);
 	File(const FilePath& path, const std::string& mode="r", bool open=false);
 
 	~File();
 
 
+	/// Open file
+
+	/// @param[in] path		path of file
+	/// @param[in] mode		i/o mode "w", "r", "wb", "rb"
+	/// \returns true on success, false otherwise
+	bool open(const std::string& path, const std::string& mode="r");
+
+	/// Open file using member variables
+
+	/// \returns true on success, false otherwise
+	///
+	bool open();
+
 	/// Close file
 	void close();
 
-	/// Open file with specified i/o mode
-	bool open();
 
 	/// Set i/o mode
 
