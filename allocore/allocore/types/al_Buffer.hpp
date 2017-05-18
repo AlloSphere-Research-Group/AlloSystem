@@ -78,6 +78,10 @@ public:
 	const T * elems() const { return &mElems[0]; }		///< Returns C pointer to elements
 	T * elems(){ return &mElems[0]; }					///< Returns C pointer to elements
 
+	T * begin(){ return elems(); }
+	const T * begin() const { return elems(); }
+	T * end(){ return elems() + size(); }
+	const T * end() const { return elems() + size(); }
 
 	/// Get element at index
 	T& operator[](int i){ return mElems[i]; }
