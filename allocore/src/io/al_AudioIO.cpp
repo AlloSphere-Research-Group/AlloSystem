@@ -331,6 +331,13 @@ AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
 	if(devNum >= 0) setImpl(devNum);
 }
 
+AudioDevice::AudioDevice(std::initializer_list<std::string> nameKeywordList, StreamMode stream)
+:	AudioDeviceInfo(0), mImpl(0)
+{
+	auto devNum = findDeviceNumber(nameKeywordList, stream);
+	if(devNum >= 0) setImpl(devNum);
+}
+
 int AudioDevice::findDeviceNumber(const std::string& nameKeyword, StreamMode stream){
 	for(int i=0; i<numDevices(); ++i){
 		AudioDevice d(i);
@@ -340,6 +347,14 @@ int AudioDevice::findDeviceNumber(const std::string& nameKeyword, StreamMode str
 		if(	(bi || bo) && n.find(nameKeyword) != std::string::npos){
 			return i;
 		}
+	}
+	return -1;
+}
+
+int AudioDevice::findDeviceNumber(std::initializer_list<std::string> nameKeywordList, StreamMode stream){
+	for(auto& nameKeyword : nameKeywordList){
+		auto devNum = findDeviceNumber(nameKeyword, stream);
+		if(devNum >= 0) return devNum;
 	}
 	return -1;
 }
