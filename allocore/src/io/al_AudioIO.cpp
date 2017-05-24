@@ -7,6 +7,7 @@
 
 #include "portaudio.h"
 #include "allocore/system/al_Config.h"
+#include "allocore/system/al_Printing.hpp" // AL_WARN
 #include "allocore/io/al_AudioIO.hpp"
 
 namespace al{
@@ -116,7 +117,7 @@ public:
 
 	virtual void channels(int num, bool forOutput) {
 		if(isOpen()){
-			warn("the number of channels cannnot be set with the stream open", "AudioIO");
+			AL_WARN("the number of channels cannnot be set with the stream open");
 			return;
 		}
 
@@ -130,8 +131,8 @@ public:
 
 		const PaDeviceInfo * info = Pa_GetDeviceInfo(params->device);
 		if(0 == info){
-			if(forOutput)	warn("attempt to set number of channels on invalid output device", "AudioIO");
-			else			warn("attempt to set number of channels on invalid input device", "AudioIO");
+			if(forOutput)	AL_WARN("attempt to set number of channels on invalid output device");
+			else			AL_WARN("attempt to set number of channels on invalid input device");
 			return;	// this particular device is not open, so return
 		}
 
@@ -152,7 +153,7 @@ public:
 			#endif
 		}
 		else{
-			num = min(num, maxChans);
+			num = num < maxChans ? num : maxChans;
 		}
 
 		params->channelCount = num;
@@ -526,7 +527,7 @@ void AudioIO::deviceIn(const AudioDevice& v){
 		channelsIn(v.channelsInMax());
 	}
 	else{
-		warn("attempt to set input device to a device without inputs", "AudioIO");
+		AL_WARN("attempt to set input device to a device without inputs");
 	}
 }
 
@@ -537,7 +538,7 @@ void AudioIO::deviceOut(const AudioDevice& v){
 		channelsOut(v.channelsOutMax());
 	}
 	else{
-		warn("attempt to set output device to a device without outputs", "AudioIO");
+		AL_WARN("attempt to set output device to a device without outputs");
 	}
 }
 
@@ -549,11 +550,11 @@ void AudioIO::device(const AudioDevice& v){
 void AudioIO::channelsBus(int num){
 
 	if(mImpl->isOpen()){
-		warn("the number of channels cannnot be set with the stream open", "AudioIO");
+		AL_WARN("the number of channels cannnot be set with the stream open");
 		return;
 	}
 
-	resize(mBufB, num * mFramesPerBuffer);
+	resizeBuf(mBufB, num * mFramesPerBuffer);
 	mNumB = num;
 }
 
@@ -602,7 +603,7 @@ void AudioIO::resizeBuffer(bool forOutput){
 	int& chans      = forOutput ? mNumO : mNumI;
 
 	if(chans > 0 && mFramesPerBuffer > 0){
-		int n = resize(buffer, chans * mFramesPerBuffer);
+		int n = resizeBuf(buffer, chans * mFramesPerBuffer);
 		if(0 == n) chans = 0;
 	}
 	else{
@@ -622,7 +623,7 @@ void AudioIO::framesPerSecond(double v){	//printf("AudioIO::fps(%f)\n", v);
 
 void AudioIO::framesPerBuffer(int n){
 	if(mImpl->isOpen()){
-		warn("the number of frames/buffer cannnot be set with the stream open", "AudioIO");
+		AL_WARN("the number of frames/buffer cannnot be set with the stream open");
 		return;
 	}
 
@@ -631,7 +632,7 @@ void AudioIO::framesPerBuffer(int n){
 		resizeBuffer(true);
 		resizeBuffer(false);
 		channelsBus(AudioIOData::channelsBus());
-		resize(mBufT, mFramesPerBuffer);
+		resizeBuf(mBufT, mFramesPerBuffer);
 	}
 }
 

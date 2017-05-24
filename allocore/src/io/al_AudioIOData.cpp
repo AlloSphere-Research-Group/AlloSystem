@@ -9,6 +9,10 @@
 
 namespace al{
 
+template <class T>
+void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
+
+
 AudioBackend::AudioBackend()
 :	mIsOpen(false), mIsRunning(false)
 {}
