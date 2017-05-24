@@ -73,6 +73,13 @@ public:
 	/// @param[in] stream		Whether to search for input and/or output devices
 	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
+
+	/// Find device number of given device name keyword
+
+	/// \returns device number on success or -1 if there is no match
+	///
+	int findDeviceNumber(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
+
 	virtual bool valid() const;
 	virtual bool hasInput() const;					///< Returns whether device has input
 	virtual bool hasOutput() const;					///< Returns whether device has output
