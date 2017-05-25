@@ -10,6 +10,7 @@ list(APPEND ALLOCORE_SRC
   src/io/al_MIDI.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
+  src/io/al_CSVReader.cpp
   src/io/hidapi.c
   src/protocol/al_Serialize.cpp
   src/spatial/al_HashSpace.cpp
@@ -36,6 +37,7 @@ list(APPEND ALLOCORE_HEADERS
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
   	allocore/io/al_Serial.hpp
+    allocore/io/al_CSVReader.hpp
     allocore/math/al_Analysis.hpp
     allocore/math/al_Complex.hpp
     allocore/math/al_Constants.hpp
