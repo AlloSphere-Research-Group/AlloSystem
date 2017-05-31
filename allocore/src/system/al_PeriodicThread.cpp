@@ -3,24 +3,33 @@
 
 namespace al{
 
-PeriodicThread::PeriodicThread(double periodSec)
-:	mAutocorrect(0.1)
+PeriodicThread::PeriodicThread(double periodSec, bool oneShot, bool triggerOnStart)
+    : mAutocorrect(0.1),
+      mOneShot(oneShot),
+      mTriggerOnStart(triggerOnStart),
+      mUserData(nullptr)
 {
 	period(periodSec);
+	if (mOneShot) {
+		mTriggerOnStart = false; // It doesn't make sense to have trigger on start enabled with one shot....
+	}
 }
 
 PeriodicThread::PeriodicThread(const PeriodicThread& o)
 :	Thread(o), mPeriod(o.mPeriod), mTimeCurr(o.mTimeCurr),
 	mTimePrev(o.mTimePrev), mWait(o.mWait), mTimeBehind(o.mTimeBehind),
 	mAutocorrect(o.mAutocorrect),
+    mOneShot(o.mOneShot),
+    mTriggerOnStart(o.mTriggerOnStart),
 	mUserFunc(o.mUserFunc),
+    mUserData(nullptr),
 	mRun(o.mRun)
 {}
 
 
 
-void * PeriodicThread::sPeriodicFunc(void * userData){
-	static_cast<PeriodicThread *>(userData)->go();
+void * PeriodicThread::sPeriodicFunc(void * threadData){
+	static_cast<PeriodicThread *>(threadData)->go();
 	return NULL;
 }
 
@@ -38,14 +47,26 @@ double PeriodicThread::period() const {
 	return mPeriod * 1e-9;
 }
 
-void PeriodicThread::start(ThreadFunction& func){
+void PeriodicThread::start(ThreadFunction& func, void *userData){
 	mUserFunc = &func;
+	mUserData = userData;
+	mRun = true;
+	Thread::start(sPeriodicFunc, this);
+}
+
+void PeriodicThread::start(std::function<void(void *data)> function, void *userData){
+	if(mRun) {
+		stop();
+	}
+	mFunction = function;
+	mUserData = userData;
 	mRun = true;
 	Thread::start(sPeriodicFunc, this);
 }
 
 void PeriodicThread::stop(){
 	mRun = false;
+	mUserFunc = nullptr;
 }
 
 
@@ -72,8 +93,15 @@ void PeriodicThread::go(){
 	mTimeCurr = al_steady_time_nsec();
 	mWait = 0;
 	mTimeBehind = 0;
+	bool firstPass = true;
 	while(mRun){
-		(*mUserFunc)();
+		if (mTriggerOnStart || !firstPass) {
+			if (mUserFunc) {
+				(*mUserFunc)();
+			} else if(mFunction) {
+				mFunction(mUserData);
+			}
+		}
 
 		mTimePrev = mTimeCurr + mWait;
 		mTimeCurr = al_steady_time_nsec();
@@ -105,7 +133,10 @@ void PeriodicThread::go(){
 
 			mWait -= comp;
 		}
-
+		if (mOneShot && !firstPass) {
+			mRun = false;
+		}
+		firstPass = false;
 		//printf("period=%g, dt=%g, wait=%g\n", mPeriod, dt, mWait);
 	}
 }
