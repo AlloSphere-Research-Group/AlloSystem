@@ -61,7 +61,7 @@ public:
 	/// @param[in] periodSec	calling period in seconds
 	/// @param[in] oneShot		determines if the timer triggers only once.
 	/// @param[in] triggerOnStart	if true, calling start() calls the function, otherwise function is called on next timeout
-	PeriodicThread(double periodSec=1, bool oneShot = false, bool triggerOnStart = true);
+	PeriodicThread(double periodSec=1);
 
 	/// Copy constructor
 	PeriodicThread(const PeriodicThread& other);
@@ -86,14 +86,13 @@ public:
 	double period() const;
 
 	/// Start calling the supplied function periodically
-	void start(ThreadFunction& func, void *userData = nullptr);
+	void start(ThreadFunction& func);
 
 	/// Start calling the supplied function periodically
 	void start(std::function<void(void *data)> function, void *userData = nullptr);
 
 	/// Stop the thread
 	void stop();
-
 
 	// Stuff for assignment
 	friend void swap(PeriodicThread& a, PeriodicThread& b);
@@ -108,8 +107,6 @@ private:
 	al_nsec mWait;					// actual time to sleep between frames
 	al_nsec mTimeBehind;
 	float mAutocorrect;
-	bool mOneShot;
-	bool mTriggerOnStart;
 	ThreadFunction * mUserFunc;
 	void *mUserData;
 	std::function<void(void *data)> mFunction;
