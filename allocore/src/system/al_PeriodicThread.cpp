@@ -1,26 +1,20 @@
 #include <algorithm>
+#include <iostream>
 #include "allocore/system/al_PeriodicThread.hpp"
 
 namespace al{
 
-PeriodicThread::PeriodicThread(double periodSec, bool oneShot, bool triggerOnStart)
+PeriodicThread::PeriodicThread(double periodSec)
     : mAutocorrect(0.1),
-      mOneShot(oneShot),
-      mTriggerOnStart(triggerOnStart),
       mUserData(nullptr)
 {
 	period(periodSec);
-	if (mOneShot) {
-		mTriggerOnStart = false; // It doesn't make sense to have trigger on start enabled with one shot....
-	}
 }
 
 PeriodicThread::PeriodicThread(const PeriodicThread& o)
 :	Thread(o), mPeriod(o.mPeriod), mTimeCurr(o.mTimeCurr),
 	mTimePrev(o.mTimePrev), mWait(o.mWait), mTimeBehind(o.mTimeBehind),
 	mAutocorrect(o.mAutocorrect),
-    mOneShot(o.mOneShot),
-    mTriggerOnStart(o.mTriggerOnStart),
 	mUserFunc(o.mUserFunc),
     mUserData(nullptr),
 	mRun(o.mRun)
@@ -30,7 +24,7 @@ PeriodicThread::PeriodicThread(const PeriodicThread& o)
 
 void * PeriodicThread::sPeriodicFunc(void * threadData){
 	static_cast<PeriodicThread *>(threadData)->go();
-	return NULL;
+	return nullptr;
 }
 
 PeriodicThread& PeriodicThread::autocorrect(float factor){
@@ -47,9 +41,13 @@ double PeriodicThread::period() const {
 	return mPeriod * 1e-9;
 }
 
-void PeriodicThread::start(ThreadFunction& func, void *userData){
+void PeriodicThread::start(ThreadFunction& func){
+	if(mRun) {
+		stop();
+	}
+	mFunction = nullptr;
 	mUserFunc = &func;
-	mUserData = userData;
+	mUserData = nullptr;
 	mRun = true;
 	Thread::start(sPeriodicFunc, this);
 }
@@ -58,6 +56,7 @@ void PeriodicThread::start(std::function<void(void *data)> function, void *userD
 	if(mRun) {
 		stop();
 	}
+	mUserFunc = nullptr;
 	mFunction = function;
 	mUserData = userData;
 	mRun = true;
@@ -66,7 +65,10 @@ void PeriodicThread::start(std::function<void(void *data)> function, void *userD
 
 void PeriodicThread::stop(){
 	mRun = false;
+	Thread::join();
 	mUserFunc = nullptr;
+	mFunction = nullptr;
+	mUserData = nullptr;
 }
 
 
@@ -93,14 +95,12 @@ void PeriodicThread::go(){
 	mTimeCurr = al_steady_time_nsec();
 	mWait = 0;
 	mTimeBehind = 0;
-	bool firstPass = true;
+	al_nsec granularity = 1e6;
 	while(mRun){
-		if (mTriggerOnStart || !firstPass) {
-			if (mUserFunc) {
-				(*mUserFunc)();
-			} else if(mFunction) {
-				mFunction(mUserData);
-			}
+		if (mUserFunc) {
+			(*mUserFunc)();
+		} else if(mFunction) {
+			mFunction(mUserData);
 		}
 
 		mTimePrev = mTimeCurr + mWait;
@@ -112,7 +112,15 @@ void PeriodicThread::go(){
 		// of time spent processing between iterations
 		if(dt<mPeriod){
 			mWait = mPeriod - dt;
-			al_sleep_nsec(mWait);
+			al_nsec waitTime = mWait;
+			while (waitTime > granularity && mRun) {
+				al_sleep_nsec(granularity);
+				waitTime -= granularity;
+			}
+			// TODO compensate for drift from granularity
+			if (mRun) {
+				al_sleep_nsec(waitTime);
+			}
 		}
 
 		// This means we are behind, so don't wait
@@ -133,10 +141,6 @@ void PeriodicThread::go(){
 
 			mWait -= comp;
 		}
-		if (mOneShot && !firstPass) {
-			mRun = false;
-		}
-		firstPass = false;
 		//printf("period=%g, dt=%g, wait=%g\n", mPeriod, dt, mWait);
 	}
 }
