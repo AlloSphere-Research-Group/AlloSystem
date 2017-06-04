@@ -78,6 +78,8 @@
 #include "allocore/sound/al_Reverb.hpp"
 #include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/sound/al_StereoPanner.hpp"
+#include "allocore/sound/al_Ambisonics.hpp"
 #include "allocore/spatial/al_Curve.hpp"
 #include "allocore/spatial/al_DistAtten.hpp"
 #include "allocore/spatial/al_Pose.hpp"
