@@ -94,6 +94,9 @@ public:
 	/// Stop the thread
 	void stop();
 
+	/// True if timer thread is running
+	bool running() const;
+
 	// Stuff for assignment
 	friend void swap(PeriodicThread& a, PeriodicThread& b);
 	PeriodicThread& operator= (PeriodicThread other);
