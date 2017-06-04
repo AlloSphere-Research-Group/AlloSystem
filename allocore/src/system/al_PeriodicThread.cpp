@@ -37,6 +37,11 @@ PeriodicThread& PeriodicThread::period(double sec){
 	return *this;
 }
 
+bool :PeriodicThread::running() const
+{
+	return mRun;
+}
+
 double PeriodicThread::period() const {
 	return mPeriod * 1e-9;
 }
