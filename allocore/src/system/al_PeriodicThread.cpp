@@ -37,7 +37,7 @@ PeriodicThread& PeriodicThread::period(double sec){
 	return *this;
 }
 
-bool :PeriodicThread::running() const
+bool PeriodicThread::running() const
 {
 	return mRun;
 }
