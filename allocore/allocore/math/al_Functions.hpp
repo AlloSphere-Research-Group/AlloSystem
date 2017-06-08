@@ -255,6 +255,21 @@ template<class T> bool lessAbs(const T& v, const T& eps=T(0.000001));
 /// @ingroup allocore
 uint32_t log2(uint32_t v);
 
+template <typename T> void divide(T divisor, T& x){ x/=divisor; }
+
+template <typename T, typename... Rest>
+void divide(T divisor, T& x, Rest&... rest){
+	divide(divisor,x);
+	divide(divisor,rest...);
+}
+
+/// Makes all arguments coprime (relatively prime)
+template <typename... Args>
+void makeCoprime(Args&... args){
+	auto gcd = al::gcd(args...);
+	if(gcd!=decltype(gcd)(0)) divide(gcd, args...);
+}
+
 /// Returns maximum of two values
 ///
 /// @ingroup allocore
