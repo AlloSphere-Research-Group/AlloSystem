@@ -266,8 +266,8 @@ void divide(T divisor, T& x, Rest&... rest){
 /// Makes all arguments coprime (relatively prime)
 template <typename... Args>
 void makeCoprime(Args&... args){
-	auto gcd = al::gcd(args...);
-	if(gcd!=decltype(gcd)(0)) divide(gcd, args...);
+	auto gcdiv = gcd(args...);
+	if(gcdiv > decltype(gcdiv)(1)) divide(gcdiv, args...);
 }
 
 /// Returns maximum of two values
