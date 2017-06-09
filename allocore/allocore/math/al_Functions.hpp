@@ -264,10 +264,14 @@ void divide(T divisor, T& x, Rest&... rest){
 }
 
 /// Makes all arguments coprime (relatively prime)
+
+/// \returns greatest common divisor (gcd) of output arguments with 1 meaning
+/// the input arguments were already coprime.
 template <typename... Args>
-void makeCoprime(Args&... args){
+auto makeCoprime(Args&... args) -> decltype(al::gcd(args...)){
 	auto gcdiv = gcd(args...);
-	if(gcdiv > decltype(gcdiv)(1)) divide(gcdiv, args...);
+	if(gcdiv>decltype(gcdiv)(1)) divide(gcdiv, args...);
+	return gcdiv;
 }
 
 /// Returns maximum of two values
