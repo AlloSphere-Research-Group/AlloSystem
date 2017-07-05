@@ -143,6 +143,8 @@ public:
 	          ParameterType max
 	        );
 	
+	ParameterWrapper(const ParameterWrapper& param);
+
 	~ParameterWrapper();
 	
 	/**
@@ -253,6 +255,9 @@ protected:
 	ParameterType mMax;
 	
 	std::string mFullAddress;
+	std::string mParameterName;
+	std::string mGroup;
+	std::string mPrefix;
 
 	ParameterProcessCallback mProcessCallback;
 	void * mProcessUdata;
@@ -263,9 +268,6 @@ private:
 	std::mutex mMutex;
 	ParameterType mValue;
 	ParameterType mValueCache;
-	std::string mParameterName;
-	std::string mGroup;
-	std::string mPrefix;
 };
 
 
@@ -324,6 +326,12 @@ public:
 	          float min = -99999.0,
 	          float max = 99999.0
 	        );
+
+	Parameter(const al::Parameter& param) :
+	    ParameterWrapper<float>(param)
+	{
+		mFloatValue = param.mFloatValue;
+	}
 
 	/**
 	 * @brief set the parameter's value
@@ -552,6 +560,21 @@ ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std
 {
 	mMin = min;
 	mMax = max;
+}
+
+template<class ParameterType>
+ParameterWrapper<ParameterType>::ParameterWrapper(const ParameterWrapper<ParameterType> &param)
+{
+	mParameterName = param.mParameterName;
+	mGroup = param.mGroup;
+	mPrefix = param.mPrefix;
+	mProcessCallback = param.mProcessCallback;
+	mMin = param.mMin;
+	mMax = param.mMax;
+	mProcessCallback = param.mProcessCallback;
+	mProcessUdata = param.mProcessUdata;
+	mCallbacks = param.mCallbacks;
+	mCallbackUdata = param.mCallbackUdata;
 }
 
 template<class ParameterType>
