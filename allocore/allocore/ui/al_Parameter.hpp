@@ -527,13 +527,12 @@ ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std
           std::string prefix) :
     mParameterName(parameterName), mGroup(group), mPrefix(prefix), mProcessCallback(nullptr)
 {
-
 	//TODO: Add better heuristics for slash handling
 	if (mPrefix.length() > 0 && mPrefix.at(0) != '/') {
 		mFullAddress = "/";
 	}
 	mFullAddress += mPrefix;
-	if (mPrefix.length() > 0 && mPrefix.at(prefix.length() - 1) != '/') {
+	if (mPrefix.length() > 0 && mPrefix.at(mPrefix.length() - 1) != '/') {
 		mFullAddress += "/";
 	}
 	if (mGroup.length() > 0 && mGroup.at(0) != '/') {
@@ -575,6 +574,26 @@ ParameterWrapper<ParameterType>::ParameterWrapper(const ParameterWrapper<Paramet
 	mProcessUdata = param.mProcessUdata;
 	mCallbacks = param.mCallbacks;
 	mCallbackUdata = param.mCallbackUdata;
+
+	//TODO: Add better heuristics for slash handling
+	if (mPrefix.length() > 0 && mPrefix.at(0) != '/') {
+		mFullAddress = "/";
+	}
+	mFullAddress += mPrefix;
+	if (mPrefix.length() > 0 && mPrefix.at(mPrefix.length() - 1) != '/') {
+		mFullAddress += "/";
+	}
+	if (mGroup.length() > 0 && mGroup.at(0) != '/') {
+		mFullAddress += "/";
+	}
+	mFullAddress += mGroup;
+	if (mGroup.length() > 0 && mGroup.at(mGroup.length() - 1) != '/') {
+		mFullAddress += "/";
+	}
+	if (mFullAddress.length() == 0) {
+		mFullAddress = "/";
+	}
+	mFullAddress += mParameterName;
 }
 
 template<class ParameterType>
@@ -649,7 +668,7 @@ template<class ParameterType>
 void ParameterWrapper<ParameterType>::registerChangeCallback(ParameterWrapper::ParameterChangeCallback cb, void *userData)
 {
 	mCallbacks.push_back(cb);
-	mCallbackUdata.push_back(userData);
+    mCallbackUdata.push_back(userData);
 }
 
 }
