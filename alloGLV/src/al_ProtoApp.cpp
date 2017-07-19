@@ -42,7 +42,7 @@ ProtoApp::ProtoApp()
 
 	mGUITable.colors().set(glv::StyleColor::SmokyGray);
 	//mGUITable.enable(glv::DrawBack);
-	mGUITable.enable(glv::DrawBack | glv::Controllable);
+	mGUITable.enable(glv::DrawBack | glv::Controllable | glv::KeepWithinParent);
 	mGUITable.addHandler(glv::Event::MouseDrag, glv::Behavior::mouseMove);
 	mGUITable.arrangement(">");
 	mGUITable << mTopBar << new glv::Divider(1) << mParamPanel;
