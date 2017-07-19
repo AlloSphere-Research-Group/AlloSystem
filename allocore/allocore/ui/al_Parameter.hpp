@@ -143,6 +143,8 @@ public:
 	          ParameterType max
 	        );
 	
+	ParameterWrapper(const ParameterWrapper& param);
+
 	~ParameterWrapper();
 	
 	/**
@@ -253,6 +255,9 @@ protected:
 	ParameterType mMax;
 	
 	std::string mFullAddress;
+	std::string mParameterName;
+	std::string mGroup;
+	std::string mPrefix;
 
 	ParameterProcessCallback mProcessCallback;
 	void * mProcessUdata;
@@ -263,9 +268,6 @@ private:
 	std::mutex mMutex;
 	ParameterType mValue;
 	ParameterType mValueCache;
-	std::string mParameterName;
-	std::string mGroup;
-	std::string mPrefix;
 };
 
 
@@ -324,6 +326,12 @@ public:
 	          float min = -99999.0,
 	          float max = 99999.0
 	        );
+
+	Parameter(const al::Parameter& param) :
+	    ParameterWrapper<float>(param)
+	{
+		mFloatValue = param.mFloatValue;
+	}
 
 	/**
 	 * @brief set the parameter's value
@@ -519,13 +527,12 @@ ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std
           std::string prefix) :
     mParameterName(parameterName), mGroup(group), mPrefix(prefix), mProcessCallback(nullptr)
 {
-
 	//TODO: Add better heuristics for slash handling
 	if (mPrefix.length() > 0 && mPrefix.at(0) != '/') {
 		mFullAddress = "/";
 	}
 	mFullAddress += mPrefix;
-	if (mPrefix.length() > 0 && mPrefix.at(prefix.length() - 1) != '/') {
+	if (mPrefix.length() > 0 && mPrefix.at(mPrefix.length() - 1) != '/') {
 		mFullAddress += "/";
 	}
 	if (mGroup.length() > 0 && mGroup.at(0) != '/') {
@@ -552,6 +559,41 @@ ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std
 {
 	mMin = min;
 	mMax = max;
+}
+
+template<class ParameterType>
+ParameterWrapper<ParameterType>::ParameterWrapper(const ParameterWrapper<ParameterType> &param)
+{
+	mParameterName = param.mParameterName;
+	mGroup = param.mGroup;
+	mPrefix = param.mPrefix;
+	mProcessCallback = param.mProcessCallback;
+	mMin = param.mMin;
+	mMax = param.mMax;
+	mProcessCallback = param.mProcessCallback;
+	mProcessUdata = param.mProcessUdata;
+	mCallbacks = param.mCallbacks;
+	mCallbackUdata = param.mCallbackUdata;
+
+	//TODO: Add better heuristics for slash handling
+	if (mPrefix.length() > 0 && mPrefix.at(0) != '/') {
+		mFullAddress = "/";
+	}
+	mFullAddress += mPrefix;
+	if (mPrefix.length() > 0 && mPrefix.at(mPrefix.length() - 1) != '/') {
+		mFullAddress += "/";
+	}
+	if (mGroup.length() > 0 && mGroup.at(0) != '/') {
+		mFullAddress += "/";
+	}
+	mFullAddress += mGroup;
+	if (mGroup.length() > 0 && mGroup.at(mGroup.length() - 1) != '/') {
+		mFullAddress += "/";
+	}
+	if (mFullAddress.length() == 0) {
+		mFullAddress = "/";
+	}
+	mFullAddress += mParameterName;
 }
 
 template<class ParameterType>
@@ -626,7 +668,7 @@ template<class ParameterType>
 void ParameterWrapper<ParameterType>::registerChangeCallback(ParameterWrapper::ParameterChangeCallback cb, void *userData)
 {
 	mCallbacks.push_back(cb);
-	mCallbackUdata.push_back(userData);
+    mCallbackUdata.push_back(userData);
 }
 
 }

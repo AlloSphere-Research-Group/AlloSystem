@@ -53,27 +53,47 @@
 
 #define AL_SYSTEM_LIB_VERSION 0.01
 
-#ifdef AL_WINDOWS
+#if (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__WINDOWS_MM__))
+	#if !defined(AL_WINDOWS)
+		#define AL_WINDOWS 1
+	#endif
+#elif (defined(__APPLE__) && defined(__MACH__))
+	#if !defined(AL_OSX)
+		#define AL_OSX 1
+	#endif
+#elif !defined(AL_LINUX)
+	#define AL_LINUX 1
+#endif
 
+#ifdef AL_WINDOWS
 	#ifdef AL_EXPORTS
 		#define AL_API __declspec(dllexport)
 	#else
 		#define AL_API __declspec(dllimport)
 	#endif
-
 #else
 	#define AL_API extern
+#endif
+
+#define AL_SNPRINTF snprintf
+#define AL_VSNPRINTF vsnprintf
+
+#ifdef __MINGW32__
+	#undef AL_SNPRINTF
+	#define AL_SNPRINTF _snprintf
+	#undef AL_VSNPRINTF
+	#define AL_VSNPRINTF _vsnprintf
 #endif
 
 /*
 	primitive typedefs
 */
-#ifdef AL_WINDOWS
-	#include <stdint.h>
-	#define AL_PRINTF_LL "I64"
-#else
+#if !defined(AL_WINDOWS) || defined(__MSYS__)
 	#include "allocore/system/pstdint.h"
 	#define AL_PRINTF_LL "ll"
+#else
+	#include <stdint.h>
+	#define AL_PRINTF_LL "I64"
 #endif
 
 

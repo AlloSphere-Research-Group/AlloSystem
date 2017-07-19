@@ -1,10 +1,12 @@
 #include <algorithm>
+#include <iostream>
 #include "allocore/system/al_PeriodicThread.hpp"
 
 namespace al{
 
 PeriodicThread::PeriodicThread(double periodSec)
-:	mAutocorrect(0.1)
+    : mAutocorrect(0.1),
+      mUserData(nullptr)
 {
 	period(periodSec);
 }
@@ -14,14 +16,15 @@ PeriodicThread::PeriodicThread(const PeriodicThread& o)
 	mTimePrev(o.mTimePrev), mWait(o.mWait), mTimeBehind(o.mTimeBehind),
 	mAutocorrect(o.mAutocorrect),
 	mUserFunc(o.mUserFunc),
+    mUserData(nullptr),
 	mRun(o.mRun)
 {}
 
 
 
-void * PeriodicThread::sPeriodicFunc(void * userData){
-	static_cast<PeriodicThread *>(userData)->go();
-	return NULL;
+void * PeriodicThread::sPeriodicFunc(void * threadData){
+	static_cast<PeriodicThread *>(threadData)->go();
+	return nullptr;
 }
 
 PeriodicThread& PeriodicThread::autocorrect(float factor){
@@ -34,18 +37,43 @@ PeriodicThread& PeriodicThread::period(double sec){
 	return *this;
 }
 
+bool PeriodicThread::running() const
+{
+	return mRun;
+}
+
 double PeriodicThread::period() const {
 	return mPeriod * 1e-9;
 }
 
 void PeriodicThread::start(ThreadFunction& func){
+	if(mRun) {
+		stop();
+	}
+	mFunction = nullptr;
 	mUserFunc = &func;
+	mUserData = nullptr;
+	mRun = true;
+	Thread::start(sPeriodicFunc, this);
+}
+
+void PeriodicThread::start(std::function<void(void *data)> function, void *userData){
+	if(mRun) {
+		stop();
+	}
+	mUserFunc = nullptr;
+	mFunction = function;
+	mUserData = userData;
 	mRun = true;
 	Thread::start(sPeriodicFunc, this);
 }
 
 void PeriodicThread::stop(){
 	mRun = false;
+	Thread::join();
+	mUserFunc = nullptr;
+	mFunction = nullptr;
+	mUserData = nullptr;
 }
 
 
@@ -72,8 +100,13 @@ void PeriodicThread::go(){
 	mTimeCurr = al_steady_time_nsec();
 	mWait = 0;
 	mTimeBehind = 0;
+	al_nsec granularity = 1e6;
 	while(mRun){
-		(*mUserFunc)();
+		if (mUserFunc) {
+			(*mUserFunc)();
+		} else if(mFunction) {
+			mFunction(mUserData);
+		}
 
 		mTimePrev = mTimeCurr + mWait;
 		mTimeCurr = al_steady_time_nsec();
@@ -84,7 +117,15 @@ void PeriodicThread::go(){
 		// of time spent processing between iterations
 		if(dt<mPeriod){
 			mWait = mPeriod - dt;
-			al_sleep_nsec(mWait);
+			al_nsec waitTime = mWait;
+			while (waitTime > granularity && mRun) {
+				al_sleep_nsec(granularity);
+				waitTime -= granularity;
+			}
+			// TODO compensate for drift from granularity
+			if (mRun) {
+				al_sleep_nsec(waitTime);
+			}
 		}
 
 		// This means we are behind, so don't wait
@@ -105,7 +146,6 @@ void PeriodicThread::go(){
 
 			mWait -= comp;
 		}
-
 		//printf("period=%g, dt=%g, wait=%g\n", mPeriod, dt, mWait);
 	}
 }

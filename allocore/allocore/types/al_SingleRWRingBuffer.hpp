@@ -90,6 +90,13 @@ public:
 	*/
 	size_t peek(char * dst, size_t sz);
 
+    /** Clear any data in the ringbuffer
+	*/
+    void clear()
+    {
+        mRead = mWrite;
+    }
+
 protected:
 
 	size_t mSize, mWrap;
@@ -192,8 +199,10 @@ inline size_t SingleRWRingBuffer :: peek(char * dst, size_t sz) {
 		memcpy(dst, mData+r, split);
 		memcpy(dst+split, mData, end);
 	}
-	return sz;
+    return sz;
 }
+
+
 
 
 } // al::
