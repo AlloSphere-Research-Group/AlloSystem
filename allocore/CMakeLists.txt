@@ -106,6 +106,11 @@ else()
 )
 endif()
 
+if(TRAVIS_BUILD)
+add_definitions(-DTRAVIS_BUILD)
+endif(TRAVIS_BUILD)
+
+
 # Dependencies --------------------------------------------
 set(ALLOCORE_DEP_INCLUDE_DIRS ${BUILD_ROOT_DIR}/build/include)
 
