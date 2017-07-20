@@ -10,6 +10,11 @@
 #include "allocore/system/al_Printing.hpp" // AL_WARN
 #include "allocore/io/al_AudioIO.hpp"
 
+
+#ifndef TRAVIS_BUILD
+#define BUILD_PORTAUDIO
+#endif
+
 namespace al{
 
 class DummyAudioBackend : public AudioBackend{
@@ -70,7 +75,7 @@ protected:
 
 
 //==============================================================================
-
+#ifdef BUILD_PORTAUDIO
 class PortAudioBackend : public AudioBackend{
 public:
 	PortAudioBackend(): AudioBackend(), mStream(0), mErrNum(0){ initialize(); }
@@ -314,6 +319,8 @@ private:
 	mutable PaError mErrNum;			// Most recent error number
 };
 
+#endif
+
 //==============================================================================
 
 AudioDevice::AudioDevice(int deviceNum)
@@ -368,6 +375,7 @@ bool AudioDevice::valid() const
 void AudioDevice::setImpl(int deviceNum){
 	if (deviceNum >= 0) {
 		initDevices();
+#ifdef BUILD_PORTAUDIO
 		mImpl = Pa_GetDeviceInfo(deviceNum);
 		if (mImpl) {
 			mID = deviceNum;
@@ -379,19 +387,40 @@ void AudioDevice::setImpl(int deviceNum){
 		} else {
 			printf("AudioDevice: Invalid device number %d\n", deviceNum);
 		}
+#endif
 	}
 }
-AudioDevice AudioDevice::defaultInput(){ return PortAudioBackend::defaultInput(); }
-AudioDevice AudioDevice::defaultOutput(){ return PortAudioBackend::defaultOutput(); }
+AudioDevice AudioDevice::defaultInput(){
+#ifdef BUILD_PORTAUDIO
+	return PortAudioBackend::defaultInput();
+#else
+	return 0;
+#endif
+}
+AudioDevice AudioDevice::defaultOutput(){
+#ifdef BUILD_PORTAUDIO
+	return PortAudioBackend::defaultOutput();
+#else
+	return 0;
+#endif
+}
 
 void AudioDevice::initDevices(){
+#ifdef BUILD_PORTAUDIO
 	PortAudioBackend::initialize();
+#endif
 }
 
 bool AudioDevice::hasInput() const { return channelsInMax()>0; }
 bool AudioDevice::hasOutput() const { return channelsOutMax()>0; }
 
-int AudioDevice::numDevices(){ return PortAudioBackend::numDevices(); }
+int AudioDevice::numDevices(){
+#ifdef BUILD_PORTAUDIO
+	return PortAudioBackend::numDevices();
+#else
+	return 0;
+#endif
+}
 
 void AudioDevice::print() const{
 
@@ -449,7 +478,9 @@ AudioIO::AudioIO(int framesPerBuf, double framesPerSec, void (* callbackA)(Audio
 {
 	switch(backend) {
 	case PORTAUDIO:
+#ifdef BUILD_PORTAUDIO
 		mImpl = new PortAudioBackend;
+#endif
 		mInDevice = AudioDevice::defaultInput();
 		mOutDevice = AudioDevice::defaultOutput();
 		break;
