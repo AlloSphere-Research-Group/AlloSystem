@@ -23,7 +23,7 @@ void ut_class_test(void)
 
 void ut_gains(void)
 {
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
@@ -60,7 +60,7 @@ void ut_gains(void)
 
 void ut_meter_values(void)
 {
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
@@ -90,7 +90,7 @@ void ut_meter_values(void)
 
 void ut_clipper(void)
 {
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
@@ -122,7 +122,7 @@ void ut_clipper(void)
 
 void ut_osc_gain(void)
 {
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0f);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond(), "localhost", 9001);
@@ -221,7 +221,7 @@ struct OSCHandler : public al::osc::PacketHandler{
 
 void ut_osc_meters()
 {
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0f);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond(), "localhost", 9001, "localhost", 9002);
