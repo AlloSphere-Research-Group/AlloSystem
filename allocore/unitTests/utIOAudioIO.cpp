@@ -41,7 +41,7 @@ void audioCB(AudioIOData& io){
 int utIOAudioIO(){
 
 	//AudioDevice::printAll();
-	AudioIO audioIO(256, 44100, audioCB, 0, 1, 1, AudioIOData::PORTAUDIO);
+	AudioIO audioIO(256, 44100, audioCB, 0, 1, 1);
 
 	// Make sure parameters match those passed to constructor
 	audioIO.open();
