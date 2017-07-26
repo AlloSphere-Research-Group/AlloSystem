@@ -106,13 +106,6 @@ else()
 )
 endif()
 
-if(TRAVIS_BUILD)
-add_definitions(-DTRAVIS_BUILD)
-remove_definitions(-DAL_AUDIO_PORTAUDIO)
-add_definitions(-DAL_AUDIO_DUMMY)
-endif(TRAVIS_BUILD)
-
-
 # Dependencies --------------------------------------------
 set(ALLOCORE_DEP_INCLUDE_DIRS ${BUILD_ROOT_DIR}/build/include)
 
@@ -167,6 +160,15 @@ include(modules/libsndfile_module.cmake)
 
 include(modules/osc_module.cmake)
 include(modules/zeroconf_module.cmake)
+
+
+# Travis CI configuration
+
+if(TRAVIS_BUILD)
+add_definitions(-DTRAVIS_BUILD)
+remove_definitions(-DAL_AUDIO_PORTAUDIO)
+add_definitions(-DAL_AUDIO_DUMMY)
+endif(TRAVIS_BUILD)
 
 # allocore library -----------------------
 
