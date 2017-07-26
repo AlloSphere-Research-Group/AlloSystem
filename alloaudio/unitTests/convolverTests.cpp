@@ -19,7 +19,7 @@ using namespace std;
 void ut_class_construction(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
@@ -46,7 +46,7 @@ void ut_class_construction(void)
 void ut_many_to_many(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
@@ -90,7 +90,7 @@ void ut_many_to_many(void)
 void ut_one_to_many(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
@@ -132,7 +132,7 @@ void ut_one_to_many(void)
 void ut_disabled_channels(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
@@ -170,7 +170,7 @@ void ut_disabled_channels(void)
 void ut_vector_mode(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 	assert(io.channelsOut() == 2);
 	assert(io.framesPerSecond() == 44100.0f);
 	io.append(conv);

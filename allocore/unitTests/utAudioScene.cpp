@@ -4,7 +4,7 @@
 void testBasicStereo() {
 	SpeakerLayout speakerLayout = HeadsetSpeakerLayout();
 	StereoPanner panner(speakerLayout);
-	AudioIO audioIO(8, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0, AudioIOData::DUMMY);
+	AudioIO audioIO(8, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
 
 	audioIO.zeroOut(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
 
@@ -54,7 +54,7 @@ void testStereoAudioScene(int bufferSize) {
 	AudioScene scene(bufferSize);
 	SoundSource src;
 	Listener *listener = scene.createListener(panner);
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0, AudioIOData::DUMMY);
+	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
 	src.dopplerType(DOPPLER_NONE);
 	src.useAttenuation(false);
 	scene.addSource(src);
@@ -112,7 +112,7 @@ void testMultipleSourcesStereo(int bufferSize) {
 	AudioScene scene(bufferSize);
 	SoundSource src1,src2, src3, src4;
 	scene.createListener(panner);
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0, AudioIOData::DUMMY);
+	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
 	src1.dopplerType(DOPPLER_NONE);
 	src1.useAttenuation(false);
 	src2.dopplerType(DOPPLER_NONE);
@@ -155,7 +155,7 @@ void testMultipleSourcesMovingStereo() {
 	AudioScene scene(bufferSize);
 	SoundSource src1,src2, src3, src4;
 	scene.createListener(panner);
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0, AudioIOData::DUMMY);
+	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
 	scene.usePerSampleProcessing(true); // to enable interpolation of movement
 	src1.dopplerType(DOPPLER_NONE);
 	src1.useAttenuation(false);
@@ -234,7 +234,7 @@ void testVbapTriples() {
 }
 
 void testVbapGains() {
-	AudioIO audioIO(8, 44100, NULL, NULL, 8, 0, AudioIOData::DUMMY);
+	AudioIO audioIO(8, 44100, NULL, NULL, 8, 0);
 	// Simple 2D triangle
 	SpeakerLayout speakerLayout;
 	speakerLayout.addSpeaker(Speaker(0, 0, 0, 1));
@@ -321,7 +321,7 @@ void testVbapGains() {
 void testVbapRing() {
 	SpeakerLayout speakerLayout = SpeakerRingLayout<8>();
 	Vbap panner(speakerLayout);
-	AudioIO audioIO(8, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0, AudioIOData::DUMMY);
+	AudioIO audioIO(8, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
 
 	audioIO.zeroOut(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
 
@@ -398,7 +398,7 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 	AudioScene scene(bufferSize);
 	SoundSource src;
 	scene.createListener(panner);
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0, AudioIOData::DUMMY);
+	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
 	src.dopplerType(DOPPLER_NONE);
 	src.useAttenuation(false);
 	scene.addSource(src);

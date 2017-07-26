@@ -15,7 +15,7 @@
 
 void ut_class_test(void)
 {
-	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
+	al::AudioIO io(64, 44100, 0, 0, 2, 2);
 	al::Decorrelation dec(32, 1, 1, false);
 	dec.configure(io, 1000);
 	assert(dec.getCurrentSeed() == 1000);
@@ -53,7 +53,7 @@ void ut_class_test(void)
 
 void ut_decorrelation_test(void)
 {
-	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
+	al::AudioIO io(64, 44100, 0, 0, 2, 2);
 	io.channelsBus(1);
 	al::Decorrelation dec(64, 0, 1, true);
 	dec.configure(io, 1000);
@@ -112,7 +112,7 @@ void ut_decorrelation_test(void)
 
 void ut_parallel_test(void)
 {
-	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
+	al::AudioIO io(64, 44100, 0, 0, 2, 2);
 	io.channelsBus(2);
 	al::Decorrelation dec(64, -1, 2, true); // -1 for input means "parallel" decorrelation
 	dec.configure(io, 1000);
@@ -173,7 +173,7 @@ void ut_parallel_test(void)
 
 void ut_max_jump_test(void)
 {
-	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
+	al::AudioIO io(64, 44100, 0, 0, 2, 2);
 	al::Decorrelation dec(1024, 1, 1, false);
 	for (int i = 0 ; i < 10; i++) {
 		dec.configure(io, -1, 0.1);
@@ -203,7 +203,7 @@ void ut_max_jump_test(void)
 
 void ut_deterministic_test(void)
 {
-	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
+	al::AudioIO io(64, 44100, 0, 0, 2, 2);
 	al::Decorrelation dec(32, 0, 8, false);
 	dec.configureDeterministic(io, 1000, 30, 10, 1.0);
 
