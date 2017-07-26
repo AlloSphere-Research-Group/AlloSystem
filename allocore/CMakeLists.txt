@@ -108,6 +108,8 @@ endif()
 
 if(TRAVIS_BUILD)
 add_definitions(-DTRAVIS_BUILD)
+remove_definitions(-DAL_AUDIO_PORTAUDIO)
+add_definitions(-DAL_AUDIO_DUMMY)
 endif(TRAVIS_BUILD)
 
 
