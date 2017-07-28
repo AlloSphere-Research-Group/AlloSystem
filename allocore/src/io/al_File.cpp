@@ -1,4 +1,5 @@
 #include <cstring>
+#include <fstream> // ifstream, ofstream
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <memory>
@@ -122,34 +123,25 @@ bool File::remove(const std::string &path)
 
 bool File::copy(const std::string &srcPath, const std::string &dstPath, unsigned int bufferSize)
 {
-	std::unique_ptr<char> buffer(new char[bufferSize]);
-	if (!File::exists(srcPath) || File::isDirectory(srcPath)) {
+	std::ifstream src(srcPath, std::ios::binary);	
+	if(!src.is_open()){
 		return false;
 	}
+
 	std::string outPath = dstPath;
 	if (File::isDirectory(outPath)) {
-		outPath += "/" + File::baseName(srcPath);
+		outPath += AL_FILE_DELIMITER_STR + File::baseName(srcPath);
 	}
 	outPath = File::conformPathToOS(outPath);
-	File srcFile(srcPath);
-	if (!srcFile.open()) {
+	
+	std::ofstream dst(outPath, std::ios::binary);
+	if(!dst.is_open()){
 		return false;
 	}
-	File dstFile(outPath, "w");
-	if (!dstFile.open()) {
-		return false;
-	}
-	int bytesRead = 0;
-	unsigned int totalBytes = 0;
-	while ((bytesRead = srcFile.read(buffer.get(), 1, bufferSize)) > 0) {
-		dstFile.write(buffer.get(), bytesRead);
-		totalBytes += bytesRead;
-	}
-	bool writeComplete = (totalBytes == srcFile.size());
-	srcFile.close();
-	dstFile.close();
 
-	return writeComplete;
+	dst << src.rdbuf();
+
+	return true;
 }
 
 
