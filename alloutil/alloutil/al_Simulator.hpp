@@ -6,7 +6,8 @@
 #include "alloutil/al_InterfaceServerClient.hpp"
 
 using namespace std;
-using namespace al;
+
+namespace al {
 
 class Simulator : public InterfaceServerClient, public Main::Handler {
  public:
@@ -111,6 +112,7 @@ inline void Simulator::stop() { cout << "Simulator stopped." <<endl; Main::get()
 inline Simulator::~Simulator() {
   InterfaceServerClient::disconnect();
   // oscSend().send("/interface/disconnectApplication", name());
+}
 }
 
 #endif
