@@ -8,6 +8,7 @@ list(APPEND ALLOCORE_SRC
   src/io/al_AudioIOData.cpp
   src/io/al_ControlNav.cpp
   src/io/al_MIDI.cpp
+  src/io/al_MRC.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
   src/io/al_CSVReader.cpp
@@ -33,10 +34,11 @@ list(APPEND ALLOCORE_HEADERS
     allocore/graphics/al_Shapes.hpp
     allocore/graphics/al_Image.hpp
     allocore/graphics/al_EasyFBO.hpp
-  	allocore/io/al_AudioIOData.hpp
+    allocore/io/al_AudioIOData.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
-  	allocore/io/al_Serial.hpp
+    allocore/io/al_MRC.hpp
+    allocore/io/al_Serial.hpp
     allocore/io/al_CSVReader.hpp
     allocore/math/al_Analysis.hpp
     allocore/math/al_Complex.hpp
