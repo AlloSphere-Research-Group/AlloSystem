@@ -4,7 +4,6 @@
 #include "allocore/system/al_Config.h"
 #include "allocore/io/al_MIDI.hpp"
 
-#include "rtmidi-2.1.1/RtMidi.h"
 
 using namespace al;
 

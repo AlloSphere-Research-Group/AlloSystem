@@ -90,11 +90,6 @@ set(ALLOCORE_DUMMY_HEADERS "")
 # Required for serial, hidapi, RtMidi and other externals
 INCLUDE_DIRECTORIES(external)
 
-# RtMidi source file
-list(APPEND ALLOCORE_SRC
-    external/rtmidi-2.1.1/RtMidi.cpp
-)
-
 # Dependencies --------------------------------------------
 set(ALLOCORE_DEP_INCLUDE_DIRS ${BUILD_ROOT_DIR}/build/include)
 
@@ -175,6 +170,12 @@ include(modules/libsndfile_module.cmake)
 
 include(modules/osc_module.cmake)
 include(modules/zeroconf_module.cmake)
+
+# RtMidi source file
+list(APPEND ALLOCORE_SRC
+    external/rtmidi-2.1.1/RtMidi.cpp
+)
+list(APPEND ALLOCORE_DEP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/external/rtmidi-2.1.1")
 
 
 # Travis CI configuration

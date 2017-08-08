@@ -19,9 +19,16 @@
 /**********************************************************************/
 
 
-class RtMidiIn;
+#include "RtMidi.h"
 
 namespace al{
+
+// Internal classes to maintain backward compatibility
+class MIDIIn : public RtMidiIn {};
+
+class MIDIOut : public RtMidiOut {};
+
+class MIDIError : public RtMidiError {};
 
 
 /// Convert note number to Hz value
