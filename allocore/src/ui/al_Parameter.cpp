@@ -217,3 +217,24 @@ void ParameterServer::changeCallback(float value, void *sender, void *userData, 
 	Parameter *parameter = static_cast<Parameter *>(sender);
 	server->notifyListeners(parameter->getFullAddress(), parameter->get());
 }
+
+void ParameterServer::changeStringCallback(std::string value, void *sender, void *userData, void *blockThis)
+{
+	ParameterServer *server = static_cast<ParameterServer *>(userData);
+	ParameterString *parameter = static_cast<ParameterString *>(sender);
+	server->notifyListeners(parameter->getFullAddress(), parameter->get());
+}
+
+void ParameterServer::changeVec3Callback(Vec3f value, void *sender, void *userData, void *blockThis)
+{
+	ParameterServer *server = static_cast<ParameterServer *>(userData);
+	ParameterVec3 *parameter = static_cast<ParameterVec3 *>(sender);
+	server->notifyListeners(parameter->getFullAddress(), parameter->get());
+}
+
+void ParameterServer::changeVec4Callback(Vec4f value, void *sender, void *userData, void *blockThis)
+{
+	ParameterServer *server = static_cast<ParameterServer *>(userData);
+	ParameterVec4 *parameter = static_cast<ParameterVec4 *>(sender);
+	server->notifyListeners(parameter->getFullAddress(), parameter->get());
+}

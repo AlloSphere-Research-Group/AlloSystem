@@ -255,7 +255,7 @@ private:
 };
 
 
-class SequenceServer : public osc::PacketHandler, public OSCNotifier<>
+class SequenceServer : public osc::PacketHandler, public OSCNotifier
 {
 public:
 	/**

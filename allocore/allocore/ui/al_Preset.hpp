@@ -245,7 +245,7 @@ private:
 	std::string mCurrentPresetName;
 };
 
-class PresetServer : public osc::PacketHandler, public OSCNotifier<>
+class PresetServer : public osc::PacketHandler, public OSCNotifier
 {
 public:
 	/**

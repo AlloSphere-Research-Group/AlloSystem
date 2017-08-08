@@ -45,15 +45,15 @@
 #include <mutex>
 #include <atomic>
 #include <iostream>
+
 #include "allocore/protocol/al_OSC.hpp"
+#include "allocore/math/al_Vec.hpp"
 
 namespace al
 {
 
 class Parameter;
 
-
-template<typename DataType = float>
 class OSCNotifier {
 public:
 	OSCNotifier();
@@ -83,7 +83,11 @@ public:
 	 * then.
 	 *
 	 */
-	void notifyListeners(std::string OSCaddress, DataType value);
+	void notifyListeners(std::string OSCaddress, float value);
+
+	void notifyListeners(std::string OSCaddress, std::string value);
+	void notifyListeners(std::string OSCaddress, Vec3f value);
+	void notifyListeners(std::string OSCaddress, Vec4f value);
 
 protected:
 	std::mutex mListenerLock;
@@ -93,22 +97,49 @@ private:
 
 // OSCNotifier implementation -------------------------------------------------
 
-template<typename DataType>
-OSCNotifier<DataType>::OSCNotifier() {}
+OSCNotifier::OSCNotifier() {}
 
-template<typename DataType>
-OSCNotifier<DataType>::~OSCNotifier() {
+OSCNotifier::~OSCNotifier() {
 	for(osc::Send *sender: mOSCSenders) {
 		delete sender;
 	}
 }
 
-template<typename DataType>
-void OSCNotifier<DataType>::notifyListeners(std::string OSCaddress, DataType value)
+void OSCNotifier::notifyListeners(std::string OSCaddress, float value)
 {
 	mListenerLock.lock();
 	for(osc::Send *sender: mOSCSenders) {
-		sender->send(OSCaddress, (float) value);
+		sender->send(OSCaddress, value);
+//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
+	}
+	mListenerLock.unlock();
+}
+
+void OSCNotifier::notifyListeners(std::string OSCaddress, std::string value)
+{
+	mListenerLock.lock();
+	for(osc::Send *sender: mOSCSenders) {
+		sender->send(OSCaddress, value);
+//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
+	}
+	mListenerLock.unlock();
+}
+
+void OSCNotifier::notifyListeners(std::string OSCaddress, Vec3f value)
+{
+	mListenerLock.lock();
+	for(osc::Send *sender: mOSCSenders) {
+		sender->send(OSCaddress, value[0], value[1], value[2]);
+//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
+	}
+	mListenerLock.unlock();
+}
+
+void OSCNotifier::notifyListeners(std::string OSCaddress, Vec4f value)
+{
+	mListenerLock.lock();
+	for(osc::Send *sender: mOSCSenders) {
+		sender->send(OSCaddress, value[0], value[1], value[2], value[3]);
 //		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
 	}
 	mListenerLock.unlock();
@@ -421,7 +452,11 @@ private:
 	float mFloatValue;
 };
 
-
+// These three types are blocking, should not be used in time-critical contexts
+// like the audio callback
+typedef ParameterWrapper<std::string> ParameterString;
+typedef ParameterWrapper<al::Vec3f> ParameterVec3;
+typedef ParameterWrapper<al::Vec4f> ParameterVec4;
 
 /**
  * @brief The ParameterServer class creates an OSC server to receive parameter values
@@ -431,7 +466,7 @@ private:
  *
  * @ingroup allocore
  */
-class ParameterServer : public osc::PacketHandler, public OSCNotifier<float>
+class ParameterServer : public osc::PacketHandler, public OSCNotifier
 {
 	friend class PresetServer; // To be able to take over the OSC server
 public:
@@ -462,6 +497,36 @@ public:
 	 */
 	void unregisterParameter(Parameter &param);
 
+    /**
+	 * Register a string parameter with the server.
+	 */
+	ParameterServer &registerParameter(ParameterString &param);
+
+	/**
+	 * Remove a string parameter from the server.
+	 */
+	void unregisterParameter(ParameterString &param);
+
+	/**
+	 * Register a Vec3 parameter with the server.
+	 */
+	ParameterServer &registerParameter(ParameterVec3 &param);
+
+	/**
+	 * Remove a Vec3 parameter from the server.
+	 */
+	void unregisterParameter(ParameterVec3 &param);
+
+	/**
+	 * Register a Vec4 parameter with the server.
+	 */
+	ParameterServer &registerParameter(ParameterVec4 &param);
+
+	/**
+	 * Remove a Vec4 parameter from the server.
+	 */
+	void unregisterParameter(ParameterVec4 &param);
+
 	/**
 	 * @brief print prints information about the server to std::out
 	 *
@@ -490,6 +555,24 @@ public:
 	/// Register parameter using the streaming operator
 	ParameterServer &operator << (Parameter* newParam){ return registerParameter(*newParam); }
 
+    /// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterString& newParam){ return registerParameter(newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterString* newParam){ return registerParameter(*newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterVec3& newParam){ return registerParameter(newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterVec3* newParam){ return registerParameter(*newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterVec4& newParam){ return registerParameter(newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterVec4* newParam){ return registerParameter(*newParam); }
+
 	/**
 	 * @brief Append a listener to the osc server.
 	 * @param handler
@@ -505,14 +588,67 @@ public:
 
 protected:
 	static void changeCallback(float value, void *sender, void *userData, void *blockThis);
+	static void changeStringCallback(std::string value, void *sender, void *userData, void *blockThis);
+	static void changeVec3Callback(Vec3f value, void *sender, void *userData, void *blockThis);
+	static void changeVec4Callback(Vec4f value, void *sender, void *userData, void *blockThis);
 
 private:
 	std::vector<osc::PacketHandler *> mPacketHandlers;
 	osc::Recv *mServer;
 	std::vector<Parameter *> mParameters;
-	std::mutex mParameterLock;
+	std::vector<ParameterString *> mStringParameters;
+	std::vector<ParameterVec3 *> mVec3Parameters;
+	std::vector<ParameterVec4 *> mVec4Parameters;
+    std::mutex mParameterLock;
 };
 
+ParameterServer &ParameterServer::registerParameter(ParameterString &param)
+{
+	mParameterLock.lock();
+	mStringParameters.push_back(&param);
+	mParameterLock.unlock();
+	mListenerLock.lock();
+	param.registerChangeCallback(ParameterServer::changeStringCallback,
+	                             (void *) this);
+	mListenerLock.unlock();
+	return *this;
+}
+
+void ParameterServer::unregisterParameter(ParameterString &param)
+{
+	mParameterLock.lock();
+	auto it = mStringParameters.begin();
+	for(it = mStringParameters.begin(); it != mStringParameters.end(); it++) {
+		if (*it == &param) {
+			mStringParameters.erase(it);
+		}
+	}
+	mParameterLock.unlock();
+}
+
+ParameterServer &ParameterServer::registerParameter(ParameterVec3 &param)
+{
+	mParameterLock.lock();
+	mVec3Parameters.push_back(&param);
+	mParameterLock.unlock();
+	mListenerLock.lock();
+	param.registerChangeCallback(ParameterServer::changeVec3Callback,
+	                             (void *) this);
+	mListenerLock.unlock();
+	return *this;
+}
+
+void ParameterServer::unregisterParameter(ParameterVec3 &param)
+{
+	mParameterLock.lock();
+	auto it = mVec3Parameters.begin();
+	for(it = mVec3Parameters.begin(); it != mVec3Parameters.end(); it++) {
+		if (*it == &param) {
+			mVec3Parameters.erase(it);
+		}
+	}
+	mParameterLock.unlock();
+}
 
 // Implementations -----------------------------------------------------------
 
