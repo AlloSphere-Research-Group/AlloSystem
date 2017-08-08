@@ -120,6 +120,9 @@ std::vector<std::string> al::PresetSequencer::getSequenceList()
 	if (mPresetHandler) {
 		path = mPresetHandler->getCurrentPath();
 	}
+    if (!File::isDirectory(path)) {
+        Dir::make(path, true);
+    }
 	Dir presetDir(path);
 	while(presetDir.read()) {
 		FileInfo info = presetDir.entry();
