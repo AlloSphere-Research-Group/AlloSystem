@@ -15,6 +15,7 @@ class MyApp : public App{
 public:
 
 	Texture tex;
+	Mesh mesh;
 
 	MyApp():
 		// Construct texture
@@ -28,7 +29,7 @@ public:
 
 		// Get a pointer to the (client-side) pixel buffer.
 		// When we make a read access to the pixels, they are flagged as dirty
-		// and get sent to the GPU the next time the texture bound.
+		// and get sent to the GPU the next time the texture is bound.
 		unsigned char * pixels = tex.data<unsigned char>();
 
 		// Loop through the pixels to generate an image
@@ -50,33 +51,31 @@ public:
 			pixels[idx*stride + 3] = col.a;
 		}}
 
-		nav().pos().set(0,0,4);
+		// Generate the geometry onto which to display the texture
+		mesh.primitive(Graphics::TRIANGLE_STRIP);
+		mesh.vertex(-1,  1);
+		mesh.vertex(-1, -1);
+		mesh.vertex( 1,  1);
+		mesh.vertex( 1, -1);
+
+		// Add texture coordinates
+		mesh.texCoord(0,1);
+		mesh.texCoord(0,0);
+		mesh.texCoord(1,1);
+		mesh.texCoord(1,0);
+
+		// The color acts as a multiplier on the texture color
+		mesh.color(RGB(1)); // white: shows texture as is
+		//mesh.color(RGB(1,0,0)); // red: shows only red components
+
+		nav().pullBack(4);
 		initWindow();
 	}
 
 	void onDraw(Graphics& g){
-
-		// Borrow a temporary Mesh from Graphics
-		Mesh& m = g.mesh();
-
-		m.reset();
-
-		// Generate geometry
-		m.primitive(Graphics::TRIANGLE_STRIP);
-		m.vertex(-1,  1);
-		m.vertex(-1, -1);
-		m.vertex( 1,  1);
-		m.vertex( 1, -1);
-
-		// Add texture coordinates
-		m.texCoord(0,1);
-		m.texCoord(0,0);
-		m.texCoord(1,1);
-		m.texCoord(1,0);
-
 		// We must tell the GPU to use the texture when rendering primitives
 		tex.bind();
-			g.draw(m);
+			g.draw(mesh);
 		tex.unbind();
 	}
 };

@@ -1,9 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "allocore/io/al_Socket.hpp" // Socket::hostname
 #include "allocore/protocol/al_Zeroconf.hpp"
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/system/al_Printing.hpp"
-
-#include <stdio.h>
-#include <stdlib.h>
 
 // On OSX these are implemented in al_mDNS_OSX.mm instead
 #ifndef AL_OSX

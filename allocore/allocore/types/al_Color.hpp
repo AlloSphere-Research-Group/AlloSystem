@@ -250,7 +250,7 @@ struct Color{
 	}
 
 private:
-	float tof(uint8_t v){ return float(v)/255.f; }
+	float tof(uint8_t v){ return float(v)*(1.f/255.f); }
 };
 
 
@@ -381,6 +381,13 @@ struct Colori {
 
 	/// Set from gray value and alpha
 	Colori& set(uint8_t v, uint8_t al){ return set(v,al); }
+
+
+	/// Returns inverted color
+	Colori inverse() const { return Colori(*this).invert(); }
+
+	/// Invert RGB components
+	Colori& invert(){ return set(255-r, 255-g, 255-b); }
 
 private:
 	uint8_t toi(float v){ return uint8_t(v*255.f); }
@@ -639,8 +646,8 @@ struct RGB{
 	/// Invert RGB components
 	RGB& invert(){ return set(1.f-r, 1.f-g, 1.f-b); }
 
-	/// Returns luminance value
-	float luminance() const { return r*0.3f + g*0.59f + b*0.11f; }
+	/// Returns luminance value (following ITU-R BT.601)
+	float luminance() const { return r*0.299f + g*0.587f + b*0.114f; }
 
 	/// Returns self linearly mixed with another color (0 = none)
 	RGB mix(const RGB& v, float amt=0.5f) const {

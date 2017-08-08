@@ -12,12 +12,12 @@ University of California, Santa Barbara
 </a>
 [![Build Status](https://travis-ci.org/AlloSphere-Research-Group/AlloSystem.svg?branch=devel)](https://travis-ci.org/AlloSphere-Research-Group/AlloSystem)
 
-##1. About
+## 1. About
 
 AlloSystem is a cross-platform suite of C++ components for building interactive multimedia tools and applications. It is organized into separate "allo" modules that can be compiled and linked to on a per need basis. The most important module, AlloCore, comprises core components that most other modules depend on, such as math utilities, system information, audio IO, and OpenGL-based windowing.
 
 
-###1.1 Directory Structure
+### 1.1 Directory Structure
 
 AlloSystem modules are located in subdirectories beginning with "allo". Each module has the general directory layout:
 
@@ -37,7 +37,7 @@ The build folder (typically `./build/`) is organized using a Unix-style hierarch
   lib/      - Libraries
 ```
 
-##2. Installing Dependencies
+## 2. Installing Dependencies
 
 The only mandatory dependency for AlloSystem is CMake, which is the build system used.
 
@@ -64,7 +64,7 @@ $ ./install_all_dependencies.sh allocore
 
 This will download and install all of the AlloCore dependencies using APT on Linux, Homebrew (or MacPorts) on Mac OS X, or building from source.
 
-###2.1 GLV and Gamma
+### 2.1 GLV and Gamma
 
 The AlloSystem build system can incorporate the building and linking of GLV and Gamma. GLV provides a set of GL widgets for GUI creation within an OpenGL window and Gamma provides a C++ audio synthesis and DSP library. If they are placed side by side with the AlloSystem sources, they will be found and built by default. You can get these from git with the commands:
 
@@ -73,7 +73,7 @@ git clone git@github.com:AlloSphere-Research-Group/GLV.git
 git clone git@github.com:AlloSphere-Research-Group/Gamma.git
 ```
 
-##3. Running examples and projects
+## 3. Running examples and projects
 
 AlloSystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the AlloSystem sources can be built into an application with a line like:
 
@@ -105,7 +105,7 @@ If you just want to build an executable without running it, then include the `-n
   ./run.sh -n allocore/examples/graphics/shaderSprites.cpp
 ```
 
-###3.1 Application dependencies and build flags
+### 3.1 Application dependencies and build flags
 
 If a file called `flags.cmake` is found in the source directory for the run script, the CMake commands found in it will be passed to the CMake build system. This enables writing any kind of build instructions and commands that are specific to the files on that folder, and can be used to specify the required information for additional dependencies like library paths and names, include directories. A `flags.txt` file that adds support for an additional library will look like: 
 
@@ -140,12 +140,12 @@ which will restore the default autocompletion using the file system. If that sti
 A complete tutorial of AlloSystem can be found at [AlloSystem User Guide](http://mantaraya36.gitbooks.io/allosystem-user-guide/content/)
 
 
-##4. Compilation Instructions
+## 4. Compilation Instructions
 
 Compilation is done automatically when using the run script, but if you need AlloSystem as a library you can use these methods.
 
 
-###4.1 Building AlloSystem libraries (Using Make on Linux and OS X, and MSYS on Windows)
+### 4.1 Building AlloSystem libraries (Using Make on Linux and OS X, and MSYS on Windows)
 
 You need to use CMake to configure the build for your system. You can build AlloCore like this:
 
@@ -162,7 +162,7 @@ To build the AlloSystem libraries, you need to use CMake to configure the build 
 This will build all AlloSystem libraries in the `./build/lib` folder and the examples in the `./build/bin` folder.
 
 
-###4.2 Building AlloSystem (XCode project)
+### 4.2 Building AlloSystem (XCode project)
 
 Do:
 
@@ -174,12 +174,12 @@ Do:
 
 You will be able to run examples and debug from Xcode
 
-###4.3 Building Allosystem (Visual Studio project)
+### 4.3 Building Allosystem (Visual Studio project)
 
 Coming soon...
 
 
-###4.4 Various CMake Options
+### 4.4 Various CMake Options
 
 If you want to build without examples:
 
@@ -214,7 +214,7 @@ Other variables that affect the build:
 
  * `BUILD_ROOT_DIR`: Sets where the build products will be put. This includes binaries, libraries and headers. By default it is set to the folder `build/` within the AlloSystem root folder.
 
-##5. Installing Allosystem
+## 5. Installing Allosystem
 
 You can install the AlloSystem libraries and headers, which will allow CMake AlloSystem projects to use it instead of having to include all the AlloSystem sources in your project. The difference between the install target and setting `BUILD_ROOT_DIR` is that the install target only copies libraries and headers, not executables.
 
@@ -238,7 +238,7 @@ You can uninstall with:
   xargs rm < install_manifest.txt
 ```
 
-##Unit tests
+## Unit tests
 
 AlloSystem uses the CTest facilities from CMake to organize and launch unit testing.
 To run the tests do:
@@ -253,7 +253,7 @@ To see verbose output do:
 make test ARGS="-V"
 ```
 
-#License
+# License
 
 This project is licensed under the terms of the 3-clause BSD license.
 

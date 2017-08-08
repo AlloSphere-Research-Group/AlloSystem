@@ -188,7 +188,8 @@ public:
 	/// @param[in] message		raw OSC message bytes
 	/// @param[in] size			number of bytes in message
 	/// @param[in] timeTag		time tag of message (inherited from bundle)
-	Message(const char * message, int size, const TimeTag& timeTag=1);
+	/// @param[in] senderAddr	IP address of sender
+	Message(const char * message, int size, const TimeTag& timeTag=1, const char *senderAddr = nullptr);
 	~Message();
 
 	/// Pretty-print message information
@@ -202,6 +203,8 @@ public:
 
 	/// Get address pattern
 	const std::string& addressPattern() const { return mAddressPattern; }
+
+	const std::string senderAddress() const { return std::string(mSenderAddr); }
 
 	/// Get type tags
 	const std::string& typeTags() const { return mTypeTags; }
@@ -222,11 +225,12 @@ protected:
 	std::string mAddressPattern;
 	std::string mTypeTags;
 	TimeTag mTimeTag;
+	char mSenderAddr[32];
 };
 
 
 
-/// Iterates through all messages contained within an OSC packet
+/// Interface for classes that can be registered as handlers with a osc::Recv server object
 ///
 /// @ingroup allocore
 class PacketHandler{
@@ -237,9 +241,28 @@ public:
 	/// Called for each message contained in packet
 	virtual void onMessage(Message& m) = 0;
 
-	void parse(const char *packet, int size, TimeTag timeTag=1);
+	// FIXME: For backwards compatibility. Remove when updating API
+	void parse(const char *packet, int size, TimeTag timeTag=1) {
+		parse(packet, size, timeTag, nullptr);
+	}
+
+	void parse(const char *packet, int size, TimeTag timeTag, const char *senderAddr);
 };
 
+// FIXME: These two classes should be merged...
+/// Interface for classes that can consume OSC messages
+/// When you write a class that inherits from PacketHandler, you might want to add a
+/// method to register MessageConsumer objects. This allows writing classes that can consume
+/// OSC messages with a set OSC prefix and that can notify if they have consumed the message
+///
+/// @ingroup allocore
+class MessageConsumer {
+public:
+	virtual ~MessageConsumer() {}
+	/// Returns true if message was consumed by this class
+	/// rootOSCPath should be prefixed to the consumer's OSC path
+	virtual bool consumeMessage(Message& m, std::string rootOSCPath) = 0;
+};
 
 
 /// Socket for sending OSC packets

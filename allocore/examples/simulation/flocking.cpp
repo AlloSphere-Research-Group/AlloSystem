@@ -54,17 +54,17 @@ public:
 		box.vertex( 1,-1);
 		box.vertex( 1, 1);
 		box.vertex(-1, 1);
-		nav().pos(0,0,4);
-		initWindow(Window::Dim(600,400), "", 40);
+		nav().pullBack(4);
+		initWindow();
 
 		resetBoids();
 	}
 
 	// Randomize boid positions/velocities uniformly inside unit disc
 	void resetBoids(){
-		for(int i=0; i<Nb; ++i){
-			rnd::ball<2>(&(boids[i].pos.x));
-			rnd::ball<2>(&(boids[i].vel.x));
+		for(auto& b : boids){
+			b.pos = rnd::ball<Vec2f>();
+			b.vel = rnd::ball<Vec2f>();
 		}
 	}
 
@@ -75,15 +75,15 @@ public:
 			for(int j=i+1; j<Nb; ++j){
 				//printf("checking boids %d and %d\n", i,j);
 
-				Vec2f ds = boids[i].pos - boids[j].pos;
-				float dist = ds.mag();
+				auto ds = boids[i].pos - boids[j].pos;
+				auto dist = ds.mag();
 
 				// Collision avoidance
 				float pushRadius = 0.05;
 				float pushStrength = 1;
 				float push = exp(-al::pow2(dist/pushRadius)) * pushStrength;
 
-				Vec2f pushVector = ds.normalized() * push;
+				auto pushVector = ds.normalized() * push;
 				boids[i].pos += pushVector;
 				boids[j].pos -= pushVector;
 
@@ -102,23 +102,22 @@ public:
 		}
 
 		// Update boid independent behaviors
-		for(int i=0; i<Nb; ++i){
+		for(auto& b : boids){
 			// Random "hunting" motion
 			float huntUrge = 0.2;
-			Vec2f hunt;
-			rnd::ball<2>(&hunt.x);
+			auto hunt = rnd::ball<Vec2f>();
 				// Use cubed distribution to make small jumps more frequent
 			hunt *= hunt.magSqr();
-			boids[i].vel += hunt*huntUrge;
+			b.vel += hunt*huntUrge;
 
 			// Bound boid into a box
-			if(boids[i].pos.x > 1 || boids[i].pos.x < -1){
-				boids[i].pos.x = boids[i].pos.x > 0 ? 1 : -1;
-				boids[i].vel.x = -boids[i].vel.x;
+			if(b.pos.x > 1 || b.pos.x < -1){
+				b.pos.x = b.pos.x > 0 ? 1 : -1;
+				b.vel.x =-b.vel.x;
 			}
-			if(boids[i].pos.y > 1 || boids[i].pos.y < -1){
-				boids[i].pos.y = boids[i].pos.y > 0 ? 1 : -1;
-				boids[i].vel.y = -boids[i].vel.y;
+			if(b.pos.y > 1 || b.pos.y < -1){
+				b.pos.y = b.pos.y > 0 ? 1 : -1;
+				b.vel.y =-b.vel.y;
 			}
 		}
 

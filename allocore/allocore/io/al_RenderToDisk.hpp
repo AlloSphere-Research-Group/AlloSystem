@@ -78,11 +78,15 @@ public:
 	/// Get rendering mode
 	Mode mode() const { return mMode; }
 
+	/// Get path to render files
+	const std::string& path() const { return mPath; }
+
 
 	/// Adapts frame duration used in model/animation updates
 
 	/// This will set the passed in argument to the rendering frame duration
-	/// if rendering is active.
+	/// if rendering is active. This should be called if the render mode is
+	/// NON_REAL_TIME and the application's animation depends on a delta time.
 	template <class T>
 	void adaptFrameDur(T& realtimeFrameDur) const {
 		if(mActive && mWindow) realtimeFrameDur = mFrameDur;
@@ -138,6 +142,14 @@ public:
 	/// Save a screenshot of a window to disk
 	void saveScreenshot(al::Window& win);
 
+	/// Create a video from last captured image frames and audio
+	///
+	/// @param[in] videoCompress		video compression amount in [0,51];
+	///									inversely related to quality
+	/// @param[in] videoEncodeSpeed		video encode speed amount in [0,9];
+	///									inversely related to file size
+	void createVideo(int videoCompress=23, int videoEncodeSpeed=4);
+
 private:
 
 	struct AudioRing{
@@ -158,9 +170,7 @@ private:
 		Thread mThread;
 		Image mImage;
 		std::string mPath;
-		bool mBusy;
-
-		ImageWriter();
+		bool mBusy = false;
 
 		bool run(
 			const std::string& path,
@@ -170,7 +180,7 @@ private:
 	};
 
 	Mode mMode;
-	std::string mPath;
+	std::string mUserPath, mPath;
 	unsigned mFrameNumber;
 	double mElapsedSec;
 
@@ -180,12 +190,12 @@ private:
 	std::vector<unsigned char> mPixels;
 	GLenum mGraphicsBuf;
 
-	enum { Npbos = 2 };
+	enum { Npbos = 3 };
 	GLuint mPBOs[Npbos];
 	int mPBOIdx;
 	bool mReadPBO;
 
-	enum { Nthreads = 4 };
+	enum { Nthreads = 8 };
 	ImageWriter mImageWriters[Nthreads];
 	std::string mImageExt;
 	unsigned mImageCompress;
@@ -197,6 +207,7 @@ private:
 	Thread mSoundFileThread;
 
 	bool mActive;
+	bool mWroteImages, mWroteAudio;
 
 	virtual void onAudioCB(AudioIOData& io);
 	virtual bool onFrame();

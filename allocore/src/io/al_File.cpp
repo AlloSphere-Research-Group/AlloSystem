@@ -1,7 +1,23 @@
 #include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <memory>
 #include "allocore/io/al_File.hpp"
+#include "allocore/system/al_Config.h"
+#include <stdlib.h> // realpath (POSIX), _fullpath (Windows)
+#ifdef AL_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#define VC_EXTRALEAN
+	#include <windows.h> // TCHAR, LPCTSTR
+	#include <direct.h> // _getcwd
+	#define platform_getcwd _getcwd
+	#ifndef PATH_MAX
+	#define PATH_MAX 260
+	#endif
+#else
+	#include <unistd.h> // getcwd (POSIX)
+	#define platform_getcwd getcwd
+#endif
 
 namespace al{
 
@@ -39,6 +55,12 @@ void File::getSize(){
 	mSizeBytes = r;
 }
 
+bool File::open(const std::string& path_, const std::string& mode_){
+	path(path_);
+	mode(mode_);
+	return open();
+}
+
 bool File::open(){
 	if(0 == mFP){
 		mFP = fopen(path().c_str(), mode().c_str());
@@ -59,11 +81,21 @@ void File::close(){
 const char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
 		int n = size();
+		//printf("reading %d bytes from %s\n", n, path().c_str());
 		allocContent(n);
 		int numRead = fread(mContent, sizeof(char), n, mFP);
-		if(numRead < n){}
+		if(numRead < n){
+			//printf("warning: only read %d bytes\n", numRead);
+		}
 	}
 	return mContent;
+}
+
+std::string File::read(const std::string& path){
+	File f(path, "rb");
+	f.open();
+	auto str = f.readAll();
+	return str ? str : "";
 }
 
 int File::write(const std::string& path, const void * v, int size, int items){
@@ -80,23 +112,63 @@ int File::write(const std::string& path, const std::string& data){
 	return File::write(path, &data[0], data.size());
 }
 
+bool File::remove(const std::string &path)
+{
+	if (!File::isDirectory(path)) {
+		return ::remove(path.c_str()) == 0;
+	}
+	return false;
+}
+
+bool File::copy(const std::string &srcPath, const std::string &dstPath, unsigned int bufferSize)
+{
+	std::unique_ptr<char> buffer(new char[bufferSize]);
+	if (!File::exists(srcPath) || File::isDirectory(srcPath)) {
+		return false;
+	}
+	std::string outPath = dstPath;
+	if (File::isDirectory(outPath)) {
+		outPath += "/" + File::baseName(srcPath);
+	}
+	outPath = File::conformPathToOS(outPath);
+	File srcFile(srcPath);
+	if (!srcFile.open()) {
+		return false;
+	}
+	File dstFile(outPath, "w");
+	if (!dstFile.open()) {
+		return false;
+	}
+	int bytesRead = 0;
+	unsigned int totalBytes = 0;
+	while ((bytesRead = srcFile.read(buffer.get(), 1, bufferSize)) > 0) {
+		dstFile.write(buffer.get(), bytesRead);
+		totalBytes += bytesRead;
+	}
+	bool writeComplete = (totalBytes == srcFile.size());
+	srcFile.close();
+	dstFile.close();
+
+	return writeComplete;
+}
 
 
-std::string File::conformDirectory(const std::string& src){
-	if(src[0]){
-		if(AL_FILE_DELIMITER != src[src.size()-1]){
-			return src + AL_FILE_DELIMITER;
+
+std::string File::conformDirectory(const std::string& path){
+	if(path[0]){
+		if(AL_FILE_DELIMITER != path[path.size()-1]){
+			return path + AL_FILE_DELIMITER;
 		}
-		return src;
+		return path;
 	}
 	return "." AL_FILE_DELIMITER_STR;
 }
 
-std::string File::conformPathToOS(const std::string& src){
-	std::string res(src);
+std::string File::conformPathToOS(const std::string& path){
+	std::string res(path);
 
 	// Ensure delimiters are correct
-	for(unsigned i=0; i<src.size(); ++i){
+	for(unsigned i=0; i<path.size(); ++i){
 		char c = res[i];
 		if('\\'==c || '/'==c){
 			res[i] = AL_FILE_DELIMITER;
@@ -110,47 +182,64 @@ std::string File::conformPathToOS(const std::string& src){
 	return res;
 }
 
-std::string File::absolutePath(const std::string& src) {
+std::string File::absolutePath(const std::string& path){
 #ifdef AL_WINDOWS
-	char temp[_MAX_PATH];
-	char * result = _fullpath(temp, src.c_str(), sizeof(temp));
-	return result ? result : "";
+	TCHAR dirPart[4096];
+	TCHAR ** filePart={NULL};
+	GetFullPathName((LPCTSTR)path.c_str(), sizeof(dirPart), dirPart, filePart);
+	std::string result = (char *)dirPart;
+	if(filePart != NULL && *filePart != 0){
+		result += (char *)*filePart;
+	}
+	return result;
 #else
 	char temp[PATH_MAX];
-	char * result = realpath(src.c_str(), temp);
+	char * result = realpath(path.c_str(), temp);
 	return result ? result : "";
 #endif
 }
 
-std::string File::baseName(const std::string& src){
-	size_t pos = src.find_last_of('.');
-	return src.substr(0, pos);
+std::string File::baseName(const std::string& path, const std::string& suffix){
+	auto posSlash = path.find_last_of("/\\"); // handle '/' or '\' path delimiters
+	if(path.npos == posSlash) posSlash=0; // no slash
+	else ++posSlash;
+	auto posSuffix = suffix.empty() ? path.npos : path.find(suffix, posSlash);
+	auto len = path.npos;
+	if(path.npos != posSuffix) len = posSuffix - posSlash;
+	return path.substr(posSlash, len);
 }
 
-std::string File::directory(const std::string& src){
-	size_t pos = src.find_last_of(AL_FILE_DELIMITER);
+std::string File::directory(const std::string& path){
+	size_t pos = path.find_last_of(AL_FILE_DELIMITER);
 	if(std::string::npos != pos){
-		return src.substr(0, pos+1);
+		return path.substr(0, pos+1);
 	}
 	return "." AL_FILE_DELIMITER_STR;
 }
 
-std::string File::extension(const std::string& src){
-	size_t pos = src.find_last_of('.');
-	if(src.npos != pos){
-		return src.substr(pos);
+std::string File::extension(const std::string& path){
+	size_t pos = path.find_last_of('.');
+	if(path.npos != pos){
+		return path.substr(pos);
 	}
 	return "";
 }
 
-bool File::exists(const std::string& path){
-	struct stat s;
-	return ::stat(path.c_str(), &s) == 0;
+static std::string stripEndSlash(const std::string& path){
+	if(path.back() == '\\' || path.back() == '/'){
+		return path.substr(0, path.size()-1);
+	}
+	return path;
 }
 
-bool File::isDirectory(const std::string& src){
+bool File::exists(const std::string& path){
 	struct stat s;
-	if(0 == ::stat(src.c_str(), &s)){	// exists?
+	return ::stat(stripEndSlash(path).c_str(), &s) == 0;
+}
+
+bool File::isDirectory(const std::string& path){
+	struct stat s;
+	if(0 == ::stat(stripEndSlash(path).c_str(), &s)){	// exists?
 		if(s.st_mode & S_IFDIR){		// is dir?
 			return true;
 		}
@@ -240,7 +329,7 @@ void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 
 void SearchPaths::addAppPaths(bool recursive) {
 	char cwd[4096];
-	if(getcwd(cwd, sizeof(cwd))){
+	if(platform_getcwd(cwd, sizeof(cwd))){
 		mAppPath = std::string(cwd) + "/";
 		addSearchPath(mAppPath, recursive);
 	}

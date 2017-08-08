@@ -1,3 +1,6 @@
+#include <sstream> // ostringstream
+#include <iomanip> // std::setw
+#include <stdio.h> // printf
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/system/al_Time.hpp"
 
@@ -162,15 +165,15 @@ al_nsec al_steady_time_nsec(){
 
 
 void al_sleep(al_sec v) {
-	time_t sec = (time_t)v;
-	al_nsec nsec = al_time_s2ns * (v - (al_sec)sec);
-	timespec tspec = { sec, nsec };
+	time_t sec = time_t(v);
+	al_nsec nsec = al_time_s2ns * (v - al_sec(sec));
+	timespec tspec = { sec, long(nsec) };
 	while (nanosleep(&tspec, &tspec) == -1)
 		continue;
 }
 
 void al_sleep_nsec(al_nsec v) {
-	al_sleep((al_sec)v * al_time_ns2s);
+	al_sleep(al_sec(v) * al_time_ns2s);
 }
 
 #endif
@@ -188,6 +191,45 @@ al_nsec al_time_nsec(){			return al_system_time_nsec(); }
 
 
 namespace al {
+
+std::string toTimecode(al_nsec t, const std::string& format){
+	unsigned day = t/(al_nsec(1000000000) * 60 * 60 * 24); // basically for overflow
+	unsigned hrs = t/(al_nsec(1000000000) * 60 * 60) % 24;
+	unsigned min = t/(al_nsec(1000000000) * 60) % 60;
+	unsigned sec = t/(al_nsec(1000000000)) % 60;
+	unsigned msc = t/(al_nsec(1000000)) % 1000;
+	unsigned usc = t/(al_nsec(1000)) % 1000;
+
+	std::ostringstream s;
+	s.fill('0');
+
+	for(unsigned i=0; i<format.size(); ++i){
+		const auto c = format[i];
+		switch(c){
+		case 'D': s << day; break;
+		case 'H': s << std::setw(2) << hrs; break;
+		case 'M': s << std::setw(2) << min; break;
+		case 'S': s << std::setw(2) << sec; break;
+		case 'm': s << std::setw(3) << msc; break;
+		case 'u': s << std::setw(3) << usc; break;
+		default:  s << c;
+		}
+	}
+
+	return s.str();
+}
+
+std::string timecodeNow(const std::string& format){
+	return toTimecode(al_system_time_nsec(), format);
+}
+
+void Timer::print() const {
+	auto t = getTime();
+	auto dt = t-mStart;
+	double dtSec = al_time_ns2s * dt;
+	printf("%g sec (%g ms) elapsed\n", dtSec, dtSec*1000.);
+}
+
 
 void DelayLockedLoop :: setBandwidth(double bandwidth) {
 	double F = 1./tperiod;		// step rate

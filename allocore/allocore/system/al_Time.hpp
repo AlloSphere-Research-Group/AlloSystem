@@ -47,6 +47,7 @@
 
 */
 
+#include <string>
 #include "allocore/system/al_Time.h"
 
 namespace al{
@@ -54,26 +55,45 @@ namespace al{
 /// Sleep for an interval of seconds
 inline void wait(al_sec dt){ al_sleep(dt); }
 
-/// Get current wall time in seconds
+/// Get current system time in seconds
 inline al_sec walltime(){ return al_time(); }
 inline al_sec timeNow(){ return al_time(); }
+
+/// Convert nanoseconds to timecode string
+std::string toTimecode(al_nsec t, const std::string& format="D:H:M:S:m:u");
+
+/// Get timecode of current system time
+std::string timecodeNow(const std::string& format="D:H:M:S:m:u");
+
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
 ///
 /// @ingroup allocore
 class Timer {
 public:
-	Timer(): mStart(0), mStop(0){}
+	Timer(bool setStartTime=true){
+		if(setStartTime) start();
+	}
 
-	al_nsec elapsed(){ return mStop - mStart; }					///< Returns nsec between start() and stop() calls
-	al_sec elapsedSec(){ return al_time_ns2s * elapsed(); }		///< Returns  sec between start() and stop() calls
-	void start(){ mStart=al_time_nsec(); }							///< Set start time as current time
-	void stop(){ mStop=al_time_nsec(); }								///< Set stop time as current time
+	/// Returns nsec between start() and stop() calls
+	al_nsec elapsed() const { return mStop - mStart; }					
+
+	/// Returns seconds between start() and stop() calls
+	al_sec elapsedSec() const { return al_time_ns2s * elapsed(); }
+
+	/// Set start time to current time
+	void start(){ mStart = getTime(); }
+
+	/// Set stop time to current time
+	void stop(){ mStop = getTime(); }
+
+	/// Print current elapsed time
+	void print() const;
 
 private:
-	al_nsec mStart, mStop;	// start and stop times
+	al_nsec mStart=0, mStop=0;	// start and stop times
+	static al_nsec getTime(){ return al_steady_time_nsec(); }
 };
-
 
 
 /// Self-correcting timer
@@ -134,6 +154,8 @@ protected:
 	double mB, mC;	// 1st & 2nd order weights
 	bool mReset;
 };
+
+
 
 /// A timing source that can be locked to realtime or driven manually
 ///
@@ -208,9 +230,6 @@ protected:
 	bool bUseRT;
 };
 
-
-
 } // al::
 
 #endif /* INCLUDE_AL_TIME_CPP_H */
-

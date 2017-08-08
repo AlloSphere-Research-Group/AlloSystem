@@ -1,9 +1,8 @@
 
-#include "alloutil/al_AlloSphereApp.hpp"
+#include "allosphere/al_AlloSphereApp.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
-#include <atomic>
 
-// This example shows how to use the AlloSphereApp and companion classes to
+// This exmaple shows how to use the AlloSphereApp and companion classes to
 // create a distributed multimedia app. An AlloSphereApp is comprised of three
 // separate applications that can run on different machines. One is the
 // simulator that performs computation and updates model data. It pipes this
@@ -12,9 +11,6 @@
 // The AlloSystem build system will build and run the three applications for
 // you without change either on a single machine, or on the appropiate
 // machines from a cluster if a configuration file is found.
-
-// You should run this file with the command:
-// ./run.sh -s alloutil/examples/allosphereApp.cpp
 
 using namespace al;
 
@@ -26,47 +22,35 @@ public:
 	float value;
 };
 
+// Define a state to broadcast to the audio renderers
+class AudioState {
+public:
+	AudioState() : frequency(220.0) {}
+	float frequency;
+};
+
 // For the simulator, you only need to override the onAnimate() function.
 // The simulator will run by default at 30 fps and will display a small
 // window that you can use to create a GUI or alternate display.
-class SimulatorApp : public SimulatorBase<State> {
+class SimulatorApp : public SimulatorBase<State, AudioState> {
 public:
-	SimulatorApp() {
-	}
-
 	virtual void onAnimate(double dt) override {
 		// Write to the member variables of state as needed
 		state().value += 0.01;
 		if (state().value >= 1.0) {
 			state().value = 0;
-			cout << "State wrapped! " << std::endl;
+			cout << "State wrapped!" << std::endl;
 		}
 //		cout << "New State! " << state().value << std::endl;
 		// When done and the state is ready to be updated and broadcast, call
 		// the sendState function
 		sendState();
-		mPhaseInc.store(2 * M_PI * (state().value * 660.0 + 220) / audioIO().framesPerSecond());
-	}
-
-	virtual void onSound(AudioIOData &io) override
-	{
-		while (io()) {
-			io.out(0) = 0.1 * sin(mPhase);
-			mPhase += mPhaseInc.load();
-			while (mPhase >= 2 * M_PI) {
-				mPhase -= 2 * M_PI;
-			}
-		}
+		audioState().frequency = 220.0 + (state().value * 660.0);
+		sendAudioState();
 	}
 
 	// If you need to draw on this window, override the onDraw() function:
 //	virtual void onDraw(Graphics &g, const Viewpoint &v) override;
-
-private:
-	double mPhase;
-	// Remember to make all data shared with the audio callback atomic
-	// Or use the Parameter class in allocore/system/al_Parameter.hpp
-	atomic<float> mPhaseInc;
 };
 
 // For the graphics renderer, inherit from GraphicsRendererBase<State>
@@ -86,7 +70,9 @@ public:
 		pose = nav();
 	}
 
-	virtual void onDraw(Graphics &g) override {
+	virtual void onDrawOmni(OmniStereo& om) override {
+
+		Graphics g = graphics();
 
 		// Call updateState() to process the state message queue. If there
 		// is a new state, the function will return true. You can then
@@ -118,12 +104,53 @@ private:
 };
 
 
+// The audio renderer will open the sound card and stream audio to it.
+// Inherit from AudioRendererBase<AudioState>.
+// Like the graphics renderer, it gets the state from the simulator. The
+// onSound() function is the audio callback, so all audio processes will
+// go there.
+class AudioRenderer : public AudioRendererBase<AudioState> {
+public:
+	AudioRenderer() : mPhase(0), mPhaseInc(0)
+	{
+		initAudio();
+	}
+
+	// You can perform intialization operations in the initAudio() function,
+	// but remember to initialize audio manually or call the parent's
+	// AudioRendererBase::initAudio() function
+//	virtual void initAudio() override
+//	{
+//		AudioRendererBase::initAudio();
+//	}
+
+	virtual void onSound(AudioIOData &io) override
+	{
+		if (updateAudioState()) {
+			mPhaseInc = 2 * M_PI * audioState().frequency / io.framesPerSecond();
+			std::cout << "onSound : " << audioState().frequency << std::endl;
+		}
+		while (io()) {
+			io.out(0) = 0.1 * sin(mPhase);
+			mPhase += mPhaseInc;
+			while (mPhase >= 2 * M_PI) {
+				mPhase -= 2 * M_PI;
+			}
+		}
+
+	}
+private:
+	double mPhase;
+	double mPhaseInc;
+};
+
+
 int main(int argc, char *argv[])
 {
 	// To make the distributed applications, you need to create an instance
 	// of AlloSphereApp passing the state, graphics, simultaor and audio
 	// classes as template parameters
-	AlloSphereApp<State, GraphicsRenderer, SimulatorApp> app;
+	AlloSphereApp<State, GraphicsRenderer, SimulatorApp, AudioRenderer> app;
 	// Start the app.
 	app.start();
 	return 0;

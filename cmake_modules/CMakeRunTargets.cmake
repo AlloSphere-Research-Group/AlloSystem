@@ -5,6 +5,24 @@
 
 message("Using AlloSystem Run facilties.")
 
+if(USE_CPP_11)
+  message(STATUS "Using c++11 in run script.")
+  include(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+  if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+  else()
+		message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+  endif()
+  if(USE_LIB_CPP)
+	message(STATUS "Using libc++.")
+	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -stdlib=libc++")
+  endif(USE_LIB_CPP)
+endif(USE_CPP_11)
+
 string(REGEX MATCH ".*\\*.*" match "${CMAKE_CURRENT_SOURCE_DIR}")
 IF(NOT ${match} STREQUAL "")
   message(FATAL_ERROR "Error: Please remove '*' from path!" ) # This avoids issues with the run script
@@ -32,7 +50,7 @@ else()
   set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${SOURCE_DIR}")
 endif(BUILD_DIR)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
+set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
 
 # -------------------------- BuildAlloTarget
 
@@ -47,18 +65,20 @@ endif()
 add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL ${${ALLO_APP_SRC}})
 
 if(NOT ${DEFINES} STREQUAL "")
-#message("Adding defines ${DEFINES}")
-target_compile_definitions("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${DEFINES}")
+#message("Adding defines ${DEFINES} to ${ALLO_APP_NAME_SUFFIX}")
+#target_compile_definitions("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${DEFINES}")
+set_target_properties("${ALLO_APP_NAME_SUFFIX}" PROPERTIES COMPILE_DEFINITIONS "${DEFINES}")
 endif()
 
 if(EXISTS "${SOURCE_DIR}/flags.cmake")
+	message(STATUS "NOTE: Using additional cmake code from ${SOURCE_DIR}/flags.cmake")
     include("${SOURCE_DIR}/flags.cmake")
 endif()
 
 if(COMPILER_SUPPORTS_CXX11)
 	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++11 ")
 elseif(COMPILER_SUPPORTS_CXX0X)
-	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x")
+	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x ")
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -145,15 +165,15 @@ endif(BUILDING_PHASESPACE)
 
 if(TARGET alloutil${DEBUG_SUFFIX})
     set(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX})
-    get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
+    get_target_property(ALLOUTIL_DEP_INCLUDE_DIRS alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIRS)
     get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
     add_dependencies("${ALLO_APP_NAME_SUFFIX}" alloutil${DEBUG_SUFFIX})
     target_link_libraries("${ALLO_APP_NAME_SUFFIX}" ${ALLOUTIL_LIBRARY} ${ALLOUTIL_LINK_LIBRARIES})
-    include_directories(${ALLOUTIL_DEP_INCLUDE_DIR})
+    include_directories(${ALLOUTIL_DEP_INCLUDE_DIRS})
 else()
   if(NOT ALLOUTIL_FOUND)
     set(ALLOUTIL_LIBRARY "")
-    set(ALLOUTIL_DEP_INCLUDE_DIR "")
+    set(ALLOUTIL_DEP_INCLUDE_DIRS "")
     message("Not building ALLOUTIL and no usable ALLOUTIL binary found. Not linking application to ALLOUTIL")
   endif(NOT ALLOUTIL_FOUND)
 endif(TARGET alloutil${DEBUG_SUFFIX})
@@ -202,6 +222,22 @@ else()
     message("Not building allocv and no usable allocv binary found. Not linking application to allocv")
   endif(NOT ALLOCV_FOUND)
 endif(TARGET allocv${DEBUG_SUFFIX})
+
+if(TARGET allosphere${DEBUG_SUFFIX})
+	get_target_property(ALLOSPHERE_LIBRARY allosphere${DEBUG_SUFFIX} LOCATION)
+	get_target_property(ALLOSPHERE_DEP_INCLUDE_DIR allosphere${DEBUG_SUFFIX} ALLOSPHERE_DEP_INCLUDE_DIR)
+	get_target_property(ALLOSPHERE_INCLUDE_DIR allosphere${DEBUG_SUFFIX} ALLOSPHERE_INCLUDE_DIR)
+	get_target_property(ALLOSPHERE_LINK_LIBRARIES "allosphere${DEBUG_SUFFIX}" ALLOSPHERE_LINK_LIBRARIES)
+	add_dependencies("${ALLO_APP_NAME_SUFFIX}" allosphere${DEBUG_SUFFIX})
+	target_link_libraries("${ALLO_APP_NAME_SUFFIX}" ${ALLOSPHERE_LIBRARY} ${ALLOSPHERE_LINK_LIBRARIES})
+	include_directories(${ALLOSPHERE_INCLUDE_DIR} ${ALLOSPHERE_DEP_INCLUDE_DIR})
+else()
+  if(NOT ALLOSPHERE_FOUND)
+	set(ALLOSPHERE_LIBRARY "")
+	set(ALLOSPHERE_INCLUDE_DIR "")
+	message("Not building allosphere and no usable allosphere binary found. Not linking application to allosphere")
+  endif(NOT ALLOSPHERE_FOUND)
+endif(TARGET allosphere${DEBUG_SUFFIX})
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 
@@ -258,19 +294,18 @@ BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER"
 AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
 list(APPEND ALLOSPHERE_APPS "${APP_NAME}_graphics")
 if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
-AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
-list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
+  BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
+  AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
+  list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
 endif()
-set(RUN_CONFIG "{ \"run_dir\" : \"${BUILD_ROOT_DIR}\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"build/bin/${APP_NAME}_simulator\"},")
+set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"${APP_NAME}_simulator\"},")
 
 if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"build/bin/${APP_NAME}_audio\" }, ")
+set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"${APP_NAME}_audio\" }, ")
 endif()
 
-set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"build/bin/${APP_NAME}_graphics\"} ] \n}")
+set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"${APP_NAME}_graphics\"} ] \n}")
 
-file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
 
 add_custom_target("${APP_NAME}"
   COMMAND ""
@@ -289,6 +324,12 @@ add_custom_target("${APP_NAME}_run"
 else()
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "" "")
 AddRunTarget("${APP_NAME}" "${APP_NAME}")
+
+set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"monolithic\", \"path\" : \"${APP_NAME}\"} ] }")
+
 endif()
+
+
+file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
 
 

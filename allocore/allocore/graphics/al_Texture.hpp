@@ -252,12 +252,13 @@ public:
 	void unbind(int unit = 0);
 
 	/// Render the texture onto a quad on the XY plane
-	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0);
+	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0, double z=0);
 
 	/// Render the texture onto a quad filling current viewport
 	void quadViewport(
 		Graphics& g, const Color& color = Color(1),
-		double w=2, double h=2, double x=-1, double y=-1);
+		double w=2, double h=2, double x=-1, double y=-1, double z=0);
+
 
 	/// Get mutable reference to the internal pixel data
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
@@ -272,6 +273,10 @@ public:
 
 	template<class T> const T * data() const { return (const T*)(data()); }
 	const char * data() const { return array().data.ptr; }
+
+	/// Get reference to a pixel
+	template<class T> T& at(unsigned x, unsigned y){ return array().as<T>(x,y); }
+	template<class T> const T& at(unsigned x, unsigned y) const { return array().as<T>(x,y); }
 
 	/// Flags resubmission of pixel data upon next bind
 
@@ -323,11 +328,24 @@ public:
 	/// Allocate the internal Array for a client-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);
 
-	/// Allocate memory for a client-side copy (reconfigures the internal array)
+	/// Allocate client-side texture memory using current shape
 	void allocate(unsigned align=1);
+
+	/// Allocate client-side texture memory, copying from src
+	template <class T>
+	void allocate(const T * src, unsigned w, Graphics::Format format);
+
+	/// Allocate client-side texture memory, copying from src
+	template <class T>
+	void allocate(const T * src, unsigned w, unsigned h, Graphics::Format format);
+
+	/// Allocate client-side texture memory, copying from src
+	template <class T>
+	void allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format format);
 
 	/// Deallocate any allocated client-side memory
 	void deallocate();
+
 
 	/// Print information about texture
 	void print();
@@ -354,6 +372,7 @@ protected:
 	virtual void onDestroy();
 
 	void init();
+	void deriveTarget();
 
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
@@ -383,7 +402,31 @@ public:
 };
 
 
+// Implementation --------------------------------------------------------------
 
+const char * toString(Texture::Target v);
+const char * toString(Texture::Wrap v);
+const char * toString(Texture::Filter v);
+
+template <class T>
+void Texture::allocate(const T * src, unsigned w, Graphics::Format format_ ){
+	allocate(src, w,0,0, format_);
+}
+
+template <class T>
+void Texture::allocate(const T * src, unsigned w, unsigned h, Graphics::Format format_){
+	allocate(src, w,h,0, format_);
+}
+
+template <class T>
+void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format format_){
+	type(Graphics::toDataType<T>());
+	format(format_);
+	resize(w, h, d);
+	deriveTarget();
+	allocate();
+	memcpy(mArray.data.ptr, src, mArray.size());
+}
 
 inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){
 	if(S!=mWrapS || T!=mWrapT || R!=mWrapR){

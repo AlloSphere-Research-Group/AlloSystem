@@ -6,7 +6,8 @@
 #include "alloutil/al_InterfaceServerClient.hpp"
 
 using namespace std;
-using namespace al;
+
+namespace al {
 
 class Simulator : public InterfaceServerClient, public Main::Handler {
  public:
@@ -34,9 +35,8 @@ class Simulator : public InterfaceServerClient, public Main::Handler {
   // virtual void onMessage(osc::Message& m);
 
   static bool sim(){
-    char hostname[256];
-    gethostname(hostname, 256);
-    return (!strncmp(hostname,"gr01",256) || !strncmp(hostname,"audio.10g",256));
+	std::string hostname = Socket::hostName();
+	return (hostname == "gr01" || hostname == "audio.10g");
   }
 
   static const char* defaultBroadcastIP(){
@@ -112,6 +112,7 @@ inline void Simulator::stop() { cout << "Simulator stopped." <<endl; Main::get()
 inline Simulator::~Simulator() {
   InterfaceServerClient::disconnect();
   // oscSend().send("/interface/disconnectApplication", name());
+}
 }
 
 #endif

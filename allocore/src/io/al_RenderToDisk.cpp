@@ -1,3 +1,4 @@
+#include <cstdlib> // std::system
 #include "allocore/io/al_RenderToDisk.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Time.hpp"
@@ -23,7 +24,7 @@ RenderToDisk::RenderToDisk(Mode m)
 :	mMode(m), mFrameNumber(0), mElapsedSec(0),
 	mGraphicsBuf(-1),
 	mImageExt("png"), mImageCompress(50),
-	mActive(false)
+	mActive(false), mWroteImages(false), mWroteAudio(false)
 {
 	mPBOs[0] = 0;
 	resetPBOQueue();
@@ -53,7 +54,7 @@ RenderToDisk& RenderToDisk::mode(Mode v){
 }
 
 RenderToDisk& RenderToDisk::path(const std::string& v){
-	mPath = v;
+	mUserPath = v;
 	return *this;
 }
 
@@ -101,9 +102,11 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		return false;
 	}
 
+	mWroteImages = mWroteAudio = false;
+	mFrameNumber = 0;
+
 	// Make path on HD
 	makePath();
-
 
 	if(aio){
 		// Open sound file for writing
@@ -126,7 +129,8 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		//int bytesPerSample = 4;
 		//mAudioBuf.resize(aio.channelsOut() * aio.framesPerBuffer() * bytesPerSample);
 
-		unsigned numBlocks = 8192/aio->framesPerBuffer();
+		unsigned ringSizeInFrames = aio->fps() * 0.25; // 1/4 second of audio
+		unsigned numBlocks = ringSizeInFrames/aio->framesPerBuffer();
 		if(numBlocks < 2) numBlocks = 2; // should buffer at least two (?) blocks
 		mAudioRing.resize(aio->channelsOut(), aio->framesPerBuffer(), numBlocks);
 	}
@@ -202,6 +206,8 @@ void RenderToDisk::stop(){
 		for(int i=0; i<Npbos; ++i) writeImage();
 		resetPBOQueue();
 
+		mWroteImages = true;
+
 		if(0 != mPBOs[0]){
 			glDeleteBuffers(Npbos, mPBOs);
 			mPBOs[0] = 0;
@@ -223,6 +229,8 @@ void RenderToDisk::stop(){
 	if(mAudioIO){
 		mSoundFileThread.join();
 		mSoundFile.close();
+
+		mWroteAudio = true;
 
 		mAudioIO->remove(*this);
 	
@@ -246,10 +254,13 @@ void RenderToDisk::saveScreenshot(al::Window& win){
 
 
 void RenderToDisk::makePath(){
-	// If no path specified, create default with time string
-	if(mPath.empty()){
+	// If no user path specified, create default with time string
+	if(mUserPath.empty()){
 		mPath = "./render";
 		mPath += al::toString((unsigned long long)(al::timeNow()*1000) % 31536000000ull);
+	}
+	else{
+		mPath = mUserPath;
 	}
 
 	// Create output directory if it doesn't exist
@@ -316,7 +327,7 @@ void RenderToDisk::resetPBOQueue(){
 void RenderToDisk::saveImage(
 	unsigned w, unsigned h, unsigned l, unsigned b, bool usePBO
 ){
-	unsigned numBytes = w*h*3;
+	const auto numBytes = w*h*3;
 	if(numBytes > mPixels.size()) mPixels.resize(numBytes);
 
 	unsigned char * pixs = &mPixels[0];
@@ -347,26 +358,27 @@ void RenderToDisk::saveImage(
 	if(usePBO){
 		if(0 == mPBOs[0]){ // create PBOs
 			glGenBuffers(Npbos, mPBOs);
-			for(int i=0; i<Npbos; ++i){
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, mPBOs[i]);
+			for(auto& pbo : mPBOs){
+				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
 				glBufferData(GL_PIXEL_PACK_BUFFER, numBytes, NULL, GL_STREAM_READ);
 			}
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 		}
 
 		//printf("PBO %d %s\n", mPBOIdx, mReadPBO ? "(read back)" : "");
-		GLuint pbo = mPBOs[mPBOIdx];
+		auto pbo = mPBOs[mPBOIdx];
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
 
 		if(mReadPBO){
-			// This will block until glReadPixels from previous frame finishes
-			void *ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+			// Get pointer to data in currently bound PBO
+			// (This will block until glReadPixels finishes from last time the PBO was bound)
+			auto * ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 			memcpy(pixs, ptr, numBytes);
 			glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 			readPixels = true;
 		}
 
-		// This will not block
+		// This will perform asynchronously into the bound PBO
 		glReadPixels(l,b,w,h, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
@@ -375,6 +387,7 @@ void RenderToDisk::saveImage(
 		mReadPBO = mReadPBO || (mPBOIdx == 0); // written to all PBOs at least once
 	}
 	else{
+		// This will block until all draw commands finish
 		glReadPixels(l,b,w,h, GL_RGB, GL_UNSIGNED_BYTE, pixs);
 		readPixels = true;
 	}
@@ -382,30 +395,65 @@ void RenderToDisk::saveImage(
 
 	// Launch thread to write pixels out to an image file
 	if(readPixels){
-		//printf("Writing frame %d\n", mFrameNumber);
+		//printf("----\nWriting frame %d\n", mFrameNumber);
 
 		// At 40 FPS: 60 x 60 x 40 = 144000 frames/hour
 		std::string name = mPath + "/" + al::toString("%07u", mFrameNumber) + "." + mImageExt;
 		Image::Format format = Image::RGB;
 
+		CHECK_THREADS:
 		int i=0;
 		for(; i<Nthreads; ++i){
+			//printf("Checking if image writer %d is free ...\n", i);
 			if(mImageWriters[i].run(name, mPixels, w,h, format, mImageCompress)){
 				//printf("Running image writer %d\n", i);
 				break;
 			}
-			//printf("Error: all image writers are busy...\n");
 		}
-		//printf("%d\n", i);
-		// All threaded image writers were busy, so use main thread
+		// All threaded image writers were busy
 		if(i == Nthreads){
-			al::Image::save(name, pixs, w,h, format, mImageCompress);
+			//printf("Error: all image writers are busy...\n");
+			al::wait(1./1e3); // wait 1 ms for disk i/o to finish up (hopefully)
+			goto CHECK_THREADS;
+			// Use main thread---this will definitely stall
+			//al::Image::save(name, pixs, w,h, format, mImageCompress);
 		}
 	
 		++mFrameNumber;
 	}
 }
 
+void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
+
+	// Nothing to do without image sequence
+	if(!mWroteImages) return;
+
+	std::string prog;
+	#ifdef AL_WINDOWS
+		// Note: path must be DOS style for std::system
+		prog = "c:\\Program Files\\ffmpeg\\bin\\ffmpeg";
+	#else
+		prog = "ffmpeg";
+	#endif
+
+	std::string args;
+	args += " -r " + al::toString(1./mFrameDur);
+	args += " -i " + path() + "/%07d." + mImageExt;
+	if(mWroteAudio){
+		args += " -i " + path() + "/output.au -c:a aac -b:a 192k";
+	}
+	//args += " -crf 20 -preset slower";
+	args += " -crf " + al::toString(videoCompress);
+	static const std::string speedStrings[] = {"placebo","veryslow","slower","slow","medium","fast","faster","veryfast","superfast","ultrafast"};
+	args += " -preset " + speedStrings[videoEncodeSpeed];
+	args += " " + path() + "/movie.mp4";
+
+	std::string cmd = "\"" + prog + "\"" + args;
+	//printf("%s\n", cmd.c_str());
+
+	// TODO: thread this; std::system blocks until the command finishes
+	std::system(cmd.c_str());
+}
 
 
 RenderToDisk::AudioRing::AudioRing()
@@ -485,10 +533,6 @@ unsigned RenderToDisk::AudioRing::blockSizeInSamples() const {
 }
 
 
-
-RenderToDisk::ImageWriter::ImageWriter()
-: mBusy(false)
-{}
 
 bool RenderToDisk::ImageWriter::run(
 	const std::string& path,

@@ -149,6 +149,7 @@ public:
 	uint32_t getNormalId();
 	/// Get color buffer ID
 	uint32_t getColorId();
+	uint32_t getColoriId();
 	/// Get texture coordinates buffer ID
 	uint32_t getTexCoordId();
 	/// Get index buffer ID
@@ -168,6 +169,7 @@ public:
 	bool hasNormals();
 	/// Check if colors exist
 	bool hasColors();
+	bool hasColoris();
 	/// Check if 2d texture coordinates exist
 	bool hasTexCoord2s();
 	/// Check if 3d texture coordinates exist
@@ -181,6 +183,7 @@ protected:
 	uint32_t mVertId = 0;
 	uint32_t mNormalId = 0;
 	uint32_t mColorId = 0;
+	uint32_t mColoriId = 0;
 	uint32_t mTexCoordId = 0;
 	uint32_t mIndexId = 0;
 
@@ -189,6 +192,7 @@ protected:
 	int mVertStride = sizeof(Vec3f);
 	int mNormalStride = sizeof(Vec3f);
 	int mColorStride = sizeof(Color);
+	int mColoriStride = sizeof(Colori);
 	int mTexCoordStride = sizeof(TexCoord2);
 	int mIndexStride = sizeof(uint32_t);
 
@@ -197,6 +201,7 @@ protected:
 
 	bool mHasNormals = false;
 	bool mHasColors = false;
+	bool mHasColoris = false;
 	bool mHasTexCoord2s = false;
 	bool mHasTexCoord3s = false;
 	bool mHasIndices = false;

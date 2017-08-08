@@ -45,6 +45,7 @@
 */
 
 #include <string>
+#include <unordered_map>
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -186,6 +187,9 @@ public:
 
 
 	/// Compile and link shader sources
+
+	/// If called outside of a graphics context, compiling and linking will
+	/// occur once the first time the shader is bound.
 	bool compile(
 		const std::string& vertSource,
 		const std::string& fragSource,
@@ -218,30 +222,73 @@ public:
 	bool validateProgram(bool printLog=false) const;
 
 
+	/// Set parameters for geometry shader
+
+	/// @param[in] inPrim	Input primitive to geometry shader
+	/// @param[in] outPrim	Output primitive from geometry shader
+	/// @param[in] outVert	Number of vertices output from geometry shader 
+	///						(note the number of input vertices is always 1)
+	///
+	/// This must be called before attaching the geometry shader.
+	/// For GLSL, the geometry shader must include the line:
+	///		#extension GL_EXT_geometry_shader4 : enable
+	ShaderProgram& setGeometry(Graphics::Primitive inPrim, Graphics::Primitive outPrim, unsigned outVert){
+		mInPrim=inPrim; mOutPrim=outPrim; mOutVertices=outVert; return *this;
+	}
+
 	// These parameters must be set before attaching geometry shaders
-	void setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; }
-	void setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; }
-	void setGeometryOutputVertices(unsigned int i){ mOutVertices = i; }
+	ShaderProgram& setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; return *this; }
+	ShaderProgram& setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; return *this; }
+	ShaderProgram& setGeometryOutputVertices(unsigned i){ mOutVertices = i; return *this; }
 
+
+	/// Print out all the input parameters to the shader
 	void listParams() const;
-	const ShaderProgram& uniform(const char * name, int v0) const;
-	const ShaderProgram& uniform(const char * name, float v0) const;
-	const ShaderProgram& uniform(const char * name, double v0) const { return uniform(name, (float)v0); }
-	const ShaderProgram& uniform(const char * name, float v0, float v1) const;
-	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2) const;
-	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2, float v3) const;
 
+	/// Get location of uniform
+	int uniform(const char * name) const;
 
-	const ShaderProgram& uniform(int location, int v0) const;
-	const ShaderProgram& uniform(int location, float v0) const;
-	const ShaderProgram& uniform(int location, double v0) const { return uniform(location, (float)v0); }
-	const ShaderProgram& uniform(int location, float v0, float v1) const;
-	const ShaderProgram& uniform(int location, float v0, float v1, float v2) const;
-	const ShaderProgram& uniform(int location, float v0, float v1, float v2, float v3) const;
+	/// Get location of attribute
+	int attribute(const char * name) const;
 
 	const ShaderProgram& uniform(const char * name, Color v) const {
 	  return uniform(name, v[0], v[1], v[2], v[3]);
 	}
+
+	const ShaderProgram& uniform(int loc, int v) const;
+	const ShaderProgram& uniform(int loc, float v) const;
+	const ShaderProgram& uniform(int loc, double v) const { return uniform(loc, float(v)); }
+	const ShaderProgram& uniform(int loc, float v0, float v1) const;
+	const ShaderProgram& uniform(int loc, float v0, float v1, float v2) const;
+	const ShaderProgram& uniform(int loc, float v0, float v1, float v2, float v3) const;
+	template <typename T>
+	const ShaderProgram& uniform(int loc, const Vec<2,T>& v) const {
+		return uniform(loc, v.x, v.y);
+	}
+	template <typename T>
+	const ShaderProgram& uniform(int loc, const Vec<3,T>& v) const {
+		return uniform(loc, v.x, v.y, v.z);
+	}
+	template <typename T>
+	const ShaderProgram& uniform(int loc, const Vec<4,T>& v) const {
+		return uniform(loc, v.x, v.y, v.z, v.w);
+	}
+	const ShaderProgram& uniformMatrix3(int loc, const float * v, bool transpose=false) const;
+	const ShaderProgram& uniformMatrix4(int loc, const float * v, bool transpose=false) const;
+	const ShaderProgram& uniform(int loc, const Mat<4,float>& m) const{
+		return uniformMatrix4(loc, m.elems());
+	}
+	template<typename T>
+	const ShaderProgram& uniform(int loc, const Mat<4,T>& m) const{
+		return uniform(loc, Mat4f(m));
+	}
+
+	const ShaderProgram& uniform(const char * name, int v) const;
+	const ShaderProgram& uniform(const char * name, float v) const;
+	const ShaderProgram& uniform(const char * name, double v) const { return uniform(name, float(v)); }
+	const ShaderProgram& uniform(const char * name, float v0, float v1) const;
+	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2) const;
+	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2, float v3) const;
 
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) const {
@@ -279,48 +326,48 @@ public:
 	const ShaderProgram& uniform3(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform4(const char * name, const float * v, int count=1) const;
 
-	const ShaderProgram& uniformMatrix3(const char * name, const float * v, bool transpose=0) const;
-	const ShaderProgram& uniformMatrix4(const char * name, const float * v, bool transpose=0) const;
+	const ShaderProgram& uniformMatrix3(const char * name, const float * v, bool transpose=false) const;
+	const ShaderProgram& uniformMatrix4(const char * name, const float * v, bool transpose=false) const;
 
-	const ShaderProgram& attribute(const char * name, float v0) const;
+
+	const ShaderProgram& attribute(int loc, float v) const;
+	const ShaderProgram& attribute(int loc, float v0, float v1) const;
+	const ShaderProgram& attribute(int loc, float v0, float v1, float v2) const;
+	const ShaderProgram& attribute(int loc, float v0, float v1, float v2, float v3) const;
+
+	const ShaderProgram& attribute(const char * name, float v) const;
 	const ShaderProgram& attribute(const char * name, float v0, float v1) const;
 	const ShaderProgram& attribute(const char * name, float v0, float v1, float v2) const;
 	const ShaderProgram& attribute(const char * name, float v0, float v1, float v2, float v3) const;
-
-	const ShaderProgram& attribute(int location, float v0) const;
-	const ShaderProgram& attribute(int location, float v0, float v1) const;
-	const ShaderProgram& attribute(int location, float v0, float v1, float v2) const;
-	const ShaderProgram& attribute(int location, float v0, float v1, float v2, float v3) const;
 
 	const ShaderProgram& attribute1(const char * name, const float * v) const;
 	const ShaderProgram& attribute2(const char * name, const float * v) const;
 	const ShaderProgram& attribute3(const char * name, const float * v) const;
 	const ShaderProgram& attribute4(const char * name, const float * v) const;
-	const ShaderProgram& attribute1(int location, const double * v) const;
-	const ShaderProgram& attribute2(int location, const double * v) const;
-	const ShaderProgram& attribute3(int location, const double * v) const;
-	const ShaderProgram& attribute4(int location, const double * v) const;
+	const ShaderProgram& attribute1(int loc, const double * v) const;
+	const ShaderProgram& attribute2(int loc, const double * v) const;
+	const ShaderProgram& attribute3(int loc, const double * v) const;
+	const ShaderProgram& attribute4(int loc, const double * v) const;
 
 	template<typename T>
-	const ShaderProgram& attribute(int location, const Vec<2,T>& v) const {
-		return attribute(location, v.x, v.y);
+	const ShaderProgram& attribute(int loc, const Vec<2,T>& v) const {
+		return attribute(loc, v.x, v.y);
 	}
 	template<typename T>
-	const ShaderProgram& attribute(int location, const Vec<3,T>& v) const {
-		return attribute(location, v.x, v.y, v.z);
+	const ShaderProgram& attribute(int loc, const Vec<3,T>& v) const {
+		return attribute(loc, v.x, v.y, v.z);
 	}
 	template<typename T>
-	const ShaderProgram& attribute(int location, const Vec<4,T>& v) const {
-		return attribute(location, v.x, v.y, v.z, v.w);
+	const ShaderProgram& attribute(int loc, const Vec<4,T>& v) const {
+		return attribute(loc, v.x, v.y, v.z, v.w);
 	}
 	template<typename T>
-	const ShaderProgram& attribute(int location, const Quat<T>& q) const {
+	const ShaderProgram& attribute(int loc, const Quat<T>& q) const {
 		// note wxyz => xyzw for GLSL vec4:
-		return attribute(location, q.x, q.y, q.z, q.w);
+		return attribute(loc, q.x, q.y, q.z, q.w);
 	}
 
-	int uniform(const char * name) const;
-	int attribute(const char * name) const;
+
 
 	static void use(unsigned programID);
 
@@ -328,6 +375,7 @@ protected:
 	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
 	unsigned int mOutVertices;
 	std::string mVertSource, mFragSource, mGeomSource;
+	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
 	bool mActive;
 
 	virtual void get(int pname, void * params) const;

@@ -21,18 +21,24 @@
 
 namespace al{
 
-static int initializedFreeImage = 0;
-
 class FreeImageImpl : public Image::Impl {
 public:
 	FreeImageImpl()
 	:	mImage(NULL)
 	{
-		if (!initializedFreeImage) {
-			FreeImage_Initialise();
-			initializedFreeImage = 1;
-		}
+		// Initialization singleton
+		struct Init{
+			Init(){ FreeImage_Initialise(); }
+			~Init(){ FreeImage_DeInitialise(); }
+			static Init& get(){
+				static Init v;
+				return v;
+			}
+		};
+
+		Init::get();
 	}
+
 	virtual ~FreeImageImpl() {
 		destroy();
 	}
@@ -231,9 +237,15 @@ public:
 			return false;
 		}
 
+		Image::Format format = Image::getFormat(arr.components());
+
+		if(FIF_JPEG == fileType && (Image::RGBA == format || Image::LUMALPHA == format)){
+			AL_WARN("cannot save JPEG with alpha channel; use 24-bit RGB or 8-bit grayscale/luminance");
+			return false;
+		}
+
 		unsigned w = arr.dim(0);
 		unsigned h = (arr.dimcount() > 1) ? arr.dim(1) : 1;
-		Image::Format format = Image::getFormat(arr.components());
 		int bpp = arr.stride(0)*8; // bits/pixel
 
 		resize(w,h,bpp);

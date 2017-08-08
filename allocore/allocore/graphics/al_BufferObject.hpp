@@ -127,6 +127,15 @@ public:
 	/// Get buffer store size, in bytes
 	int size() const;
 
+	/// Get data type
+	Graphics::DataType dataType() const { return mDataType; }
+
+	/// Get number of components in each data element (e.g., 4 for RGBA)
+	int numComps() const { return mNumComps; }
+
+	/// Get number of elements (e.g., colors)
+	int numElems() const { return mNumElems; }
+
 
 	/// Set buffer type
 	void bufferType(BufferType v);
@@ -163,6 +172,9 @@ public:
 
 	void operator()();
 	void send();
+
+
+	void print() const;
 
 
 	#ifdef AL_GRAPHICS_USE_OPENGL
@@ -216,7 +228,7 @@ protected:
 
 	virtual void onCreate();
 	virtual void onDestroy();
-	virtual void onPointerFunc() = 0;
+	virtual void onPointerFunc(){};
 };
 
 
@@ -271,7 +283,8 @@ protected:
 	virtual void onPointerFunc();
 };
 
-
+const char * toString(BufferObject::BufferType v);
+const char * toString(BufferObject::BufferUsage v);
 
 // IMPLEMENTATION --------------------------------------------------------------
 

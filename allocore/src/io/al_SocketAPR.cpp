@@ -243,6 +243,7 @@ struct Socket::Impl : public ImplAPR {
 	std::string mAddress;
 	apr_sockaddr_t * mSockAddr;
 	apr_socket_t * mSock;
+	apr_sockaddr_t mFromAddress;
 	al_sec mTimeout;
 	int mType;
 };
@@ -292,13 +293,18 @@ void Socket::timeout(al_sec v){
 	mImpl->timeout(v);
 }
 
-size_t Socket::recv(char * buffer, size_t maxlen) {
+
+size_t Socket::recv(char * buffer, size_t maxlen, char *from) {
 	apr_size_t len = maxlen;
 
 	// printf("About to call apr_socket_recv(%p, %p, %d)\n", mImpl->mSock, buffer, len);
-
-	apr_status_t r = apr_socket_recv(mImpl->mSock, buffer, &len);
-
+ 	apr_int32_t flags = 0;
+	apr_status_t r = apr_socket_recvfrom(&mImpl->mFromAddress, mImpl->mSock, flags, buffer, &len);
+	char addr[32] = "";
+	apr_status_t ret = apr_sockaddr_ip_getbuf(addr, 32, &mImpl->mFromAddress);
+	if (len > 0 && from != nullptr && ret == APR_SUCCESS) {
+		strncpy(from, addr, 15);
+	}
 	// printf("apr_socket_recv returned\n");
 
 	// only error check if not error# 35: Resource temporarily unavailable

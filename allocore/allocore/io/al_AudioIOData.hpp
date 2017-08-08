@@ -40,31 +40,28 @@
 
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
+	Andres Cabrera 2017 mantaraya36@gmail.com
 */
 
+#include <cassert>
 #include <cstdio>
 
-namespace al{
+namespace al {
 
-
-static int min(int x, int y){ return x<y?x:y; }
-
-/*
-static void err(const char * msg, const char * src, bool exits){
-	fprintf(stderr, "%s%serror: %s\n", src, src[0]?" ":"", msg);
-	if(exits) exit(EXIT_FAILURE);
-}
-*/
-
-static void warn(const char * msg, const char * src){
-	fprintf(stderr, "%s%swarning: %s\n", src, src[0]?" ":"", msg);
+// FIXME move this warn function. Perhaps replace use with a function from the
+// core/system/al_Printing.hpp file
+static void warn(const char* msg, const char* src) {
+	fprintf(stderr, "%s%swarning: %s\n", src, src[0] ? " " : "", msg);
 }
 
 template <class T>
-static void deleteBuf(T *& buf){ delete[] buf; buf=0; }
+static void deleteBuf(T*& buf) {
+	delete[] buf;
+	buf = 0;
+}
 
 template <class T>
-static int resize(T *& buf, int n){
+static int resize(T*& buf, int n) {
 	deleteBuf(buf);
 	buf = new T[n];
 	return n;
@@ -72,14 +69,16 @@ static int resize(T *& buf, int n){
 
 // Utility function to efficiently clear buffer (set all to 0)
 template <class T>
-static void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
+static void zero(T* buf, int n) {
+	memset(buf, 0, n * sizeof(T));
+}
 
 // Utility function to deinterleave samples
 template <class T>
-static void deinterleave(T * dst, const T * src, int numFrames, int numChannels){
+static void deinterleave(T* dst, const T* src, int numFrames, int numChannels) {
 	int numSamples = numFrames * numChannels;
-	for(int c=0; c < numChannels; c++){
-		for(int i=c; i < numSamples; i+=numChannels){
+	for (int c = 0; c < numChannels; c++) {
+		for (int i = c; i < numSamples; i += numChannels) {
 			*dst++ = src[i];
 		}
 	}
@@ -87,10 +86,10 @@ static void deinterleave(T * dst, const T * src, int numFrames, int numChannels)
 
 /// Utility function to interleave samples
 template <class T>
-static void interleave(T * dst, const T * src, int numFrames, int numChannels){
+static void interleave(T* dst, const T* src, int numFrames, int numChannels) {
 	int numSamples = numFrames * numChannels;
-	for(int c=0; c < numChannels; c++){
-		for(int i=c; i < numSamples; i+=numChannels){
+	for (int c = 0; c < numChannels; c++) {
+		for (int i = c; i < numSamples; i += numChannels) {
 			dst[i] = *src++;
 		}
 	}
@@ -99,97 +98,63 @@ static void interleave(T * dst, const T * src, int numFrames, int numChannels){
 /// Audio device information
 ///
 /// @ingroup allocore
-class AudioDeviceInfo{
+class AudioDeviceInfo {
 public:
-
 	/// Stream mode
-	enum StreamMode{
-		INPUT	= 1,	/**< Input stream */
-		OUTPUT	= 2		/**< Output stream */
+	enum StreamMode {
+		INPUT = 1, /**< Input stream */
+		OUTPUT = 2 /**< Output stream */
 	};
 
 	/// @param[in] deviceNum	Device enumeration number
 	AudioDeviceInfo(int deviceNum);
 
-//	/// @param[in] nameKeyword	Keyword to search for in device name
-//	/// @param[in] stream		Whether to search for input and/or output devices
-//	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT)) : mID(-1) {}
+	//	/// @param[in] nameKeyword	Keyword to search for in device name
+	//	/// @param[in] stream		Whether to search for input and/or
+	//output
+	// devices
+	//	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream =
+	// StreamMode(INPUT | OUTPUT)) : mID(-1) {}
 
-	virtual ~AudioDeviceInfo(){}
+	virtual ~AudioDeviceInfo() {}
 
-	virtual bool valid() const;						///< Returns whether device is valid
-	virtual int id() const;							///< Get device unique ID
-	virtual const char * name() const;				///< Get device name
-	virtual int channelsInMax() const;				///< Get maximum number of input channels supported
-	virtual int channelsOutMax() const;				///< Get maximum number of output channels supported
-	virtual double defaultSampleRate() const;		///< Get default sample rate
+	virtual bool valid() const;        ///< Returns whether device is valid
+	virtual int id() const;            ///< Get device unique ID
+	virtual const char* name() const;  ///< Get device name
+	virtual int channelsInMax()
+	const;  ///< Get maximum number of input channels supported
+	virtual int channelsOutMax()
+	const;  ///< Get maximum number of output channels supported
+	virtual double defaultSampleRate() const;  ///< Get default sample rate
 
-	virtual void setID(int iD);						///< Sets unique ID
-	virtual void setName(char *name);				///< Sets device name
-	virtual void setChannelsInMax(int num);			///< Sets maximum number of Input channels supported
-	virtual void setChannelsOutMax(int num);		///< Sets maximum number of Output channels supported
-	virtual void setDefaultSampleRate(double rate);	///< Sets default sample rate
+	virtual void setID(int iD);        ///< Sets unique ID
+	virtual void setName(char* name);  ///< Sets device name
+	virtual void setChannelsInMax(
+	        int num);  ///< Sets maximum number of Input channels supported
+	virtual void setChannelsOutMax(
+	        int num);  ///< Sets maximum number of Output channels supported
+	virtual void setDefaultSampleRate(double rate);  ///< Sets default sample rate
 
-	virtual bool hasInput() const = 0;				///< Returns whether device has input
-	virtual bool hasOutput() const = 0;				///< Returns whether device has output
+	virtual bool hasInput() const = 0;   ///< Returns whether device has input
+	virtual bool hasOutput() const = 0;  ///< Returns whether device has output
 
-	virtual void print() const = 0;					///< Prints info about specific i/o device to stdout
+	virtual void print()
+	const = 0;  ///< Prints info about specific i/o device to stdout
 
 protected:
-	int mID;
+	int mID{-1};
 	char mName[128];
-	int mChannelsInMax;
-	int mChannelsOutMax;
-	double mDefaultSampleRate;
+	int mChannelsInMax{0};
+	int mChannelsOutMax{0};
+	double mDefaultSampleRate{0};
+	bool mValid{false};
 };
 
-inline AudioDeviceInfo::StreamMode operator| (const AudioDeviceInfo::StreamMode& a, const AudioDeviceInfo::StreamMode& b){
-	return static_cast<AudioDeviceInfo::StreamMode>(+a|+b);
+inline AudioDeviceInfo::StreamMode operator|(
+        const AudioDeviceInfo::StreamMode& a,
+        const AudioDeviceInfo::StreamMode& b) {
+	return static_cast<AudioDeviceInfo::StreamMode>(+a | +b);
 }
-
-
-/// Abstract audio backend
-///
-/// @ingroup allocore
-class AudioBackend{
-public:
-	AudioBackend();
-
-	virtual ~AudioBackend(){}
-
-	virtual bool isOpen() const = 0;
-	virtual bool isRunning() const = 0;
-	virtual bool error() const = 0;
-
-	virtual void printError(const char * text = "") const = 0;
-	virtual void printInfo() const = 0;
-
-	virtual bool supportsFPS(double fps) const = 0;
-
-	virtual void inDevice(int index) = 0;
-	virtual void outDevice(int index) = 0;
-
-	virtual void channels(int num, bool forOutput) = 0;
-
-	virtual int inDeviceChans() = 0;
-	virtual int outDeviceChans() = 0;
-	virtual void setInDeviceChans(int num) = 0;
-	virtual void setOutDeviceChans(int num) = 0;
-
-	virtual double time() = 0;
-
-	virtual bool open(int framesPerSecond, int framesPerBuffer, void *userdata) = 0;
-	virtual bool close() = 0;
-
-	virtual bool start(int framesPerSecond, int framesPerBuffer, void *userdata) = 0;
-	virtual bool stop() = 0;
-	virtual double cpu() = 0;
-
-protected:
-	bool mIsOpen;						// An audio device is open
-	bool mIsRunning;					// An audio stream is running
-};
-
 
 /// Audio data to be sent to callback
 /// Audio buffers are guaranteed to be stored in a contiguous non-interleaved
@@ -199,17 +164,14 @@ protected:
 class AudioIOData {
 public:
 	/// Constructor
-	AudioIOData(void * user);
+	AudioIOData(void* user);
 
 	virtual ~AudioIOData();
 
-	typedef enum {
-		PORTAUDIO,
-		DUMMY
-	} Backend;
+	typedef enum { PORTAUDIO, RTAUDIO, DUMMY } Backend;
 
 	/// Iterate frame counter, returning true while more frames
-	bool operator()() const { return (++mFrame)<framesPerBuffer(); }
+	bool operator()() const { return (++mFrame) < framesPerBuffer(); }
 
 	/// Get current frame number
 	int frame() const { return mFrame; }
@@ -221,16 +183,16 @@ public:
 	float& bus(int chan, int frame) const;
 
 	/// Get non-interleaved bus buffer on specified channel
-	float * busBuffer(int chan=0) const { return &bus(chan,0); }
+	float* busBuffer(int chan = 0) const { return &bus(chan, 0); }
 
 	/// Get input sample at current frame iteration on specified channel
-	const float& in(int chan) const { return in (chan, frame()); }
+	const float& in(int chan) const { return in(chan, frame()); }
 
 	/// Get input sample at specified channel and frame
-	const float& in (int chan, int frame) const;
+	const float& in(int chan, int frame) const;
 
 	/// Get non-interleaved input buffer on specified channel
-	const float * inBuffer(int chan=0) const { return &in(chan,0); }
+	const float* inBuffer(int chan = 0) const { return &in(chan, 0); }
 
 	/// Get output sample at current frame iteration on specified channel
 	float& out(int chan) const { return out(chan, frame()); }
@@ -239,56 +201,62 @@ public:
 	float& out(int chan, int frame) const;
 
 	/// Get non-interleaved output buffer on specified channel
-	float * outBuffer(int chan=0) const { return &out(chan,0); }
+	float* outBuffer(int chan = 0) const { return &out(chan, 0); }
 
 	/// Add value to current output sample on specified channel
-	void sum(float v, int chan) const { out(chan)+=v; }
+	void sum(float v, int chan) const { out(chan) += v; }
 
 	/// Add value to current output sample on specified channels
-	void sum(float v, int ch1, int ch2) const { sum(v, ch1); sum(v,ch2); }
+	void sum(float v, int ch1, int ch2) const {
+		sum(v, ch1);
+		sum(v, ch2);
+	}
 
 	/// Get sample from temporary buffer at specified frame
 	float& temp(int frame) const;
 
 	/// Get non-interleaved temporary buffer on specified channel
-	float * tempBuffer() const { return &temp(0); }
+	float* tempBuffer() const { return &temp(0); }
 
-	void * user() const{ return mUser; } ///< Get pointer to user data
+	void* user() const { return mUser; }  ///< Get pointer to user data
 
-	template<class UserDataType>
-	UserDataType& user() const { return *(static_cast<UserDataType *>(mUser)); }
+	template <class UserDataType>
+	UserDataType& user() const {
+		return *(static_cast<UserDataType*>(mUser));
+	}
 
-	int channelsIn () const;			///< Get effective number of input channels
-	int channelsOut() const;			///< Get effective number of output channels
-	int channelsBus() const;			///< Get number of allocated bus channels
-	int framesPerBuffer() const;		///< Get frames/buffer of audio I/O stream
-	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
+	int channelsIn() const;          ///< Get effective number of input channels
+	int channelsOut() const;         ///< Get effective number of output channels
+	int channelsBus() const;         ///< Get number of allocated bus channels
+	int framesPerBuffer() const;     ///< Get frames/buffer of audio I/O stream
+	double framesPerSecond() const;  ///< Get frames/second of audio I/O streams
 	double fps() const { return framesPerSecond(); }
-	double secondsPerBuffer() const;	///< Get seconds/buffer of audio I/O stream
-	double time() const;				///< Get current stream time in seconds
-	double time(int frame) const;		///< Get current stream time in seconds of frame
+	double secondsPerBuffer() const;  ///< Get seconds/buffer of audio I/O stream
 
-	void user(void * v){ mUser=v; }		///< Set user data
-	void frame(int v){ mFrame=v-1; }	///< Set frame count for next iteration
-	void zeroBus();						///< Zeros all the bus buffers
-	void zeroOut();						///< Zeros all the internal output buffers
+	void user(void* v) { mUser = v; }      ///< Set user data
+	void frame(int v) { mFrame = v - 1; }  ///< Set frame count for next iteration
+	void zeroBus();                        ///< Zeros all the bus buffers
+	void zeroOut();  ///< Zeros all the internal output buffers
 
-	AudioIOData& gain(float v){ mGain=v; return *this; }
+	AudioIOData& gain(float v) {
+		mGain = v;
+		return *this;
+	}
 	bool usingGain() const { return mGain != 1.f || mGainPrev != 1.f; }
 
 protected:
-	AudioBackend * mImpl;
-	void * mUser;					// User specified data
+	void* mUser;  // User specified data
 	mutable int mFrame;
 	int mFramesPerBuffer;
 	double mFramesPerSecond;
-	float *mBufI, *mBufO, *mBufB;	// input, output, and aux buffers
-	float * mBufT;					// temporary one channel buffer
-	int mNumI, mNumO, mNumB;		// input, output, and aux channels
+	float *mBufI, *mBufO, *mBufB;  // input, output, and aux buffers
+	float* mBufT;                  // temporary one channel buffer
+	int mNumI, mNumO, mNumB;       // input, output, and aux channels
+private:
+	void operator=(const AudioIOData&);  // Disallow copy
 public:
 	float mGain, mGainPrev;
 };
-
 
 /// Interface for objects which can be registered with an audio IO stream
 ///
@@ -296,16 +264,29 @@ public:
 class AudioCallback {
 public:
 	virtual ~AudioCallback() {}
-	virtual void onAudioCB(AudioIOData& io) = 0;	///< Callback
+	virtual void onAudioCB(AudioIOData& io) = 0;  ///< Callback
 };
 
-
 //==============================================================================
-inline float&       AudioIOData::bus(int c, int f) const { return mBufB[c*framesPerBuffer() + f]; }
-inline const float& AudioIOData::in (int c, int f) const { return mBufI[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::out(int c, int f) const { return mBufO[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::temp(int f) const { return mBufT[f]; }
+inline float& AudioIOData::bus(int c, int f) const {
+	assert(c < mNumB);
+	assert(f < framesPerBuffer());
+	return mBufB[c * framesPerBuffer() + f];
+}
 
-} // al::
+inline const float& AudioIOData::in(int c, int f) const {
+	assert(c < mNumI);
+	assert(f < framesPerBuffer());
+	return mBufI[c * framesPerBuffer() + f];
+}
+
+inline float& AudioIOData::out(int c, int f) const {
+	assert(c < mNumO);
+	assert(f < framesPerBuffer());
+	return mBufO[c * framesPerBuffer() + f];
+}
+inline float& AudioIOData::temp(int f) const { return mBufT[f]; }
+
+}  // al::
 
 #endif

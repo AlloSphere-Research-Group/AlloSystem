@@ -923,8 +923,8 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
 	gl.viewport(0, 0, mResolution, mResolution);
 
-	for (int i=0; i<(mStereo+1); i++) {
-		mEyeParallax = eyeSep * (i-0.5);
+	for (mCurrentEye = 0; mCurrentEye < (mStereo+1); mCurrentEye++) {
+		mEyeParallax = eyeSep * (mCurrentEye-0.5);
 		for (mFace=0; mFace<6; mFace++) {
 
 			glDrawBuffer(GL_COLOR_ATTACHMENT0 + mFace);
@@ -932,7 +932,7 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 				GL_FRAMEBUFFER,
 				GL_COLOR_ATTACHMENT0 + mFace,
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace,
-				mTex[i], 0);
+				mTex[mCurrentEye], 0);
 
 			gl.clearColor(mClearColor);
 			gl.depthTesting(1);

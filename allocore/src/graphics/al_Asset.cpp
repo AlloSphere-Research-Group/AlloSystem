@@ -1,3 +1,4 @@
+#include <algorithm> // min,max
 #include "allocore/graphics/al_Asset.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -404,12 +405,12 @@ void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, V
             struct aiVector3D tmp = mesh->mVertices[t];
 #endif
 			aiTransformVecByMatrix4(&tmp,trafo);
-			min[0] = AL_MIN(min[0],tmp.x);
-			min[1] = AL_MIN(min[1],tmp.y);
-			min[2] = AL_MIN(min[2],tmp.z);
-			max[0] = AL_MAX(max[0],tmp.x);
-			max[1] = AL_MAX(max[1],tmp.y);
-			max[2] = AL_MAX(max[2],tmp.z);
+			min[0] = std::min(min[0],tmp.x);
+			min[1] = std::min(min[1],tmp.y);
+			min[2] = std::min(min[2],tmp.z);
+			max[0] = std::max(max[0],tmp.x);
+			max[1] = std::max(max[1],tmp.y);
+			max[2] = std::max(max[2],tmp.z);
 		}
 	}
 	for (n = 0; n < nd->mNumChildren; ++n) {

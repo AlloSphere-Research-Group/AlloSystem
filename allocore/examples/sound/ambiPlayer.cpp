@@ -46,7 +46,7 @@ void audioCB(AudioIOData& io)
 	assert(AUDIO_BLOCK_SIZE == numFrames);
 	
 	AmbisonicsSpatializer* spatializer = ud->spatializer;
-	spatializer->prepare(io);
+    spatializer->prepare();
 	
 	float * ambiChans = spatializer->ambiChans();
 	
@@ -216,7 +216,7 @@ int main (int argc, char * argv[])
 	audioIO.start();
 
 	while (!ud.done) {
-		sleep(1);
+        al_sleep(1);
 	}
 	
 	return 0;

@@ -41,6 +41,7 @@
 	File author(s):
 	Lance Putnam, 2013, putnam.lance@gmail.com
 */
+#include <functional>
 
 #include "allocore/system/al_Thread.hpp"
 #include "allocore/system/al_Time.hpp"
@@ -58,6 +59,8 @@ class PeriodicThread : public Thread{
 public:
 
 	/// @param[in] periodSec	calling period in seconds
+	/// @param[in] oneShot		determines if the timer triggers only once.
+	/// @param[in] triggerOnStart	if true, calling start() calls the function, otherwise function is called on next timeout
 	PeriodicThread(double periodSec=1);
 
 	/// Copy constructor
@@ -85,9 +88,14 @@ public:
 	/// Start calling the supplied function periodically
 	void start(ThreadFunction& func);
 
+	/// Start calling the supplied function periodically
+	void start(std::function<void(void *data)> function, void *userData = nullptr);
+
 	/// Stop the thread
 	void stop();
 
+	/// True if timer thread is running
+	bool running() const;
 
 	// Stuff for assignment
 	friend void swap(PeriodicThread& a, PeriodicThread& b);
@@ -103,6 +111,8 @@ private:
 	al_nsec mTimeBehind;
 	float mAutocorrect;
 	ThreadFunction * mUserFunc;
+	void *mUserData;
+	std::function<void(void *data)> mFunction;
 	bool mRun;
 };
 

@@ -330,9 +330,10 @@ Isosurface::NoVertexAction Isosurface::noVertexAction;
 
 Isosurface::Isosurface(float lev, VertexAction& va)
 :	mIsolevel(lev), mVertexAction(&va),
-	mComputeNormals(true), mNormalize(true), mInBox(false)
+	mValidSurface(false), mComputeNormals(true), mNormalize(true), mInBox(false)
 {
-	clear();
+	cellLengths(1);
+	fieldDims(0);
 }
 
 Isosurface::~Isosurface(){}
@@ -412,9 +413,9 @@ void Isosurface::addCell(const int * cellIdx3, const float * vals){
 		// Each triangle consists of 3 vertex indices stored in mEdgeToVertex
 		for(int i=1; i <= sTriTable[idx][0]; i+=3){
 			// Add 3 edge indices of triangle
-			index(edgeID(cID, sTriTable[idx][i  ]));
-			index(edgeID(cID, sTriTable[idx][i+1]));
 			index(edgeID(cID, sTriTable[idx][i+2]));
+			index(edgeID(cID, sTriTable[idx][i+1]));
+			index(edgeID(cID, sTriTable[idx][i  ]));
 		}
 	}
 }
@@ -563,17 +564,9 @@ void Isosurface::compressTriangles(){
 }
 
 
-
-
 Isosurface& Isosurface::cellLengths(double dx, double dy, double dz){
 	mL[0]=dx; mL[1]=dy; mL[2]=dz;
 	return *this;
-}
-
-
-void Isosurface::clear(){
-	mL[0] = mL[1] = mL[2] = mNF[0] = mNF[1] = mNF[2] = 0;
-	mValidSurface = false;
 }
 
 
@@ -631,10 +624,7 @@ bool Isosurface::volumeLengths(double& volLengthX, double& volLengthY, double& v
 	return false;
 }
 
-
 } // al::
-
-
 
 /*
 
@@ -691,5 +681,4 @@ struct CellVertex{
 	Color color;
 	Index index;
 };
-
 */

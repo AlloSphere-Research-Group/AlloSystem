@@ -44,6 +44,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
+#include <functional>
 #include "allocore/al_Allocore.hpp"
 
 // #include "allocore/io/al_AudioIO.hpp"
@@ -161,8 +162,11 @@ public:
 	/// Add a new viewpoint to the window
 	ViewpointWindow& add(Viewpoint& v);
 
+	std::vector<std::function<void(void)>>& drawCalls(){ return mDrawCalls; }
+
 protected:
 	Viewpoints mViewpoints;
+	std::vector<std::function<void(void)>> mDrawCalls;
 
 	virtual bool onResize(int dw, int dh);
 
@@ -355,6 +359,10 @@ public:
 	 // i.e. use mouse xy
 	Rayd getPickRay(const ViewpointWindow& w, int screenX, int screenY);
 
+protected:
+	osc::Recv mOSCRecv;
+	osc::Send mOSCSend;
+
 private:
 
 	typedef std::vector<Viewpoint *> Viewpoints;
@@ -379,8 +387,6 @@ private:
 
 	// control
 	NavInputControl mNavControl;
-	osc::Recv mOSCRecv;
-	osc::Send mOSCSend;
 
 	std::string mName;
 	void * mClockAnimate;

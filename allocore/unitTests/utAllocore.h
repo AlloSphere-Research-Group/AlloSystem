@@ -1,6 +1,7 @@
 #ifndef INCLUDE_UT_ALLOCORE_H
 #define INCLUDE_UT_ALLOCORE_H
 
+#undef NDEBUG
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>

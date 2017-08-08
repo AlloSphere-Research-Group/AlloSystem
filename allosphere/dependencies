@@ -1,0 +1,8 @@
+# alloutil dependencies.
+
+alloutil_apt="libluajit-5.1-dev libjsoncpp-dev"
+
+alloutil_brew="luajit jsoncpp"
+alloutil_port="luajit jsoncpp"
+
+alloutil_pacman="mingw-w64-${arch}-luajit-git mingw-w64-${arch}-jsoncpp"

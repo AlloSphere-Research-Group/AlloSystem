@@ -1,12 +1,12 @@
-#include <algorithm>
+#include <algorithm> // transform
+#include <cctype> // tolower
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include <fstream>
-
-#include "allocore/system/al_Config.h"
-#include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
 namespace al{
@@ -514,6 +514,57 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 }
 
 
+void Mesh::smooth(float amount, int weighting){
+	std::map<int, std::set<int>> nodes;
+
+	int Ni = indices().size();
+
+	// Build adjacency map
+	for(int i=0; i<Ni; i+=3){
+		int i0 = indices()[i  ];
+		int i1 = indices()[i+1];
+		int i2 = indices()[i+2];
+		nodes[i0].insert(i1);
+		nodes[i0].insert(i2);
+		nodes[i1].insert(i2);
+		nodes[i1].insert(i0);
+		nodes[i2].insert(i0);
+		nodes[i2].insert(i1);
+	}
+
+	Mesh::Vertices vertsCopy(vertices());
+
+	for(const auto& node: nodes){
+		Mesh::Vertex sum(0,0,0);
+		const auto& adjs = node.second;
+
+		switch(weighting){
+		case 0: { // equal weighting
+			for(auto adj : adjs){
+				sum += vertsCopy[adj];
+			}
+			sum /= adjs.size();
+		} break;
+
+		case 1: { // inverse distance weights; reduces vertex sliding
+			float sumw = 0;
+			for(auto adj : adjs){
+				const auto& v = vertsCopy[adj];
+				const auto& c = vertsCopy[node.first];
+				float dist = (v-c).mag();
+				float w = 1./dist;
+				sumw += w;
+				sum += v * w;
+			}
+			sum /= sumw;
+		} break;
+		}
+
+		auto& orig = vertices()[node.first];
+		orig = (sum-orig)*amount + orig;
+	}
+}
+
 
 void Mesh::merge(const Mesh& src){
 //	if (indices().size() || src.indices().size()) {
@@ -568,8 +619,8 @@ void Mesh::getBounds(Vertex& min, Vertex& max) const {
 		for(int v=1; v<vertices().size(); ++v){
 			const Vertex& vt = vertices()[v];
 			for(int i=0; i<3; ++i){
-				min[i] = AL_MIN(min[i], vt[i]);
-				max[i] = AL_MAX(max[i], vt[i]);
+				min[i] = std::min(min[i], vt[i]);
+				max[i] = std::max(max[i], vt[i]);
 			}
 		}
 	}
@@ -677,6 +728,10 @@ void Mesh::toTriangles(){
 		// TODO: remove degenerate triangles
 		else if(Ni == 0 && Nv > 3){
 			stripToTri(vertices());
+			for (unsigned int i = 0; i < vertices().size() - 2; i+=2){
+				index(i); index(i+1); index(i+2);
+				index(i+2); index(i+1); index(i+3);
+			}
 			if(normals().size() >= Nv) stripToTri(normals());
 			if(colors().size() >= Nv) stripToTri(colors());
 			if(coloris().size() >= Nv) stripToTri(coloris());
@@ -687,8 +742,7 @@ void Mesh::toTriangles(){
 	}
 }
 
-
-bool Mesh::exportSTL(const char * path, const char * name) const {
+bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) const {
 	int prim = primitive();
 
 	if(Graphics::TRIANGLES != prim && Graphics::TRIANGLE_STRIP != prim){
@@ -708,28 +762,185 @@ bool Mesh::exportSTL(const char * path, const char * name) const {
 	Vec3f vmin, vmax;
 	m.getBounds(vmin, vmax);
 
-	std::ofstream file(path);
-	if(file.fail()) return false;
-	file.flags(std::ios::scientific);
+	std::ofstream s(filePath);
+	if(s.fail()) return false;
+	s.flags(std::ios::scientific);
 
-	file << "solid " << name << "\n";
+	s << "solid " << solidName << "\n";
 	for(int i=0; i<m.vertices().size(); i+=3){
-		file << "facet normal";
-		for(int j=0; j<3; j++) file << " " << m.normals()[i][j];
-		file << "\n";
-		file << "outer loop\n";
+		s << "facet normal";
+		for(int j=0; j<3; j++) s << " " << m.normals()[i][j];
+		s << "\n";
+		s << "outer loop\n";
 		for(int j=0; j<3; ++j){
-			file << "vertex";
-			for(int k=0; k<3; k++) file << " " << m.vertices()[i+j][k] - vmin[k];
-			file << "\n";
+			s << "vertex";
+			for(int k=0; k<3; k++) s << " " << m.vertices()[i+j][k] - vmin[k];
+			s << "\n";
 		}
-		file << "endloop\n";
-		file << "endfacet\n";
+		s << "endloop\n";
+		s << "endfacet\n";
 	}
-	file << "endsolid " << name;
+	s << "endsolid " << solidName;
 
 	return true;
 }
+
+bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bool binary) const {
+	// Ref: http://paulbourke.net/dataformats/ply/
+
+	int prim = primitive();
+
+	if(Graphics::TRIANGLES != prim && Graphics::TRIANGLE_STRIP != prim){
+		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
+		return false;
+	}
+
+	unsigned Nv = vertices().size();
+
+	if(!Nv) return false;
+
+	std::ofstream s;
+	s.open(filePath, binary ? (std::ios::out | std::ios::binary) : std::ios::out);
+	if(s.fail()) return false;
+
+	// Use a copy to handle triangle strip;
+	// not ideal if already triangles!
+	Mesh m(*this);
+	m.toTriangles();
+	Nv = m.vertices().size();
+	const unsigned Nc = m.colors().size();
+	const unsigned Nci= m.coloris().size();
+	const unsigned Ni = m.indices().size();
+	//const unsigned Bi = Nv<=65536 ? 2 : 4; // max bytes/index
+	const unsigned Bi = Nv<=32768 ? 2 : 4; // changed since assimp import not working with full ushort range up to 65536
+
+	int bigEndian = 1;
+	if(1 == *(char *)&bigEndian) bigEndian = 0;
+
+	// Header
+	s << "ply\n";
+	s << "format " << (binary ? (bigEndian ? "binary_big_endian" : "binary_little_endian") : "ascii") << " 1.0\n";
+	s << "comment Exported by AlloSystem\n";
+
+	if(solidName[0]){
+		s << "comment " << solidName << "\n";
+	}
+
+	s <<
+	"element vertex " << Nv << "\n"
+	"property float x\n"
+	"property float y\n"
+	"property float z\n"
+	;
+
+	// TODO: normals (nx,ny,nz), texcoords (s,t)
+
+	bool hasColors = Nc >= Nv || Nci >= Nv;
+	if(hasColors){
+		s <<
+		"property uchar red\n"
+		"property uchar green\n"
+		"property uchar blue\n"
+		"property uchar alpha\n"
+		;
+	}
+
+	if(Ni){
+		s << "element face " << Ni/3 << "\n";
+		s << "property list uchar " << (Bi==4?"uint":"ushort") << " vertex_indices\n";
+	}
+
+	s << "end_header\n";
+
+	if(binary){
+		// Vertex data
+		for(unsigned i = 0; i < Nv; ++i){
+			s.write(reinterpret_cast<const char*>(&m.vertices()[i][0]), sizeof(Mesh::Vertex));
+			if(hasColors){
+				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i].clamp(1.0));
+				s << col.r << col.g << col.b << col.a;
+			}
+		}
+		// Face data
+		if(Ni){
+			for(unsigned i = 0; i < Ni; i+=3){
+				s << char(3); // 3 indices/face
+				if(sizeof(Mesh::Index) == Bi){
+					s.write(reinterpret_cast<const char*>(&m.indices()[i]), Bi*3);
+				}
+				else{
+					if (Bi == 4) {
+						uint32_t idx[3];
+						idx[0] = m.indices()[i  ];
+						idx[1] = m.indices()[i+1];
+						idx[2] = m.indices()[i+2];
+						s.write(reinterpret_cast<const char*>(idx), sizeof(int32_t)*3);
+					} else {
+						uint16_t idx[3];
+						idx[0] = m.indices()[i  ];
+						idx[1] = m.indices()[i+1];
+						idx[2] = m.indices()[i+2];
+						s.write(reinterpret_cast<const char*>(idx), sizeof(uint16_t)*3);
+
+					}
+					//printf("%u %u %u\n", idx[0], idx[1], idx[2]);
+					/*for(int i=0; i<Bi*3; ++i){
+						printf("%d ", reinterpret_cast<char*>(idx)[i]);
+					}printf("\n");*/
+				}
+			}
+		}
+	}
+	else {
+		// Vertex data
+		for(unsigned i = 0; i < Nv; ++i){
+			auto vrt = m.vertices()[i];
+			s << vrt.x << " " << vrt.y << " " << vrt.z;
+			if(hasColors){
+				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
+				s << " " << int(col.r) << " " << int(col.g) << " " << int(col.b) << " " << int(col.a);
+			}
+			s << "\n";
+		}
+		// Face data
+		if(Ni){
+			for(unsigned i = 0; i < Ni; i+=3){
+				auto i1 = m.indices()[i  ];
+				auto i2 = m.indices()[i+1];
+				auto i3 = m.indices()[i+2];
+				s << "3 " << i1 << " " << i2 << " " << i3 << "\n";
+			}
+		}
+	}
+
+	return true;
+}
+
+bool Mesh::save(const std::string& filePath, const std::string& solidName, bool binary) const {
+
+	auto pos = filePath.find_last_of(".");
+	if(std::string::npos == pos) return false;
+	auto ext = filePath.substr(pos+1);
+	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+	if("ply" == ext){
+		return savePLY(filePath, solidName, binary);
+	}
+	else if("stl" == ext){
+		return saveSTL(filePath, solidName);
+	}
+
+	return false;
+}
+
+bool Mesh::exportSTL(const char * filePath, const char * solidName) const {
+	return saveSTL(filePath, solidName);
+}
+
+bool Mesh::exportPLY(const char * filePath, const char * solidName) const {
+	return savePLY(filePath, solidName);
+}
+
 
 void Mesh::print(FILE * dst) const {
 	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);

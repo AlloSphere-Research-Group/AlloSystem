@@ -95,7 +95,8 @@ Vec<N-1,T> sterProj(const Vec<N,T>& v);
 ///
 /// @ingroup allocore
 template <class T>
-struct SphereCoord {
+class SphereCoord {
+public:
 	typedef Complex<T> C;
 
 	C t;	///< Theta component, longitudinal angle (angle from +x towards +y)

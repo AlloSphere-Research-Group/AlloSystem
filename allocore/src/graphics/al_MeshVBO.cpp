@@ -25,6 +25,7 @@ void MeshVBO::copyFrom(MeshVBO& cpy){
   mVertId = cpy.mVertId;
   mNormalId = cpy.mNormalId;
   mColorId = cpy.mColorId;
+  mColoriId = cpy.mColoriId;
   mTexCoordId = cpy.mTexCoordId;
   mIndexId = cpy.mIndexId;
 
@@ -37,6 +38,7 @@ void MeshVBO::copyFrom(MeshVBO& cpy){
 
   mHasNormals = cpy.mHasNormals;
   mHasColors = cpy.mHasColors;
+  mHasColoris = cpy.mHasColoris;
   mHasTexCoord2s = cpy.mHasTexCoord2s;
   mHasTexCoord3s = cpy.mHasTexCoord3s;
   mHasIndices = cpy.mHasIndices;
@@ -69,6 +71,7 @@ void MeshVBO::allocate(BufferDataUsage usage){
 
     if (normals().size()) mHasNormals = true;
     if (colors().size()) mHasColors = true;
+    if (coloris().size()) mHasColoris = true;
     if (texCoord2s().size()) mHasTexCoord2s = true;
     if (texCoord3s().size()) mHasTexCoord3s = true;
     if (indices().size()) mHasIndices = true;
@@ -88,6 +91,11 @@ void MeshVBO::allocate(BufferDataUsage usage){
     if (hasColors()) {
       mColorStride = sizeof(colors()[0]);
       setData(colors().elems(), &mColorId, colors().size(), usage, GL_ARRAY_BUFFER);
+    }
+
+    if (hasColoris()) {
+      mColoriStride = sizeof(coloris()[0]);
+      setData(coloris().elems(), &mColoriId, coloris().size(), usage, GL_ARRAY_BUFFER);
     }
 
     if (hasTexCoord2s()) {
@@ -118,6 +126,7 @@ void MeshVBO::update(){
   else {
     if (normals().size()) mHasNormals = true;
     if (colors().size()) mHasColors = true;
+    if (coloris().size()) mHasColoris = true;
     if (texCoord2s().size()) mHasTexCoord2s = true;
     if (texCoord3s().size()) mHasTexCoord3s = true;
     if (indices().size()) mHasIndices = true;
@@ -133,6 +142,11 @@ void MeshVBO::update(){
     if (hasColors()) {
       if (mColorId!=0) updateData(colors().elems(), &mColorId, colors().size(), GL_ARRAY_BUFFER);
       else setData(colors().elems(), &mColorId, colors().size(), mBufferUsage, GL_ARRAY_BUFFER);
+    }
+
+    if (hasColoris()) {
+      if (mColoriId!=0) updateData(coloris().elems(), &mColoriId, coloris().size(), GL_ARRAY_BUFFER);
+      else setData(coloris().elems(), &mColoriId, coloris().size(), mBufferUsage, GL_ARRAY_BUFFER);
     }
 
     if (hasTexCoord2s()) {
@@ -182,29 +196,35 @@ void MeshVBO::bind(){
 
   glBindBuffer(GL_ARRAY_BUFFER, mVertId);
   glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, mVertStride, 0);
+  glVertexPointer(3, GL_FLOAT, 0, 0);
 
   if (hasNormals()){
     glBindBuffer(GL_ARRAY_BUFFER, mNormalId);
     glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT, mNormalStride, 0);
+    glNormalPointer(GL_FLOAT, 0, 0);
   }
 
   if (hasTexCoord2s()){
     glBindBuffer(GL_ARRAY_BUFFER, mTexCoordId);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, mTexCoordStride, 0);
+    glTexCoordPointer(2, GL_FLOAT, 0, 0);
   }
   else if (hasTexCoord3s()){
     glBindBuffer(GL_ARRAY_BUFFER, mTexCoordId);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(3, GL_FLOAT, mTexCoordStride, 0);
+    glTexCoordPointer(3, GL_FLOAT, 0, 0);
   }
 
   if (hasColors()){
     glBindBuffer(GL_ARRAY_BUFFER, mColorId);
     glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(4, GL_FLOAT, mColorStride, 0);
+    glColorPointer(4, GL_FLOAT, 0, 0);
+  }
+
+  if (hasColoris()){
+    glBindBuffer(GL_ARRAY_BUFFER, mColoriId);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glColorPointer(4, GL_UNSIGNED_BYTE, 0, 0);
   }
 
   if (hasIndices()){
@@ -223,7 +243,7 @@ void MeshVBO::unbind(){
 
   glDisableClientState(GL_VERTEX_ARRAY);
   if (hasNormals()) glDisableClientState(GL_NORMAL_ARRAY);
-  if (hasColors()) glDisableClientState(GL_COLOR_ARRAY);
+  if (hasColors() || hasColoris()) glDisableClientState(GL_COLOR_ARRAY);
   if (hasTexCoord2s() || hasTexCoord3s()) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
   mBound = false;
@@ -236,6 +256,7 @@ void MeshVBO::clear(){
   mVertId = 0;
   mNormalId = 0;
   mColorId = 0;
+  mColoriId = 0;
   mTexCoordId = 0;
   mIndexId = 0;
 
@@ -248,6 +269,7 @@ void MeshVBO::clear(){
 
   mHasNormals = false;
   mHasColors = false;
+  mHasColoris = false;
   mHasTexCoord2s = false;
   mHasTexCoord3s = false;
   mHasIndices = false;
@@ -266,6 +288,11 @@ uint32_t MeshVBO::getNormalId() {
 ////////////////////////////////////////////////////////////////////////////////
 uint32_t MeshVBO::getColorId() {
   return mColorId;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+uint32_t MeshVBO::getColoriId() {
+  return mColoriId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,6 +333,11 @@ bool MeshVBO::hasNormals() {
 ////////////////////////////////////////////////////////////////////////////////
 bool MeshVBO::hasColors() {
   return mHasColors;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool MeshVBO::hasColoris() {
+  return mHasColoris;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

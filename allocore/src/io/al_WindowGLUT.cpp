@@ -7,13 +7,15 @@
 #include "allocore/system/al_Printing.hpp"	// warnings
 #include "allocore/graphics/al_OpenGL.hpp"	// OpenGL headers
 
-#ifdef AL_OSX
+#if defined AL_OSX
 	#include <GLUT/glut.h>
-#endif
-#ifdef AL_LINUX
+
+#elif defined AL_LINUX
+	#include <GL/glew.h>
 	#include <GL/glut.h>
-#endif
-#ifdef AL_WINDOWS
+
+#elif defined AL_WINDOWS
+	#include <GL/wglew.h> // wglSwapInterval
 	#include <GL/glut.h>
 #endif
 
@@ -128,7 +130,7 @@ public:
 			// set full screen settings
 			{
 				char buf[32];
-				snprintf(buf, sizeof(buf), "%dx%d:24", sw, sh);
+				AL_SNPRINTF(buf, sizeof(buf), "%dx%d:24", sw, sh);
 				glutGameModeString(buf);
 				//int refresh = glutGameModeGet(GLUT_GAME_MODE_REFRESH_RATE);
 				//printf("%d\n", refresh);
@@ -278,6 +280,7 @@ public:
 	}
 
 	static void cbKeyboard(unsigned char key, int x, int y){
+		//printf("GLUT: key down %d (%c)\n", key,key);
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
@@ -288,6 +291,7 @@ public:
 	}
 
 	static void cbKeyboardUp(unsigned char key, int x, int y){
+		//printf("GLUT: key up %d (%c)\n", key,key);
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
@@ -509,15 +513,17 @@ private:
 						if(timePost < timeNext){
 							double wait = timeNext - timePost;
 							waitMsec = unsigned(wait * 1000. + 0.5);
-							//printf("num=%llu, wait=%5.3f frames, %2u ms, dt=%5.3f, fps=%5.2f (avg=%5.2f)\n", (unsigned long long)(timePost*FPS), wait*FPS, waitMsec, win->mDeltaTime, win->fpsActual(), win->fpsAvg());
+							//printf("num=%lu, wait=%5.3f frames, %2u ms, dt=%5.3f, fps=%5.2f (avg=%5.2f)\n", (unsigned long)(timePost*FPS), wait*FPS, waitMsec, win->mDeltaTime, win->fpsActual(), win->fpsAvg());
 						}
 						else{
 							//printf("dropped frame!\n");
 						}
 					}
-
+					#ifdef AL_WINDOWS
+						// Passing 0 ms wait to glutTimerFunc may cause lockup on Windows
+						if(0==waitMsec) waitMsec=1;
+					#endif
 					glutTimerFunc(waitMsec, scheduleDrawStaticGLUT, winID);
-
 				}
 				else {
 					impl->mScheduled = false;
@@ -734,7 +740,7 @@ void Window::implSetVSync(){
 		CGLSetParameter(ctx, kCGLCPSwapInterval, &VBL);
 	#elif defined AL_LINUX
 	#elif defined AL_WINDOWS
-		// see: http://stackoverflow.com/questions/21262944/trouble-with-vsync-using-glut-in-opengl
+		wglSwapIntervalEXT(int(mVSync));
 	#endif
 }
 

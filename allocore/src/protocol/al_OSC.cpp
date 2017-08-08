@@ -60,6 +60,13 @@ etc.												Addtional bundle elements
 		AL_WARN("OSC error: %s", e.what()); \
 	}
 
+//#define VERBOSE
+#ifdef VERBOSE
+	#define DPRINTF(...) printf(__VA_ARGS__)
+#else
+	#define DPRINTF(...) 
+#endif
+
 namespace al{
 namespace osc{
 
@@ -167,14 +174,13 @@ int Packet::size() const { return mImpl->Size(); }
 
 
 
-struct Message::Impl
-:	public ::osc::ReceivedMessage
-{
+class Message::Impl : public ::osc::ReceivedMessage {
+public:
 	Impl(const char * message, int size)
 	:	::osc::ReceivedMessage(::osc::ReceivedPacket(message,size)), args(ArgumentStream())
 	{
-          // printf("made an ::osc::ReceivedMessage out of message %p and size %d\n", message, size);
-        }
+		// printf("made an ::osc::ReceivedMessage out of message %p and size %d\n", message, size);
+	}
 
 	template <class T>
 	void operator>> (T& v){ OSCTRY("Message>>", args>>v;) }
@@ -182,7 +188,7 @@ struct Message::Impl
 	::osc::ReceivedMessageArgumentStream args;
 };
 
-Message::Message(const char * message, int size, const TimeTag& timeTag)
+Message::Message(const char * message, int size, const TimeTag& timeTag, const char *senderAddr)
 :	mImpl(new Impl(message, size)), mTimeTag(timeTag)
 {
 	OSCTRY("Message()",
@@ -190,6 +196,11 @@ Message::Message(const char * message, int size, const TimeTag& timeTag)
 		mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
 		resetStream();
 	)
+	if (senderAddr != nullptr) {
+		strncpy(mSenderAddr, senderAddr, 32);
+	} else {
+		mSenderAddr[0] = '\0';
+	}
 }
 
 Message::~Message() {
@@ -198,8 +209,8 @@ Message::~Message() {
 
 void Message::print() const {
 	OSCTRY("Message::print",
-		printf("%s, %s %" AL_PRINTF_LL "d\n",
-			addressPattern().c_str(), typeTags().c_str(), timeTag());
+		printf("%s, %s %" AL_PRINTF_LL "d from %s\n",
+			addressPattern().c_str(), typeTags().c_str(), timeTag(), mSenderAddr);
 
 		::osc::ReceivedMessageArgumentIterator it = mImpl->ArgumentsBegin();
 
@@ -247,8 +258,7 @@ Message& Message::operator>> (const char*& v){
 	return *this;
 }
 Message& Message::operator>> (std::string& v){
-	// const char * r = '\0';
-	const char * r = nullptr;
+	const char * r = "";
 	OSCTRY("Message >> string", (*mImpl)>>r;)
 	v=r;
 	return *this;
@@ -265,82 +275,54 @@ Message& Message::operator>> (Blob& v){
 #include <netinet/in.h>  // for ntohl
 #endif
 
-void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
-	OSCTRY("PacketHandler::parse",
-#ifdef VERBOSE
-	       printf("PacketHandler::parse(size %d, packet %p)\n", size, packet);
-	       printf("Data to parse: ");
-	       for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
-#endif
+void PacketHandler::parse(const char *packet, int size, TimeTag timeTag, const char *senderAddr){
+	#ifdef VERBOSE
+	int i = 1;
+	#endif
 
+OSCTRY("PacketHandler::parse",
+	DPRINTF("PacketHandler::parse(size %d, packet %p)\n", size, packet);
+	DPRINTF("Data to parse: ");
+	for(int i=0; i<size; ++i){ DPRINTF("%c", packet[i]); }
+	DPRINTF("\n");
 
-		// this is the only generic entry point for parsing packets
-		::osc::ReceivedPacket p(packet, size);
-#ifdef VERBOSE
-	       printf("Just made an ::osc::ReceivedPacket that has contents %p and size %d\n",
-		      p.Contents(), p.Size());
-#endif
+	// this is the only generic entry point for parsing packets
+	::osc::ReceivedPacket p(packet, size);
 
-		// iterate through all the bundle elements (bundles or messages)
-		if(p.IsBundle()){
+	DPRINTF("Just made an ::osc::ReceivedPacket that has contents %p and size %d\n",
+		p.Contents(), (int)p.Size());
 
-#ifdef VERBOSE
-		  printf("It's a bundle\n");
-		  char *afterTimeTag = (char *)packet+16;  // "#bundle\0" plus 8-byte time tag
-		  int firstBundleElementSize = ntohl(* ((int *)  afterTimeTag));
-		  printf("First bundle element has size %d\n", firstBundleElementSize);
-#endif
+	// iterate through all the bundle elements (bundles or messages)
+	if(p.IsBundle()){
 
-		  ::osc::ReceivedBundle r(p);
-#ifdef VERBOSE
-		  printf("Just made an ::osc::ReceivedBundle that has time tag at %p and %d elements\n",
-			 r.timeTag_, r.ElementCount() );
-#endif
+		DPRINTF("It's a bundle\n");
+		//char *afterTimeTag = (char *)packet+16;  // "#bundle\0" plus 8-byte time tag
+		DPRINTF("First bundle element has size %d\n", ntohl(*((int *)(packet+16))/*firstBundleElementSize*/));
 
+		::osc::ReceivedBundle r(p);
 
-		  ::osc::ReceivedBundleElementIterator it = r.ElementsBegin();
-#ifdef VERBOSE
-		  printf("Just made an ::osc::ReceivedBundleElementIterator\n");
-#endif
+		//DPRINTF("Just made an ::osc::ReceivedBundle that has time tag at %p and %d elements\n", r.timeTag_, r.ElementCount() );
 
+		for(auto it = r.ElementsBegin(); it != r.ElementsEnd(); ++it){
+			const ::osc::ReceivedBundleElement& e = *it;
 
-#ifdef VERBOSE
-		  int i = 1;
-#endif
-		  while(it != r.ElementsEnd()){
-		    const ::osc::ReceivedBundleElement& e = *it;
-#ifdef VERBOSE
-		    printf("Just made an ::osc::ReceivedBundleElement with contents %p and size %d\n",
-			   e.Contents(), e.Size());
-#endif
+			DPRINTF("Just made an ::osc::ReceivedBundleElement with contents %p and size %d\n", e.Contents(), (int)e.Size());
+			DPRINTF("Parsing bundle element %d\n", i++);
+			DPRINTF("Made an ::osc::ReceivedBundleElement out of the iterator.\n");
+			DPRINTF("\tcontents: %p\n", e.Contents());
+			DPRINTF("\tsize: %d\n", (int)e.Size());
+			DPRINTF("\ttimeTag %lu\n", (unsigned long)r.TimeTag());
+			DPRINTF("\tLet's try to parse it...\n");
 
-
-
-#ifdef VERBOSE
-		    printf("After it++, the same ::osc::ReceivedBundleElement has contents %p and size %d\n",
-                           e.Contents(), e.Size());
-
-
-		    printf("Parsing bundle element %d\n", i++);
-		    printf("Made an ::osc::ReceivedBundleElement out of the iterator.\n");
-		    printf("\tcontents: %p\n", e.Contents());
-		    printf("\tsize: %d\n",e.Size());
-		    printf("\ttimeTag %ld\n", r.TimeTag());
-		    printf("\tLet's try to parse it...\n");
-#endif
-		    parse(e.Contents(), e.Size(), r.TimeTag());
-
-		    it++;
-		  }
+			parse(e.Contents(), e.Size(), r.TimeTag(), senderAddr);
 		}
-		else if(p.IsMessage()){
-#ifdef VERBOSE
-		  printf("Parsing a message\n");
-#endif
-		  Message m(packet, size, timeTag);
-		  onMessage(m);
-		}
-	       )
+	}
+	else if(p.IsMessage()){
+		DPRINTF("Parsing a message\n");
+		Message m(packet, size, timeTag, senderAddr);
+		onMessage(m);
+	}
+) // OSCTRY
 }
 
 
@@ -377,7 +359,7 @@ static void * recvThreadFunc(void * user){
 Recv::Recv()
 :	mHandler(0), mBuffer(1024), mBackground(false)
 {
-  // printf("Entering Recv::Recv()\n");
+	//printf("Entering Recv::Recv()\n");
 }
 
 
@@ -385,15 +367,12 @@ Recv::Recv(uint16_t port, const char * address, al_sec timeout)
 :	SocketServer(port, address, timeout, Socket::UDP),
 	mHandler(0), mBuffer(1024), mBackground(false)
 {
-  // printf("Entering Recv::Recv(port=%d, addr=%s)\n", port, address);
+	//printf("Entering Recv::Recv(port=%d, addr=%s)\n", port, address);
 }
 
 int Recv::recv(){
 	int r = 0;
-#ifdef VERBOSE
-        printf("Entering Recv::recv() - mBuffer = %p and mBuffer.size() = %d\n", &mBuffer[0], mBuffer.size());
-#endif
-
+	DPRINTF("Entering Recv::recv() - mBuffer = %p and mBuffer.size() = %d\n", &mBuffer[0], mBuffer.size());
 
 	/*	printf("Here's what's in my buffer before recv...\n");
 	for (int i = 0; i < mBuffer.size(); ++i) {
@@ -402,18 +381,15 @@ int Recv::recv(){
 	*/
 
 	OSCTRY("Packet::endMessage",
-		r = Socket::recv(&mBuffer[0], mBuffer.size());
+		char sender[16] = "";
+		r = Socket::recv(&mBuffer[0], mBuffer.size(), sender);
 		if(r && mHandler){
-#ifdef VERBOSE
-		  printf("Recv:recv() Received %d bytes; parsing...\n", r);
-#endif
-			mHandler->parse(&mBuffer[0], r);
+			DPRINTF("Recv:recv() Received %d bytes from %s; parsing...\n", r, sender);
+			mHandler->parse(&mBuffer[0], r, 1, sender);
 		}
 	)
 
-#ifdef VERBOSE
-        printf("Exiting Recv::recv() - mBuffer = %p and mBuffer.size() = %d\n", &mBuffer[0], mBuffer.size());
-#endif
+	DPRINTF("Exiting Recv::recv() - mBuffer = %p and mBuffer.size() = %d\n", &mBuffer[0], mBuffer.size());
 	return r;
 }
 
@@ -426,14 +402,12 @@ bool Recv::start(){
 	return mThread.start(recvThreadFunc, this);
 }
 
-/// Stop the background polling
 void Recv::stop(){
 	if(mBackground){
 		mBackground = false;
 		mThread.join();
 	}
 }
-
 
 } // osc::
 } // al::

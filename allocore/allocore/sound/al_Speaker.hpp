@@ -83,19 +83,29 @@ public:
 		return *this;
 	}
 
+
+	void posCart2(Vec3d xyz){
+		using namespace std;
+
+		radius =  sqrt((xyz[0]*xyz[0])+(xyz[1]*xyz[1])+(xyz[2]*xyz[2]));
+		float gd = sqrt((xyz[0]*xyz[0])+(xyz[1]*xyz[1]));
+		elevation = atan2(xyz[2],gd)*180.f/M_PI;
+		azimuth = atan2(xyz[0],xyz[1])*180.f/M_PI;
+
+	}
+
 	/// Get position as Cartesian coordinate
-    Vec3d vec() const {
-
-        //TODO doxygen style commenting on coordinates like ambisonics
-
+	Vec3d vec() const {
+		//TODO doxygen style commenting on coordinates like ambisonics
 		double cosel = cos(toRad(elevation));
-//		double x = sin(toRad(azimuth)) * cosel * radius;
-//		double y = cos(toRad(azimuth)) * cosel * radius;
-//		double z = sin(toRad(elevation)) * radius;
-        //Ryan: the standard conversions assume +z is up, these are correct for allocore
-        double x = sin(toRad(azimuth)) * cosel * radius;
-		double y = sin(toRad(elevation)) * radius;
-        double z = -1*cos(toRad(azimuth)) * cosel * radius;
+		double x = sin(toRad(azimuth)) * cosel * radius;
+		double y = cos(toRad(azimuth)) * cosel * radius;
+		double z = sin(toRad(elevation)) * radius;
+		//Ryan: the standard conversions assume +z is up, these are correct for allocore
+
+		//        double x = sin(toRad(azimuth)) * cosel * radius;
+		//		double y = sin(toRad(elevation)) * radius;
+		//        double z = -1*cos(toRad(azimuth)) * cosel * radius;
 		return Vec3d(x,y,z);
 	}
 
@@ -123,7 +133,7 @@ public:
 	const Speakers& speakers() const { return mSpeakers; }
 
 	/// Add speaker
-	SpeakerLayout& addSpeaker(const Speaker& spkr){
+	SpeakerLayout& addSpeaker(const Speaker spkr){
 		mSpeakers.push_back(spkr);
 		return *this;
 	}
@@ -148,7 +158,7 @@ public:
 	{
 		mSpeakers.reserve(N);
 		for(int i=0; i<N; ++i)
-			addSpeaker(Speaker(i+deviceChannelStart, 360./N*i + phase, 0, radius, gain));
+            addSpeaker(Speaker(i+deviceChannelStart, 360./N*i + phase, 0, radius, gain));
 	}
 };
 
@@ -184,6 +194,23 @@ private:
 ///
 /// @ingroup allocore
 typedef SpeakerRingLayout<8> OctalSpeakerLayout;
+
+
+/// Generic layout of 8 speakers arranged in a cube with listener in the middle
+///
+/// @ingroup allocore
+class CubeLayout : public SpeakerLayout {
+public:
+
+	CubeLayout(int deviceChannelStart=0)
+	{
+		mSpeakers.reserve(8);
+		for(int i=0; i<4; ++i) {
+			addSpeaker(Speaker(i+deviceChannelStart, 45 + (i * 90), 0));
+			addSpeaker(Speaker(4 + i+deviceChannelStart, 45 + (i * 90), 60, sqrt(5)));
+		}
+	}
+};
 
 
 } // al::

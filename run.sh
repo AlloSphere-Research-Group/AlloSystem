@@ -16,7 +16,7 @@ ALLOSPHERE_APP_FLAG="-DBUILD_ALLOSPHERE_APP=0"
 
 # Runs the program through the specified debugger if -d is passed.
 OPTIND=1
-while getopts ":d:v:n:a:s" opt; do
+while getopts ":dvnas" opt; do
   case "$opt" in
   d)  debugger="$DEBUGGER"
       shift

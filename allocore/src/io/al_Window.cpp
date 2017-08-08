@@ -5,26 +5,32 @@
 namespace al{
 
 Keyboard::Keyboard()
-:	mKeycode(-1), mDown(false)
+:	mKeycode(-1), mDown(false), mCaps(false), mModifiers(0)
 {
-	for(int i=0; i<5; ++i) mModifiers[i] = false;
 }
 
 int Keyboard::key() const { return mKeycode; }
 int Keyboard::keyAsNumber() const { return key() - 48; }
 bool Keyboard::down() const { return mDown; }
 bool Keyboard::isNumber() const { return (key() >= '0') && (key() <= '9'); }
-bool Keyboard::alt()   const { return mModifiers[1]; }
-bool Keyboard::caps()  const { return mModifiers[3]; }
-bool Keyboard::ctrl()  const { return mModifiers[2]; }
-bool Keyboard::meta()  const { return mModifiers[4]; }
-bool Keyboard::shift() const { return mModifiers[0]; }
+bool Keyboard::alt()   const { return mModifiers & ALT; }
+
+bool Keyboard::ctrl()  const { return mModifiers & CTRL; }
+bool Keyboard::meta()  const { return mModifiers & META; }
+bool Keyboard::shift() const { return mModifiers & SHIFT; }
+bool Keyboard::caps()  const { return mCaps; }
+unsigned char Keyboard::modifiers() const { return mModifiers; }
 bool Keyboard::key(int k) const { return mKeycode == k; }
-void Keyboard::alt  (bool state){mModifiers[1] = state;}
-void Keyboard::caps (bool state){mModifiers[3] = state;}
-void Keyboard::ctrl (bool state){mModifiers[2] = state;}
-void Keyboard::meta (bool state){mModifiers[4] = state;}
-void Keyboard::shift(bool state){mModifiers[0] = state;}
+
+void setBit(unsigned char& bits, unsigned char mask, bool val){
+	if(val)	bits |=  mask;
+	else	bits &= ~mask;
+}
+void Keyboard::alt  (bool state){ setBit(mModifiers, ALT  , state); }
+void Keyboard::ctrl (bool state){ setBit(mModifiers, CTRL , state); }
+void Keyboard::meta (bool state){ setBit(mModifiers, META , state); }
+void Keyboard::shift(bool state){ setBit(mModifiers, SHIFT, state); }
+void Keyboard::caps (bool state){ mCaps = state; }
 void Keyboard::setKey(int k, bool v){ mKeycode=k; mDown=v; }
 
 void Keyboard::print() const {
@@ -89,7 +95,7 @@ void WindowEventHandler::removeFromWindow(){
 
 Window::Window()
 :	mDim(0,0,0,0), mDisplayMode(DEFAULT_BUF), mCursor(POINTER),
-	mFPSAvg(0), mFrameTime(0), mDeltaTime(0),
+	mFPS(0), mFPSAvg(0), mFrameTime(0), mDeltaTime(0),
 	mASAP(false), mCursorHide(false), mFullScreen(false),
 	mVisible(false), mVSync(true)
 {

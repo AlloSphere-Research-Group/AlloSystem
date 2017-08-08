@@ -44,12 +44,6 @@
 */
 
 #include <string>
-#include <vector>
-#include "allocore/io/al_Socket.hpp"
-#include "allocore/system/al_Thread.hpp"
-
-#include <string>
-#include <stdio.h>
 
 namespace al{
 namespace zero{
@@ -105,4 +99,3 @@ protected:
 } // al::
 
 #endif
-

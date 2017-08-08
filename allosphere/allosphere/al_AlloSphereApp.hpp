@@ -11,7 +11,7 @@
 #include <iostream>
 
 #if !defined(ALLOSPHERE_BUILD_SIMULATOR) && !defined(ALLOSPHERE_BUILD_GRAPHICS_RENDERER) && !defined(ALLOSPHERE_BUILD_AUDIO_RENDERER)
-#define ALLOSPHERE_BUILD_GRAPHICS_RENDERER
+#define ALLOSPHERE_BUILD_SIMULATOR
 #endif
 
 #if (defined(ALLOSPHERE_BUILD_SIMULATOR) && defined(ALLOSPHERE_BUILD_GRAPHICS_RENDERER)) || \
@@ -128,17 +128,17 @@ private:
 template<typename State = DummyState, typename AudioState = DummyState,
          unsigned GRAPHICSPORT = ALLOAPP_GRAPHICS_PORT,
          unsigned AUDIOPORT = ALLOAPP_AUDIO_PORT>
-class SimulatorBase : public App {
+class SimulatorBase : public App, public osc::PacketHandler {
 public:
 	explicit SimulatorBase(const Window::Dim& dims = Window::Dim(320, 240),
 	                       const std::string title="",
 	                       double fps=60,
 	                       Window::DisplayMode mode = Window::DEFAULT_BUF,
 	                       int flags=0,
-	                       const char *broadcastIP = "127.0.0.1") :
+						   const char *broadcastIP = "127.0.0.1") :
 	    mDims(dims), mTitle(title), mFps(fps), mMode(mode), mFlags(flags),
 	    mMakerAudio(broadcastIP),
-	    mMakerGraphics(broadcastIP)
+		mMakerGraphics(broadcastIP)
 	{
 		mMakerGraphics.start();
 		mMakerAudio.start();
@@ -156,6 +156,12 @@ public:
 	/// \param dt the time delta since last call to onAnimate()
 	///
 	virtual void onAnimate(double dt) override{}
+
+	///
+	/// \brief onMessage will recieve the messages from Device Server
+	/// \param m
+	///
+	virtual void onMessage(osc::Message &m) override {};
 
 	///
 	/// \brief Send the state to the graphics renderers
@@ -209,10 +215,10 @@ public:
 	}
 
 	///
-	/// \brief override onDrawOmni() to draw graphics
-	/// \param om OmniStereo object for rendering
+	/// \brief override onDraw() to draw graphics
+	/// \param g Graphics object for rendering
 	///
-	virtual void onDrawOmni(OmniStereo& om) override {}
+	virtual void onDraw(Graphics &g) override {}
 
 	///
 	/// \brief updateState reads the state buffer and updates current state
@@ -293,13 +299,13 @@ public:
 //		this->initAudio();
 
 		this->initWindow();
-		this->initAudio(44100, 1024, 2, 0);
+//		this->initAudio(44100, 1024, 2, 0);
 		std::cout << "Running Simulator" << std::endl;
 #endif
 
 
 #ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
-		this->initAudio();
+//		this->initAudio();
 		this->dimensions(Window::Dim(320, 240));
 		this->title("Audio Renderer");
 //		std::cout << "Running Audio Renderer" << std::endl;
@@ -343,20 +349,8 @@ void SimulatorBase<State, AudioState, GRAPHICSPORT, AUDIOPORT>::initWindow()
 
 template<typename State, typename AudioState, unsigned GRAPHICSPORT, unsigned AUDIOPORT>
 void SimulatorBase<State, AudioState, GRAPHICSPORT, AUDIOPORT>::onDraw(Graphics &g, const Viewpoint &v) {
-	float H = v.viewport().h;
-	float W = v.viewport().w;
-	g.pushMatrix(Graphics::PROJECTION);
-	g.loadMatrix(Matrix4f::ortho2D(0, W, 0, H));
-	g.pushMatrix(Graphics::MODELVIEW);
-
-	g.blendAdd();
-	Font f("allocore/share/fonts/VeraMono.ttf", 40);
-	g.translate(int(W/2 - f.width("Simulator")/2), int(H/2 - f.size()/2));
-	g.currentColor(1,1,0,1);
-	f.render(g, "Simulator");
-
-	g.popMatrix();
-	g.popMatrix(Graphics::PROJECTION);
+	g.clearColor(Color(0.0, 1.0, 0.0));
+	g.clear(Graphics::COLOR_BUFFER_BIT);
 }
 
 }

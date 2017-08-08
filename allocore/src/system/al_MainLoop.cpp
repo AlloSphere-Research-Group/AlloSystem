@@ -50,16 +50,18 @@ extern "C" void al_main_glut_stop();
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/system/al_Config.h"
 
-#ifdef AL_OSX
+#if defined AL_OSX
 	#include <OpenGL/OpenGL.h>
 	#include <GLUT/glut.h>
-#endif
-#ifdef AL_LINUX
-	#include <GL/glew.h>
+
+#elif defined AL_LINUX
+	#include <GL/glew.h> // Needed since GLUT includes GL
 	#include <GL/glut.h>
-#endif
-#ifdef AL_WINDOWS
-	#include <GL/glew.h>
+
+#elif defined AL_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h> // Prevents GLUT from redefining APIENTRY
+	#include <GL/glew.h> // Needed since GLUT includes GL
 	#include <GL/glut.h>
 #endif
 

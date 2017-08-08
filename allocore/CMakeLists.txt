@@ -8,8 +8,10 @@ list(APPEND ALLOCORE_SRC
   src/io/al_AudioIOData.cpp
   src/io/al_ControlNav.cpp
   src/io/al_MIDI.cpp
+  src/io/al_MRC.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
+  src/io/al_CSVReader.cpp
   src/io/hidapi.c
   src/protocol/al_Serialize.cpp
   src/spatial/al_HashSpace.cpp
@@ -33,10 +35,12 @@ list(APPEND ALLOCORE_HEADERS
     allocore/graphics/al_Shapes.hpp
     allocore/graphics/al_Image.hpp
     allocore/graphics/al_EasyFBO.hpp
-	allocore/io/al_AudioIOData.hpp
+    allocore/io/al_AudioIOData.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
-	allocore/io/al_Serial.hpp
+    allocore/io/al_MRC.hpp
+    allocore/io/al_Serial.hpp
+    allocore/io/al_CSVReader.hpp
     allocore/math/al_Analysis.hpp
     allocore/math/al_Complex.hpp
     allocore/math/al_Constants.hpp
@@ -74,6 +78,11 @@ list(APPEND ALLOCORE_HEADERS
     allocore/types/al_MsgTube.hpp
     allocore/types/al_SingleRWRingBuffer.hpp
     allocore/types/al_Voxels.hpp
+    allocore/ui/al_Gnomon.hpp
+    allocore/ui/al_BoundingBox.hpp
+    allocore/ui/al_Pickable.hpp
+    allocore/ui/al_TranslateHandle.hpp
+    allocore/ui/al_RotateHandle.hpp
 )
 
 set(ALLOCORE_DUMMY_HEADERS "")
@@ -166,6 +175,15 @@ include(modules/libsndfile_module.cmake)
 
 include(modules/osc_module.cmake)
 include(modules/zeroconf_module.cmake)
+
+
+# Travis CI configuration
+
+if(TRAVIS_BUILD)
+add_definitions(-DTRAVIS_BUILD)
+remove_definitions(-DAL_AUDIO_PORTAUDIO)
+add_definitions(-DAL_AUDIO_DUMMY)
+endif(TRAVIS_BUILD)
 
 # allocore library -----------------------
 

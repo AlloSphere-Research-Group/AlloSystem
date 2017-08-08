@@ -130,6 +130,13 @@ public:
 	template <class T>
 	void normal(T& y1, T& y2);
 
+	/// Returns triangle distribution variate, in (-1,1)
+	float triangle();
+
+	/// Returns triangle distribution variate, in (-hi,hi)
+	template <class T>
+	T triangle(const T& hi){ return hi*triangle(); }
+
 	/// Returns argument with sign randomly flipped
 	float sign(float x=1.f);
 
@@ -338,6 +345,9 @@ inline VecType ball(){ VecType v; ball(v); return v; }
 inline float normal(){ return global().normal(); }
 inline float gaussian(){ return normal(); }
 
+/// Returns triangle distribution variate, in (-1,1)
+inline float triangle(){ return global().triangle(); }
+
 /// Returns true with probability 0.5
 inline bool prob(){ return global().prob(); }
 
@@ -437,7 +447,15 @@ template <class T> void Random<RNG>::normal(T& y1, T& y2){
 }
 
 template <class RNG>
-float Random<RNG>::sign(float x){
+inline float Random<RNG>::triangle(){
+	union {float f; uint32_t i;} u,v;
+	u.i = 0x3f800000 | (mRNG()>>9); // float in [1,2)
+	v.i = 0x3f800000 | (mRNG()>>9); // float in [1,2)
+	return u.f - v.f;
+}
+
+template <class RNG>
+inline float Random<RNG>::sign(float x){
 	union {float f; uint32_t i;} u = {x};
 	u.i |= mRNG() & 0x80000000;
 	return u.f;

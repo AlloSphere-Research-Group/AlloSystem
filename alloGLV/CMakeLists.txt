@@ -5,6 +5,20 @@ message(STATUS "==== Configuring alloGLV")
 
 aux_source_directory(src ALLOGLV_SRC)
 
+set(ALLOGLV_SRC
+    src/al_ControlGLV.cpp
+    src/al_ParameterGUI.cpp
+    src/al_ProtoApp.cpp
+    src/al_SequencerGUI.cpp
+)
+
+set(ALLOGLV_HEADERS
+    alloGLV/al_ControlGLV.hpp
+    alloGLV/al_ParameterGUI.hpp
+    alloGLV/al_ProtoApp.hpp
+    alloGLV/al_SequencerGUI.hpp
+)
+
 set(LIBRARY_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/lib")
 set(EXECUTABLE_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/bin")
 
@@ -39,7 +53,7 @@ include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(ALLOGLV_LIB "alloGLV${DEBUG_SUFFIX}")
-add_library(${ALLOGLV_LIB} ${ALLOGLV_SRC})
+add_library(${ALLOGLV_LIB} ${ALLOGLV_SRC} ${ALLOGLV_HEADERS})
 
 target_link_libraries(${ALLOGLV_LIB} ${ALLOCORE_LIBRARY} ${GLV_LIBRARY})
 set_target_properties(${ALLOGLV_LIB}

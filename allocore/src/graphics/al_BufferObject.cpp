@@ -95,6 +95,9 @@ void BufferObject::onDestroy(){
 	glDeleteBuffers(1, (GLuint*)&mID);
 }
 
+void BufferObject::print() const {
+	printf("%s: %s %s (%d comps %d elems [%d bytes])\n", toString(mType), toString(mUsage), toString(mDataType), mNumComps, mNumElems, size());
+}
 
 
 VBO::VBO(BufferUsage usage)
@@ -139,28 +142,20 @@ void EBO::onPointerFunc(){
 	else		glDrawRangeElements(mPrim, 0, mNumElems, mNumElems, mDataType, 0);
 }
 
-/*
-class BufferObjects : public GPUObject, public Drawable {
-public:
+#define CS(t) case BufferObject::t: return #t;
+const char * toString(BufferObject::BufferType v){
+	switch(v){
+		CS(ARRAY_BUFFER) CS(ELEMENT_ARRAY_BUFFER) CS(PIXEL_PACK_BUFFER) CS(PIXEL_UNPACK_BUFFER)
+		default: return "";
+	}
+}
 
-	BufferObjects() {};
-
-	virtual ~BufferObjects() {};
-	virtual void draw(Graphics& gl);
-
-	Mesh& data() { return *mData; }
-
-protected:
-
-	virtual void onCreate() {};
-	virtual void onDestroy() {};
-
-	Mesh mData;
-
-	VBO mVBO;
-	CBO mCBO;
-	EBO mEBO;
-};
-*/
+const char * toString(BufferObject::BufferUsage v){
+	switch(v){
+		CS(STREAM_DRAW) CS(STATIC_DRAW) CS(DYNAMIC_DRAW)
+		default: return "";
+	}
+}
+#undef CS
 
 } // al::

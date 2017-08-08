@@ -44,9 +44,6 @@
 */
 
 #include <cmath>
-#include <float.h>
-#include <math.h>
-#include <stdlib.h>
 #include "allocore/system/al_Config.h"
 #include "allocore/math/al_Constants.hpp"
 
@@ -56,6 +53,7 @@
 #ifdef sinc
 #undef sinc
 #endif
+
 
 namespace al {
 
@@ -79,7 +77,7 @@ bool aeq(double a, double b, int maxULP=10);
 ///
 /// @ingroup allocore
 template <class T>
-inline T ampTodB(const T& amp){ return 20*::log(amp); }
+inline T ampTodB(const T& amp){ return 20*std::log(amp); }
 
 /// Returns value clipped ouside of range [-eps, eps]
 ///
@@ -204,6 +202,9 @@ template<class T> T gaussian(const T& v);
 ///
 /// @ingroup allocore
 template<class T> T gcd(const T& x, const T& y);
+
+template <typename T, typename... Ts>
+T gcd(const T& x, const Ts&... rest){ return gcd(x, gcd(rest...)); }
 
 /// The Gudermannian function
 /// relates circular and hyperbolic functions without using complex numbers.
@@ -505,17 +506,9 @@ namespace{
 	};
 }
 
-
-
-/// Returns absolute value
-template<> inline float abs(const float& v){ return ::fabsf(v); }
-template<> inline double abs(const double& v){ return ::fabs(v); }
-template<> inline char abs(const char& v){ return ::labs(v); }
-template<> inline short abs(const short& v){ return ::labs(v); }
-template<> inline int abs(const int& v){ return ::labs(v); }
-template<> inline long abs(const long& v){ return ::labs(v); }
-template<> inline long long abs(const long long& v){ return ::llabs(v); }
-
+template<> inline float abs<float>(const float& v){ return std::abs(v); }
+template<> inline double abs<double>(const double& v){ return std::abs(v); }
+TEM inline T abs(const T& v){ return v>T(0) ? v : -v; }
 
 inline bool aeq(float a, float b, int maxULP){
 	// Make sure maxULP is non-negative and small enough that the
@@ -527,7 +520,7 @@ inline bool aeq(float a, float b, int maxULP){
 	// Make ai and bi lexicographically ordered as a twos-complement int
 	if(ai < 0) ai = 0x80000000 - ai;
 	if(bi < 0) bi = 0x80000000 - bi;
-	return abs(ai - bi) <= maxULP;
+	return al::abs(ai - bi) <= maxULP;
 }
 
 inline bool aeq(double a, double b, int maxULP){
@@ -540,10 +533,10 @@ inline bool aeq(double a, double b, int maxULP){
 	// Make ai and bi lexicographically ordered as a twos-complement int
 	if(ai < 0) ai = 0x8000000000000000ULL - ai;
 	if(bi < 0) bi = 0x8000000000000000ULL - bi;
-	return abs(ai - bi) <= maxULP;
+	return al::abs(ai - bi) <= maxULP;
 }
 
-TEM inline T atLeast(const T& v, const T& e){	return (v >= T(0)) ? max(v, e) : min(v, -e); }
+TEM inline T atLeast(const T& v, const T& e){ return (v >= T(0)) ? max(v, e) : min(v, -e); }
 
 TEM T atan2Fast(const T& y, const T& x){
 
@@ -605,7 +598,7 @@ TEM inline T erf(const T& x) {
 	static T a = 0.147;
 	const T x2 = x*x;
 	const T ax2 = a * x2;
-	return sign(x)*sqrt(T(1) - exp(-x2*(T(4./M_PI) + ax2)/(T(1)+ax2)));
+	return al::sgn(x)*std::sqrt(T(1) - std::exp(-x2*(T(4./M_PI) + ax2)/(T(1)+ax2)));
 }
 
 inline uint32_t factorial(uint32_t v){ return mFactorial12u[v]; }
@@ -613,7 +606,7 @@ inline uint32_t factorial(uint32_t v){ return mFactorial12u[v]; }
 inline double factorialSqrt(int v){
 	if(v<=1) return 1;
 	double r=1;
-	for(int i=2; i<=v; ++i) r *= ::sqrt(i);
+	for(int i=2; i<=v; ++i) r *= std::sqrt(i);
 	return r;
 }
 
@@ -643,7 +636,7 @@ TEM inline T foldOnce(const T& v, const T& hi, const T& lo){
 	return v;
 }
 
-TEM inline T gaussian(const T& v){ return ::exp(-v*v); }
+TEM inline T gaussian(const T& v){ return std::exp(-v*v); }
 
 TEM T gcd(const T& x, const T& y){
 	if(y==T(0)) return al::abs(x);
@@ -652,7 +645,7 @@ TEM T gcd(const T& x, const T& y){
 
 /// @see http://en.wikipedia.org/wiki/Gudermannian_function
 TEM T gudermannian(const T& x) {
-	return T(2) * atan(exp(x)) - T(M_PI_2);
+	return T(2) * std::atan(exp(x)) - T(M_PI_2);
 }
 
 TEM T laguerreL(int n, int k, T x){
@@ -782,68 +775,24 @@ TEM inline T mean(const T& v1, const T& v2){ return (v1 + v2) * T(0.5); }
 TEM inline T min(const T& v1, const T& v2){ return v1<v2?v1:v2; }
 TEM inline T min(const T& v1, const T& v2, const T& v3){ return al::min(al::min(v1,v2),v3); }
 
-#if defined(AL_WINDOWS)
-/*
- * s_nextafterf.c -- float version of s_nextafter.c.
- * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
- * ====================================================
- * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
- *
- * Developed at SunPro, a Sun Microsystems, Inc. business.
- * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice
- * is preserved.
- * ====================================================
- */
-inline float nextafterf(float x, float y){
-	union{ float f; int32_t i; } ux, uy;
-	ux.f=x;
-	uy.f=y;
-	int32_t hx=ux.i;
-	int32_t hy=uy.i;
-	int32_t ix=ux.i&0x7fffffff;	/* |x| */
-	int32_t iy=uy.i&0x7fffffff;	/* |y| */
-	if((ix>0x7f800000)||(iy>0x7f800000)) return x+y; /* x or y are nan */
-	if(x==y) return y;			/* x=y, return y */
-	if(ix==0){					/* x == 0 */
-		ux.i=(hy&0x80000000)|1;	/* return +-minsubnormal */
-		x = ux.f;
-		float t = x*x;
-		return t==x ? t : x;	/* raise underflow flag */
-	}
-	if(hx>=0) {					/* x > 0 */
-		if(hx>hy)	--hx;		/* x > y, x -= ulp */
-		else		++hx;		/* x < y, x += ulp */
-	} else {					/* x < 0 */
-		if(hy>=0||hx>hy)--hx;	/* x < y, x -= ulp */
-		else			++hx;	/* x > y, x += ulp */
-	}
-	hy = hx&0x7f800000;
-	if(hy>=0x7f800000) return x+x;	/* overflow  */
-	if(hy <0x00800000){			/* underflow */
-		float t = x*x;
-		if(t!=x){				/* raise underflow flag */
-			ux.i = hx;
-			return ux.f;
-		}
-	}
-	ux.i = hx;
-	return ux.f;
-}
+#ifdef __MSYS__
+// MSYS2 does not support C++11 std::nextafter like it should
+template<class T>
+inline T nextAfter(const T& x, const T& y){ return x<y ? x+1 : x-1; }
+template<>
+inline float nextAfter(const float& x, const float& y){ return nextafterf(x,y); }
+template<>
+inline double nextAfter(const double& x, const double& y){ return nextafter(x,y); }
+#else
+TEM inline T nextAfter(const T& x, const T& y){ return std::nextafter(x,y); }
 #endif
-
-TEM inline T nextAfter(const T& x, const T& y){ return x<y ? x+1 : x-1; }
-template<> inline float nextAfter(const float& x, const float& y){ return nextafterf(x,y); }
-//template<> inline float nextAfter(const float& x, const float& y){ return x > y ? x - FLT_EPSILON : x + FLT_EPSILON; }
-template<> inline double nextAfter(const double& x, const double& y){ return nextafter(x,y); }
-template<> inline long double nextAfter(const long double& x, const long double& y){ return nextafterl(x,y); }
 
 TEM inline T nextMultiple(T v, T m){
 	uint32_t div = (uint32_t)(v / m);
 	return T(div + 1) * m;
 }
 
-TEM inline T numInt(const T& v){ return al::floor(::log10(v)) + 1; }
+TEM inline T numInt(const T& v){ return al::floor(std::log10(v)) + 1; }
 
 TEM inline bool odd(const T& v){ return v & T(1); }
 
@@ -883,10 +832,7 @@ TEM inline T powN(T base, unsigned power){
 
 inline uint8_t prime(uint32_t n){ return mPrimes54[n]; }
 
-template<> inline float remainder<float>(const float& x, const float& y){ return ::remainderf(x,y); }
-template<> inline double remainder<double>(const double& x, const double& y){ return ::remainder(x,y); }
-template<> inline long double remainder<long double>(const long double& x, const long double& y){ return ::remainderl(x,y); }
-TEM inline T remainder(const T& x, const T& y){ return x-(x/y)*y; }
+TEM inline T remainder(const T& x, const T& y){ return x - long(x/y) * y; }
 
 TEM inline T round(const T& v){
 	static const double roundMagic = 6755399441055744.; // 2^52 * 1.5

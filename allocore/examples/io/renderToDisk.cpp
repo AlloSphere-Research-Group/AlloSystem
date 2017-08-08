@@ -47,6 +47,7 @@ public:
 		nav().pos(0,0,4);
 		initWindow(Window::Dim(800,600));
 		initAudio(44100, 128, 2,0);
+		printf("Press ctrl-r to toggle rendering\n");
 	}
 
 	void onSound(AudioIOData& io){

@@ -52,10 +52,12 @@ else (PORTAUDIO_LIBRARIES AND PORTAUDIO_INCLUDE_DIRS)
     if (NOT Portaudio_FIND_QUIETLY)
       message(STATUS "Found Portaudio: ${PORTAUDIO_LIBRARIES}")
     endif (NOT Portaudio_FIND_QUIETLY)
+    add_definitions(-DAL_AUDIO_PORTAUDIO)
   else (PORTAUDIO_FOUND)
     if (Portaudio_FIND_REQUIRED)
       message(FATAL_ERROR "Could not find Portaudio")
     endif (Portaudio_FIND_REQUIRED)
+    add_definitions(-DAL_AUDIO_DUMMY)
   endif (PORTAUDIO_FOUND)
 
   # show the PORTAUDIO_INCLUDE_DIRS and PORTAUDIO_LIBRARIES variables only in the advanced view

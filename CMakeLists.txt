@@ -124,7 +124,7 @@ endif(BUILDING_GAMMA)
 # Alloutil ----------------------------------
 add_subdirectory(alloutil)
 set(ALLOUTIL_LIBRARY "alloutil${DEBUG_SUFFIX}")
-get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
+get_target_property(ALLOUTIL_DEP_INCLUDE_DIRS alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIRS)
 get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 
 # alloGLV ---------------------------------------
@@ -146,12 +146,22 @@ endif(BUILD_ALLOCV)
 
 # alloaudio ----------------------------------
 add_subdirectory(alloaudio)
-set(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}")
+get_target_property(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}" ALLOAUDIO_LIBRARY)
 get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
 get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
-if("alloaudio${DEBUG_SUFFIX}")
+if(ALLOAUDIO_LIBRARY)
   add_dependencies("alloaudio${DEBUG_SUFFIX}" "${ALLOCORE_LIBRARY}")
-endif("alloaudio${DEBUG_SUFFIX}")
+endif(ALLOAUDIO_LIBRARY)
+
+# allosphere ----------------------------------
+add_subdirectory(allosphere)
+get_target_property(ALLOSPHERE_LIBRARY "allosphere${DEBUG_SUFFIX}" ALLOSPHERE_LIBRARY)
+get_target_property(ALLOSPHERE_INCLUDE_DIR allosphere${DEBUG_SUFFIX} ALLOSPHERE_INCLUDE_DIR)
+get_target_property(ALLOSPHERE_LINK_LIBRARIES allosphere${DEBUG_SUFFIX} ALLOSPHERE_LINK_LIBRARIES)
+if(ALLOSPHERE_LIBRARY)
+  add_dependencies("allosphere${DEBUG_SUFFIX}" "${ALLOCORE_LIBRARY}")
+  set(USE_CPP_11 1) # To trigger usage of C++11 in run script below
+endif(ALLOSPHERE_LIBRARY)
 
 # Run from path (Used in run.sh script)
 if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
@@ -180,7 +190,7 @@ if(BUILD_EXAMPLES)
   endif (NOT GAMMA_LIBRARY)
   find_library(CUTTLEBONE_LIBRARY cuttlebone)
   find_library(MYSQLPP_LIBRARY mysqlpp)
-  if (CUTTLEBONE_LIBRARY AND MYSQLPP_LIBRARY)
+  if (CUTTLEBONE_LIBRARY AND MYSQLPP_LIBRARY AND OPENCL_LIBRARY)
   subdirlist(EXAMPLE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/examples)
   #include root projects directory
   list(APPEND EXAMPLE_DIRS ".")
@@ -221,13 +231,13 @@ if(BUILD_EXAMPLES)
       endif(EXTRA_COMPILER_FLAGS)
       #message("Adding target for example: ${example_src}")
       include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
-        ${GLV_INCLUDE_DIRS} ${GAMMA_INCLUDE_DIRS} ${ALLOAUDIO_INCLUDE_DIR} )
+        ${GLV_INCLUDE_DIRS} ${GAMMA_INCLUDE_DIRS} ${ALLOAUDIO_INCLUDE_DIR} ${ALLOSPHERE_INCLUDE_DIR})
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
-      add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}")
+      add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}" "allosphere${DEBUG_SUFFIX}")
       target_link_libraries(${EXAMPLE_TARGET}
-        ${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES} ${ALLOAUDIO_LIBRARY}
+        ${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES} ${ALLOAUDIO_LIBRARY} ${ALLOSPHERE_LIBRARY}
         ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES}
-        ${ALLOAUDIO_LINK_LIBRARIES})
+        ${ALLOAUDIO_LINK_LIBRARIES} ${ALLOSPHERE_LINK_LIBRARIES})
       if(ALLOGLV_LIBRARY)
         add_dependencies(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY})
         target_link_libraries(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})

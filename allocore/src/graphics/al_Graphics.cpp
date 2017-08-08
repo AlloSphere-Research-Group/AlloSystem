@@ -15,6 +15,25 @@ Graphics::Graphics()
 
 Graphics::~Graphics(){}
 
+#define CS(t) case Graphics::t: return #t;
+const char * toString(Graphics::DataType v){
+	switch(v){
+		CS(BYTE) CS(UBYTE) CS(SHORT) CS(USHORT) CS(INT) CS(UINT)
+		CS(BYTES_2) CS(BYTES_3) CS(BYTES_4)
+		CS(FLOAT) CS(DOUBLE)
+		default: return "";
+	}
+}
+
+const char * toString(Graphics::Format v){
+	switch(v){
+		CS(DEPTH_COMPONENT) CS(LUMINANCE) CS(LUMINANCE_ALPHA)
+		CS(RED) CS(GREEN) CS(BLUE) CS(ALPHA)
+		CS(RGB) CS(BGR) CS(RGBA) CS(BGRA)
+		default: return "";
+	}
+}
+#undef CS
 
 int Graphics::numComponents(Format v){
 	switch(v){

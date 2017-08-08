@@ -7,29 +7,28 @@ namespace al{
 
 RGB& RGB::operator= (const HSV& hsv){
 
-	float h=hsv.h*6.f, s=hsv.s, v=hsv.v;
+	auto s=hsv.s, v=hsv.v;
 
+	/* Removed extra branch as we typically will not use HSV for grayscale
 	if(s == 0.f){	// achromatic (gray)
 		return set(v);
+	}//*/
+
+	auto h=hsv.h*6.f;
+										
+	auto i = (unsigned int)(h);	// hue sector 0, 1, 2, 3, 4, or 5
+	float f = h - float(i);		// fraction between sectors
+	auto vs = v*s;
+	auto p = v - vs;
+
+	switch(i){
+		case 0: {auto w=p+vs*f; return set(v,w,p);}
+		case 1:	{auto w=v-vs*f; return set(w,v,p);}
+		case 2:	{auto w=p+vs*f; return set(p,v,w);}
+		case 3:	{auto w=v-vs*f; return set(p,w,v);}
+		case 4: {auto w=p+vs*f; return set(w,p,v);}
+		default:{auto w=v-vs*f; return set(v,p,w);}
 	}
-										// sector 0 to 5
-	unsigned int i = (unsigned int)(h);	// integer part of h
-	float f = h - float(i);				// fractional part of h
-	float p = v * (1.f - s);
-
-	// depends on hue section being even or odd
-	float q = v * (1.f - s*( (i & 1U) ? f : (1.f - f) ));
-
-	switch( i ) {
-		case 0: r=v; g=q; b=p; break;
-		case 1:	r=q; g=v; b=p; break;
-		case 2:	r=p; g=v; b=q; break;
-		case 3:	r=p; g=q; b=v; break;
-		case 4: r=q; g=p; b=v; break;
-		default:r=v; g=p; b=q; break;
-	}
-
-	return *this;
 }
 
 
@@ -185,22 +184,18 @@ Lab& Lab::operator= (const CIEXYZ& v){
 Lab& Lab::operator=(const HCLab& v){
 	l = v.l * 100.0f;
 	static const float TAU = 2 * M_PI;
-	a = (v.c * 133.419f) * cos((v.h * TAU) - M_PI);
-	b = (v.c * 133.419f) * sin((v.h * TAU) - M_PI);
+	a = (v.c * 133.419f) * cos(v.h * TAU);
+	b = (v.c * 133.419f) * sin(v.h * TAU);
 	//cout << "Lab from HCLab: {" << l << ", " << a << ", " << b << "}" << endl;
 	return *this;
 }
 
 //HCLab operators
 HCLab& HCLab::operator= (const Lab& v){
-	static const float TAU = 2 * M_PI;
 	float L = v.l, a = v.a, b = v.b;
 	//calculate hue angle from 0 to 1
-	h = (atan2(b, a) + M_PI) / TAU;
-
-	//wrap hue angle
-	if(h < 0.f) h += 1.f;
-	if(h >= 1.f) h -= 1.f;
+	h = atan2(b, a) * (1.f / (2.f*M_PI));	// hue in [-0.5, 0.5]
+	if(h < 0.f) h += 1.f;					// wrap hue angle into [0, 1]
 
 	c = sqrt(a * a + b * b) / 133.419f; //range determined empirically using
 										//16million RGB color image from http://brucelindbloom.com
@@ -235,21 +230,18 @@ Luv& Luv::operator= (const CIEXYZ& w){
 Luv& Luv::operator=(const HCLuv& w){
 	l = w.l * 100.0f;
 	static const float TAU = 2 * M_PI;
-	u = (w.c * 178.387f) * cos((w.h * TAU) - M_PI);
-	v = (w.c * 178.387f) * sin((w.h * TAU) - M_PI);
+	u = (w.c * 178.387f) * cos(w.h * TAU);
+	v = (w.c * 178.387f) * sin(w.h * TAU);
 	//cout << "Luv from HCLuv: {" << l << ", " << u << ", " << v << "}" << endl;
 	return *this;
 }
 
 //HCLuv operators
 HCLuv& HCLuv::operator= (const Luv& w){
-	static const float TAU = 2 * M_PI;
 	float L = w.l, u = w.u, v = w.v;
 	//calculate hue angle from 0 to 1
-	h = (atan2(v, u) + M_PI) / TAU;
-	//wrap hue angle
-	if(h < 0.f) h += 1.f;
-	if(h >= 1.f) h -= 1.f;
+	h = atan2(v, u) * (1.f / (2.f*M_PI));	// hue in [-0.5, 0.5]
+	if(h < 0.f) h += 1.f;					// wrap hue angle into [0, 1]
 
 	c = sqrt(u * u + v * v) / 178.387f; //range determined empirically using
 										//16million RGB color image from http://brucelindbloom.com

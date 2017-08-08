@@ -130,18 +130,24 @@ bool SceneWindowHandler::onFrame(){
 
 	if(app.clockNav() == &win){
 		double dt = win.spfActual();
+		//double dt = win.spf(); // use theoretical dt for smooth control
 		app.nav().smooth(::pow(0.0001, dt));
 		app.nav().step(dt * 40./*FPS*/);
 		//app.nav().smooth(0.8);
 		//app.nav().step(1.);
 	}
 
-	app.navDraw() = app.nav();
-	app.navDraw().quat().normalize();
-
 	if(app.clockAnimate() == &win){
 		app.onAnimate(win.spfActual());
 	}
+
+	// Quatd accumulated rotations are very precise, so we should rarely need
+	// to normalize it
+	if(app.nav().quat().magSqr() > 1.0000001){
+		app.nav().quat().normalize();
+	}
+
+	app.navDraw() = app.nav();
 
 	Graphics& g = app.graphics();
 	g.depthTesting(true);
@@ -150,12 +156,14 @@ bool SceneWindowHandler::onFrame(){
 	struct DrawFunc : public Drawable {
 		App& app;
 		Viewpoint& vp;
+		ViewpointWindow& win;
 
-		DrawFunc(App& a, Viewpoint& v)
-		:	app(a), vp(v){}
+		DrawFunc(App& a, Viewpoint& v, ViewpointWindow& w)
+		:	app(a), vp(v), win(w){}
 
 		void onDraw(Graphics& g){
 			g.pushMatrix(g.MODELVIEW);
+			for(auto& drawCall : win.drawCalls()) drawCall();
 			app.onDraw(g,vp);
 			g.popMatrix(g.MODELVIEW);
 		}
@@ -217,7 +225,7 @@ bool SceneWindowHandler::onFrame(){
 			}
 		}
 
-		DrawFunc drawFunc(app, vp);
+		DrawFunc drawFunc(app, vp, win);
 		stereo.draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc, doClear);
 		stereo.clearColor(defaultClearColor);
 	}
@@ -231,7 +239,9 @@ bool SceneWindowHandler::onFrame(){
 App::App()
 :	mName(""),
 	mNavControl(mNav),
-	mClockAnimate(0), mClockNav(0)
+	mClockAnimate(0), mClockNav(0),
+	mOSCRecv(12001, "", 0.001),
+	mOSCSend(12000, "bossanova.mat.ucsb.edu", 0)
 {}
 
 
@@ -244,7 +254,7 @@ App::~App(){
 		delete mFacViewpoints[i];
 	}
 
-	if(name()!="" && oscSend().opened()) sendDisconnect();
+	if(oscSend().opened() && !name().empty()) sendDisconnect();
 }
 
 
@@ -297,26 +307,25 @@ ViewpointWindow * App::initWindow(
 	Window::DisplayMode mode,
 	int flags
 ){
-	//ViewpointWindow * win = new ViewpointWindow(dims, title, fps, mode);
-
-	ViewpointWindow * win = new ViewpointWindow;
-	win->dimensions(dims);
-	win->title(title);
-	win->fps(fps);
-	win->displayMode(mode);
-
-	mFacViewpoints.push_back(new Viewpoint);
-
-	int last = mFacViewpoints.size()-1;
-	{
-		Viewpoint& vp = *mFacViewpoints[last];
-		vp.parentTransform(nav().transformed());
-		win->add(vp);
+	auto& win = *new ViewpointWindow;
+	win.dimensions(dims);
+	if(title.empty()){ // if no title, use app name, if any
+		if(!name().empty()) win.title(name());
+	} else {
+		win.title(title);
 	}
 
-	mFacWindows.push_back(win);
-	add(*win);
-	return win;
+	win.fps(fps);
+	win.displayMode(mode);
+	
+	auto& newVP = *new Viewpoint;
+	mFacViewpoints.push_back(&newVP);
+	newVP.parentTransform(nav().transformed());
+	win.add(newVP);
+
+	mFacWindows.push_back(&win);
+	add(win);
+	return &win;
 }
 
 
@@ -340,7 +349,7 @@ void App::start(){
 		clockAnimate(mWindows[0]);
 	}
 	if(usingAudio()) mAudioIO.start();
-	if(name()!="" && oscSend().opened()) sendHandshake();
+	if(oscSend().opened() && !name().empty()) sendHandshake();
 
 //	// factories OKAY
 //	for(unsigned i=0; i<mFacViewpoints.size(); ++i)
@@ -387,9 +396,7 @@ void App::start(){
 
 	if(windows().size()){
 		// create the windows
-		for(unsigned i=0; i<windows().size(); ++i){
-			windows()[i]->create();
-		}
+		for(auto& w : windows()) w->create();
 
 		// start the main loop
 		Main::get().start();

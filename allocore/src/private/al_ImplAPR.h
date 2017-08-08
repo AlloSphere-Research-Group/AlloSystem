@@ -28,12 +28,19 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
-
-// need this to pick up AL_LINUX etc:
+#include <stdlib.h> // atexit
 #include "allocore/system/al_Config.h"
 
-#if defined(AL_LINUX) && !defined(AL_WINDOWS)
+#if defined AL_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#define VC_EXTRALEAN
+	// Ensure this is defined since this is the only def APR checks
+	#ifndef WIN32
+	#define WIN32
+	#endif
+#endif
+
+#ifdef AL_LINUX
 	#include "apr-1.0/apr_general.h"
 	#include "apr-1.0/apr_errno.h"
 	#include "apr-1.0/apr_pools.h"

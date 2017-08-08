@@ -4,6 +4,14 @@ typedef double data_t;
 
 int utTypes(){
 
+	// Conversion
+	{ auto s = toString(0.3f); assert("0.3"==s);}
+	{ auto s = toString(0.3 ); assert("0.3"==s);}
+	{ auto s = toString(333 ); assert("333"==s);}
+
+	{ auto v = fromString<float>("0.3"); assert(float(0.3)==v); }
+	{ auto v = fromString<double>("0.3"); assert(double(0.3)==v); }
+	{ auto v = fromString<int>("333"); assert(int(333)==v); }
 
 	// Array
 	{	// test the basic C functionality

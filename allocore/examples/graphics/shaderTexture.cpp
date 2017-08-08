@@ -11,52 +11,46 @@ Lance Putnam, May 2011
 #include "allocore/io/al_App.hpp"
 using namespace al;
 
-const char * vTexture = R"(
-void main(){
-	// OpenGL-provided varying that we will use in the fragment shader
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-}
-)";
-
-const char * fTexture = R"(
-uniform sampler2D texSampler;
-void main(){
-	gl_FragColor = texture2D(texSampler, gl_TexCoord[0].xy);
-}
-)";
-
-
 class MyApp : public App{
 public:
-	MyApp()
-	:	 tex(64,64, Graphics::RGBA, Graphics::FLOAT)
-	{
-		nav().pullBack(4);
-		initWindow();
-	}
 
 	ShaderProgram shader;
-	Texture tex;
+	Texture tex{64, 64};
 
-	void onCreate(const ViewpointWindow& w){
+	MyApp(){
+
+		// Set texture pixels
 		int Nx = tex.width();
 		int Ny = tex.height();
-		float * texBuf = new float[tex.numElems()];
+		Colori * pix = tex.data<Colori>();
 
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1);
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1);
 			int idx = j*Nx + i;
-			texBuf[idx*4 + 0] = x;
-			texBuf[idx*4 + 1] = y;
-			texBuf[idx*4 + 2] = 0;
-			texBuf[idx*4 + 3] = 1;
+			pix[idx] = RGB(x,y,0);
 		}}
 
-		tex.submit(texBuf);
-		delete[] texBuf;
+		// Compile the vertex and fragment shaders to display the texture
+		shader.compile(
+		R"(
+			void main(){
+				// Built-in varying that we will use in the fragment shader
+				gl_TexCoord[0] = gl_MultiTexCoord0;
 
-		shader.compile(vTexture, fTexture);
+				// Set position as you normally do
+				gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+			}
+		)", R"(
+			// A "sampler" is used to fetch texels from the texture
+			uniform sampler2D texSampler;
+			void main(){
+				gl_FragColor = texture2D(texSampler, gl_TexCoord[0].xy);
+			}
+		)"
+		);
+
+		nav().pullBack(4);
+		initWindow();
 	}
 
 	void onDraw(Graphics& g){

@@ -1,9 +1,8 @@
-
-ALLOSYSTEM CODING STYLE
-===========================================================================
+1 ALLOSYSTEM CODING STYLE
+=========================
 
 1.1 File Naming
----------------------------------------------------------------------------
+---------------
 For C++:
 al_[CamelCase].hpp
 al_[CamelCase].cpp
@@ -14,7 +13,7 @@ al_[CamelCase].c
 
 
 1.2 Header Files
----------------------------------------------------------------------------
+----------------
 All header content should be contained within a preprocessor conditional block to avoid multiple include errors.
 
 	#ifndef INCLUDE_AL_[FILE_STEM]_[FILE_EXT (H or HPP)]
@@ -34,14 +33,14 @@ A comment at the beginning of the file should include:
 
 
 1.3 Whitespace
----------------------------------------------------------------------------
+--------------
 Indentation should be done using tabs. Make sure your editor does not replace tabs with spaces.
 
-Make sure your editor uses Unix-like line endings "\n". This is especially relevant for development in Windows where many editors use "\r\n" by default.
+Make sure your editor uses Unix-like line endings "\n". This is especially relevant on Windows where many editors use "\r\n" by default.
 
 
 1.4 Macros
----------------------------------------------------------------------------
+----------
 Minimize use of macros as they always have global scope. Do not use macros to define constants or functions.
 
 Instead of
@@ -54,7 +53,7 @@ use
 
 
 1.5 Naming conventions
----------------------------------------------------------------------------
+----------------------
 - Macros should be all uppercase with words separated by underscores, e.g. AL_NSEC_FMT.
 - enum constants should be all uppercase.
 
@@ -66,8 +65,8 @@ C only:
 - Function names should be prefixed with 'al_'.
 
 
-1.6 C++isms
----------------------------------------------------------------------------
+1.7 C++isms
+-----------
 Use references instead of pointers in public interfaces. A reference cannot be NULL unlike a pointer and therefore catches many run-time errors. For example, instead of passing a pointer
 
 	void foo(Object * obj);
@@ -87,13 +86,20 @@ prefer
 	Object obj;
 	// code using obj
 
-For more information on how not to use pointers in modern C++ see
+For more information on how to not use pointers in modern C++ see
 
 	klmr.me/slides/modern-cpp/
 
 
-1.7 Dependencies
----------------------------------------------------------------------------
+1.6 Class design
+----------------
+- Include a default constructor whenever possible.
+- Avoid dynamic memory allocation or resource acquisition (opening files, etc.) in constructors.
+- Place implementation code into a separate .cpp file. This make headers easier to read and speeds up compilation time for users of the library. You may, however, place the implementation in the header file for inlined functions (small, frequently-called functions) or templated functions.
+
+
+1.8 Dependencies
+----------------
 Try to keep the amount of code dependencies at a minimum, both internally and with regards to third-party libraries. 
 
 For example:
@@ -103,7 +109,7 @@ For example:
 
 
 2 LIBRARY ORGANIZATION
-===========================================================================
+======================
 allocore
 	math
 		complex number
@@ -176,5 +182,3 @@ external
 
 * Consider porting to C++11
 ** Consider porting to C++17
-
-

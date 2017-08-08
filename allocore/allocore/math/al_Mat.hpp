@@ -52,6 +52,9 @@ namespace al {
 
 template <int N, class T> class Mat;
 
+typedef Mat<2,float>	Mat2f;	///< float 2x2 matrix
+typedef Mat<2,double>	Mat2d;	///< double 2x2 matrix
+typedef Mat<2,int>		Mat2i;	///< integer 2x2 matrix
 typedef Mat<3,float>	Mat3f;	///< float 3x3 matrix
 typedef Mat<3,double>	Mat3d;	///< double 3x3 matrix
 typedef Mat<3,int>		Mat3i;	///< integer 3x3 matrix
@@ -87,7 +90,8 @@ public:
 	Mat(){ set(T(0)); }
 
 	/// @param[in] arr	one dimensional array in column-major
-	Mat(const T * arr){ set(arr); }
+	template <class U>
+	Mat(const U * arr){ set(arr); }
 
 	/// @param[in] src	matrix with same dimension, but possibly different type
 	template <class U>
@@ -165,6 +169,18 @@ public:
 		return m;
 	}
 
+	/// Get a scaling transform matrix
+	template <class V>
+	static Mat scaling(V v){
+		return scaling(Vec<N-1,V>(v));
+	}
+
+	/// Get a scaling transform matrix
+	template <typename... Vals>
+	static Mat scaling(Vals... vals){
+		return scaling(Vec<(sizeof...(Vals)),T>(vals...));
+	}
+
 	/// Get a translation transform matrix
 	template <class V>
 	static Mat translation(const Vec<N-1,V>& v){
@@ -174,13 +190,18 @@ public:
 		return m;
 	}
 
-
+	/// Get a translation transform matrix
+	template <typename... Vals>
+	static Mat translation(Vals... vals){
+		return translation(Vec<(sizeof...(Vals)),T>(vals...));
+	}
 
 	//--------------------------------------------------------------------------
 	// Memory Operations
 
 	/// Returns C array type punned into a matrix
 	static Mat& pun(T * src){ return *(Mat*)(src); }
+	static const Mat& pun(const T * src){ return *(const Mat*)(src); }
 
 	/// Returns total number of elements
 	static int size(){ return N*N; }
@@ -474,6 +495,10 @@ public:
 	template<class V>
 	Mat& scale(const V& amount){ return scale(Vec<N-1,V>(amount)); }
 
+	/// Scale transformation matrix
+	template<typename... Vals>
+	Mat& scale(Vals... vals){ return scale(Vec<(sizeof...(Vals)),T>(vals...)); }
+
 	/// Scale transformation matrix global coordinates
 	template<class V>
 	Mat& scaleGlobal(const Vec<N-1,V>& amount){
@@ -494,6 +519,13 @@ public:
 		return *this;
 	}
 
+	/// Translate transformation matrix by same amount in all directions
+	template<class V>
+	Mat& translate(const V& amount){ return translate(Vec<N-1,V>(amount)); }
+
+	/// Translate transformation matrix
+	template<typename... Vals>
+	Mat& translate(Vals... vals){ return translate(Vec<(sizeof...(Vals)),T>(vals...)); }
 
 	/// Print to file (stream)
 	void print(FILE * file = stderr) const;

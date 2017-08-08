@@ -45,6 +45,7 @@
 */
 
 #include <stdio.h>
+#include <string>
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/types/al_Buffer.hpp"
@@ -136,6 +137,9 @@ public:
 	template <class T>
 	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
 
+	template <class T>
+	Mesh& translate(const T& v){ return translate(v,v,v); }
+
 	/// Transform vertices by projective transform matrix
 
 	/// @param[in] m		projective transform matrix
@@ -192,6 +196,15 @@ public:
 	///								If false, surface faces normal vector of curve.
 	void ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
 
+	/// Smooths a triangle mesh
+
+	/// This smooths a triangle mesh using Laplacian (low-pass) filtering.
+	/// New vertex positions are a weighted sum of their nearest neighbors. 
+	/// The number of vertices is not changed.
+	/// @param[in] amount		interpolation fraction between original and smoothed result
+	/// @param[in] weighting	0 = equal weight, 1 = inverse distance weight
+	void smooth(float amount=1, int weighting=0);
+
 
 	int primitive() const { return mPrimitive; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
@@ -218,6 +231,12 @@ public:
 	void index(const Tindex * buf, int size, Tindex indexOffset=0){
 		for(int i=0; i<size; ++i) index((Index)(buf[i] + indexOffset)); }
 
+	template <class...Indices>
+	void index(unsigned i, Indices... indices){
+		index(i);
+		index(indices...);
+	}
+
 
 	/// Append color to color buffer
 	void color(const Color& v) { colors().append(v); }
@@ -238,8 +257,23 @@ public:
 	template <class T>
 	void color(const Vec<4,T>& v) { color(v[0], v[1], v[2], v[3]); }
 
+	/// Append colors from flat array
+	template <class T>
+	void color(const T * src, int numColors){
+		for(int i=0; i<numColors; ++i) color(src[4*i+0], src[4*i+1], src[4*i+2], src[4*i+3]);
+	}
+
+
 	/// Append floating-point color to integer color buffer
 	void colori(const Color& v) { coloris().append(Colori(v)); }
+
+	/// Append integer colors from flat array
+	template <class T>
+	void colori(const T * src, int numColors){
+		for(int i=0; i<numColors; ++i){
+			coloris().append(Colori(src[4*i+0], src[4*i+1], src[4*i+2], src[4*i+3]));
+		}
+	}
 
 
 	/// Append normal to normal buffer
@@ -251,6 +285,12 @@ public:
 	/// Append normal to normal buffer
 	template <class T>
 	void normal(const Vec<2,T>& v, float z=0){ normal(v[0], v[1], z); }
+
+	/// Append normals from flat array
+	template <class T>
+	void normal(const T * src, int numNormals){
+		for(int i=0; i<numNormals; ++i) normal(src[3*i+0], src[3*i+1], src[3*i+2]);
+	}
 
 
 	/// Append texture coordinate to 1D texture coordinate buffer
@@ -281,16 +321,16 @@ public:
 	template <class T>
 	void vertex(const Vec<2,T>& v, float z=0){ vertex(v[0], v[1], z); }
 
-	/// Append vertices to vertex buffer
+	/// Append vertices from flat array
 	template <class T>
-	void vertex(const T * buf, int size){
-		for(int i=0; i<size; ++i) vertex(buf[3*i+0], buf[3*i+1], buf[3*i+2]);
+	void vertex(const T * src, int numVerts){
+		for(int i=0; i<numVerts; ++i) vertex(src[3*i+0], src[3*i+1], src[3*i+2]);
 	}
 
 	/// Append vertices to vertex buffer
 	template <class T>
-	void vertex(const Vec<3,T> * buf, int size){
-		for(int i=0; i<size; ++i) vertex(buf[i][0], buf[i][1], buf[i][2]);
+	void vertex(const Vec<3,T> * src, int numVerts){
+		for(int i=0; i<numVerts; ++i) vertex(src[i][0], src[i][1], src[i][2]);
 	}
 
 
@@ -304,7 +344,17 @@ public:
 	Indices& indices(){ return mIndices; }
 
 
-	/// Export mesh to an STL file
+	/// Save mesh to file
+
+	/// Currently supported are STL and PLY files.
+	///
+	/// @param[in] filePath		path of file to save to
+	/// @param[in] solidName	solid name defined within the file (optional)
+	/// @param[in] binary		write data in binary form as opposed to ASCII
+	/// \returns true on successful save, otherwise false
+	bool save(const std::string& filePath, const std::string& solidName = "", bool binary=true) const;
+
+	/// Save mesh to an STL file
 
 	/// STL (STereoLithography) is a file format used widely for
 	/// rapid prototyping. It contains only surface geometry (vertices and
@@ -312,9 +362,19 @@ public:
 	/// This implementation saves an ASCII (as opposed to binary) STL file.
 	///
 	/// @param[in] filePath		path of file to save to
-	/// @param[in] solidName	solid name defined within the STL file (optional)
-	/// \returns true on successful export, otherwise false
-	bool exportSTL(const char * filePath, const char * solidName = "") const;
+	/// @param[in] solidName	solid name defined within the file (optional)
+	/// \returns true on successful save, otherwise false
+	bool saveSTL(const std::string& filePath, const std::string& solidName = "") const;
+
+	/// Save mesh to a PLY file
+
+	/// This implementation saves an ASCII (as opposed to binary) PLY file.
+	///
+	/// @param[in] filePath		path of file to save to
+	/// @param[in] solidName	solid name defined within the file (optional)
+	/// @param[in] binary		write data in binary form as opposed to ASCII
+	/// \returns true on successful save, otherwise false
+	bool savePLY(const std::string& filePath, const std::string& solidName = "", bool binary=true) const;
 
 
 	/// Print information about Mesh
@@ -333,6 +393,12 @@ protected:
 	Indices mIndices;
 
 	int mPrimitive;
+
+public:
+	/// \deprecated
+	bool exportSTL(const char * filePath, const char * solidName = "") const;
+	/// \deprecated
+	bool exportPLY(const char * filePath, const char * solidName = "") const;
 };
 
 

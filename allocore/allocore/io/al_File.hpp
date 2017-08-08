@@ -43,16 +43,11 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-
-#include <limits.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <string>
 #include <list>
 #include <vector>
 #include <algorithm>
-
 #include "allocore/system/al_Config.h"
 
 #ifndef AL_FILE_DELIMITER_STR
@@ -121,19 +116,30 @@ class File{
 public:
 
 	/// @param[in] path		path of file
-	/// @param[in] mode		i/o mode w, r, wb, rb
+	/// @param[in] mode		i/o mode "w", "r", "wb", "rb"
 	/// @param[in] open		whether to open the file
-	File(const std::string& path, const std::string& mode="r", bool open=false);
+	File(const std::string& path=".", const std::string& mode="r", bool open=false);
 	File(const FilePath& path, const std::string& mode="r", bool open=false);
 
 	~File();
 
 
+	/// Open file
+
+	/// @param[in] path		path of file
+	/// @param[in] mode		i/o mode "w", "r", "wb", "rb"
+	/// \returns true on success, false otherwise
+	bool open(const std::string& path, const std::string& mode="r");
+
+	/// Open file using member variables
+
+	/// \returns true on success, false otherwise
+	///
+	bool open();
+
 	/// Close file
 	void close();
 
-	/// Open file with specified i/o mode
-	bool open();
 
 	/// Set i/o mode
 
@@ -191,11 +197,22 @@ public:
 	FILE * filePointer() { return mFP; }
 
 
+	/// Quick and dirty read of all bytes from file
+	static std::string read(const std::string& path);
+
 	/// Quick and dirty write memory to file
 	static int write(const std::string& path, const void * v, int size, int items=1);
 
 	/// Quick and dirty write character string to file
 	static int write(const std::string& path, const std::string& data);
+
+	/// Copy a file in srcPath to a new location. dstPath can be the new file name or the
+	/// directory where the file is copied.
+	/// Returns true when sucessful.
+	static bool copy(const std::string& srcPath, const std::string& dstPath, unsigned int bufferSize = 1e6);
+
+	/// Delete file from file system
+	static bool remove(const std::string& path);
 
 	/// Returns string ensured to having an ending delimiter
 
@@ -208,29 +225,30 @@ public:
 	/// This function takes a path as an argument and returns a new path with
 	/// correct platform-specific directory delimiters, '/' or '\' and
 	/// an extra delimiter at the end if the argument is a valid directory.
-	static std::string conformPathToOS(const std::string& src);
+	static std::string conformPathToOS(const std::string& path);
 
 	/// Convert relative paths to absolute paths
-	static std::string absolutePath(const std::string& src);
+	static std::string absolutePath(const std::string& path);
 
 	/// Returns the base name of path.
 
-	/// The base name is everything up to the last period.
-	///
-	static std::string baseName(const std::string& src);
+	/// The base name is everything following the last slash.
+	/// @param[in] path		The input path
+	/// @param[in] suffix	An optional suffix to strip from the end of the base name
+	static std::string baseName(const std::string& path, const std::string& suffix="");
 
 	/// Returns the directory part of path.
 
 	/// The directory part of the path is everything up through (and  including)
 	/// the last slash in it. If the path contains no slash, the directory part
 	/// is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
-	static std::string directory(const std::string& src);
+	static std::string directory(const std::string& path);
 
 	/// Returns extension of file name.
 
 	/// The extension is everything including and after the last period.
 	/// If there is no period, an empty string is returned.
-	static std::string extension(const std::string& src);
+	static std::string extension(const std::string& path);
 
 
 	/// Returns whether a file or directory exists
@@ -242,7 +260,7 @@ public:
 	}
 
 	/// Returns true if path is a directory
-	static bool isDirectory(const std::string& src);
+	static bool isDirectory(const std::string& path);
 
 	/// Search for file or directory back from current directory
 
@@ -332,12 +350,14 @@ public:
 	/// Go back to first entry in directory
 	bool rewind();
 
-
 	/// Make a directory
 	static bool make(const std::string& path, bool recursive=true);
 
 	/// Remove a directory
 	static bool remove(const std::string& path);
+
+	/// Remove a directory recursively
+	static bool removeRecursively(const std::string& path);
 
 private:
 	class Impl; Impl * mImpl;

@@ -269,13 +269,13 @@ public:
 	Quat& fromMatrix(const T * matrix);
 
 	/// Set as versor from column-major 4-by-4 projective space transformation matrix
-	Quat& fromMatrix(const Mat<4,T>& v){ return fromMatrix(v.ptr()); }
+	Quat& fromMatrix(const Mat<4,T>& v){ return fromMatrix(&v[0]); }
 
 	/// Set as versor from row-major 4-by-4 projective space transformation matrix
 	Quat& fromMatrixTransposed(const T * matrix);
 
 	/// Set as versor from row-major 4-by-4 projective space transformation matrix
-	Quat& fromMatrixTransposed(const Mat<4,T>& v){ return fromMatrixTransposed(v.ptr()); }
+	Quat& fromMatrixTransposed(const Mat<4,T>& v){ return fromMatrixTransposed(&v[0]); }
 
 	/// Convert to coordinate frame unit vectors
 	void toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const;

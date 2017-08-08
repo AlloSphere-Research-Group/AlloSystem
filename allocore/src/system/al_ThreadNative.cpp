@@ -102,7 +102,8 @@ void * Thread::current(){
 //typedef unsigned (__stdcall *ThreadFunction)(void *);
 //#define THREAD_FUNCTION(name) unsigned _stdcall * name(void * user)
 
-struct Thread::Impl{
+class Thread::Impl{
+public:
 	Impl(): mHandle(0){}
 
 	bool start(ThreadFunction& func){

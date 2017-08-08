@@ -83,24 +83,32 @@ public:
 		INSERT, LEFT, UP, RIGHT, DOWN, PAGE_DOWN, PAGE_UP, END, HOME
 	};
 
+	enum Modifier{
+		SHIFT		= 1<<0,	///< Shift key
+		CTRL		= 1<<1,	///< Control key
+		ALT			= 1<<2,	///< Alt key
+		META		= 1<<3	///< Windows/Apple key
+	};
+
 	Keyboard();
 
 	int key() const;			///< Returns character or code of last key event
 	int keyAsNumber() const;	///< Returns decimal number correlating to key code
 	bool alt() const;			///< Whether an alt key is down
-	bool caps() const;			///< Whether capslock is down
 	bool ctrl() const;			///< Whether a control key is down
 	bool meta() const;			///< Whether a meta (e.g. windows, apple) key is down
 	bool shift() const;			///< Whether a shift key is down
+	unsigned char modifiers() const;	///< Returns state of modifier keys
 	bool down() const;			///< Whether last event was button down
 	bool isNumber() const;		///< Whether key is a number key
 	bool key(int k) const;		///< Whether the last key was 'k'
+	bool caps() const;			///< Whether capslock is down
 
 	void alt  (bool state);		///< Set alt key state
-	void caps (bool state);		///< Set alt key state
 	void ctrl (bool state);		///< Set ctrl key state
 	void meta (bool state);		///< Set meta key state
 	void shift(bool state);		///< Set shift key state
+	void caps (bool state);		///< Set capslock key state
 
 	void print() const;			///< Print keyboard state
 
@@ -109,7 +117,8 @@ protected:
 
 	int	mKeycode;		// last key event key number
 	bool mDown;			// last key event state (pressed or released)
-	bool mModifiers[5];	// Modifier key state array (shift, alt, ctrl, caps, meta)
+	bool mCaps;
+	unsigned char mModifiers; // modifier key states
 
 	void setKey(int k, bool v);
 };
@@ -504,6 +513,11 @@ public:
 };
 
 
+inline Keyboard::Modifier
+operator| (const Keyboard::Modifier& a, const Keyboard::Modifier& b){ return Keyboard::Modifier(+a | +b); }
+
+inline Keyboard::Modifier
+operator& (const Keyboard::Modifier& a, const Keyboard::Modifier& b){ return Keyboard::Modifier(+a & +b); }
 
 inline Window::DisplayMode
 operator| (const Window::DisplayMode& a, const Window::DisplayMode& b){ return Window::DisplayMode(+a | +b); }
@@ -517,13 +531,19 @@ operator& (const Window::DisplayMode& a, const Window::DisplayMode& b){ return W
 /// @ingroup allocore
 struct StandardWindowKeyControls : InputEventHandler {
 	bool onKeyDown(const Keyboard& k){
-		if(k.ctrl()){
+		if(k.modifiers() == Keyboard::CTRL){
 			switch(k.key()){
 				case 'q': Window::stopLoop(); return false;
 				//case 'w': window().destroy(); return false;
 				case 'h': window().hide(); return false;
 				case 'm': window().iconify(); return false;
 				case 'c': window().cursorHideToggle(); return false;
+				default:;
+			}
+		}
+		else if(k.modifiers() == Keyboard::ALT){
+			switch(k.key()){
+				case Keyboard::F4: Window::stopLoop(); return false;
 				default:;
 			}
 		}

@@ -4,7 +4,7 @@
 #include "allocore/sound/al_Ambisonics.hpp"
 #include "allocore/sound/al_Speaker.hpp"
 #include "allocore/io/al_AudioIOData.hpp"
-#include "allocore/system/al_Parameter.hpp"
+#include "allocore/ui/al_Parameter.hpp"
 #include "alloaudio/al_SoundfileBuffered.hpp"
 #include "alloaudio/al_AmbiTunedDecoder.hpp"
 #include "alloaudio/al_AmbisonicsConfig.hpp"
