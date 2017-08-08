@@ -18,6 +18,7 @@ void PresetSequencer::playSequence(std::string sequenceName)
 		while (!mSteps.empty()) {
 			mSteps.pop();
 		}
+		mSequenceLock.unlock();
 		mRunning = true;
 		mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
 		mSequenceLock.unlock();
@@ -75,11 +76,13 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 		sequencer->mPresetHandler->setMorphTime(step.delta);
 		sequencer->mPresetHandler->recallPreset(step.presetName);
 		std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
-		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - sequenceStart).count()/1000.0 << std::endl;
+		//		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - sequenceStart).count()/1000.0 << std::endl;
 		float totalWaitTime = step.delta + step.duration;
-		targetTime += std::chrono::microseconds((int) (totalWaitTime*1e6 - (granularity * 1.5 * 1000.0)));
+		targetTime += std::chrono::microseconds((int) (totalWaitTime*1.0e3 - (granularity * 1.5 * 1.0)));
 
 		while (std::chrono::high_resolution_clock::now() < targetTime) { // Granularity to allow more responsive stopping of composition playback
+		  //std::cout << std::chrono::high_resolution_clock::to_time_t(targetTime) 
+		//	    << "---" << std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now()) << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(granularity));
 			if (sequencer->mRunning == false) {
 				targetTime = std::chrono::high_resolution_clock::now();
@@ -199,6 +202,8 @@ void SequenceServer::onMessage(osc::Message &m)
 			}
 		} else if(m.addressPattern() == mOSCpath && m.typeTags() == "N"){
 		std::cout << "start last recorder sequence " << std::endl;
+	} else if(m.addressPattern() == mOSCpath + "/last"){
+	  std::cout << "start last recorder sequence " << mRecorder->lastSequenceName() << std::endl;
 		if (mSequencer) {
 			mSequencer->playSequence(mRecorder->lastSequenceName());
 		} else {
