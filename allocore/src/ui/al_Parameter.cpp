@@ -8,6 +8,56 @@
 
 using namespace al;
 
+// OSCNotifier implementation -------------------------------------------------
+
+OSCNotifier::OSCNotifier() {}
+
+OSCNotifier::~OSCNotifier() {
+	for(osc::Send *sender: mOSCSenders) {
+		delete sender;
+	}
+}
+
+void OSCNotifier::notifyListeners(std::string OSCaddress, float value)
+{
+	mListenerLock.lock();
+	for(osc::Send *sender: mOSCSenders) {
+		sender->send(OSCaddress, value);
+//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
+	}
+	mListenerLock.unlock();
+}
+
+void OSCNotifier::notifyListeners(std::string OSCaddress, std::string value)
+{
+	mListenerLock.lock();
+	for(osc::Send *sender: mOSCSenders) {
+		sender->send(OSCaddress, value);
+//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
+	}
+	mListenerLock.unlock();
+}
+
+void OSCNotifier::notifyListeners(std::string OSCaddress, Vec3f value)
+{
+	mListenerLock.lock();
+	for(osc::Send *sender: mOSCSenders) {
+		sender->send(OSCaddress, value[0], value[1], value[2]);
+//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
+	}
+	mListenerLock.unlock();
+}
+
+void OSCNotifier::notifyListeners(std::string OSCaddress, Vec4f value)
+{
+	mListenerLock.lock();
+	for(osc::Send *sender: mOSCSenders) {
+		sender->send(OSCaddress, value[0], value[1], value[2], value[3]);
+//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
+	}
+	mListenerLock.unlock();
+}
+
 // Parameter ------------------------------------------------------------------
 Parameter::Parameter(std::string parameterName, std::string Group,
                      float defaultValue,
@@ -149,6 +199,54 @@ void ParameterServer::unregisterParameter(Parameter &param)
 	for(it = mParameters.begin(); it != mParameters.end(); it++) {
 		if (*it == &param) {
 			mParameters.erase(it);
+		}
+	}
+	mParameterLock.unlock();
+}
+
+ParameterServer &ParameterServer::registerParameter(ParameterString &param)
+{
+	mParameterLock.lock();
+	mStringParameters.push_back(&param);
+	mParameterLock.unlock();
+	mListenerLock.lock();
+	param.registerChangeCallback(ParameterServer::changeStringCallback,
+	                             (void *) this);
+	mListenerLock.unlock();
+	return *this;
+}
+
+void ParameterServer::unregisterParameter(ParameterString &param)
+{
+	mParameterLock.lock();
+	auto it = mStringParameters.begin();
+	for(it = mStringParameters.begin(); it != mStringParameters.end(); it++) {
+		if (*it == &param) {
+			mStringParameters.erase(it);
+		}
+	}
+	mParameterLock.unlock();
+}
+
+ParameterServer &ParameterServer::registerParameter(ParameterVec3 &param)
+{
+	mParameterLock.lock();
+	mVec3Parameters.push_back(&param);
+	mParameterLock.unlock();
+	mListenerLock.lock();
+	param.registerChangeCallback(ParameterServer::changeVec3Callback,
+	                             (void *) this);
+	mListenerLock.unlock();
+	return *this;
+}
+
+void ParameterServer::unregisterParameter(ParameterVec3 &param)
+{
+	mParameterLock.lock();
+	auto it = mVec3Parameters.begin();
+	for(it = mVec3Parameters.begin(); it != mVec3Parameters.end(); it++) {
+		if (*it == &param) {
+			mVec3Parameters.erase(it);
 		}
 	}
 	mParameterLock.unlock();
