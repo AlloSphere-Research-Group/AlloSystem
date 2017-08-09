@@ -163,6 +163,8 @@ void MRC::print(FILE * fp) {
   fprintf(fp,"  cell:   %f, %f, %f\n", header().cella[0], header().cella[1], header().cella[2]);
 }
 
+
+
 // bool MRC::getdir(std::string path, std::vector<std::string> &files) {
 //   al::Dir dir;
 //   if(dir.open(path)){
@@ -203,6 +205,34 @@ void MRC::print(FILE * fp) {
 
 //   return true;
 // }
+
+/*
+   sliceassembler
+
+   Voxel data import aka slice assembler aka volume reconstructor 
+
+   by Matt Wright, April 2015
+   and Hannah Wolfe, July 2015
+
+   based on tiExporter.cpp from images2raw.cpp by Coby Kaufer
+   <cobykaufer@bluejayke.com>, Karl Yerkes <karl.yerkes@gmail.com>,
+   and Matt Wright <matt@create.ucsb.edu
+
+   Read in a directory full of 2D image files with some naming
+   convention, assemble them all into an al::Array or al::Voxels
+   and write the result as one huge fast-to-load raw binary data file.
+
+
+   Limitations:
+
+   - Images must contain 8-bit RGB pixels
+
+   - Ignores all but the red channel
+
+   - Chokes if directory contains anything besides "info.txt" and image files
+
+   - Creates a voxel from the data
+*/
 
 // bool MRC::loadFromDirectory(std::string dir) {
   

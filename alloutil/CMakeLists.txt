@@ -11,6 +11,7 @@ set(ALLOUTIL_SRC
   src/al_RayStereo.cpp
   src/al_InterfaceServerClient.cpp
   src/al_Simulator.cpp
+  src/al_SliceViewer.cpp
   )
 
 # Dependencies ------------------------------

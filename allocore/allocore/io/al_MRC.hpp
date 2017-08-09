@@ -139,10 +139,13 @@ public:
   
   // header functions
   MRCHeader& header() { return m_header; }
+  const MRCHeader& header() const { return m_header; }
   MRCHeader& parseMRC(const char * data);
 
   Array& array() { return m_array; }
+  const Array& array() const { return m_array; }
   char* dataPtr() { return m_array.data.ptr; }
+  const char* dataPtr() const { return m_array.data.ptr; }
 
   // utility functions
   void print(FILE * fp = stdout);
