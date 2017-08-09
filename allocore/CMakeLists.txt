@@ -24,7 +24,6 @@ list(APPEND ALLOCORE_SRC
   src/types/al_Array_C.c
   src/types/al_Color.cpp
   src/types/al_MsgQueue.cpp
-  src/types/al_Voxels.cpp
 )
 
 list(APPEND ALLOCORE_HEADERS
@@ -76,7 +75,6 @@ list(APPEND ALLOCORE_HEADERS
     allocore/types/al_MsgQueue.hpp
     allocore/types/al_MsgTube.hpp
     allocore/types/al_SingleRWRingBuffer.hpp
-    allocore/types/al_Voxels.hpp
     allocore/ui/al_Gnomon.hpp
     allocore/ui/al_BoundingBox.hpp
     allocore/ui/al_Pickable.hpp
