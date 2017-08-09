@@ -45,6 +45,7 @@
 #include <mutex>
 #include <atomic>
 #include <iostream>
+#include <float.h>
 
 #include "allocore/protocol/al_OSC.hpp"
 #include "allocore/math/al_Vec.hpp"
@@ -404,8 +405,34 @@ private:
 // These three types are blocking, should not be used in time-critical contexts
 // like the audio callback
 typedef ParameterWrapper<std::string> ParameterString;
-typedef ParameterWrapper<al::Vec3f> ParameterVec3;
-typedef ParameterWrapper<al::Vec4f> ParameterVec4;
+
+class ParameterVec3: public ParameterWrapper<al::Vec3f>
+{
+	ParameterVec3(std::string parameterName, std::string group, al::Vec3f defaultValue,
+	              std::string prefix) :
+	    ParameterWrapper<al::Vec3f>::ParameterWrapper<al::Vec3f>(parameterName,
+	                                                            group,
+	                                                            defaultValue,
+	                                                            prefix)
+	{
+		mMax = Vec3f(FLT_MAX, FLT_MAX, FLT_MAX);
+		mMin = Vec3f(0,0,0);
+	}
+};
+
+class ParameterVec4: public ParameterWrapper<al::Vec4f>
+{
+	ParameterVec4(std::string parameterName, std::string group, al::Vec3f defaultValue,
+	              std::string prefix) :
+	    ParameterWrapper<al::Vec4f>::ParameterWrapper<al::Vec4f>(parameterName,
+	                                                            group,
+	                                                            defaultValue,
+	                                                            prefix)
+	{
+		mMax = Vec4f(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
+		mMin = Vec4f(0,0,0,0);
+	}
+};
 
 /**
  * @brief The ParameterServer class creates an OSC server to receive parameter values
