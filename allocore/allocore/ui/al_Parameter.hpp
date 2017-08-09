@@ -58,7 +58,7 @@ class Parameter;
 class OSCNotifier {
 public:
 	OSCNotifier();
-	~OSCNotifier();
+	virtual ~OSCNotifier();
 
 	/**
 	 * @brief addListener enables notifiying via OSC that a preset has changed
@@ -126,7 +126,7 @@ public:
 	
 	ParameterWrapper(const ParameterWrapper& param);
 
-	~ParameterWrapper();
+	virtual ~ParameterWrapper();
 	
 	/**
 	 * @brief set the parameter's value
@@ -144,6 +144,16 @@ public:
 	 * recursion when a widget sets the parameter that then sets the widget.
 	 */
 	virtual void setNoCalls(ParameterType value, void *blockReceiver = NULL);
+
+	/**
+	 * @brief set the parameter's value forcing a lock
+	 */
+	inline void setLocking(ParameterType value)
+	{
+		mMutex.lock();
+		mValue = value;
+		mMutex.unlock();
+	}
 
 	/**
 	 * @brief get the parameter's value
@@ -403,34 +413,99 @@ private:
 };
 
 // These three types are blocking, should not be used in time-critical contexts
-// like the audio callback
-typedef ParameterWrapper<std::string> ParameterString;
+// like the audio callback. The classes were explicitly defined to overcome
+// the issues related to the > and < operators needed when validating minumum
+// and maximum values for the parameter
+class ParameterString: public ParameterWrapper<std::string>
+{
+	virtual void set(std::string value) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		setLocking(value);
+		for(size_t i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this,  mCallbackUdata[i], NULL);
+			}
+		}
+	}
+
+	virtual void setNoCalls(std::string value, void *blockReceiver) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		if (blockReceiver) {
+			for(size_t i = 0; i < mCallbacks.size(); ++i) {
+				if (mCallbacks[i]) {
+					mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+				}
+			}
+		}
+		setLocking(value);
+	}
+};
 
 class ParameterVec3: public ParameterWrapper<al::Vec3f>
 {
-	ParameterVec3(std::string parameterName, std::string group, al::Vec3f defaultValue,
-	              std::string prefix) :
-	    ParameterWrapper<al::Vec3f>::ParameterWrapper<al::Vec3f>(parameterName,
-	                                                            group,
-	                                                            defaultValue,
-	                                                            prefix)
+	virtual void set(Vec3f value) override
 	{
-		mMax = Vec3f(FLT_MAX, FLT_MAX, FLT_MAX);
-		mMin = Vec3f(0,0,0);
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		setLocking(value);
+		for(size_t i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this,  mCallbackUdata[i], NULL);
+			}
+		}
+	}
+
+	virtual void setNoCalls(Vec3f value, void *blockReceiver) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		if (blockReceiver) {
+			for(size_t i = 0; i < mCallbacks.size(); ++i) {
+				if (mCallbacks[i]) {
+					mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+				}
+			}
+		}
+		setLocking(value);
 	}
 };
 
 class ParameterVec4: public ParameterWrapper<al::Vec4f>
 {
-	ParameterVec4(std::string parameterName, std::string group, al::Vec3f defaultValue,
-	              std::string prefix) :
-	    ParameterWrapper<al::Vec4f>::ParameterWrapper<al::Vec4f>(parameterName,
-	                                                            group,
-	                                                            defaultValue,
-	                                                            prefix)
+	virtual void set(Vec4f value) override
 	{
-		mMax = Vec4f(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
-		mMin = Vec4f(0,0,0,0);
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		setLocking(value);
+		for(size_t i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this,  mCallbackUdata[i], NULL);
+			}
+		}
+	}
+
+	virtual void setNoCalls(Vec4f value, void *blockReceiver) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		if (blockReceiver) {
+			for(size_t i = 0; i < mCallbacks.size(); ++i) {
+				if (mCallbacks[i]) {
+					mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+				}
+			}
+		}
+		setLocking(value);
 	}
 };
 
@@ -671,9 +746,9 @@ void ParameterWrapper<ParameterType>::set(ParameterType value)
 	mMutex.lock();
 	mValue = value;
 	mMutex.unlock();
-	for(int i = 0; i < mCallbacks.size(); ++i) {
+	for(size_t i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
-			mCallbacks[i](value, (void *) this,  mCallbackUdata[i], NULL);
+			mCallbacks[i](value, this,  mCallbackUdata[i], NULL);
 		}
 	}
 }
@@ -688,7 +763,7 @@ void ParameterWrapper<ParameterType>::setNoCalls(ParameterType value, void *bloc
 	}
 
 	if (blockReceiver) {
-		for(int i = 0; i < mCallbacks.size(); ++i) {
+		for(size_t i = 0; i < mCallbacks.size(); ++i) {
 			if (mCallbacks[i]) {
 				mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
 			}
@@ -698,6 +773,8 @@ void ParameterWrapper<ParameterType>::setNoCalls(ParameterType value, void *bloc
 	mValue = value;
 	mMutex.unlock();
 }
+
+
 
 template<class ParameterType>
 ParameterType ParameterWrapper<ParameterType>::get()

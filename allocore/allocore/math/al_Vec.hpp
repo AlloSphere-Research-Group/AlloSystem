@@ -230,8 +230,6 @@ public:
 	Vec operator / (const Vec& v) const { return Vec(*this) /= v; }
 	Vec operator / (const   T& v) const { return Vec(*this) /= v; }
 	Vec operator - () const { return Vec(*this).negate(); }
-	bool operator > (const Vec& v) const { return Vec(*this).mag() > v.mag(); }
-	bool operator < (const Vec& v) const { return Vec(*this).mag() < v.mag(); }
 
 	/// Set elements from another vector
 	template <class T2>
