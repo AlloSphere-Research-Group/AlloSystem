@@ -21,7 +21,7 @@ build_and_install_assimp(){
 		curl -LO https://github.com/assimp/assimp/archive/v3.2.zip && mv v3.2.zip ${PKG}.zip
 		unzip -q "${PKG}.zip"
 		cd "$PKG"
-			cmake -DCMAKE_BUILD_TYPE=RELEASE -DASSIMP_ENABLE_BOOST_WORKAROUND=ON .
+			cmake -DCMAKE_BUILD_TYPE=RELEASE -DASSIMP_ENABLE_BOOST_WORKAROUND=ON -DASSIMP_BUILD_ASSIMP_TOOLS=OFF -DASSIMP_BUILD_SAMPLES=OFF -DASSIMP_BUILD_TESTS=OFF .
 			make
 			sudo make install
 		cd ..
