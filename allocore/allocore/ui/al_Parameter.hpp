@@ -418,6 +418,13 @@ private:
 // and maximum values for the parameter
 class ParameterString: public ParameterWrapper<std::string>
 {
+public:
+	ParameterString(std::string parameterName, std::string Group,
+	              std::string  defaultValue,
+	              std::string prefix = "") :
+	    ParameterWrapper<std::string>(parameterName, Group, defaultValue, prefix)
+	{ }
+
 	virtual void set(std::string value) override
 	{
 		if (mProcessCallback) {
@@ -449,6 +456,13 @@ class ParameterString: public ParameterWrapper<std::string>
 
 class ParameterVec3: public ParameterWrapper<al::Vec3f>
 {
+public:
+	ParameterVec3(std::string parameterName, std::string Group,
+	              al::Vec3f defaultValue,
+	              std::string prefix = "") :
+	    ParameterWrapper<al::Vec3f>(parameterName, Group, defaultValue, prefix)
+	{ }
+
 	virtual void set(Vec3f value) override
 	{
 		if (mProcessCallback) {
@@ -480,6 +494,13 @@ class ParameterVec3: public ParameterWrapper<al::Vec3f>
 
 class ParameterVec4: public ParameterWrapper<al::Vec4f>
 {
+public:
+	ParameterVec4(std::string parameterName, std::string Group,
+	              al::Vec4f defaultValue,
+	              std::string prefix = "") :
+	    ParameterWrapper<al::Vec4f>(parameterName, Group, defaultValue, prefix)
+	{ }
+
 	virtual void set(Vec4f value) override
 	{
 		if (mProcessCallback) {
