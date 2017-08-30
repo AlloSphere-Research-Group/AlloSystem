@@ -104,8 +104,8 @@ bool SliceViewer::parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, std:
   if ((p0-p1).mag()/(p0-p2).mag() == aDirection/oDirection){ 
     n = oDirection; 
   }
-  std::cout.flush();
-  std::cout << "t = " << t << "\n";
+  // std::cout.flush();
+  // std::cout << "t = " << t << "\n";
   if (t == -1.0){
     list = linspace(p0,p1,n);
     list2 = linspace(p3,p2,n);
@@ -137,7 +137,7 @@ Array SliceViewer::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f
   float yMax =  m_array->height()* m_voxWidth[1];
   float zMax =  m_array->depth()* m_voxWidth[2];
 
-  std::cout << "values " << xMax << " " << yMax << " " << zMax << "\n";
+  // std::cout << "values " << xMax << " " << yMax << " " << zMax << "\n";
 //
 //calculate intersections 
   std::vector<Vec3f> P;
@@ -173,7 +173,7 @@ Array SliceViewer::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f
     Vec2f *p2D = new Vec2f[P.size()];
     p2D[0] = Vec2f(0,0);
     float x = sqrt(pow(P[1].x-P[0].x,2.0)+pow(P[1].y-P[0].y,2.0)+pow(P[1].z-P[0].z,2.0));
-    std::cout << x << "\n";
+    // std::cout << x << "\n";
     p2D[1] = Vec2f(x,0);
     if(P.size() == 2){
       //super easy, it's just a line :)
@@ -215,10 +215,10 @@ Array SliceViewer::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f
       Vec3f p1 = point2Dto3D(planeCenter,y_axis,z_axis,minA2D,maxO2D);
       Vec3f p2 = point2Dto3D(planeCenter,y_axis,z_axis,maxA2D,maxO2D);
       Vec3f p3 = point2Dto3D(planeCenter,y_axis,z_axis,maxA2D,minO2D);
-      std::cout << "p0 :" << p0.x << " " << p0.y << " " << p0.z << "\n";
-      std::cout << "p1 :" << p1.x << " " << p1.y << " " << p1.z << "\n";
-      std::cout << "p2 :" << p2.x << " " << p2.y << " " << p2.z << "\n";
-      std::cout << "p3 :" << p3.x << " " << p3.y << " " << p3.z << "\n";
+      // std::cout << "p0 :" << p0.x << " " << p0.y << " " << p0.z << "\n";
+      // std::cout << "p1 :" << p1.x << " " << p1.y << " " << p1.z << "\n";
+      // std::cout << "p2 :" << p2.x << " " << p2.y << " " << p2.z << "\n";
+      // std::cout << "p3 :" << p3.x << " " << p3.y << " " << p3.z << "\n";
       //Check to see if two lines intersect
       std::vector<Vec3f> list;
       std::vector<Vec3f> list2;
@@ -227,7 +227,7 @@ Array SliceViewer::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f
           parallelLinespace(p0, p3, p1, p2, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList);
         }
       }
-      std::cout << "finalPointList Length:" << finalPointList.size() << "\n";
+      // std::cout << "finalPointList Length:" << finalPointList.size() << "\n";
       //now lets fill the results
       for (unsigned i = 0; i < list.size(); i++){
         std::vector<Vec3f> space = linspace(list[i], list2[i], oDirection);  //XXX should this be oDirection or aDirection, please check!
