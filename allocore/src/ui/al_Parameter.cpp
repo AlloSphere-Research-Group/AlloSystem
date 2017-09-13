@@ -260,7 +260,7 @@ void ParameterServer::onMessage(osc::Message &m)
 		std::string parameterAddress;
 		m >> parameterAddress;
 	}
-	float val;
+	float val; // TODO: doens't make sense for parameters of different types
 	m >> val;
 	mParameterLock.lock();
 	for (Parameter *p:mParameters) {
@@ -268,6 +268,20 @@ void ParameterServer::onMessage(osc::Message &m)
 			// Extract the data out of the packet
 			p->set(val);
 //			std::cout << "ParameterServer::onMessage" << val << std::endl;
+		}
+	}
+	for (ParameterVec3 *p:mVec3Parameters) {
+		if(m.addressPattern() == p->getFullAddress() && m.typeTags() == "fff"){
+			float y,z;
+			m >> y >> z;
+			p->set(Vec3f(val,y,z));
+		}
+	}
+	for (ParameterVec4 *p:mVec4Parameters) {
+		if(m.addressPattern() == p->getFullAddress() && m.typeTags() == "ffff"){
+			float x,y,z;
+			m >> x >> y >> z;
+			p->set(Vec4f(val,x,y,z));
 		}
 	}
 	for (osc::PacketHandler *handler: mPacketHandlers) {
