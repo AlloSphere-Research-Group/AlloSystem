@@ -28,29 +28,7 @@ IF(NOT ${match} STREQUAL "")
   message(FATAL_ERROR "Error: Please remove '*' from path!" ) # This avoids issues with the run script
 ENDIF()
 
-if(BUILD_DIR)
-  string(REGEX REPLACE "/+$" "" ALLOSYSTEM_BUILD_APP_DIR "${ALLOSYSTEM_BUILD_APP_DIR}") # remove trailing slash
-  file(GLOB ALLOSYSTEM_APP_SRC "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp")
-#  file(GLOB ALLOSYSTEM_APP_SRC RELATIVE "${CMAKE_SOURCE_DIR}" "${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp")
-  string(REPLACE "/" "_" APP_NAME "${ALLOSYSTEM_BUILD_APP_DIR}")
-  string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
-  set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}")
-else()
-  string(REPLACE "/" "_" APP_NAME "${BUILD_APP_FILE}")
-  get_filename_component(APP_NAME "${APP_NAME}" NAME)
-  STRING(REGEX REPLACE "\\.[^.]*\$" "" APP_NAME "${APP_NAME}")
-  string(REPLACE "." "_" APP_NAME "${APP_NAME}")
-  if (IS_ABSOLUTE "${BUILD_APP_FILE}")
-    set(ALLOSYSTEM_APP_SRC "${BUILD_APP_FILE}")
-  else()
-    set(ALLOSYSTEM_APP_SRC "${CMAKE_SOURCE_DIR}/${BUILD_APP_FILE}")
-  endif()
-#  get_filename_component(APP_NAME ${APP_NAME} NAME_WE) # Get name w/o extension (extension is anything after first dot!)
-  get_filename_component(SOURCE_DIR "${BUILD_APP_FILE}" PATH)
-  set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${SOURCE_DIR}")
-endif(BUILD_DIR)
-
-set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
+# ----- Function definitions
 
 # -------------------------- BuildAlloTarget
 
@@ -283,49 +261,78 @@ endfunction()
 
 # --------------- Build
 
+if(BUILD_DIR)
+    string(REGEX REPLACE "/+$" "" ALLOSYSTEM_BUILD_APP_DIR "${ALLOSYSTEM_BUILD_APP_DIR}") # remove trailing slash
+    file(GLOB ALLOSYSTEM_APP_SRC "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp")
+    #  file(GLOB ALLOSYSTEM_APP_SRC RELATIVE "${CMAKE_SOURCE_DIR}" "${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp")
+    string(REPLACE "/" "_" APP_NAME "${ALLOSYSTEM_BUILD_APP_DIR}")
+    string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
+    set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}")
+else()
+endif(BUILD_DIR)
+
+set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
+
 if(BUILD_ALLOSPHERE_APP)
 
-list(APPEND ALLOSPHERE_APPS "")
+    list(APPEND ALLOSPHERE_APPS "")
 
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_SIMULATOR" "simulator")
-AddRunTarget("${APP_NAME}_simulator" "${APP_NAME}_simulator")
-list(APPEND ALLOSPHERE_APPS "${APP_NAME}_simulator")
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER" "graphics")
-AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
-list(APPEND ALLOSPHERE_APPS "${APP_NAME}_graphics")
-if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-  BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
-  AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
-  list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
-endif()
-set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"${APP_NAME}_simulator\"},")
+    BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_SIMULATOR" "simulator")
+    AddRunTarget("${APP_NAME}_simulator" "${APP_NAME}_simulator")
+    list(APPEND ALLOSPHERE_APPS "${APP_NAME}_simulator")
+    BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER" "graphics")
+    AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
+    list(APPEND ALLOSPHERE_APPS "${APP_NAME}_graphics")
+    if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
+        BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
+        AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
+        list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
+    endif()
+    set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"${APP_NAME}_simulator\"},")
 
-if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"${APP_NAME}_audio\" }, ")
-endif()
+    if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
+        set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"${APP_NAME}_audio\" }, ")
+    endif()
 
-set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"${APP_NAME}_graphics\"} ] \n}")
+    set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"${APP_NAME}_graphics\"} ] \n}")
 
 
-add_custom_target("${APP_NAME}"
-  COMMAND ""
-  DEPENDS ${ALLOSPHERE_APPS}
-  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-  SOURCES ${${ALLO_APP_SRC}})
+    add_custom_target("${APP_NAME}"
+        COMMAND ""
+        DEPENDS ${ALLOSPHERE_APPS}
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        SOURCES ${${ALLO_APP_SRC}})
 
-add_custom_target("${APP_NAME}_run"
-  COMMAND "python" "${CMAKE_CURRENT_SOURCE_DIR}/tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"
-  DEPENDS ${ALLOSPHERE_APPS}
-  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-  SOURCES ${${ALLO_APP_SRC}}
-  COMMENT "Running: ${APP_NAME} from ${CMAKE_SOURCE_DIR}")
-#  option(RUN_IN_DEBUGGER 0) # For next run
+    add_custom_target("${APP_NAME}_run"
+        COMMAND "python" "${CMAKE_CURRENT_SOURCE_DIR}/tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"
+        DEPENDS ${ALLOSPHERE_APPS}
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        SOURCES ${${ALLO_APP_SRC}}
+        COMMENT "Running: ${APP_NAME} from ${CMAKE_SOURCE_DIR}")
+    #  option(RUN_IN_DEBUGGER 0) # For next run
 
 else()
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "" "")
-AddRunTarget("${APP_NAME}" "${APP_NAME}")
 
-set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"monolithic\", \"path\" : \"${APP_NAME}\"} ] }")
+    foreach(SRC_FILE ${BUILD_APP_FILE})
+
+        string(REPLACE "/" "_" APP_NAME "${SRC_FILE}")
+        get_filename_component(APP_NAME "${APP_NAME}" NAME)
+        STRING(REGEX REPLACE "\\.[^.]*\$" "" APP_NAME "${APP_NAME}")
+        string(REPLACE "." "_" APP_NAME "${APP_NAME}")
+        if (IS_ABSOLUTE "${SRC_FILE}")
+          set(ALLOSYSTEM_APP_SRC "${SRC_FILE}")
+        else()
+          set(ALLOSYSTEM_APP_SRC "${CMAKE_SOURCE_DIR}/${SRC_FILE}")
+        endif()
+      #  get_filename_component(APP_NAME ${APP_NAME} NAME_WE) # Get name w/o extension (extension is anything after first dot!)
+        get_filename_component(SOURCE_DIR "${SRC_FILE}" PATH)
+        set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${SOURCE_DIR}")
+        message("----Building ${ALLOSYSTEM_APP_SRC}")
+        BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "" "")
+        AddRunTarget("${APP_NAME}" "${APP_NAME}")
+    endforeach()
+
+    set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"monolithic\", \"path\" : \"${APP_NAME}\"} ] }")
 
 endif()
 
