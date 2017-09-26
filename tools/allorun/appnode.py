@@ -51,13 +51,11 @@ def which(program):
 
 def build_thread_func(builder):
     command_lists = builder._get_build_commands()
-    os.chdir(builder.project_dir);
     if builder.remote:
         for i in range(len(command_lists)):
-            command_lists[i] = ['ssh', '-o StrictHostKeyChecking=no', builder.hostname, '"%s"'%' '.join(command_lists[i])]
-            if builder.gateway != '' :
-                command_lists[i] = ["ssh", "-o StrictHostKeyChecking=no",
-                                "%s@%s" % (builder.login, builder.gateway), ' '.join(command_lists[i])]
+            command_lists[i] = ['ssh', '-o StrictHostKeyChecking=no', "%s@%s" % (builder.login, builder.hostname), ' eval "%s"'%' '.join(command_lists[i])]
+    else:
+        os.chdir(builder.project_dir);
 #    builder._debug_print(str(command_lists))
     for command in command_lists:
         builder._debug_print("-- Building: " + ' '.join(command) + " from " + os.getcwd() + '\n')
@@ -119,12 +117,10 @@ def run_thread_func(runner, run_command_lists):
 class Node:
     def __init__(self,
                  hostname = 'localhost',
-                 gateway = "",
                  login = '',
                  ):
         self.remote = False
         self.hostname = hostname
-        self.gateway = gateway
         self.login = login
         self._next_node = None
         self.internal_process = None
@@ -178,6 +174,9 @@ class BuildNode(Node):
 
         self.name = name
         self.build_distributed_app = distributed
+        self.prebuild_commands = []
+        self.debug = False
+        self.cmake = "cmake"
 
     def configure(self, **kwargs):
         if "project_dir" in kwargs:
@@ -188,7 +187,12 @@ class BuildNode(Node):
             self.prebuild_commands = kwargs["prebuild_commands"]
         if "build_commands" in kwargs:
             self.build_commands = kwargs["build_commands"]
+        if "cmake" in kwargs:
+            self.cmake = kwargs["cmake"]
         self.configured = True
+
+    def set_debug(self, debug_ = True):
+        self.debug = debug_
 
     def build(self):
         # Execute pre-build commands
@@ -208,7 +212,7 @@ class BuildNode(Node):
 
     def _get_build_commands(self):
         use_ninja = False
-        if which("ninja"): use_ninja = True
+        if not self.remote and which("ninja"): use_ninja = True
         if not self.configured:
             raise exceptions.RuntimeError("Node not configured.")
         commands = []
@@ -223,7 +227,7 @@ class BuildNode(Node):
                     generator = '-GNinja'
 
                 debug_flags = ['-DRUN_IN_DEBUGGER=0']
-                build_debug = False # TODO set from command line
+                build_debug = self.debug
                 if build_debug:
                     debugger = "gdb"
                     debug_flags = ['-DRUN_IN_DEBUGGER=1',
@@ -235,18 +239,18 @@ class BuildNode(Node):
                 if self.project_dir:
                     command.append("cd %s;"%self.project_dir)
                 if os.path.isdir(src):
-                    target_flag = '-DALLOPROJECT_BUILD_APP_DIR="%s"'%src
+                    target_flag = '-DALLOPROJECT_BUILD_APP_DIR=\\"%s\\"'%src
                     build_flag = "-DALLOPROJECT_BUILD_DIR=1"
                 else:
-                    target_flag = '-DALLOPROJECT_BUILD_APP_FILE="%s"'%src
+                    target_flag = '-DALLOPROJECT_BUILD_APP_FILE=\\"%s\\"'%src
                     build_flag = "-DALLOPROJECT_BUILD_DIR=0"
-                command = ['cmake', '.',  generator, target_flag, build_flag]
+                command += [self.cmake, '.',  generator, target_flag, build_flag]
                 command += debug_flags
 
                 commands.append(command)
             elif build_comm == "$$make":
 
-                targets = [os.path.splitext(src)[0].replace('/', '_') for src in self.project_src]
+                targets = self.get_products()
                 if use_ninja:
                     command = ['ninja'] + targets
                 else:
@@ -262,15 +266,17 @@ class BuildNode(Node):
                     commands.append(command)
         return commands
 
+    def get_products(self):
+        products = [os.path.splitext(src)[0].replace('/', '_') for src in self.project_src]
+        return products
+
 class RemoteBuildNode(BuildNode):
     def __init__(self, hostname = 'gr01',
-                 gateway = "nonce.mat.ucsb.edu",
                  login = 'sphere',
                  deploy_to = []):
         BuildNode.__init__(self)
         self.hostname = hostname
         self.name = hostname
-        self.gateway = gateway
         self.login = login
         self.deploy_to = deploy_to
 
@@ -292,7 +298,7 @@ class RunNode(Node):
 
         command = self.path
         if self.remote:
-            command_list = [' '.join(["ssh", "%s@%s" % (self.login,self.gateway), command])]
+            command_list = [' '.join(["ssh", "%s@%s" % (self.login,self.hostname), command])]
         else:
             command_list = [command]
 

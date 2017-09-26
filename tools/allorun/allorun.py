@@ -9,13 +9,14 @@ import argparse
 sys.path.append("AlloSystem/tools/allorun/")
 from appnode import BuildNode, RemoteBuildNode, RunNode
 
-
 class AlloRunner():
-    def __init__(self, nodes, source, verbose = True):
+    def __init__(self, nodes, source, verbose = True, debug = False):
         self.current_index = 0
         self.buffer_len = 256
         self.chase = True
         self.verbose = verbose
+        self.debug = debug
+
         self.log_text = ''
         if self.verbose:
             self.log('Started...\n')
@@ -26,7 +27,6 @@ class AlloRunner():
                     self.log("----- Node -----")
                     self.log("Remote: " + str(node.remote))
                     self.log("Hostname:" + node.hostname)
-                    self.log("Gateway: " + node.gateway)
 
         #self.item_color = { "none": 7, "error" : 1, "done" : 2, "working" : 4}
 
@@ -58,8 +58,11 @@ class AlloRunner():
             from os.path import expanduser
             home = expanduser("~")
             cwd = os.getcwd()
-#            if cwd[:len(home)] == home:
-#                cwd = cwd[len(home) + 1:]
+            if builder.remote:
+                cwd = base_path + '/' + user_prefix + '/' + node.hostname + '/' + cwd[cwd.rfind('/')+ 1 :]
+#                if cwd[:len(home)] == home:
+#                    cwd = cwd[len(home) + 1:]
+                print(cwd)
 
             if self.source:
                 configuration = {"project_dir" : cwd,
@@ -67,6 +70,7 @@ class AlloRunner():
             else:
                 configuration = {"project_dir" : cwd }
             builder.configure(**configuration)
+            builder.set_debug(self.debug)
             self.builders.append(builder)
             builder.build()
 
@@ -116,21 +120,32 @@ class AlloRunner():
                 import json
                 if self.verbose:
                     self.log("Reading build report:" + build_report)
-                with open(build_report) as fp:
-                    conf = json.load(fp)
-                    for app in conf['apps']:
-                        if self.verbose:
-                            self.log("New runner    :" + app['type'])
-                            self.log("       bin dir:" + conf['bin_dir'])
-                            self.log("          path:" + app['path'])
-                            self.log("      root_dir:" + conf['root_dir'])
-                        if type(node) == RemoteBuildNode:
-                            self.runstdoutbuf.append(str(node.deploy_to))
+                if os.path.exists(build_report):
+                    with open(build_report) as fp:
+                        conf = json.load(fp)
+                        for app in conf['apps']:
+                            if self.verbose:
+                                self.log("New runner    :" + app['type'])
+                                self.log("       bin dir:" + conf['bin_dir'])
+                                self.log("          path:" + app['path'])
+                                self.log("      root_dir:" + conf['root_dir'])
+#                            if type(node) == RemoteBuildNode:
+#                                self.runstdoutbuf.append(str(node.deploy_to))
 
+                            self.stdoutbuf.append('')
+                            self.stderrbuf.append('')
+                            runner = RunNode('local-' + app['path'])
+                            bin_path = conf['bin_dir'] + app['path']
+                            runner.configure(conf['root_dir'], bin_path)
+                            runner.run()
+                            self.runners.append(runner)
+                else:
+                    apps = node.get_products()
+                    for app in apps:
                         self.stdoutbuf.append('')
                         self.stderrbuf.append('')
-                        runner = RunNode('local-' + app['path'])
-                        bin_path = conf['bin_dir'] + app['path']
+                        runner = RunNode(node.hostname + '-' + app)
+                        bin_path = conf['bin_dir'] + app
                         runner.configure(conf['root_dir'], bin_path)
                         runner.run()
                         self.runners.append(runner)
@@ -175,6 +190,7 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--local', help='Force local build.', action="store_true")
     parser.add_argument('-a', '--allosphere', help='Force Allosphere build.', action="store_true")
     parser.add_argument('-v', '--verbose', help='Verbose output.', action="store_true")
+    parser.add_argument('-d', '--debug', help='Build debug version.', action="store_true")
 
     args = parser.parse_args()
     project_src = args.source
@@ -182,27 +198,30 @@ if __name__ == "__main__":
     import socket
     hostname = socket.gethostname()
 
-    base_path = '/alloshare/scratch'
-    user_prefix = 'andres'
     cur_dir = os.getcwd()
     project_name = cur_dir[cur_dir.rindex('/') + 1:]
 
-    if args.allosphere:
-        rsync_command = 'rsync -arv --exclude "build" --exclude "AlloSystem/.git '
-        rsync_command += cur_dir + ' '
-        rsync_command += "nonce.mat.ucsb.edu:" + base_path + "/" + user_prefix
-        print("syncing:  " + rsync_command)
-        os.system(rsync_command)
 
     if (hostname == 'audio.10g' and not args.local) or (args.allosphere):
         from allosphere import nodes
     else:
         from local import nodes
 
+    if args.allosphere:
+        base_path = '/alloshare/scratch'
+        user_prefix = 'andres'
+        for node in nodes:
+            exclude_dirs = ['"CMakeCache.txt"', '"build"', '".git"', '"AlloSystem/.git"', '"AlloSystem/CMakeFiles"','"*/CMakeFiles"', '"*/AlloSystem-build"']
+            rsync_command = 'rsync -arv -p --delete --group=users ' + "--exclude " + ' --exclude '.join(exclude_dirs) + " "
+            rsync_command += cur_dir + ' '
+            rsync_command += "sphere@%s:"%node.hostname + base_path + "/" + user_prefix + "/" + node.hostname
+            print("syncing:  " + rsync_command)
+            os.system(rsync_command)
+
     import traceback
 
     if len(nodes) > 0:
-        app = AlloRunner(nodes, project_src, args.verbose)
+        app = AlloRunner(nodes, project_src, args.verbose, args.debug)
         try:
             app.start()
         except:
