@@ -7,7 +7,7 @@ import sys, os
 import argparse
 
 sys.path.append("AlloSystem/tools/allorun/")
-from appnode import BuildNode, RemoteBuildNode, RunNode
+from appnode import BuildNode, RemoteBuildNode, RunNode, RemoteRunNode
 
 class AlloRunner():
     def __init__(self, nodes, source, verbose = True, debug = False):
@@ -115,12 +115,21 @@ class AlloRunner():
         self.stderrbuf = []
         self.runners = []
         for i, node in enumerate(self.nodes):
-            for src in node.project_src:
-                build_report = 'build/' + src[:-4].replace('/', '_') + '.json'
-                import json
-                if self.verbose:
-                    self.log("Reading build report:" + build_report)
-                if os.path.exists(build_report):
+            for src, app, deploy_hosts in zip(node.project_src, node.get_products(), node.deploy_to):
+                if node.remote:
+                    for deploy_host in deploy_hosts:
+                        self.stdoutbuf.append('')
+                        self.stderrbuf.append('')
+                        runner = RemoteRunNode(deploy_host + '-' + app, deploy_host)
+                        bin_path = 'build/bin/' + app
+                        runner.configure(node.project_dir, bin_path)
+                        runner.run()
+                        self.runners.append(runner)
+                else:
+                    build_report = 'build/' + src[:-4].replace('/', '_') + '.json'
+                    import json
+                    if self.verbose:
+                        self.log("Reading build report:" + build_report)
                     with open(build_report) as fp:
                         conf = json.load(fp)
                         for app in conf['apps']:
@@ -134,22 +143,11 @@ class AlloRunner():
 
                             self.stdoutbuf.append('')
                             self.stderrbuf.append('')
-                            runner = RunNode('local-' + app['path'])
+                            runner = RunNode('local-' + app['path'], )
                             bin_path = conf['bin_dir'] + app['path']
                             runner.configure(conf['root_dir'], bin_path)
                             runner.run()
                             self.runners.append(runner)
-                else:
-                    apps = node.get_products()
-                    for app in apps:
-                        self.stdoutbuf.append('')
-                        self.stderrbuf.append('')
-                        runner = RunNode(node.hostname + '-' + app)
-                        bin_path = conf['bin_dir'] + app
-                        runner.configure(conf['root_dir'], bin_path)
-                        runner.run()
-                        self.runners.append(runner)
-
         done = False
 
         while not done:

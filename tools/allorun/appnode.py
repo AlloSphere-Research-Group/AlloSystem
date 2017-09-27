@@ -85,10 +85,14 @@ def build_thread_func(builder):
     builder._debug_print("Builder Thread done")
 
 def run_thread_func(runner, run_command_lists):
-    os.chdir(runner.run_dir);
 
     for run_command in run_command_lists:
-        runner._debug_print("-- Running: " + run_command + " from " + os.getcwd() + '\n')
+        if runner.remote:
+            run_command = "ssh %s@%s eval 'export DISPLAY=:0;cd %s;%s'"%(runner.login, runner.hostname, runner.run_dir, run_command)
+        else:
+            os.chdir(runner.run_dir);
+
+        runner._debug_print("---. Running: " + run_command + " from " + runner.run_dir + '\n')
         runner.internal_process = subprocess.Popen(run_command,
                        shell=True,
                        stdout=subprocess.PIPE,
@@ -197,7 +201,7 @@ class BuildNode(Node):
     def build(self):
         # Execute pre-build commands
         for pb_command in self.prebuild_commands:
-            self._debug_print("-- Running:" + pb_command + '\n')
+            self._debug_print("-- Running (pre-build):" + pb_command + '\n')
             ssh = subprocess.Popen(pb_command.split(),
                        shell=True,
                        stdout=subprocess.PIPE,
@@ -249,12 +253,14 @@ class BuildNode(Node):
 
                 commands.append(command)
             elif build_comm == "$$make":
-
+                command = []
+                if self.project_dir:
+                    command.append("cd %s;"%self.project_dir)
                 targets = self.get_products()
                 if use_ninja:
-                    command = ['ninja'] + targets
+                    command += ['ninja'] + targets
                 else:
-                    command = ['make'] + targets + ['-j7']
+                    command += ['make'] + targets + ['-j7']
                 commands.append(command)
             else:
                 for src in self.project_src:
@@ -297,18 +303,23 @@ class RunNode(Node):
     def run(self):
 
         command = self.path
-        if self.remote:
-            command_list = [' '.join(["ssh", "%s@%s" % (self.login,self.hostname), command])]
-        else:
+        if not type(command) == list:
             command_list = [command]
+        else:
+            command_list = command
 
-        self._debug_print("-- Running " + str(command_list) + " from " + self.run_dir + " \n")
-
-        self._debug_print(command_list)
         self.thread = Thread(target=run_thread_func, args=(self, command_list))
         self.thread.daemon = True # thread dies with the program
         self.thread.start()
 
+class RemoteRunNode(RunNode):
+    def __init__(self, name, hostname = 'gr01',
+                 login = 'sphere'):
+        RunNode.__init__(self, name)
+        self.hostname = hostname
+        self.login = login
+
+        self.remote = True
 
 if __name__ == "__main__":
     builder = BuildNode('distributed app', False)
