@@ -239,7 +239,11 @@ public:
 		return paramVector;
 	}
 
-	const ParameterType operator= (const ParameterType value) { this->set(value); return value; }
+	// Allow automatic conversion to the data type
+	// this allows e.g. float value = parameter;
+	operator ParameterType() { return this->get();}
+
+	ParameterWrapper<ParameterType> operator= (const ParameterType value) { this->set(value); return *this; }
 	
 protected:
 	ParameterType mMin;
