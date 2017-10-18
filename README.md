@@ -11,8 +11,7 @@ University of California, Santa Barbara
      src="https://scan.coverity.com/projects/5548/badge.svg"/>
 </a>
 
-![Build Status](https://travis-ci.org/AlloSphere-Research-Group/AlloSystem.svg?branch=devel)
-[Build Status](https://travis-ci.org/AlloSphere-Research-Group/AlloSystem)
+[![Build Status](https://travis-ci.org/AlloSphere-Research-Group/AlloSystem.svg?branch=parametercrash)](https://travis-ci.org/AlloSphere-Research-Group/AlloSystem)
 
 ## 1. About
 
