@@ -59,7 +59,7 @@ class AlloRunner():
             home = expanduser("~")
             cwd = os.getcwd()
             if builder.remote:
-                cwd = base_path + '/' + user_prefix + '/' + node.hostname + '/' + cwd[cwd.rfind('/')+ 1 :]
+                cwd = builder.scratch_path + '/' + user_prefix + '/' + node.hostname + '/' + cwd[cwd.rfind('/')+ 1 :]
 #                if cwd[:len(home)] == home:
 #                    cwd = cwd[len(home) + 1:]
                 print(cwd)
@@ -99,8 +99,8 @@ class AlloRunner():
 #                    num_lines = console_output.count('\n')
 
             done = True
-            for b in self.builders:
-                if not b.is_done():
+            for builder in self.builders:
+                if not builder.is_done():
                     done = False
                     break
 
@@ -116,17 +116,20 @@ class AlloRunner():
         self.runners = []
         for i, node in enumerate(self.nodes):
             for src, app, deploy_hosts in zip(node.project_src, node.get_products(), node.deploy_to):
-                if node.remote:
+                build_report = 'build/' + src[:-4].replace('/', '_') + '.json'
+                if node.remote or not os.path.exists(build_report):
                     for deploy_host in deploy_hosts:
                         self.stdoutbuf.append('')
                         self.stderrbuf.append('')
-                        runner = RemoteRunNode(deploy_host + '-' + app, deploy_host)
+                        if node.remote:
+                            runner = RemoteRunNode(deploy_host + '-' + app, deploy_host)
+                        else:
+                            runner = RunNode(deploy_host + '-' + app)
                         bin_path = 'build/bin/' + app
                         runner.configure(node.project_dir, bin_path)
                         runner.run()
                         self.runners.append(runner)
                 else:
-                    build_report = 'build/' + src[:-4].replace('/', '_') + '.json'
                     import json
                     if self.verbose:
                         self.log("Reading build report:" + build_report)
@@ -206,13 +209,13 @@ if __name__ == "__main__":
         from local import nodes
 
     if args.allosphere:
-        base_path = '/alloshare/scratch'
         user_prefix = 'andres'
         for node in nodes:
+            scratch_path = node.scratch_path
             exclude_dirs = ['"CMakeCache.txt"', '"build"', '".git"', '"AlloSystem/.git"', '"AlloSystem/CMakeFiles"','"*/CMakeFiles"', '"*/AlloSystem-build"']
             rsync_command = 'rsync -arv -p --delete --group=users ' + "--exclude " + ' --exclude '.join(exclude_dirs) + " "
             rsync_command += cur_dir + ' '
-            rsync_command += "sphere@%s:"%node.hostname + base_path + "/" + user_prefix + "/" + node.hostname
+            rsync_command += "sphere@%s:"%node.hostname + scratch_path + "/" + user_prefix + "/" + node.hostname
             print("syncing:  " + rsync_command)
             os.system(rsync_command)
 

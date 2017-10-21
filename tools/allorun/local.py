@@ -10,7 +10,7 @@ import os
 
 nodes = []
 
-filenames = ["src/%s.cpp"%name for name in ["simulator", "graphics", "control"] ]
+filenames = ["src/%s.cpp"%name for name in ["simulator", "graphics", "control", "audio"] ]
 
 node = appnode.BuildNode('local', False)
 

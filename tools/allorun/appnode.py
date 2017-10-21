@@ -181,18 +181,24 @@ class BuildNode(Node):
         self.prebuild_commands = []
         self.debug = False
         self.cmake = "cmake"
+        self.deploy_to = []
+        self.scratch_path = '/alloshare/scratch'
 
     def configure(self, **kwargs):
         if "project_dir" in kwargs:
             self.project_dir = kwargs["project_dir"]
         if "project_src" in kwargs:
             self.project_src = kwargs["project_src"]
+            if len(self.deploy_to) == 0:
+                self.deploy_to = [["localhost"] for i in range(len(self.project_src)) ]
         if "prebuild_commands" in kwargs:
             self.prebuild_commands = kwargs["prebuild_commands"]
         if "build_commands" in kwargs:
             self.build_commands = kwargs["build_commands"]
         if "cmake" in kwargs:
             self.cmake = kwargs["cmake"]
+        if "scratch_path" in kwargs:
+            self.scratch_path = kwargs["scratch_path"]
         self.configured = True
 
     def set_debug(self, debug_ = True):
@@ -243,10 +249,16 @@ class BuildNode(Node):
                 if self.project_dir:
                     command.append("cd %s;"%self.project_dir)
                 if os.path.isdir(src):
-                    target_flag = '-DALLOPROJECT_BUILD_APP_DIR=\\"%s\\"'%src
+                    if self.remote:
+                        target_flag = '-DALLOPROJECT_BUILD_APP_DIR=\\"%s\\"'%src
+                    else:
+                        target_flag = '-DALLOPROJECT_BUILD_APP_DIR="%s"'%src
                     build_flag = "-DALLOPROJECT_BUILD_DIR=1"
                 else:
-                    target_flag = '-DALLOPROJECT_BUILD_APP_FILE=\\"%s\\"'%src
+                    if self.remote:
+                        target_flag = '-DALLOPROJECT_BUILD_APP_FILE=\\"%s\\"'%src
+                    else:
+                        target_flag = '-DALLOPROJECT_BUILD_APP_FILE="%s"'%src
                     build_flag = "-DALLOPROJECT_BUILD_DIR=0"
                 command += [self.cmake, '.',  generator, target_flag, build_flag]
                 command += debug_flags
