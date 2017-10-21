@@ -494,6 +494,10 @@ public:
 		}
 		setLocking(value);
 	}
+
+	ParameterVec3 operator=(const Vec3f vec) {this->set(vec); return *this;}
+
+	float operator[](size_t index) { Vec3f vec = this->get(); return vec[index];}
 };
 
 class ParameterVec4: public ParameterWrapper<al::Vec4f>
@@ -532,6 +536,10 @@ public:
 		}
 		setLocking(value);
 	}
+
+	ParameterVec4 operator=(const Vec4f vec) {this->set(vec); return *this;}
+
+	float operator[](size_t index) { Vec4f vec = this->get(); return vec[index];}
 };
 
 /**
