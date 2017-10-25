@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 
 #ifdef AL_AUDIO_RTAUDIO
@@ -207,8 +208,7 @@ void AudioBackend::outDevice(int index) {
 void AudioBackend::channels(int num, bool forOutput) {
 	AudioBackendData *data = static_cast<AudioBackendData *>(mBackendData.get());
 	if (isOpen()) {
-		warn("the number of channels cannnot be set with the stream open",
-		     "AudioIO");
+		AL_WARN("the number of channels cannnot be set with the stream open");
 		return;
 	}
 
@@ -223,11 +223,9 @@ void AudioBackend::channels(int num, bool forOutput) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(params->device);
 	if (0 == info) {
 		if (forOutput)
-			warn("attempt to set number of channels on invalid output device",
-			     "AudioIO");
+			AL_WARN("attempt to set number of channels on invalid output device");
 		else
-			warn("attempt to set number of channels on invalid input device",
-			     "AudioIO");
+			AL_WARN("attempt to set number of channels on invalid input device");
 		return;  // this particular device is not open, so return
 	}
 
@@ -720,8 +718,7 @@ static int rtaudioCallback(void *output, void *input, unsigned int frameCount,
 
 void AudioBackend::channels(int num, bool forOutput) {
 	if (isOpen()) {
-		warn("the number of channels cannnot be set with the stream open",
-		     "AudioIO");
+		AL_WARN("the number of channels cannnot be set with the stream open");
 		return;
 	}
 
@@ -742,11 +739,9 @@ void AudioBackend::channels(int num, bool forOutput) {
 	}
 	if (!info.probed) {
 		if (forOutput)
-			warn("attempt to set number of channels on invalid output device",
-			     "AudioIO");
+			AL_WARN("attempt to set number of channels on invalid output device");
 		else
-			warn("attempt to set number of channels on invalid input device",
-			     "AudioIO");
+			AL_WARN("attempt to set number of channels on invalid input device");
 		return;  // this particular device is not open, so return
 	}
 
@@ -1010,7 +1005,7 @@ void AudioIO::deviceIn(const AudioDevice &v) {
 		mBackend->inDevice(v.id());
 		channelsIn(v.channelsInMax());
 	} else {
-		warn("attempt to set input device to a device without inputs", "AudioIO");
+		AL_WARN("attempt to set input device to a device without inputs");
 	}
 }
 
@@ -1020,7 +1015,7 @@ void AudioIO::deviceOut(const AudioDevice &v) {
 		mBackend->outDevice(v.id());
 		channelsOut(v.channelsOutMax());
 	} else {
-		warn("attempt to set output device to a device without outputs", "AudioIO");
+		AL_WARN("attempt to set output device to a device without outputs");
 	}
 }
 
@@ -1031,12 +1026,11 @@ void AudioIO::device(const AudioDevice &v) {
 
 void AudioIO::channelsBus(int num) {
 	if (mBackend->isOpen()) {
-		warn("the number of channels cannnot be set with the stream open",
-		     "AudioIO");
+		AL_WARN("the number of channels cannnot be set with the stream open");
 		return;
 	}
 
-	resize(mBufB, num * mFramesPerBuffer);
+	resizeBuf(mBufB, num * mFramesPerBuffer);
 	mNumB = num;
 }
 
@@ -1095,7 +1089,7 @@ void AudioIO::resizeBuffer(bool forOutput) {
 	int &chans = forOutput ? mNumO : mNumI;
 
 	if (chans > 0 && mFramesPerBuffer > 0) {
-		int n = resize(buffer, chans * mFramesPerBuffer);
+		int n = resizeBuf(buffer, chans * mFramesPerBuffer);
 		if (0 == n) chans = 0;
 	} else {
 		deleteBuf(buffer);
@@ -1112,8 +1106,7 @@ void AudioIO::framesPerSecond(double v) {  // printf("AudioIO::fps(%f)\n", v);
 
 void AudioIO::framesPerBuffer(int n) {
 	if (mBackend->isOpen()) {
-		warn("the number of frames/buffer cannnot be set with the stream open",
-		     "AudioIO");
+		AL_WARN("the number of frames/buffer cannnot be set with the stream open");
 		return;
 	}
 
@@ -1122,7 +1115,7 @@ void AudioIO::framesPerBuffer(int n) {
 		resizeBuffer(true);
 		resizeBuffer(false);
 		channelsBus(AudioIOData::channelsBus());
-		resize(mBufT, mFramesPerBuffer);
+		resizeBuf(mBufT, mFramesPerBuffer);
 	}
 }
 

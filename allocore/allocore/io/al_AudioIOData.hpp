@@ -48,53 +48,6 @@
 
 namespace al {
 
-// FIXME move this warn function. Perhaps replace use with a function from the
-// core/system/al_Printing.hpp file
-static void warn(const char* msg, const char* src) {
-	fprintf(stderr, "%s%swarning: %s\n", src, src[0] ? " " : "", msg);
-}
-
-template <class T>
-static void deleteBuf(T*& buf) {
-	delete[] buf;
-	buf = 0;
-}
-
-template <class T>
-static int resize(T*& buf, int n) {
-	deleteBuf(buf);
-	buf = new T[n];
-	return n;
-}
-
-// Utility function to efficiently clear buffer (set all to 0)
-template <class T>
-static void zero(T* buf, int n) {
-	memset(buf, 0, n * sizeof(T));
-}
-
-// Utility function to deinterleave samples
-template <class T>
-static void deinterleave(T* dst, const T* src, int numFrames, int numChannels) {
-	int numSamples = numFrames * numChannels;
-	for (int c = 0; c < numChannels; c++) {
-		for (int i = c; i < numSamples; i += numChannels) {
-			*dst++ = src[i];
-		}
-	}
-}
-
-/// Utility function to interleave samples
-template <class T>
-static void interleave(T* dst, const T* src, int numFrames, int numChannels) {
-	int numSamples = numFrames * numChannels;
-	for (int c = 0; c < numChannels; c++) {
-		for (int i = c; i < numSamples; i += numChannels) {
-			dst[i] = *src++;
-		}
-	}
-}
-
 /// Audio device information
 ///
 /// @ingroup allocore
@@ -118,28 +71,23 @@ public:
 
 	virtual ~AudioDeviceInfo() {}
 
-	virtual bool valid() const;        ///< Returns whether device is valid
-	virtual int id() const;            ///< Get device unique ID
-	virtual const char* name() const;  ///< Get device name
-	virtual int channelsInMax()
-	const;  ///< Get maximum number of input channels supported
-	virtual int channelsOutMax()
-	const;  ///< Get maximum number of output channels supported
-	virtual double defaultSampleRate() const;  ///< Get default sample rate
+	virtual bool valid() const;					///< Returns whether device is valid
+	virtual int id() const;						///< Get device unique ID
+	virtual const char* name() const;			///< Get device name
+	virtual int channelsInMax()	const;			///< Get maximum number of input channels supported
+	virtual int channelsOutMax() const;			///< Get maximum number of output channels supported
+	virtual double defaultSampleRate() const;	///< Get default sample rate
 
-	virtual void setID(int iD);        ///< Sets unique ID
-	virtual void setName(char* name);  ///< Sets device name
-	virtual void setChannelsInMax(
-	        int num);  ///< Sets maximum number of Input channels supported
-	virtual void setChannelsOutMax(
-	        int num);  ///< Sets maximum number of Output channels supported
-	virtual void setDefaultSampleRate(double rate);  ///< Sets default sample rate
+	virtual void setID(int iD);					///< Sets unique ID
+	virtual void setName(char* name);			///< Sets device name
+	virtual void setChannelsInMax(int num);		///< Sets maximum number of Input channels supported
+	virtual void setChannelsOutMax(int num);	///< Sets maximum number of Output channels supported
+	virtual void setDefaultSampleRate(double rate); ///< Sets default sample rate
 
-	virtual bool hasInput() const = 0;   ///< Returns whether device has input
-	virtual bool hasOutput() const = 0;  ///< Returns whether device has output
+	virtual bool hasInput() const = 0;			///< Returns whether device has input
+	virtual bool hasOutput() const = 0;			///< Returns whether device has output
 
-	virtual void print()
-	const = 0;  ///< Prints info about specific i/o device to stdout
+	virtual void print() const = 0;				///< Prints info about specific i/o device to stdout
 
 protected:
 	int mID{-1};
@@ -286,6 +234,39 @@ inline float& AudioIOData::out(int c, int f) const {
 	return mBufO[c * framesPerBuffer() + f];
 }
 inline float& AudioIOData::temp(int f) const { return mBufT[f]; }
+
+
+/// Utility function to deinterleave samples
+template <class T>
+void deinterleave(T * dst, const T * src, int numFrames, int numChannels){
+	int numSamples = numFrames * numChannels;
+	for(int c=0; c < numChannels; c++){
+		for(int i=c; i < numSamples; i+=numChannels){
+			*dst++ = src[i];
+		}
+	}
+}
+
+/// Utility function to interleave samples
+template <class T>
+void interleave(T * dst, const T * src, int numFrames, int numChannels){
+	int numSamples = numFrames * numChannels;
+	for(int c=0; c < numChannels; c++){
+		for(int i=c; i < numSamples; i+=numChannels){
+			dst[i] = *src++;
+		}
+	}
+}
+
+template <class T>
+void deleteBuf(T *& buf){ delete[] buf; buf=0; }
+
+template <class T>
+int resizeBuf(T *& buf, int n){
+	deleteBuf(buf);
+	buf = new T[n];
+	return n;
+}
 
 }  // al::
 
