@@ -46,6 +46,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <initializer_list>
 
 #include "allocore/io/al_AudioIOData.hpp"
 
@@ -126,15 +127,25 @@ public:
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output
 	/// devices
-	AudioDevice(const std::string &nameKeyword,
-	            StreamMode stream = StreamMode(INPUT | OUTPUT));
+	AudioDevice(const std::string &nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
+
+	/// @param[in] nameKeywords	List of keywords to search for in device name
+	/// @param[in] stream		Whether to search for input and/or output devices
+	AudioDevice(std::initializer_list<std::string> nameKeywords, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
 
 	/// Find device number of given device name keyword
 	
 	/// \returns device number on success or -1 if there is no match
 	///
-	int findDeviceNumber(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
+	static int findDeviceNumber(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
+
+	/// Find device number from a list of device name keywords
+
+	/// \returns device number of first match in list or -1 if there is no match
+	///
+	static int findDeviceNumber(std::initializer_list<std::string> nameKeywordList, StreamMode stream = StreamMode(INPUT | OUTPUT));
+	
 
 	virtual bool valid() const { return mValid; }
 	
