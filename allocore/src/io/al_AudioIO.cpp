@@ -803,19 +803,24 @@ AudioDevice::AudioDevice(int deviceNum) : AudioDeviceInfo(deviceNum) {
 	setImpl(deviceNum);
 }
 
-AudioDevice::AudioDevice(const std::string &nameKeyword, StreamMode stream)
-    : AudioDeviceInfo(0) {
-	for (int i = 0; i < numDevices(); ++i) {
-		AudioDevice d(i);
-		bool bi = (stream & INPUT) && d.hasInput();
-		bool bo = (stream & OUTPUT) && d.hasOutput();
-		std::string n = d.name();
+AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
+:	AudioDeviceInfo(0)
+{
+	auto devNum = findDeviceNumber(nameKeyword, stream);
+	if(devNum >= 0) setImpl(devNum);
+}
 
-		if ((bi || bo) && n.find(nameKeyword) != std::string::npos) {
-			setImpl(i);
-			break;
-		}
-	}
+int AudioDevice::findDeviceNumber(const std::string& nameKeyword, StreamMode stream){
+ 	for(int i=0; i<numDevices(); ++i){
+ 		AudioDevice d(i);
+ 		bool bi = (stream &  INPUT) && d.hasInput();
+ 		bool bo = (stream & OUTPUT) && d.hasOutput();
+ 		std::string n = d.name();
+ 		if(	(bi || bo) && n.find(nameKeyword) != std::string::npos){
+			return i;
+ 		}
+ 	}
+	return -1;
 }
 
 AudioDevice AudioDevice::defaultInput() { return AudioBackend::defaultInput(); }

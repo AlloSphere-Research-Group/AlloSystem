@@ -129,6 +129,13 @@ public:
 	AudioDevice(const std::string &nameKeyword,
 	            StreamMode stream = StreamMode(INPUT | OUTPUT));
 
+
+	/// Find device number of given device name keyword
+	
+	/// \returns device number on success or -1 if there is no match
+	///
+	int findDeviceNumber(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
+
 	virtual bool valid() const { return mValid; }
 	
 	/// Returns whether device has input
