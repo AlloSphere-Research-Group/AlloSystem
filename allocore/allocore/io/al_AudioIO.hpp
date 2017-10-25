@@ -130,21 +130,19 @@ public:
 	            StreamMode stream = StreamMode(INPUT | OUTPUT));
 
 	virtual bool valid() const { return mValid; }
-	virtual bool hasInput() const {
-		return channelsInMax() > 0;
-	}  ///< Returns whether device has input
-	virtual bool hasOutput() const {
-		return channelsOutMax() > 0;
-	}  ///< Returns whether device has output
+	
+	/// Returns whether device has input
+	virtual bool hasInput() const { return channelsInMax() > 0; }
+	
+	/// Returns whether device has output
+	virtual bool hasOutput() const { return channelsOutMax() > 0; }
 
-	virtual void print()
-	const;  ///< Prints info about specific i/o device to stdout
+	virtual void print() const;				///< Prints info about specific i/o device to stdout
 
-	static AudioDevice defaultInput();   ///< Get system's default input device
-	static AudioDevice defaultOutput();  ///< Get system's default output device
-	static int numDevices();  ///< Returns number of audio i/o devices available
-	static void
-	printAll();  ///< Prints info about all available i/o devices to stdout
+	static AudioDevice defaultInput();		///< Get system's default input device
+	static AudioDevice defaultOutput();		///< Get system's default output device
+	static int numDevices();				///< Returns number of audio i/o devices available
+	static void	printAll();					///< Prints info about all available i/o devices to stdout
 
 protected:
 	void setImpl(int deviceNum);
@@ -201,24 +199,20 @@ public:
 	void initWithDefaults(void (*callback)(AudioIOData &), void *userData,
 	                      bool use_out, bool use_in, int framesPerBuffer = 256);
 
-	bool open();   ///< Opens audio device.
-	bool close();  ///< Closes audio device. Will stop active IO.
-	bool start();  ///< Starts the audio IO.  Will open audio device if necessary.
-	bool stop();   ///< Stops the audio IO.
-	void processAudio();  ///< Call callback manually
+	bool open();			///< Opens audio device.
+	bool close();			///< Closes audio device. Will stop active IO.
+	bool start();			///< Starts the audio IO.  Will open audio device if necessary.
+	bool stop();			///< Stops the audio IO.
+	void processAudio();	///< Call callback manually
 
 	bool autoZeroOut() const { return mAutoZeroOut; }
 	int channels(bool forOutput) const;
-	int channelsInDevice()
-	const;  ///< Get number of channels opened on input device
-	int channelsOutDevice()
-	const;  ///< Get number of channels opened on output device
-	bool clipOut() const { return mClipOut; }  ///< Returns clipOut setting
-	double cpu() const;  ///< Returns current CPU usage of audio thread
-	bool supportsFPS(
-	        double fps);  ///< Return true if fps supported, otherwise false
-	bool zeroNANs()
-	const;  ///< Returns whether to zero NANs in output buffer going to DAC
+	int channelsInDevice() const;	///< Get number of channels opened on input device
+	int channelsOutDevice()	const;	///< Get number of channels opened on output device
+	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
+	double cpu() const;				///< Returns current CPU usage of audio thread
+	bool supportsFPS(double fps);	///< Return true if fps supported, otherwise false
+	bool zeroNANs()	const;			///< Returns whether to zero NANs in output buffer going to DAC
 
 	/// Sets number of effective channels on input or output device depending on
 	/// 'forOutput' flag.
@@ -228,28 +222,22 @@ public:
 	/// the number of channels opens all available channels.
 	void channels(int num, bool forOutput);
 
-	void channelsIn(int n);     ///< Set number of input channels
-	void channelsOut(int n);    ///< Set number of output channels
-	void channelsBus(int num);  ///< Set number of bus channels
-	void clipOut(bool v) {
-		mClipOut = v;
-	}  ///< Set whether to clip output between -1 and 1
-	void device(
-	        const AudioDevice &v);  ///< Set input/output device (must be duplex)
-	void deviceIn(const AudioDevice &v);   ///< Set input device
-	void deviceOut(const AudioDevice &v);  ///< Set output device
-	void framesPerSecond(double v);        ///< Set number of frames per second
-	void framesPerBuffer(int n);  ///< Set number of frames per processing buffer
-	void zeroNANs(bool v) {
-		mZeroNANs = v;
-	}  ///< Set whether to zero NANs in output buffer going to DAC
+	void channelsIn(int n);					///< Set number of input channels
+	void channelsOut(int n);				///< Set number of output channels
+	void channelsBus(int num);				///< Set number of bus channels
+	void clipOut(bool v){ mClipOut = v;	}	///< Set whether to clip output between -1 and 1
+	void device(const AudioDevice &v);		///< Set input/output device (must be duplex)
+	void deviceIn(const AudioDevice &v);	///< Set input device
+	void deviceOut(const AudioDevice &v);	///< Set output device
+	void framesPerSecond(double v);			///< Set number of frames per second
+	void framesPerBuffer(int n);			///< Set number of frames per processing buffer
+	void zeroNANs(bool v){ mZeroNANs = v; }	///< Set whether to zero NANs in output buffer going to DAC
 
 	void print() const;  ///< Prints info about current i/o devices to stdout.
 	static const char *errorText(int errNum);  ///< Returns error string.
 
 	double time() const;  ///< Get current stream time in seconds
-	double time(
-	        int frame) const;  ///< Get current stream time in seconds of frame
+	double time(int frame) const;  ///< Get current stream time in seconds of frame
 
 	/// Add an AudioCallback handler (internal callback is always called first)
 	AudioIO &append(AudioCallback &v);
