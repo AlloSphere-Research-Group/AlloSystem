@@ -107,7 +107,7 @@ public:
 	RenderToDisk& mode(Mode v);
 
 	/// Set format of image files
-	RenderToDisk& imageFormat(const std::string& ext, int compression=50);
+	RenderToDisk& imageFormat(const std::string& ext, int compression=50, int paletteSize=-1);
 
 	/// Start rendering
 
@@ -175,20 +175,20 @@ private:
 		bool run(
 			const std::string& path,
 			const std::vector<unsigned char>& pixels, unsigned w, unsigned h,
-			Image::Format format, unsigned compress
+			Image::Format format, int compress, int paletteSize
 		);
 	};
 
 	Mode mMode;
 	std::string mUserPath, mPath;
-	unsigned mFrameNumber;
-	double mElapsedSec;
+	unsigned mFrameNumber = 0;
+	double mElapsedSec = 0.;
 
-	al::Window * mWindow;
+	al::Window * mWindow = NULL;
 	double mFrameDur; // graphics frame duration
 	double mWindowFPS;
 	std::vector<unsigned char> mPixels;
-	GLenum mGraphicsBuf;
+	GLenum mGraphicsBuf = -1;
 
 	enum { Npbos = 3 };
 	GLuint mPBOs[Npbos];
@@ -197,17 +197,18 @@ private:
 
 	enum { Nthreads = 8 };
 	ImageWriter mImageWriters[Nthreads];
-	std::string mImageExt;
-	unsigned mImageCompress;
+	std::string mImageExt = "png";
+	int mImageCompress = 50;
+	int mImagePaletteSize = -1;
 
-	al::AudioIO * mAudioIO;
+	al::AudioIO * mAudioIO = NULL;
 	//std::vector<char> mAudioBuf;
 	AudioRing mAudioRing;
 	std::ofstream mSoundFile;
 	Thread mSoundFileThread;
 
-	bool mActive;
-	bool mWroteImages, mWroteAudio;
+	bool mActive = false;
+	bool mWroteImages = false, mWroteAudio = false;
 
 	virtual void onAudioCB(AudioIOData& io);
 	virtual bool onFrame();
