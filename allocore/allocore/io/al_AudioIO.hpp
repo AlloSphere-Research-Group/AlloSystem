@@ -127,7 +127,7 @@ public:
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output
 	/// devices
-	AudioDevice(const std::string &nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
+	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
 	/// @param[in] nameKeywords	List of keywords to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices

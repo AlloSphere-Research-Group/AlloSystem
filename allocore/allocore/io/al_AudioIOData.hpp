@@ -45,6 +45,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <string>
 
 namespace al {
 
@@ -73,13 +74,13 @@ public:
 
 	virtual bool valid() const;					///< Returns whether device is valid
 	virtual int id() const;						///< Get device unique ID
-	virtual const char* name() const;			///< Get device name
+	virtual const std::string& name() const;	///< Get device name
 	virtual int channelsInMax()	const;			///< Get maximum number of input channels supported
 	virtual int channelsOutMax() const;			///< Get maximum number of output channels supported
 	virtual double defaultSampleRate() const;	///< Get default sample rate
 
 	virtual void setID(int iD);					///< Sets unique ID
-	virtual void setName(char* name);			///< Sets device name
+	virtual void setName(const std::string& name); ///< Sets device name
 	virtual void setChannelsInMax(int num);		///< Sets maximum number of Input channels supported
 	virtual void setChannelsOutMax(int num);	///< Sets maximum number of Output channels supported
 	virtual void setDefaultSampleRate(double rate); ///< Sets default sample rate
@@ -91,7 +92,7 @@ public:
 
 protected:
 	int mID{-1};
-	char mName[128];
+	std::string mName;
 	int mChannelsInMax{0};
 	int mChannelsOutMax{0};
 	double mDefaultSampleRate{0};

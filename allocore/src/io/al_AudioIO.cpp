@@ -382,10 +382,7 @@ double AudioBackend::devicePreferredSamplingRate(int num) {
 
 std::string AudioBackend::deviceName(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	char name[128];
-	strncpy(name, info->name, 127);
-	name[127] = '\0';
-	return std::string(name);
+	return info->name;
 }
 
 int AudioBackend::numDevices() { return Pa_GetDeviceCount(); }
@@ -768,9 +765,6 @@ void AudioBackend::channels(int num, bool forOutput) {
 std::string AudioBackend::deviceName(int num) {
 	RtAudio rt;
 	RtAudio::DeviceInfo info = rt.getDeviceInfo(num);
-	char name[128];
-	strncpy(name, info.name.c_str(), 127);
-	name[127] = '\0';
 	return info.name;
 }
 
@@ -854,7 +848,7 @@ void AudioDevice::print() const {
 		return;
 	}
 
-	printf("[%2d] %s, ", id(), name());
+	printf("[%2d] %s, ", id(), name().c_str());
 
 	int chans = channelsInMax();
 	if (chans > 0) printf("%2i in, ", chans);
@@ -903,8 +897,7 @@ void AudioDevice::setImpl(int deviceNum) {
 		mChannelsInMax = AudioBackend::deviceMaxInputChannels(deviceNum);
 		mChannelsOutMax = AudioBackend::deviceMaxOutputChannels(deviceNum);
 		mDefaultSampleRate = AudioBackend::devicePreferredSamplingRate(deviceNum);
-		strncpy(mName, AudioBackend::deviceName(deviceNum).c_str(), 128);
-		mName[127] = '\0';
+		mName = AudioBackend::deviceName(deviceNum);
 		mValid = true;
 	} else {
 		mValid = false;
