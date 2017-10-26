@@ -279,8 +279,7 @@ static int paCallback(const void *input, void *output, unsigned long frameCount,
                       const PaStreamCallbackTimeInfo *timeInfo,
                       PaStreamCallbackFlags statusFlags, void *userData);
 
-bool AudioBackend::open(int framesPerSecond, int framesPerBuffer,
-                        void *userdata) {
+bool AudioBackend::open(int framesPerSecond, int framesPerBuffer, void *userdata){
 	assert(framesPerBuffer != 0 && framesPerSecond != 0 && userdata != NULL);
 	AudioBackendData *data = static_cast<AudioBackendData *>(mBackendData.get());
 
@@ -298,14 +297,15 @@ bool AudioBackend::open(int framesPerSecond, int framesPerBuffer,
 			outParams = 0;
 
 		data->mErrNum = Pa_OpenStream(
-		            &data->mStream,   // PortAudioStream **
-		            inParams,         // PaStreamParameters * in
-		            outParams,        // PaStreamParameters * out
-		            framesPerSecond,  // frames/sec (double)
-		            framesPerBuffer,  // frames/buffer (unsigned long)
-		            paNoFlag,         // paNoFlag, paClipOff, paDitherOff
-		            paCallback,       // static callback function (PaStreamCallback *)
-		            userdata);
+			&data->mStream,   // PortAudioStream **
+			inParams,         // PaStreamParameters * in
+			outParams,        // PaStreamParameters * out
+			framesPerSecond,  // frames/sec (double)
+			framesPerBuffer,  // frames/buffer (unsigned long)
+			paNoFlag,         // paNoFlag, paClipOff, paDitherOff
+			paCallback,       // static callback function (PaStreamCallback *)
+			userdata
+		);
 
 		mOpen = paNoError == data->mErrNum;
 	}
@@ -325,8 +325,7 @@ bool AudioBackend::close() {
 	return paNoError == data->mErrNum;
 }
 
-bool AudioBackend::start(int framesPerSecond, int framesPerBuffer,
-                         void *userdata) {
+bool AudioBackend::start(int framesPerSecond, int framesPerBuffer, void *userdata) {
 	AudioBackendData *data = static_cast<AudioBackendData *>(mBackendData.get());
 	data->mErrNum = paNoError;
 	if (!isOpen()) {
@@ -367,36 +366,37 @@ bool AudioBackend::deviceIsValid(int num) {
 
 int AudioBackend::deviceMaxInputChannels(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	return info->maxInputChannels;
+	return info ? info->maxInputChannels : 0;
 }
 
 int AudioBackend::deviceMaxOutputChannels(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	return info->maxOutputChannels;
+	return info ? info->maxOutputChannels : 0;
 }
 
 double AudioBackend::devicePreferredSamplingRate(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	return info->defaultSampleRate;
+	return info ? info->defaultSampleRate : 0.;
 }
 
 std::string AudioBackend::deviceName(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	return info->name;
+	return info ? info->name : "";
 }
 
 int AudioBackend::numDevices() { return Pa_GetDeviceCount(); }
 
-static int paCallback(const void *input, void *output, unsigned long frameCount,
-                      const PaStreamCallbackTimeInfo *timeInfo,
-                      PaStreamCallbackFlags statusFlags, void *userData) {
+static int paCallback(
+	const void *input, void *output, unsigned long frameCount,
+	const PaStreamCallbackTimeInfo *timeInfo,
+    PaStreamCallbackFlags statusFlags, void *userData
+){
 	AudioIO &io = *(AudioIO *)userData;
 
 	assert(frameCount == (unsigned)io.framesPerBuffer());
 	const float **inBuffers = (const float **)input;
 	for (int i = 0; i < io.channelsInDevice(); i++) {
-		memcpy(const_cast<float *>(&io.in(i, 0)), inBuffers[i],
-		       frameCount * sizeof(float));
+		memcpy(const_cast<float *>(&io.in(i, 0)), inBuffers[i], frameCount * sizeof(float));
 	}
 
 	if (io.autoZeroOut()) io.zeroOut();
@@ -443,8 +443,7 @@ static int paCallback(const void *input, void *output, unsigned long frameCount,
 
 	float **outBuffers = (float **)output;
 	for (int i = 0; i < io.channelsOutDevice(); i++) {
-		memcpy(outBuffers[i], const_cast<float *>(&io.out(i, 0)),
-		       frameCount * sizeof(float));
+		memcpy(outBuffers[i], const_cast<float *>(&io.out(i, 0)), frameCount * sizeof(float));
 	}
 
 	return 0;
