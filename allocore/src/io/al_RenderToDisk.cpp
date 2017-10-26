@@ -21,10 +21,7 @@ static void serializeToBigEndian(char * out, float in){
 
 
 RenderToDisk::RenderToDisk(Mode m)
-:	mMode(m), mFrameNumber(0), mElapsedSec(0),
-	mGraphicsBuf(-1),
-	mImageExt("png"), mImageCompress(50),
-	mActive(false), mWroteImages(false), mWroteAudio(false)
+:	mMode(m)
 {
 	mPBOs[0] = 0;
 	resetPBOQueue();
@@ -58,9 +55,10 @@ RenderToDisk& RenderToDisk::path(const std::string& v){
 	return *this;
 }
 
-RenderToDisk& RenderToDisk::imageFormat(const std::string& ext, int compress){
+RenderToDisk& RenderToDisk::imageFormat(const std::string& ext, int compress, int paletteSize){
 	mImageExt = ext;
 	mImageCompress = compress;
+	mImagePaletteSize = paletteSize;
 	return *this;
 }
 
@@ -403,7 +401,7 @@ void RenderToDisk::saveImage(
 		int i=0;
 		for(; i<Nthreads; ++i){
 			//printf("Checking if image writer %d is free ...\n", i);
-			if(mImageWriters[i].run(name, mPixels, w,h, format, mImageCompress)){
+			if(mImageWriters[i].run(name, mPixels, w,h, format, mImageCompress, mImagePaletteSize)){
 				//printf("Running image writer %d\n", i);
 				break;
 			}
@@ -414,7 +412,7 @@ void RenderToDisk::saveImage(
 			al::wait(1./1e3); // wait 1 ms for disk i/o to finish up (hopefully)
 			goto CHECK_THREADS;
 			// Use main thread---this will definitely stall
-			//al::Image::save(name, pixs, w,h, format, mImageCompress);
+			//al::Image::save(name, pixs, w,h, format, mImageCompress, mImagePaletteSize);
 		}
 	
 		++mFrameNumber;
@@ -535,7 +533,7 @@ unsigned RenderToDisk::AudioRing::blockSizeInSamples() const {
 bool RenderToDisk::ImageWriter::run(
 	const std::string& path,
 	const std::vector<unsigned char>& pixels, unsigned w, unsigned h,
-	Image::Format format, unsigned compress
+	Image::Format format, int compress, int paletteSize
 ){
 	if(mBusy) return false;
 
@@ -546,6 +544,7 @@ bool RenderToDisk::ImageWriter::run(
 	memcpy(mImage.pixels<void>(), &pixels[0], pixels.size());
 
 	mImage.compression(compress);
+	mImage.paletteSize(paletteSize);
 	mPath = path;
 
 	// Wait for any thread function in progress
