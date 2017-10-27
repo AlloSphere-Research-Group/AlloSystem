@@ -126,7 +126,7 @@ namespace al {
     mHostName = Socket::hostName();
     mName = name;
     
-    mNavSpeed = 1;
+    mNavSpeed = 0.1;
     mNavTurnSpeed = 0.02;
     
     // default for omniapp: lens().near(0.01).far(40).eyeSep(0.03);
