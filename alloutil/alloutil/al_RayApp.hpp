@@ -126,8 +126,8 @@ namespace al {
     mHostName = Socket::hostName();
     mName = name;
     
-    mNavSpeed = 0.1;
-    mNavTurnSpeed = 0.02;
+    mNavSpeed = 0.02;
+    mNavTurnSpeed = 0.005;
     
     // default for omniapp: lens().near(0.01).far(40).eyeSep(0.03);
     // default for brain: lens().near(0.03).far(100).fovy(73.5).eyeSep(-0.02);
