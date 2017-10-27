@@ -280,7 +280,7 @@ namespace al {
     float x;
     if (m.addressPattern() == "/mx") {
       m >> x;
-      nav().moveR(-x * mNavSpeed);
+      nav().moveR(x * mNavSpeed);
       
     } else if (m.addressPattern() == "/my") {
       m >> x;
@@ -292,7 +292,7 @@ namespace al {
       
     } else if (m.addressPattern() == "/tx") {
       m >> x;
-      nav().spinR(x * -mNavTurnSpeed);
+      nav().spinR(x * mNavTurnSpeed);
       
     } else if (m.addressPattern() == "/ty") {
       m >> x;
@@ -300,7 +300,7 @@ namespace al {
       
     } else if (m.addressPattern() == "/tz") {
       m >> x;
-      nav().spinF(x * -mNavTurnSpeed);
+      nav().spinF(x * mNavTurnSpeed);
       
     } else if (m.addressPattern() == "/home") {
       nav().home();
