@@ -145,6 +145,9 @@ namespace al {
       oscRecv().bufferSize(32000);
       oscRecv().handler(*this);
       sendHandshake();
+    } else {
+      oscRecv().bufferSize(32000);
+      oscRecv().handler(*this);
     }
   }
   
