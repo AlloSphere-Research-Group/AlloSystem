@@ -126,8 +126,8 @@ namespace al {
     mHostName = Socket::hostName();
     mName = name;
     
-    mNavSpeed = 1;
-    mNavTurnSpeed = 0.02;
+    mNavSpeed = 0.02;
+    mNavTurnSpeed = 0.005;
     
     // default for omniapp: lens().near(0.01).far(40).eyeSep(0.03);
     // default for brain: lens().near(0.03).far(100).fovy(73.5).eyeSep(-0.02);
@@ -145,6 +145,9 @@ namespace al {
       oscRecv().bufferSize(32000);
       oscRecv().handler(*this);
       sendHandshake();
+    } else {
+      oscRecv().bufferSize(32000);
+      oscRecv().handler(*this);
     }
   }
   
@@ -277,7 +280,7 @@ namespace al {
     float x;
     if (m.addressPattern() == "/mx") {
       m >> x;
-      nav().moveR(-x * mNavSpeed);
+      nav().moveR(x * mNavSpeed);
       
     } else if (m.addressPattern() == "/my") {
       m >> x;
@@ -289,7 +292,7 @@ namespace al {
       
     } else if (m.addressPattern() == "/tx") {
       m >> x;
-      nav().spinR(x * -mNavTurnSpeed);
+      nav().spinR(x * mNavTurnSpeed);
       
     } else if (m.addressPattern() == "/ty") {
       m >> x;
@@ -297,7 +300,7 @@ namespace al {
       
     } else if (m.addressPattern() == "/tz") {
       m >> x;
-      nav().spinF(x * -mNavTurnSpeed);
+      nav().spinF(x * mNavTurnSpeed);
       
     } else if (m.addressPattern() == "/home") {
       nav().home();

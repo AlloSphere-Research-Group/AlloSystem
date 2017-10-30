@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 
 #ifdef AL_AUDIO_RTAUDIO
@@ -207,8 +208,7 @@ void AudioBackend::outDevice(int index) {
 void AudioBackend::channels(int num, bool forOutput) {
 	AudioBackendData *data = static_cast<AudioBackendData *>(mBackendData.get());
 	if (isOpen()) {
-		warn("the number of channels cannnot be set with the stream open",
-		     "AudioIO");
+		AL_WARN("the number of channels cannnot be set with the stream open");
 		return;
 	}
 
@@ -223,11 +223,9 @@ void AudioBackend::channels(int num, bool forOutput) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(params->device);
 	if (0 == info) {
 		if (forOutput)
-			warn("attempt to set number of channels on invalid output device",
-			     "AudioIO");
+			AL_WARN("attempt to set number of channels on invalid output device");
 		else
-			warn("attempt to set number of channels on invalid input device",
-			     "AudioIO");
+			AL_WARN("attempt to set number of channels on invalid input device");
 		return;  // this particular device is not open, so return
 	}
 
@@ -281,8 +279,7 @@ static int paCallback(const void *input, void *output, unsigned long frameCount,
                       const PaStreamCallbackTimeInfo *timeInfo,
                       PaStreamCallbackFlags statusFlags, void *userData);
 
-bool AudioBackend::open(int framesPerSecond, int framesPerBuffer,
-                        void *userdata) {
+bool AudioBackend::open(int framesPerSecond, int framesPerBuffer, void *userdata){
 	assert(framesPerBuffer != 0 && framesPerSecond != 0 && userdata != NULL);
 	AudioBackendData *data = static_cast<AudioBackendData *>(mBackendData.get());
 
@@ -300,14 +297,15 @@ bool AudioBackend::open(int framesPerSecond, int framesPerBuffer,
 			outParams = 0;
 
 		data->mErrNum = Pa_OpenStream(
-		            &data->mStream,   // PortAudioStream **
-		            inParams,         // PaStreamParameters * in
-		            outParams,        // PaStreamParameters * out
-		            framesPerSecond,  // frames/sec (double)
-		            framesPerBuffer,  // frames/buffer (unsigned long)
-		            paNoFlag,         // paNoFlag, paClipOff, paDitherOff
-		            paCallback,       // static callback function (PaStreamCallback *)
-		            userdata);
+			&data->mStream,   // PortAudioStream **
+			inParams,         // PaStreamParameters * in
+			outParams,        // PaStreamParameters * out
+			framesPerSecond,  // frames/sec (double)
+			framesPerBuffer,  // frames/buffer (unsigned long)
+			paNoFlag,         // paNoFlag, paClipOff, paDitherOff
+			paCallback,       // static callback function (PaStreamCallback *)
+			userdata
+		);
 
 		mOpen = paNoError == data->mErrNum;
 	}
@@ -327,8 +325,7 @@ bool AudioBackend::close() {
 	return paNoError == data->mErrNum;
 }
 
-bool AudioBackend::start(int framesPerSecond, int framesPerBuffer,
-                         void *userdata) {
+bool AudioBackend::start(int framesPerSecond, int framesPerBuffer, void *userdata) {
 	AudioBackendData *data = static_cast<AudioBackendData *>(mBackendData.get());
 	data->mErrNum = paNoError;
 	if (!isOpen()) {
@@ -369,39 +366,37 @@ bool AudioBackend::deviceIsValid(int num) {
 
 int AudioBackend::deviceMaxInputChannels(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	return info->maxInputChannels;
+	return info ? info->maxInputChannels : 0;
 }
 
 int AudioBackend::deviceMaxOutputChannels(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	return info->maxOutputChannels;
+	return info ? info->maxOutputChannels : 0;
 }
 
 double AudioBackend::devicePreferredSamplingRate(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	return info->defaultSampleRate;
+	return info ? info->defaultSampleRate : 0.;
 }
 
 std::string AudioBackend::deviceName(int num) {
 	const PaDeviceInfo *info = Pa_GetDeviceInfo(num);
-	char name[128];
-	strncpy(name, info->name, 127);
-	name[127] = '\0';
-	return std::string(name);
+	return info ? info->name : "";
 }
 
 int AudioBackend::numDevices() { return Pa_GetDeviceCount(); }
 
-static int paCallback(const void *input, void *output, unsigned long frameCount,
-                      const PaStreamCallbackTimeInfo *timeInfo,
-                      PaStreamCallbackFlags statusFlags, void *userData) {
+static int paCallback(
+	const void *input, void *output, unsigned long frameCount,
+	const PaStreamCallbackTimeInfo *timeInfo,
+    PaStreamCallbackFlags statusFlags, void *userData
+){
 	AudioIO &io = *(AudioIO *)userData;
 
 	assert(frameCount == (unsigned)io.framesPerBuffer());
 	const float **inBuffers = (const float **)input;
 	for (int i = 0; i < io.channelsInDevice(); i++) {
-		memcpy(const_cast<float *>(&io.in(i, 0)), inBuffers[i],
-		       frameCount * sizeof(float));
+		memcpy(const_cast<float *>(&io.in(i, 0)), inBuffers[i], frameCount * sizeof(float));
 	}
 
 	if (io.autoZeroOut()) io.zeroOut();
@@ -448,8 +443,7 @@ static int paCallback(const void *input, void *output, unsigned long frameCount,
 
 	float **outBuffers = (float **)output;
 	for (int i = 0; i < io.channelsOutDevice(); i++) {
-		memcpy(outBuffers[i], const_cast<float *>(&io.out(i, 0)),
-		       frameCount * sizeof(float));
+		memcpy(outBuffers[i], const_cast<float *>(&io.out(i, 0)), frameCount * sizeof(float));
 	}
 
 	return 0;
@@ -720,8 +714,7 @@ static int rtaudioCallback(void *output, void *input, unsigned int frameCount,
 
 void AudioBackend::channels(int num, bool forOutput) {
 	if (isOpen()) {
-		warn("the number of channels cannnot be set with the stream open",
-		     "AudioIO");
+		AL_WARN("the number of channels cannnot be set with the stream open");
 		return;
 	}
 
@@ -742,11 +735,9 @@ void AudioBackend::channels(int num, bool forOutput) {
 	}
 	if (!info.probed) {
 		if (forOutput)
-			warn("attempt to set number of channels on invalid output device",
-			     "AudioIO");
+			AL_WARN("attempt to set number of channels on invalid output device");
 		else
-			warn("attempt to set number of channels on invalid input device",
-			     "AudioIO");
+			AL_WARN("attempt to set number of channels on invalid input device");
 		return;  // this particular device is not open, so return
 	}
 
@@ -773,9 +764,6 @@ void AudioBackend::channels(int num, bool forOutput) {
 std::string AudioBackend::deviceName(int num) {
 	RtAudio rt;
 	RtAudio::DeviceInfo info = rt.getDeviceInfo(num);
-	char name[128];
-	strncpy(name, info.name.c_str(), 127);
-	name[127] = '\0';
 	return info.name;
 }
 
@@ -808,19 +796,39 @@ AudioDevice::AudioDevice(int deviceNum) : AudioDeviceInfo(deviceNum) {
 	setImpl(deviceNum);
 }
 
-AudioDevice::AudioDevice(const std::string &nameKeyword, StreamMode stream)
-    : AudioDeviceInfo(0) {
-	for (int i = 0; i < numDevices(); ++i) {
-		AudioDevice d(i);
-		bool bi = (stream & INPUT) && d.hasInput();
-		bool bo = (stream & OUTPUT) && d.hasOutput();
-		std::string n = d.name();
+AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
+:	AudioDeviceInfo(0)
+{
+	auto devNum = findDeviceNumber(nameKeyword, stream);
+	if(devNum >= 0) setImpl(devNum);
+}
 
-		if ((bi || bo) && n.find(nameKeyword) != std::string::npos) {
-			setImpl(i);
-			break;
-		}
+AudioDevice::AudioDevice(std::initializer_list<std::string> nameKeywordList, StreamMode stream)
+:	AudioDeviceInfo(0)
+{
+	auto devNum = findDeviceNumber(nameKeywordList, stream);
+	if(devNum >= 0) setImpl(devNum);
+}
+
+int AudioDevice::findDeviceNumber(const std::string& nameKeyword, StreamMode stream){
+ 	for(int i=0; i<numDevices(); ++i){
+ 		AudioDevice d(i);
+ 		bool bi = (stream &  INPUT) && d.hasInput();
+ 		bool bo = (stream & OUTPUT) && d.hasOutput();
+ 		std::string n = d.name();
+ 		if(	(bi || bo) && n.find(nameKeyword) != std::string::npos){
+			return i;
+ 		}
+ 	}
+	return -1;
+}
+
+int AudioDevice::findDeviceNumber(std::initializer_list<std::string> nameKeywordList, StreamMode stream){
+	for(auto& nameKeyword : nameKeywordList){
+		auto devNum = findDeviceNumber(nameKeyword, stream);
+		if(devNum >= 0) return devNum;
 	}
+	return -1;
 }
 
 AudioDevice AudioDevice::defaultInput() { return AudioBackend::defaultInput(); }
@@ -839,7 +847,7 @@ void AudioDevice::print() const {
 		return;
 	}
 
-	printf("[%2d] %s, ", id(), name());
+	printf("[%2d] %s, ", id(), name().c_str());
 
 	int chans = channelsInMax();
 	if (chans > 0) printf("%2i in, ", chans);
@@ -888,8 +896,7 @@ void AudioDevice::setImpl(int deviceNum) {
 		mChannelsInMax = AudioBackend::deviceMaxInputChannels(deviceNum);
 		mChannelsOutMax = AudioBackend::deviceMaxOutputChannels(deviceNum);
 		mDefaultSampleRate = AudioBackend::devicePreferredSamplingRate(deviceNum);
-		strncpy(mName, AudioBackend::deviceName(deviceNum).c_str(), 128);
-		mName[127] = '\0';
+		mName = AudioBackend::deviceName(deviceNum);
 		mValid = true;
 	} else {
 		mValid = false;
@@ -1010,7 +1017,7 @@ void AudioIO::deviceIn(const AudioDevice &v) {
 		mBackend->inDevice(v.id());
 		channelsIn(v.channelsInMax());
 	} else {
-		warn("attempt to set input device to a device without inputs", "AudioIO");
+		AL_WARN("attempt to set input device to a device without inputs");
 	}
 }
 
@@ -1020,7 +1027,7 @@ void AudioIO::deviceOut(const AudioDevice &v) {
 		mBackend->outDevice(v.id());
 		channelsOut(v.channelsOutMax());
 	} else {
-		warn("attempt to set output device to a device without outputs", "AudioIO");
+		AL_WARN("attempt to set output device to a device without outputs");
 	}
 }
 
@@ -1031,12 +1038,11 @@ void AudioIO::device(const AudioDevice &v) {
 
 void AudioIO::channelsBus(int num) {
 	if (mBackend->isOpen()) {
-		warn("the number of channels cannnot be set with the stream open",
-		     "AudioIO");
+		AL_WARN("the number of channels cannnot be set with the stream open");
 		return;
 	}
 
-	resize(mBufB, num * mFramesPerBuffer);
+	resizeBuf(mBufB, num * mFramesPerBuffer);
 	mNumB = num;
 }
 
@@ -1095,7 +1101,7 @@ void AudioIO::resizeBuffer(bool forOutput) {
 	int &chans = forOutput ? mNumO : mNumI;
 
 	if (chans > 0 && mFramesPerBuffer > 0) {
-		int n = resize(buffer, chans * mFramesPerBuffer);
+		int n = resizeBuf(buffer, chans * mFramesPerBuffer);
 		if (0 == n) chans = 0;
 	} else {
 		deleteBuf(buffer);
@@ -1112,8 +1118,7 @@ void AudioIO::framesPerSecond(double v) {  // printf("AudioIO::fps(%f)\n", v);
 
 void AudioIO::framesPerBuffer(int n) {
 	if (mBackend->isOpen()) {
-		warn("the number of frames/buffer cannnot be set with the stream open",
-		     "AudioIO");
+		AL_WARN("the number of frames/buffer cannnot be set with the stream open");
 		return;
 	}
 
@@ -1122,7 +1127,7 @@ void AudioIO::framesPerBuffer(int n) {
 		resizeBuffer(true);
 		resizeBuffer(false);
 		channelsBus(AudioIOData::channelsBus());
-		resize(mBufT, mFramesPerBuffer);
+		resizeBuf(mBufT, mFramesPerBuffer);
 	}
 }
 
