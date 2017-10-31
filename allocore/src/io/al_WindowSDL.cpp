@@ -405,10 +405,10 @@ bool Window::implCreate(){
 	#ifdef EMSCRIPTEN
 	{
 		int infiniteLoop = 1;
-		int fps = asap() ? -1 : fps();
+		int emFPS = asap() ? -1 : fps();
 		//void loop_handler(void *arg)
 		emscripten_set_main_loop_arg(
-			[](void * user){ decltype(mImpl)(user)->onFrame(); }, mImpl, fps, infiniteLoop
+			[](void * user){ decltype(mImpl)(user)->onFrame(); }, mImpl, emFPS, infiniteLoop
 		);
 	}
 	#else
