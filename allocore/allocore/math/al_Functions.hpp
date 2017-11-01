@@ -206,6 +206,9 @@ template<class T> T gcd(const T& x, const T& y);
 template <typename T, typename... Ts>
 T gcd(const T& x, const Ts&... rest){ return gcd(x, gcd(rest...)); }
 
+template <typename... Ts>
+bool coprime(const Ts&... vals){ return gcd(vals...) == 1; }
+
 /// The Gudermannian function
 /// relates circular and hyperbolic functions without using complex numbers.
 /// @see http://en.wikipedia.org/wiki/Gudermannian_function
