@@ -108,6 +108,13 @@ protected:
 	bool mRunning{false};
 	bool mOpen{false};
 	std::shared_ptr<void> mBackendData;
+
+	template<class T> T& backendData(){
+		return *static_cast<T *>(mBackendData.get());
+	}
+	template<class T> const T& backendData() const {
+		return *static_cast<const T *>(mBackendData.get());
+	}
 };
 
 /// Audio device
