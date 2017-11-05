@@ -51,7 +51,7 @@ public:
 		mesh.color(0, 0, 1); // 2: blue
 		mesh.color(1, 1, 1); // 3: white
 
-		nav().pos(0,0,4);
+		nav().pullBack(4);
 
 		initWindow();
 	}

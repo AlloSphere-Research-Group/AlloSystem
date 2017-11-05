@@ -44,7 +44,7 @@ public:
 		shapes.decompress();
 		shapes.generateNormals();
 
-		nav().pos(0,0,24);
+		nav().pullBack(24);
 		initWindow();
 	}
 
