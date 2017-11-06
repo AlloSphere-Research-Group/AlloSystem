@@ -377,47 +377,7 @@ static int paCallback(
 		memcpy(const_cast<float *>(&io.in(i, 0)), inBuffers[i], frameCount * sizeof(float));
 	}
 
-	if (io.autoZeroOut()) io.zeroOut();
-
-	io.processAudio();  // call callback
-
-	// apply smoothly-ramped gain to all output channels
-	if (io.usingGain()) {
-		float dgain = (io.mGain - io.mGainPrev) / frameCount;
-
-		for (int j = 0; j < io.channelsOutDevice(); ++j) {
-			float *out = io.outBuffer(j);
-			float gain = io.mGainPrev;
-
-			for (unsigned i = 0; i < frameCount; ++i) {
-				out[i] *= gain;
-				gain += dgain;
-			}
-		}
-
-		io.mGainPrev = io.mGain;
-	}
-
-	// kill pesky nans so we don't hurt anyone's ears
-	if (io.zeroNANs()) {
-		for (unsigned i = 0; i < unsigned(frameCount * io.channelsOutDevice());
-		     ++i) {
-			float &s = (&io.out(0, 0))[i];
-			// if(isnan(s)) s = 0.f;
-			if (s != s) s = 0.f;  // portable isnan; only nans do not equal themselves
-		}
-	}
-
-	if (io.clipOut()) {
-		for (unsigned i = 0; i < unsigned(frameCount * io.channelsOutDevice());
-		     ++i) {
-			float &s = (&io.out(0, 0))[i];
-			if (s < -1.f)
-				s = -1.f;
-			else if (s > 1.f)
-				s = 1.f;
-		}
-	}
+	io.processAudio();
 
 	float **outBuffers = (float **)output;
 	for (int i = 0; i < io.channelsOutDevice(); i++) {
@@ -637,47 +597,8 @@ static int rtaudioCallback(void *output, void *input, unsigned int frameCount,
 			hwInBuffer[i * frameCount + frame] = *inBuffers++;
 		}
 	}
-	if (io.autoZeroOut()) io.zeroOut();
 
 	io.processAudio();  // call callback
-
-	// apply smoothly-ramped gain to all output channels
-	if (io.usingGain()) {
-		float dgain = (io.mGain - io.mGainPrev) / frameCount;
-
-		for (int j = 0; j < io.channelsOutDevice(); ++j) {
-			float *out = io.outBuffer(j);
-			float gain = io.mGainPrev;
-
-			for (unsigned i = 0; i < frameCount; ++i) {
-				out[i] *= gain;
-				gain += dgain;
-			}
-		}
-
-		io.mGainPrev = io.mGain;
-	}
-
-	// kill pesky nans so we don't hurt anyone's ears
-	if (io.zeroNANs()) {
-		for (unsigned i = 0; i < unsigned(frameCount * io.channelsOutDevice());
-		     ++i) {
-			float &s = (&io.out(0, 0))[i];
-			// if(isnan(s)) s = 0.f;
-			if (s != s) s = 0.f;  // portable isnan; only nans do not equal themselves
-		}
-	}
-
-	if (io.clipOut()) {
-		for (unsigned i = 0; i < unsigned(frameCount * io.channelsOutDevice());
-		     ++i) {
-			float &s = (&io.out(0, 0))[i];
-			if (s < -1.f)
-				s = -1.f;
-			else if (s > 1.f)
-				s = 1.f;
-		}
-	}
 
 	float *outBuffers = (float *)output;
 
@@ -872,49 +793,12 @@ bool AudioBackend::open(int framesPerSecond, int framesPerBuffer, void *userdata
 			memcpy(const_cast<float *>(&io.in(i, 0)), inBuffers[i], frameCount * sizeof(float));
 		}*/
 
-		if(io.autoZeroOut()) io.zeroOut();
-
 		io.processAudio();  // call callback
-
-		// Apply smoothly-ramped gain to all output channels
-		if(io.usingGain()){
-			float dgain = (io.mGain - io.mGainPrev) / numFrames;
-
-			for(int j=0; j<chansOut; ++j){
-				float *out = io.outBuffer(j);
-				float gain = io.mGainPrev;
-
-				for(int i=0; i<numFrames; ++i){
-					out[i] *= gain;
-					gain += dgain;
-				}
-			}
-
-			io.mGainPrev = io.mGain;
-		}
-
-		// Kill pesky nans so we don't hurt anyone's ears
-		if(io.zeroNANs()){
-			for(int i=0; i < numFrames * chansOut; ++i){
-				float &s = (&io.out(0, 0))[i];
-				if(s != s) s = 0.f;  // portable isnan; only nans do not equal themselves
-			}
-		}
-
-		if(io.clipOut()){
-			for(int i=0; i < numFrames * chansOut; ++i){
-				float& s = (&io.out(0, 0))[i];
-				if(s < -1.f)
-					s = -1.f;
-				else if(s > 1.f)
-					s = 1.f;
-			}
-		}
 
 		// Copy AudioIO buffers over to backend implementation
 		auto * sdlBuf = (float *)stream; // samples are interleaved in SDL
 		for(int chan=0; chan<chansOut; ++chan){
-			for(int i=0; i<io.framesPerBuffer(); ++i){
+			for(int i=0; i<numFrames; ++i){
 				sdlBuf[i*chansOut + chan] = io.out(chan, i);
 			}
 		}
@@ -1402,6 +1286,9 @@ void AudioIO::print() const {
 
 
 void AudioIO::processAudio() {
+	if(autoZeroOut()) zeroOut();
+
+	// Call user callbacks
 	frame(0);
 	if(callback) callback(*this);
 
@@ -1409,6 +1296,41 @@ void AudioIO::processAudio() {
 		frame(0);
 		cb->onAudioCB(*this);
 	}
+
+	// Apply smoothly-ramped gain to all output channels
+	if(usingGain()){
+		float dgain = (mGain - mGainPrev) / mFramesPerBuffer;
+
+		for(int j=0; j<channelsOutDevice(); ++j){
+			auto * out = outBuffer(j);
+			float gain = mGainPrev;
+
+			for(int i=0; i<mFramesPerBuffer; ++i){
+				out[i] *= gain;
+				gain += dgain;
+			}
+		}
+
+		mGainPrev = mGain;
+	}
+
+	// Kill pesky nans so we don't hurt anyone's ears
+	if(zeroNANs()){
+		for(int i=0; i < mFramesPerBuffer * channelsOutDevice(); ++i){
+			auto& s = outBuffer()[i];
+			if(s != s) s = 0.f;  // portable isnan; only nans do not equal themselves
+		}
+	}
+
+	// Clip output to [-1,1]
+	if(clipOut()){
+		for(int i=0; i < mFramesPerBuffer * channelsOutDevice(); ++i){
+			auto& s = outBuffer()[i];
+			if(s < -1.f) s = -1.f;
+			else if(s > 1.f) s = 1.f;
+		}
+	}
+
 }
 
 int AudioIO::channels(bool forOutput) const {
