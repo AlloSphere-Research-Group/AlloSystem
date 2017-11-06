@@ -97,11 +97,11 @@ public:
 	// Device information
 	static AudioDevice defaultInput();
 	static AudioDevice defaultOutput();
-	static bool deviceIsValid(int num);
-	static int deviceMaxInputChannels(int num);
-	static int deviceMaxOutputChannels(int num);
-	static double devicePreferredSamplingRate(int num);
-	static std::string deviceName(int num);
+	static bool deviceIsValid(int index);
+	static int deviceMaxInputChannels(int index);
+	static int deviceMaxOutputChannels(int index);
+	static double devicePreferredSamplingRate(int index);
+	static std::string deviceName(int index);
 	static int numDevices();
 
 protected:
