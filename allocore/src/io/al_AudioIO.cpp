@@ -274,68 +274,56 @@ bool AudioBackend::open(int framesPerSecond, int framesPerBuffer, void *userdata
 	assert(framesPerBuffer != 0 && framesPerSecond != 0 && userdata != NULL);
 	auto& data = backendData<AudioBackendData>();
 
-	data.mErrNum = paNoError;
+	PaStreamParameters * inParams = &data.mInParams;
+	PaStreamParameters * outParams = &data.mOutParams;
 
-	if (!(isOpen() || isRunning())) {
-		PaStreamParameters * inParams = &data.mInParams;
-		PaStreamParameters * outParams = &data.mOutParams;
+	// Must pass in 0s for input- or output-only streams.
+	// Stream will not be opened if no device or channel count is zero
+	if ((paNoDevice == inParams->device) || (0 == inParams->channelCount))
+		inParams = 0;
+	if ((paNoDevice == outParams->device) || (0 == outParams->channelCount))
+		outParams = 0;
 
-		// Must pass in 0s for input- or output-only streams.
-		// Stream will not be opened if no device or channel count is zero
-		if ((paNoDevice == inParams->device) || (0 == inParams->channelCount))
-			inParams = 0;
-		if ((paNoDevice == outParams->device) || (0 == outParams->channelCount))
-			outParams = 0;
+	data.mErrNum = Pa_OpenStream(
+		&data.mStream,		// PortAudioStream **
+		inParams,			// PaStreamParameters * in
+		outParams,			// PaStreamParameters * out
+		framesPerSecond,	// frames/sec (double)
+		framesPerBuffer,	// frames/buffer (unsigned long)
+		paNoFlag,			// paNoFlag, paClipOff, paDitherOff
+		paCallback,			// static callback function (PaStreamCallback *)
+		userdata
+	);
 
-		data.mErrNum = Pa_OpenStream(
-			&data.mStream,		// PortAudioStream **
-			inParams,			// PaStreamParameters * in
-			outParams,			// PaStreamParameters * out
-			framesPerSecond,	// frames/sec (double)
-			framesPerBuffer,	// frames/buffer (unsigned long)
-			paNoFlag,			// paNoFlag, paClipOff, paDitherOff
-			paCallback,			// static callback function (PaStreamCallback *)
-			userdata
-		);
-
-		mOpen = (paNoError == data.mErrNum);
-	}
+	mOpen = (paNoError == data.mErrNum);
 
 	printError("Error in al::AudioIO::open()");
-	return paNoError == data.mErrNum;
+	return mOpen;
 }
 
 bool AudioBackend::close() {
 	auto& data = backendData<AudioBackendData>();
-	data.mErrNum = paNoError;
-	if (mOpen) data.mErrNum = Pa_CloseStream(data.mStream);
+	data.mErrNum = Pa_CloseStream(data.mStream);
 	if (paNoError == data.mErrNum) {
 		mOpen = false;
 		mRunning = false;
 	}
-	return paNoError == data.mErrNum;
+	return !mOpen;
 }
 
 bool AudioBackend::start(int framesPerSecond, int framesPerBuffer, void *userdata) {
 	auto& data = backendData<AudioBackendData>();
-	data.mErrNum = paNoError;
-	if (!isOpen()) {
-		open(framesPerSecond, framesPerBuffer, userdata);
-	}
-	if (isOpen() && !isRunning()) data.mErrNum = Pa_StartStream(data.mStream);
+	data.mErrNum = Pa_StartStream(data.mStream);
 	if (paNoError == data.mErrNum) mRunning = true;
 	printError("Error in AudioIO::start()");
-	return (paNoError == data.mErrNum);
+	return mRunning;
 }
 
 bool AudioBackend::stop() {
 	auto& data = backendData<AudioBackendData>();
-	data.mErrNum = paNoError;
-	if (mRunning) {
-		data.mErrNum = Pa_StopStream(data.mStream);
-	}
+	data.mErrNum = Pa_StopStream(data.mStream);
 	if (paNoError == data.mErrNum) mRunning = false;
-	return paNoError == data.mErrNum;
+	return !mRunning;
 }
 
 double AudioBackend::cpu() {
@@ -980,10 +968,6 @@ bool AudioBackend::close(){
 }
 
 bool AudioBackend::start(int framesPerSecond, int framesPerBuffer, void *userdata){
-	if(!isOpen()){ // TODO: should the backend really be doing this?
-		open(framesPerSecond, framesPerBuffer, userdata);
-	}
-
 	auto& data = backendData<AudioBackendData>();
 	SDL_PauseAudioDevice(data.devOut, SDL_FALSE);
 	//SDL_PauseAudioDevice(data.devIn , SDL_FALSE); // TODO
@@ -1321,16 +1305,15 @@ int AudioIO::channelsOutDevice() const {
 	return (int)mBackend->outDeviceChans();
 }
 
-bool AudioIO::close() {
-	if (mBackend != nullptr) {
-		return mBackend->close();
-	} else {
-		return true;
-	}
+bool AudioIO::open() {
+	if(mBackend->isOpen()) return true;
+	return mBackend->open(mFramesPerSecond, mFramesPerBuffer, this);
 }
 
-bool AudioIO::open() {
-	return mBackend->open(mFramesPerSecond, mFramesPerBuffer, this);
+bool AudioIO::close() {
+	if(!mBackend->isOpen()) return true;
+	if(!stop()) return false;
+	return mBackend->close();
 }
 
 void AudioIO::reopen() {
@@ -1341,6 +1324,23 @@ void AudioIO::reopen() {
 		close();
 		open();
 	}
+}
+
+bool AudioIO::start() {
+	if(mBackend->isRunning()) return true;
+
+	if(!mBackend->isOpen()){
+		if(!open()){
+			return false;
+		}
+	}
+	return mBackend->start(mFramesPerSecond, mFramesPerBuffer, this);
+}
+
+bool AudioIO::stop() {
+	if(!mBackend->isRunning()) return true;
+
+	return mBackend->stop();
 }
 
 void AudioIO::resizeBuffer(bool forOutput) {
@@ -1378,12 +1378,6 @@ void AudioIO::framesPerBuffer(int n) {
 	}
 }
 
-bool AudioIO::start() {
-	return mBackend->start(mFramesPerSecond, mFramesPerBuffer, this);
-}
-
-bool AudioIO::stop() { return mBackend->stop(); }
-
 bool AudioIO::supportsFPS(double fps) { return mBackend->supportsFPS(fps); }
 
 void AudioIO::print() const {
@@ -1406,15 +1400,14 @@ void AudioIO::print() const {
 	printf("Frames/Buf:  %d\n", mFramesPerBuffer);
 }
 
-// void AudioIO::processAudio(){ frame(0); if(callback) callback(*this); }
+
 void AudioIO::processAudio() {
 	frame(0);
-	if (callback) callback(*this);
+	if(callback) callback(*this);
 
-	std::vector<AudioCallback *>::iterator iter = mAudioCallbacks.begin();
-	while (iter != mAudioCallbacks.end()) {
+	for(auto * cb : mAudioCallbacks){
 		frame(0);
-		(*iter++)->onAudioCB(*this);
+		cb->onAudioCB(*this);
 	}
 }
 
