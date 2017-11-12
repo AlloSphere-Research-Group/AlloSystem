@@ -145,10 +145,10 @@ Main::Main()
 	mIntervalActual(0.01),
 	mLogicalTime(0),
 	mCPU(0),
-	mDriver(Main::SLEEP),
 	mActive(false)
 {
 	for(auto& v : mInited) v = false;
+	driver(Main::DEFAULT);
 }
 
 Main::~Main() {
@@ -164,6 +164,15 @@ Main::~Main() {
 
 Main& Main::driver(Driver v) {
 	//if (mDriver != GLUT) mDriver = v;
+
+	if(v == Main::DEFAULT){
+		#ifdef __EMSCRIPTEN__
+		v = NATIVE;
+		#else
+		v = SLEEP;
+		#endif
+	}
+
 	if(!mInited[v]){
 		switch(v){
 			case GLUT: al_main_glut_init(); break;

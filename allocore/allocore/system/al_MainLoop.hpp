@@ -69,7 +69,8 @@ public:
 
 	/// Main loop driver
 	enum Driver {
-		SLEEP = 0,	///< Uses platform-specific sleep function
+		DEFAULT = 0,///< Use an appropriate default driver (usually SLEEP)
+		SLEEP,		///< Uses platform-specific sleep function
 		GLUT,		///< GLUT (forced by Window using GLUT backend)
 		NATIVE,		///< Use platform specific run loop
 		NUM_DRIVERS
@@ -94,7 +95,7 @@ public:
 
 	/// Stop the main loop
 
-	/// This releases control of the current thread where it was start(ed)
+	/// This releases control of the current thread where it was start()ed
 	/// and stops the clock-driven scheduler. In some implementations
 	/// (e.g. GLUT), it may exit the application.
 	void stop();
