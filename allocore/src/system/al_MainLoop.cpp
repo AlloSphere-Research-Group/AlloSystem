@@ -137,6 +137,8 @@ Main::Handler :: ~Handler() {
 
 ////////////////////////////////////////////////////////////////
 
+al_sec timeInSec(){ return al_steady_time(); }
+
 Main::Main()
 :	mT0(timeInSec()), mT1(0),
 	mInterval(0.01),
@@ -173,6 +175,15 @@ Main& Main::driver(Driver v) {
 
 	mDriver = v;
 	return *this;
+}
+
+Main& Main::interval(al_sec v) {
+	mInterval = v > 0.001 ? v : 0.001;
+	return *this;
+}
+
+al_sec Main::realtime() {
+	return timeInSec() - get().mT0;
 }
 
 void Main::tick() {
