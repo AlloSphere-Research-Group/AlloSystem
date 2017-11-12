@@ -12,7 +12,25 @@ extern "C" void al_main_native_attach(al_sec interval);
 extern "C" void al_main_native_enter(al_sec interval);
 extern "C" void al_main_native_stop();
 
-#ifdef AL_LINUX
+#ifdef __EMSCRIPTEN__
+	#include <emscripten.h>
+
+	extern "C" void al_main_native_init(){}
+	extern "C" void al_main_native_attach(al_sec interval){}
+	extern "C" void al_main_native_enter(al_sec interval){
+		// If fps<=0, uses the browser’s requestAnimationFrame mechanism
+		// to call the function.
+		int fps = int(1./interval);
+		emscripten_set_main_loop(
+			[](){ al::Main::get().tick(); },
+			fps, 1
+		);
+	}
+	extern "C" void al_main_native_stop(){
+		emscripten_cancel_main_loop();
+	}
+
+#elif defined AL_LINUX
 	extern "C" void al_main_native_init(){
 		AL_WARN("Linux native loop not yet implemented");
 	}
