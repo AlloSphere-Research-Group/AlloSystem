@@ -146,13 +146,18 @@ Main::Main()
 	mDriver(Main::SLEEP),
 	mActive(false)
 {
-	for(unsigned i=0; i<NUM_DRIVERS; ++i){
-		mInited[i] = false;
-	}
+	for(auto& v : mInited) v = false;
 }
 
 Main::~Main() {
 	Main::exit();
+}
+
+/*static*/ Main& Main::get() {
+	// This has to be dynamically allocated,
+	// otherwise it can get destroyed at some random time
+	static Main * gMain = new Main;
+	return *gMain;
 }
 
 Main& Main::driver(Driver v) {
@@ -189,21 +194,6 @@ void Main::tick() {
 	// running average:
 	mCPU += 0.1 * (used - mCPU);
 }
-
-Main& Main::get() {
-	// This has to be dynamically allocated,
-	// otherwise it can get destroyed at some random time
-	static Main * gMain = new Main;
-	return *gMain;
-}
-
-struct ForceMainThreadMain {
-	ForceMainThreadMain() {
-		Main::get();
-	}
-};
-
-static ForceMainThreadMain fmtm;
 
 void Main::start() {
 	if (!mActive) {
