@@ -181,11 +181,7 @@ void Main::tick() {
 	mQueue.update(mLogicalTime);
 
 	// call tick handlers...
-	std::vector<Handler *>::iterator it = mHandlers.begin();
-	while(it != mHandlers.end()){
-		(*it)->onTick();
-		++it;
-	}
+	for(auto * h : mHandlers) h->onTick();
 
 	// measure CPU usage:
 	al_sec t2 = timeInSec();
@@ -246,11 +242,7 @@ void Main::stop() {
 
 void Main::exit() {
 	// call exit handlers...
-	std::vector<Handler *>::iterator it = mHandlers.begin();
-	while(it != mHandlers.end()){
-		(*it)->onExit();
-		++it;
-	}
+	for(auto * h : mHandlers) h->onExit();
 }
 
 
@@ -262,7 +254,7 @@ Main& Main::add(Main::Handler& v) {
 }
 
 Main& Main::remove(Main::Handler& v) {
-	std::vector<Handler *>::iterator it = std::find(mHandlers.begin(), mHandlers.end(), &v);
+	auto it = std::find(mHandlers.begin(), mHandlers.end(), &v);
 	if (it != mHandlers.end()) {
 		mHandlers.erase(it);
 	}
