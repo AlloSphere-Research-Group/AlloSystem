@@ -179,8 +179,6 @@ public:
 	Quat operator * (const Quat& v) const { return Quat(*this)*=v; }
 	Quat operator * (const    T& v) const { return Quat(*this)*=v; }
 
-	template <class U>
-	Quat& operator  =(const Quat<U>& v){ return set(v); }
 	Quat& operator  =(const    T& v){ return set(v); }
 	Quat& operator +=(const Quat& v){ w+=v.w; x+=v.x; y+=v.y; z+=v.z; return *this; }
 	Quat& operator +=(const    T& v){ w+=  v; x+=  v; y+=  v; z+=  v; return *this; }
