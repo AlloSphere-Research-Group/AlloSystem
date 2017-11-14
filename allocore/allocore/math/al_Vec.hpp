@@ -210,7 +210,6 @@ public:
 	//--------------------------------------------------------------------------
 	// Basic Arithmetic Operations
 
-	Vec& operator  =(const Vec& v){ return set(v); }
 	Vec& operator  =(const   T& v){ return set(v); }
 	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
 	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
