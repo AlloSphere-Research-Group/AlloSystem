@@ -617,6 +617,34 @@ inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Ve
 	n.normalize();
 }
 
+/// Returns element with minimum value
+template <int N, class T>
+inline const T& min(const Vec<N,T>& v){
+	int j = 0;
+	for(int i=1; i<N; ++i){
+		if(v[i] < v[j]) j=i;
+	}
+	return v[j];
+}
+template <int N, class T>
+inline T& min(Vec<N,T>& v){
+	return const_cast<T&>(min(static_cast<const Vec<N,T>&>(v)));
+}
+
+/// Returns element with maximum value
+template <int N, class T>
+inline const T& max(const Vec<N,T>& v){
+	int j = 0;
+	for(int i=1; i<N; ++i){
+		if(v[i] > v[j]) j=i;
+	}
+	return v[j];
+}
+template <int N, class T>
+inline T& max(Vec<N,T>& v){
+	return const_cast<T&>(max(static_cast<const Vec<N,T>&>(v)));
+}
+
 /// Returns vector containing element-wise minimum between two vectors
 template <int N, class T>
 inline Vec<N,T> min(const Vec<N,T>& a, const Vec<N,T>& b){
