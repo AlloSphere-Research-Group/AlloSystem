@@ -689,6 +689,29 @@ bool invert(Mat<N,T>& m){
 	return false;
 }
 
+/// Get rotation matrix that rotates one unit vector onto another
+
+/// @param[in] from		Unit vector to rotate from
+/// @param[in] to		Unit vector to rotate onto
+template <class T>
+Mat<3,T> rotation(const Vec<3,T>& from, const Vec<3,T>& to){
+	// From https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
+	auto n = cross(from, to); // normal to plane of rotation
+	auto cosAng = from.dot(to);
+
+	if(cosAng == T(-1)){ // vectors point in opposite directions?
+		return Mat<3,T>(T(-1)); // reflection
+	}
+
+	// Skew-symmetric cross-product matrix: A^T = -A
+	Mat<3,T> ssc(
+		T(0),-n.z,  n.y,
+		 n.z, T(0),-n.x,
+		-n.y, n.x,  T(0)
+	);
+	return Mat<3,T>(T(1)) + ssc + ssc*ssc*(T(1)/(T(1)+cosAng));
+}
+
 
 //----------------------------
 // Member function definitions
