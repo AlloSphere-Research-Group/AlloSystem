@@ -97,6 +97,11 @@ public:
 	template <class U>
 	Mat(const Mat<N,U>& src){ set(src.elems()); }
 
+	template <int M, class U>
+	Mat(const Mat<M,U>& src){
+		*this = src;
+	}
+
 	/// Construct without initializing elements
 	Mat(const MatNoInit& v){}
 
@@ -320,6 +325,20 @@ public:
 		return r;
 	}
 
+	/// Set elements from different sized matrix
+
+	/// Only the corresponding elements are copied from the source. Extra
+	/// elements in the destination are set according to the identity matrix.
+	template <int M, class U>
+	Mat& operator = (const Mat<M,U>& v){
+		setIdentity(); // this could perhaps be done more efficiently
+		constexpr auto L = N<M ? N : M;
+		for(int r=0; r<L; ++r)
+			for(int c=0; c<L; ++c)
+				(*this)(c,r) = v(c,r);
+		return *this;
+	}
+
 	/// Set all elements to value
 	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
 
@@ -401,8 +420,13 @@ public:
 
 	/// Set elements on diagonal to one and all others to zero
 	Mat& setIdentity(){
+		return diagonal(T(1));
+	}
+
+	/// Set elements on diagonal to a value and all others to zero
+	Mat& diagonal(T v){
 		for(int i=0; i<N; ++i)
-			(*this)[i*(N+1)] = T(1);
+			(*this)[i*(N+1)] = v;
 
 		for(int i=0;   i<N-1  ; ++i){
 		for(int j=i+1; j<N+i+1; ++j){
@@ -410,7 +434,6 @@ public:
 		}}
 		return *this;
 	}
-
 
 
 	//--------------------------------------------------------------------------
