@@ -89,6 +89,9 @@ public:
 	/// Default constructor that initializes elements to zero
 	Mat(){ set(T(0)); }
 
+	/// Construct without initializing elements
+	Mat(const MatNoInit& v){}
+
 	/// @param[in] arr	one dimensional array in column-major
 	template <class U>
 	Mat(const U * arr){ set(arr); }
@@ -102,8 +105,14 @@ public:
 		*this = src;
 	}
 
-	/// Construct without initializing elements
-	Mat(const MatNoInit& v){}
+	/// Create diagonal matrix
+
+	/// Sets the diagonal elements to the input value and all other elements
+	/// to zero. The identity matrix is created by passing in a value of 1.
+	/// @param[in] diag		The value to place on the diagonal
+	Mat(const T& diag){
+		diagonal(diag);
+	}
 
 	/// 2x2 matrix constructor with element initialization
 	Mat(
