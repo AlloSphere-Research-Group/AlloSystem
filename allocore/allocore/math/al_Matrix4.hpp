@@ -57,6 +57,8 @@ typedef Matrix4<float>	Matrix4f;	///< Single-precision 4-by-4 matrix
 
 
 /// 4x4 Matrix (Homogenous Transform)
+
+/// All functions operate according to a right-handed coordinate system.
 ///
 /// @ingroup allocore
 template<typename T=double>
@@ -383,48 +385,32 @@ public:
 						0,		0,		0,		1	);
 	}
 
-	/// Get a viewing matrix based on an eye reference frame
+	/// Get a view matrix based on an eye reference frame
 
-	/// @param[in] ur		eye right unit direction vector
-	/// @param[in] uu		eye up unit direction vector
-	/// @param[in] uf		eye forward unit direction vector
+	/// @param[in] ur		eye right direction unit vector
+	/// @param[in] uu		eye up direction unit vector
+	/// @param[in] ub		eye backward direction unit vector
 	/// @param[in] eyePos	eye position
-	static Matrix4 lookAt(const Vec<3,T>& ur, const Vec<3,T>& uu, const Vec<3,T>& uf, const Vec<3,T>& eyePos) {
+	static Matrix4 lookAt(const Vec<3,T>& ur, const Vec<3,T>& uu, const Vec<3,T>& ub, const Vec<3,T>& eyePos) {
 		return Matrix4(
-			 ur[0], ur[1], ur[2], -(ur.dot(eyePos)),
-			 uu[0], uu[1], uu[2], -(uu.dot(eyePos)),
-			 uf[0], uf[1], uf[2], -(uf.dot(eyePos)),
+			ur[0], ur[1], ur[2], -(ur.dot(eyePos)),
+			uu[0], uu[1], uu[2], -(uu.dot(eyePos)),
+			ub[0], ub[1], ub[2], -(ub.dot(eyePos)),
 			0, 0, 0, 1
 		);
 	}
 
-	/// Get a viewing matrix based on look-at parameters
+	/// Get a view matrix based on look-at parameters
 
 	/// @param[in] eyePos	eye position
 	/// @param[in] at		point being looked at
 	/// @param[in] up		up vector
 	static Matrix4 lookAt(const Vec<3,T>& eyePos, const Vec<3,T>& at, const Vec<3,T>& up) {
-		Vec<3,T> z = (at - eyePos).normalize();
-		Vec<3,T> y = up; y.normalize();
-		Vec<3,T> x = cross(z, up).normalize();
-		return lookAt(x, y, -z, eyePos);
+		const auto ub = (eyePos - at).normalize();
+		const auto ur = cross(up, ub).normalize();
+		const auto uu = cross(ub, ur);
+		return lookAt(ur, uu, ub, eyePos);
 	}
-
-//	static Matrix4 lookAtRH(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos) {
-//		return Matrix4(
-//					   ux[0], ux[1], ux[2], -(ux.dot(pos)),
-//					   uy[0], uy[1], uy[2], -(uy.dot(pos)),
-//					   uz[0],uz[1],uz[2],  -(uz.dot(pos)),
-//					   0, 0, 0, 1
-//					   );
-//	}
-//
-//	static Matrix4 lookAtRH(const Vec<3,T>& eye, const Vec<3,T>& at, const Vec<3,T>& up) {
-//		Vec<3,T> z = (at - eye).normalize();
-//		Vec<3,T> x = cross(up, z);
-//		Vec<3,T> y = cross(z, x);
-//		return lookAt(x, y, z, eye);
-//	}
 
 	/// Get a left-eye viewing matrix
 	static Matrix4 lookAtLeft(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep) {
