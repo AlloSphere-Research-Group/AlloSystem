@@ -720,20 +720,31 @@ void invertRigid(Mat<N,T>& m){
 template <class T>
 Mat<3,T> rotation(const Vec<3,T>& from, const Vec<3,T>& to){
 	// From https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
-	auto n = cross(from, to); // normal to plane of rotation
 	auto cosAng = from.dot(to);
 
 	if(cosAng == T(-1)){ // vectors point in opposite directions?
 		return Mat<3,T>(T(-1)); // reflection
 	}
 
+	auto n = cross(from, to); // normal to plane of rotation
+
 	// Skew-symmetric cross-product matrix: A^T = -A
-	Mat<3,T> ssc(
+	/*Mat<3,T> ssc(
 		T(0),-n.z,  n.y,
 		 n.z, T(0),-n.x,
 		-n.y, n.x,  T(0)
 	);
-	return Mat<3,T>(T(1)) + ssc + ssc*ssc*(T(1)/(T(1)+cosAng));
+	return Mat<3,T>(T(1)) + ssc + ssc*ssc*(T(1)/(T(1)+cosAng));*/
+
+	// Much faster version of above
+	auto s = T(1)/(T(1)+cosAng);
+	auto sx=s*n.x, sy=s*n.y, sz=s*n.z;
+	auto sxx=sx*n.x, sxy=sx*n.y, szx=sx*n.z, syy=sy*n.y, syz=sy*n.z, szz=sz*n.z;
+	return Mat<3,T>(
+		T(1)-syy-szz, sxy-n.z, szx+n.y,
+		sxy+n.z, T(1)-szz-sxx, syz-n.x,
+		szx-n.y, syz+n.x, T(1)-sxx-syy
+	);
 }
 
 
