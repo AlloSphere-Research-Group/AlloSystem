@@ -59,6 +59,8 @@ typedef Quat<double>	Quatd;	///< Double-precision quaternion
 
 
 /// Quaternion
+
+/// coordinate system.
 ///
 /// @ingroup allocore
 template<typename T=double>
@@ -626,43 +628,64 @@ inline void Quat<T> :: toEuler(T& az, T& el, T& ba) const {
 	//*/
 }
 
+/*
+A 3x3 rotation matrix from a quaternion 'q' is given by
+
+	[ 1 - sy - sz    sxy - swz      sxz + swy	]
+	[											]
+	[ sxy + swz      1 - sx - sz    syz - swx	]
+	[											]
+	[ sxz - swy      syz + swx      1 - sx - sy	]
+
+where s=2/|q|^2 for |q|!=0 and s=0 for |q|=0. For a unit quaternion, s=2.
+*/
+
+template<typename T>
+inline void Quat<T> :: toVectorX(T& ax, T& ay, T& az) const {
+	const T s = T(2); // divide by magSqr() to generalize to any quat
+	ax = T(1) - s*(y*y + z*z);
+	ay = s*(x*y + z*w);
+	az = s*(x*z - y*w);
+}
+
+template<typename T>
+inline void Quat<T> :: toVectorY(T& ax, T& ay, T& az) const {
+	const T s = T(2); // divide by magSqr() to generalize to any quat
+	ax = s*(x*y - z*w);
+	ay = T(1) - s*(x*x + z*z);
+	az = s*(y*z + x*w);
+}
+
+template<typename T>
+inline void Quat<T> :: toVectorZ(T& ax, T& ay, T& az) const {
+	const T s = T(2); // divide by magSqr() to generalize to any quat
+	ax = s*(x*z + y*w);
+	ay = s*(y*z - x*w);
+	az = T(1) - s*(x*x + y*y);
+}
+
 template<typename T>
 void Quat<T>::toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {
-	static const T _2 = T(2);
-	static const T _1 = T(1);
-	T	_2w=_2*w, _2x=_2*x, _2y=_2*y;
-	T	wx=_2w*x, wy=_2w*y, wz=_2w*z, xx=_2x*x, xy=_2x*y,
-		xz=_2x*z, yy=_2y*y, yz=_2y*z, zz=_2*z*z;
+	// Note: For efficiency, this does not use the toVector* functions as you
+	// might expect. By doing it this way, we reduce 27 muls to 12 muls.
+	const T s = T(2); // divide by magSqr() to generalize to any quat
+	const T sw=s*w, sx=s*x, sy=s*y,
+			wx=sw*x, wy=sw*y, wz=sw*z, 
+			xx=sx*x, xy=sx*y, xz=sx*z,
+			yy=sy*y, yz=sy*z, zz=s*z*z;
 
-	ux[0] =-zz - yy + _1;
+	ux[0] = T(1) - zz - yy;
 	ux[1] = wz + xy;
 	ux[2] = xz - wy;
 
 	uy[0] = xy - wz;
-	uy[1] =-zz - xx + _1;
+	uy[1] = T(1) - zz - xx;
 	uy[2] = wx + yz;
 
 	uz[0] = wy + xz;
 	uz[1] = yz - wx;
-	uz[2] =-yy - xx + _1;
+	uz[2] = T(1) - yy - xx;
 }
-
-/*
-Quat to matrix:
-RHCS
-	[ 1 - 2y - 2z    2xy + 2wz      2xz - 2wy	]
-	[											]
-	[ 2xy - 2wz      1 - 2x - 2z    2yz + 2wx	]
-	[											]
-	[ 2xz + 2wy      2yz - 2wx      1 - 2x - 2y	]
-
-LHCS
-	[ 1 - 2y - 2z    2xy - 2wz      2xz + 2wy	]
-	[											]
-	[ 2xy + 2wz      1 - 2x - 2z    2yz - 2wx	]
-	[											]
-	[ 2xz - 2wy      2yz + 2wx      1 - 2x - 2y	]
-*/
 
 template<typename T>
 void Quat<T> :: toMatrix(T * m) const {
@@ -680,31 +703,10 @@ void Quat<T> :: toMatrixTransposed(T * m) const {
 	Vec<3,T> ux,uy,uz;
 	toCoordinateFrame(ux,uy,uz);
 
-	m[ 0] = ux[0];	m[ 1] = uy[0];	m[ 2] = uz[0];	m[ 3] = 0;
-	m[ 4] = ux[1];	m[ 5] = uy[1];	m[ 6] = uz[1];	m[ 7] = 0;
-	m[ 8] = ux[2];	m[ 9] = uy[2];	m[10] = uz[2];	m[11] = 0;
-	m[12] = 0;		m[13] = 0;		m[14] = 0;		m[15] = 1;
-}
-
-template<typename T>
-inline void Quat<T> :: toVectorX(T& ax, T& ay, T& az) const {
-	ax = 1.0 - 2.0*y*y - 2.0*z*z;
-	ay = 2.0*x*y + 2.0*z*w;
-	az = 2.0*x*z - 2.0*y*w;
-}
-
-template<typename T>
-inline void Quat<T> :: toVectorY(T& ax, T& ay, T& az) const {
-	ax = 2.0*x*y - 2.0*z*w;
-	ay = 1.0 - 2.0*x*x - 2.0*z*z;
-	az = 2.0*y*z + 2.0*x*w;
-}
-
-template<typename T>
-inline void Quat<T> :: toVectorZ(T& ax, T& ay, T& az) const {
-	ax = 2.0*x*z + 2.0*y*w;
-	ay = 2.0*y*z - 2.0*x*w;
-	az = 1.0 - 2.0*x*x - 2.0*y*y;
+	m[ 0] = ux[0];	m[ 1] = uy[0];	m[ 2] = uz[0];	m[ 3] = T(0);
+	m[ 4] = ux[1];	m[ 5] = uy[1];	m[ 6] = uz[1];	m[ 7] = T(0);
+	m[ 8] = ux[2];	m[ 9] = uy[2];	m[10] = uz[2];	m[11] = T(0);
+	m[12] = T(0);	m[13] = T(0);	m[14] = T(0);	m[15] = T(1);
 }
 
 /*
