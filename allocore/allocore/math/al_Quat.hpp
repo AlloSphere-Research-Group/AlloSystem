@@ -60,7 +60,7 @@ typedef Quat<double>	Quatd;	///< Double-precision quaternion
 
 /// Quaternion
 
-/// coordinate system.
+/// Conversions to and from matrices assume a right-handed coordinate system.
 ///
 /// @ingroup allocore
 template<typename T=double>
