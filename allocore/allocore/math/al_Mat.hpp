@@ -689,6 +689,30 @@ bool invert(Mat<N,T>& m){
 	return false;
 }
 
+/// Invert a proper rigid transformation matrix (rotation + translation)
+
+/// This can be used to convert between camera and view matrices.
+///
+template <int N, class T>
+void invertRigid(Mat<N,T>& m){
+	// Given A = T * R, A^-1 = R^-1 * T^-1
+
+	// Compute inverse translation T^-1
+	T it[N-1];
+	for(int i=0; i<N-1; ++i)
+		it[i] = -(m.col(i).dot(m.col(N-1)));
+
+	for(int r=0; r<N-1; ++r)
+		m(r,N-1) = it[r];
+
+	// Transpose rotation part to get R^-1
+	for(int c=0; c<N-1; ++c){
+		for(int r=c+1; r<N-1; ++r){
+			std::swap(m(r,c), m(c,r));
+		}
+	}
+}
+
 /// Get rotation matrix that rotates one unit vector onto another
 
 /// @param[in] from		Unit vector to rotate from
