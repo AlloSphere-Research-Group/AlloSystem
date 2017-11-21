@@ -376,7 +376,7 @@ public:
 		return pow(r, T(1)/p);
 	}
 
-	/// Return 1-norm of elements
+	/// Return 1-norm of elements (sum of absolute values)
 	T norm1() const { return sumAbs(); }
 
 	/// Return 2-norm of elements
@@ -396,7 +396,7 @@ public:
 		return r;
 	}
 
-	/// Returns sum of absolute value of elements
+	/// Returns sum of absolute value of elements (1-norm)
 	T sumAbs() const {
 		T r = abs((*this)[0]);
 		for(int i=1; i<N; ++i){ r += abs((*this)[i]); }
@@ -411,22 +411,35 @@ public:
 	/// Set magnitude (preserving direction)
 	Vec& mag(T v);
 
+	/// Set 1-norm of vector (sum of absolute values)
+
+	/// This is useful for when you need to ensure the sum of absolute values 
+	/// is equal to some value without changing the direction of the vector.
+	Vec& norm1(T v){
+		auto n1 = sumAbs();
+		if(n1 > T(0)) (*this) *= (v/n1);
+		return *this;
+	}
+
 	/// Negates all elements
 	Vec& negate(){
-		IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
+		for(auto& v:*this){ v = -v; } return *this;
+	}
 
-	/// Set magnitude to one without changing direction
+	/// Normalize magnitude (preserving direction)
 
-	/// @param[in] scale	amount to scale magnitude
+	/// @param[in] magVal	magnitude (1 is a standard normalization)
 	///
-	Vec& normalize(T scale=T(1));
+	Vec& normalize(T magVal=T(1)){
+		return mag(magVal);
+	}
 
-	/// Return closest vector lying on unit sphere
+	/// Return closest vector lying on a sphere
 
-	/// @param[in] scale	amount to scale magnitude of result
+	/// @param[in] magVal	magnitude (1 is a standard normalization)
 	///
-	Vec normalized(T scale=T(1)) const {
-		return Vec(*this).normalize(scale); }
+	Vec normalized(T magVal=T(1)) const {
+		return Vec(*this).normalize(magVal); }
 
 	/// Get projection of vector onto a unit vector
 	Vec projection(const Vec& u) const {
@@ -670,12 +683,6 @@ Vec<N,T>& Vec<N,T>::mag(T v){
 	}
 	return *this;
 }
-
-template <int N, class T>
-Vec<N,T>& Vec<N,T>::normalize(T scale){
-	return mag(scale);
-}
-
 
 template <typename T> const char* typeString();
 #define TypeString(A) template <> inline const char* typeString<A>() { return #A; }
