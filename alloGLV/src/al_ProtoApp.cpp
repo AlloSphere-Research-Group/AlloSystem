@@ -23,6 +23,7 @@ ProtoApp::ProtoApp()
 	mTopBar.paddingX(8);
 	//mTopBar.stretch(1,0);
 	//mTopBar.enable(glv::DrawBorder);
+	mAppLabel.stroke(1.8); // bold
 	mTopBar << mAppLabel << mGUI.detachedButton();
 	mGUI.detachedButton().disable(glv::DrawBack);
 
@@ -45,7 +46,7 @@ ProtoApp::ProtoApp()
 	mGUITable.enable(glv::DrawBack | glv::Controllable);
 	mGUITable.addHandler(glv::Event::MouseDrag, glv::Behavior::mouseMove);
 	mGUITable.arrangement(">");
-	mGUITable << mTopBar << new glv::Divider(1) << mParamPanel;
+	mGUITable << mTopBar /*<< new glv::Divider(3)*/ << mParamPanel;
 
 	mGUI.cloneStyle().colors().back.set(0,0,0,1);
 	mGUI.detachedButton().padding(4);

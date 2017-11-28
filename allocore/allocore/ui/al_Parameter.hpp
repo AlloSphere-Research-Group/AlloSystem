@@ -45,19 +45,20 @@
 #include <mutex>
 #include <atomic>
 #include <iostream>
+#include <float.h>
+
 #include "allocore/protocol/al_OSC.hpp"
+#include "allocore/math/al_Vec.hpp"
 
 namespace al
 {
 
 class Parameter;
 
-
-template<typename DataType = float>
 class OSCNotifier {
 public:
 	OSCNotifier();
-	~OSCNotifier();
+	virtual ~OSCNotifier();
 
 	/**
 	 * @brief addListener enables notifiying via OSC that a preset has changed
@@ -83,37 +84,17 @@ public:
 	 * then.
 	 *
 	 */
-	void notifyListeners(std::string OSCaddress, DataType value);
+	void notifyListeners(std::string OSCaddress, float value);
+
+	void notifyListeners(std::string OSCaddress, std::string value);
+	void notifyListeners(std::string OSCaddress, Vec3f value);
+	void notifyListeners(std::string OSCaddress, Vec4f value);
 
 protected:
 	std::mutex mListenerLock;
 	std::vector<osc::Send *> mOSCSenders;
 private:
 };
-
-// OSCNotifier implementation -------------------------------------------------
-
-template<typename DataType>
-OSCNotifier<DataType>::OSCNotifier() {}
-
-template<typename DataType>
-OSCNotifier<DataType>::~OSCNotifier() {
-	for(osc::Send *sender: mOSCSenders) {
-		delete sender;
-	}
-}
-
-template<typename DataType>
-void OSCNotifier<DataType>::notifyListeners(std::string OSCaddress, DataType value)
-{
-	mListenerLock.lock();
-	for(osc::Send *sender: mOSCSenders) {
-		sender->send(OSCaddress, (float) value);
-//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
-	}
-	mListenerLock.unlock();
-}
-
 
 template<class ParameterType>
 class ParameterWrapper{
@@ -145,7 +126,7 @@ public:
 	
 	ParameterWrapper(const ParameterWrapper& param);
 
-	~ParameterWrapper();
+	virtual ~ParameterWrapper();
 	
 	/**
 	 * @brief set the parameter's value
@@ -163,6 +144,16 @@ public:
 	 * recursion when a widget sets the parameter that then sets the widget.
 	 */
 	virtual void setNoCalls(ParameterType value, void *blockReceiver = NULL);
+
+	/**
+	 * @brief set the parameter's value forcing a lock
+	 */
+	inline void setLocking(ParameterType value)
+	{
+		mMutex.lock();
+		mValue = value;
+		mMutex.unlock();
+	}
 
 	/**
 	 * @brief get the parameter's value
@@ -248,7 +239,11 @@ public:
 		return paramVector;
 	}
 
-	const ParameterType operator= (const ParameterType value) { this->set(value); return value; }
+	// Allow automatic conversion to the data type
+	// this allows e.g. float value = parameter;
+	operator ParameterType() { return this->get();}
+
+	ParameterWrapper<ParameterType> operator= (const ParameterType value) { this->set(value); return *this; }
 	
 protected:
 	ParameterType mMin;
@@ -421,7 +416,131 @@ private:
 	float mFloatValue;
 };
 
+// These three types are blocking, should not be used in time-critical contexts
+// like the audio callback. The classes were explicitly defined to overcome
+// the issues related to the > and < operators needed when validating minumum
+// and maximum values for the parameter
+class ParameterString: public ParameterWrapper<std::string>
+{
+public:
+	ParameterString(std::string parameterName, std::string Group,
+	              std::string  defaultValue,
+	              std::string prefix = "") :
+	    ParameterWrapper<std::string>(parameterName, Group, defaultValue, prefix)
+	{ }
 
+	virtual void set(std::string value) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		setLocking(value);
+		for(size_t i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this,  mCallbackUdata[i], NULL);
+			}
+		}
+	}
+
+	virtual void setNoCalls(std::string value, void *blockReceiver) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		if (blockReceiver) {
+			for(size_t i = 0; i < mCallbacks.size(); ++i) {
+				if (mCallbacks[i]) {
+					mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+				}
+			}
+		}
+		setLocking(value);
+	}
+};
+
+class ParameterVec3: public ParameterWrapper<al::Vec3f>
+{
+public:
+	ParameterVec3(std::string parameterName, std::string Group,
+	              al::Vec3f defaultValue,
+	              std::string prefix = "") :
+	    ParameterWrapper<al::Vec3f>(parameterName, Group, defaultValue, prefix)
+	{ }
+
+	virtual void set(Vec3f value) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		setLocking(value);
+		for(size_t i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this,  mCallbackUdata[i], NULL);
+			}
+		}
+	}
+
+	virtual void setNoCalls(Vec3f value, void *blockReceiver) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		if (blockReceiver) {
+			for(size_t i = 0; i < mCallbacks.size(); ++i) {
+				if (mCallbacks[i]) {
+					mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+				}
+			}
+		}
+		setLocking(value);
+	}
+
+	ParameterVec3 operator=(const Vec3f vec) {this->set(vec); return *this;}
+
+	float operator[](size_t index) { Vec3f vec = this->get(); return vec[index];}
+};
+
+class ParameterVec4: public ParameterWrapper<al::Vec4f>
+{
+public:
+	ParameterVec4(std::string parameterName, std::string Group,
+	              al::Vec4f defaultValue,
+	              std::string prefix = "") :
+	    ParameterWrapper<al::Vec4f>(parameterName, Group, defaultValue, prefix)
+	{ }
+
+	virtual void set(Vec4f value) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		setLocking(value);
+		for(size_t i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this,  mCallbackUdata[i], NULL);
+			}
+		}
+	}
+
+	virtual void setNoCalls(Vec4f value, void *blockReceiver) override
+	{
+		if (mProcessCallback) {
+			value = mProcessCallback(value, mProcessUdata);
+		}
+		if (blockReceiver) {
+			for(size_t i = 0; i < mCallbacks.size(); ++i) {
+				if (mCallbacks[i]) {
+					mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+				}
+			}
+		}
+		setLocking(value);
+	}
+
+	ParameterVec4 operator=(const Vec4f vec) {this->set(vec); return *this;}
+
+	float operator[](size_t index) { Vec4f vec = this->get(); return vec[index];}
+};
 
 /**
  * @brief The ParameterServer class creates an OSC server to receive parameter values
@@ -431,7 +550,7 @@ private:
  *
  * @ingroup allocore
  */
-class ParameterServer : public osc::PacketHandler, public OSCNotifier<float>
+class ParameterServer : public osc::PacketHandler, public OSCNotifier
 {
 	friend class PresetServer; // To be able to take over the OSC server
 public:
@@ -462,6 +581,36 @@ public:
 	 */
 	void unregisterParameter(Parameter &param);
 
+    /**
+	 * Register a string parameter with the server.
+	 */
+	ParameterServer &registerParameter(ParameterString &param);
+
+	/**
+	 * Remove a string parameter from the server.
+	 */
+	void unregisterParameter(ParameterString &param);
+
+	/**
+	 * Register a Vec3 parameter with the server.
+	 */
+	ParameterServer &registerParameter(ParameterVec3 &param);
+
+	/**
+	 * Remove a Vec3 parameter from the server.
+	 */
+	void unregisterParameter(ParameterVec3 &param);
+
+	/**
+	 * Register a Vec4 parameter with the server.
+	 */
+	ParameterServer &registerParameter(ParameterVec4 &param);
+
+	/**
+	 * Remove a Vec4 parameter from the server.
+	 */
+	void unregisterParameter(ParameterVec4 &param);
+
 	/**
 	 * @brief print prints information about the server to std::out
 	 *
@@ -490,6 +639,24 @@ public:
 	/// Register parameter using the streaming operator
 	ParameterServer &operator << (Parameter* newParam){ return registerParameter(*newParam); }
 
+    /// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterString& newParam){ return registerParameter(newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterString* newParam){ return registerParameter(*newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterVec3& newParam){ return registerParameter(newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterVec3* newParam){ return registerParameter(*newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterVec4& newParam){ return registerParameter(newParam); }
+
+	/// Register generic parameter using the streaming operator
+	ParameterServer &operator << (ParameterVec4* newParam){ return registerParameter(*newParam); }
+
 	/**
 	 * @brief Append a listener to the osc server.
 	 * @param handler
@@ -505,14 +672,19 @@ public:
 
 protected:
 	static void changeCallback(float value, void *sender, void *userData, void *blockThis);
+	static void changeStringCallback(std::string value, void *sender, void *userData, void *blockThis);
+	static void changeVec3Callback(Vec3f value, void *sender, void *userData, void *blockThis);
+	static void changeVec4Callback(Vec4f value, void *sender, void *userData, void *blockThis);
 
 private:
 	std::vector<osc::PacketHandler *> mPacketHandlers;
 	osc::Recv *mServer;
 	std::vector<Parameter *> mParameters;
-	std::mutex mParameterLock;
+	std::vector<ParameterString *> mStringParameters;
+	std::vector<ParameterVec3 *> mVec3Parameters;
+	std::vector<ParameterVec4 *> mVec4Parameters;
+    std::mutex mParameterLock;
 };
-
 
 // Implementations -----------------------------------------------------------
 
@@ -607,9 +779,9 @@ void ParameterWrapper<ParameterType>::set(ParameterType value)
 	mMutex.lock();
 	mValue = value;
 	mMutex.unlock();
-	for(int i = 0; i < mCallbacks.size(); ++i) {
+	for(size_t i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
-			mCallbacks[i](value, (void *) this,  mCallbackUdata[i], NULL);
+			mCallbacks[i](value, this,  mCallbackUdata[i], NULL);
 		}
 	}
 }
@@ -624,7 +796,7 @@ void ParameterWrapper<ParameterType>::setNoCalls(ParameterType value, void *bloc
 	}
 
 	if (blockReceiver) {
-		for(int i = 0; i < mCallbacks.size(); ++i) {
+		for(size_t i = 0; i < mCallbacks.size(); ++i) {
 			if (mCallbacks[i]) {
 				mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
 			}
@@ -634,6 +806,8 @@ void ParameterWrapper<ParameterType>::setNoCalls(ParameterType value, void *bloc
 	mValue = value;
 	mMutex.unlock();
 }
+
+
 
 template<class ParameterType>
 ParameterType ParameterWrapper<ParameterType>::get()

@@ -127,6 +127,14 @@ public:
 	 */
 	std::string recallPreset(int index);
 
+	void recallPresetSynchronous(std::string name);
+
+	/**
+	 * @brief recall immediately (not using the morph thread)
+	 * @param index
+	 */
+	std::string recallPresetSynchronous(int index);
+
 	/**
 	 * @brief Set parameters to values interpolated between two presets
 	 * @param index1 index of the first preset
@@ -245,7 +253,7 @@ private:
 	std::string mCurrentPresetName;
 };
 
-class PresetServer : public osc::PacketHandler, public OSCNotifier<>
+class PresetServer : public osc::PacketHandler, public OSCNotifier
 {
 public:
 	/**

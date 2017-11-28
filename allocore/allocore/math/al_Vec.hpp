@@ -210,7 +210,6 @@ public:
 	//--------------------------------------------------------------------------
 	// Basic Arithmetic Operations
 
-	Vec& operator  =(const Vec& v){ return set(v); }
 	Vec& operator  =(const   T& v){ return set(v); }
 	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
 	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
@@ -230,6 +229,8 @@ public:
 	Vec operator / (const Vec& v) const { return Vec(*this) /= v; }
 	Vec operator / (const   T& v) const { return Vec(*this) /= v; }
 	Vec operator - () const { return Vec(*this).negate(); }
+	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
+	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
 
 	/// Set elements from another vector
 	template <class T2>
@@ -607,6 +608,34 @@ template <class T>
 inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Vec<3,T>& p3){
 	cross(n, p2-p1, p3-p1);
 	n.normalize();
+}
+
+/// Returns element with minimum value
+template <int N, class T>
+inline const T& min(const Vec<N,T>& v){
+	int j = 0;
+	for(int i=1; i<N; ++i){
+		if(v[i] < v[j]) j=i;
+	}
+	return v[j];
+}
+template <int N, class T>
+inline T& min(Vec<N,T>& v){
+	return const_cast<T&>(min(static_cast<const Vec<N,T>&>(v)));
+}
+
+/// Returns element with maximum value
+template <int N, class T>
+inline const T& max(const Vec<N,T>& v){
+	int j = 0;
+	for(int i=1; i<N; ++i){
+		if(v[i] > v[j]) j=i;
+	}
+	return v[j];
+}
+template <int N, class T>
+inline T& max(Vec<N,T>& v){
+	return const_cast<T&>(max(static_cast<const Vec<N,T>&>(v)));
 }
 
 /// Returns vector containing element-wise minimum between two vectors

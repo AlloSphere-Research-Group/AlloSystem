@@ -120,6 +120,9 @@ std::vector<std::string> al::PresetSequencer::getSequenceList()
 	if (mPresetHandler) {
 		path = mPresetHandler->getCurrentPath();
 	}
+    if (!File::isDirectory(path)) {
+        Dir::make(path, true);
+    }
 	Dir presetDir(path);
 	while(presetDir.read()) {
 		FileInfo info = presetDir.entry();
@@ -136,10 +139,6 @@ std::vector<std::string> al::PresetSequencer::getSequenceList()
 
 void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 {
-	if (sequencer->mPresetHandler == nullptr) {
-		std::cerr << "No preset handler registered. Can't run sequencer." << std::endl;
-		return;
-	}
 	{
 		std::lock_guard<std::mutex> lk(sequencer->mPlayWaitLock);
 		if (sequencer->mBeginCallbackEnabled && sequencer->mBeginCallback != nullptr) {
@@ -153,27 +152,56 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 	auto targetTime = sequenceStart;
 	while(sequencer->running() && sequencer->mSteps.size() > 0) {
 		Step &step = sequencer->mSteps.front();
-		sequencer->mPresetHandler->setMorphTime(step.delta);
-		sequencer->mPresetHandler->recallPreset(step.presetName);
-		std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
-		//		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - sequenceStart).count()/1000.0 << std::endl;
-		float totalWaitTime = step.delta + step.duration;
-		targetTime += std::chrono::microseconds((int) (totalWaitTime*1.0e6 - (granularity * 1.5 * 1.0e3)));
+		if (step.type == PRESET) {
+			if (sequencer->mPresetHandler) {
+				sequencer->mPresetHandler->setMorphTime(step.delta);
+				sequencer->mPresetHandler->recallPreset(step.presetName);
+			} else {
+				std::cerr << "No preset handler registered. Ignoring preset change." << std::endl;
+			}
+//			std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
+//			std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - sequenceStart).count() / 1000.0 << std::endl;
+			float totalWaitTime = step.delta + step.duration;
+			targetTime += std::chrono::microseconds((int) (totalWaitTime*1.0e6 - (granularity * 1.5 * 1.0e3)));
 
-		while (std::chrono::high_resolution_clock::now() < targetTime) { // Granularity to allow more responsive stopping of composition playback
-		  //std::cout << std::chrono::high_resolution_clock::to_time_t(targetTime)
-		//	    << "---" << std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now()) << std::endl;
-			std::this_thread::sleep_for(std::chrono::milliseconds(granularity));
-			if (sequencer->mRunning == false) {
-				targetTime = std::chrono::high_resolution_clock::now();
-				break;
+			while (std::chrono::high_resolution_clock::now() < targetTime) { // Granularity to allow more responsive stopping of composition playback
+				//std::cout << std::chrono::high_resolution_clock::to_time_t(targetTime)
+				//	    << "---" << std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now()) << std::endl;
+				std::this_thread::sleep_for(std::chrono::milliseconds(granularity));
+				if (sequencer->mRunning == false) {
+					targetTime = std::chrono::high_resolution_clock::now();
+					break;
+				}
+			}
+		} else if (step.type == EVENT) {
+			float totalWaitTime = step.delta + step.duration;
+			targetTime += std::chrono::microseconds((int) (totalWaitTime*1.0e6 - (granularity * 1.5 * 1.0e3)));
+
+			while (std::chrono::high_resolution_clock::now() < targetTime) { // Granularity to allow more responsive stopping of composition playback
+				//std::cout << std::chrono::high_resolution_clock::to_time_t(targetTime)
+				//	    << "---" << std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now()) << std::endl;
+				std::this_thread::sleep_for(std::chrono::milliseconds(granularity));
+				if (sequencer->mRunning == false) {
+					targetTime = std::chrono::high_resolution_clock::now();
+					break;
+				}
+			}
+			if (sequencer->mRunning) {
+				for (auto eventCallback: sequencer->mEventCallbacks) {
+					if (eventCallback.eventName == step.presetName) {
+						eventCallback.callback(eventCallback.callbackData, step.params);
+						break;
+					}
+				}
 			}
 		}
 		sequencer->mSteps.pop();
-		std::this_thread::sleep_until(targetTime);
+//		std::this_thread::sleep_until(targetTime);
 		// std::this_thread::sleep_for(std::chrono::duration<float>(totalWaitTime));
 	}
-	sequencer->mPresetHandler->stopMorph();
+	if (sequencer->mPresetHandler) {
+		sequencer->mPresetHandler->stopMorph();
+	}
 //	std::cout << "Sequence finished." << std::endl;
 	sequencer->mRunning = false;
 	sequencer->mSequenceLock.unlock();
@@ -215,7 +243,20 @@ std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequ
 		std::getline(ss, delta, ':');
 		std::getline(ss, duration, ':');
 		std::cout << line << std::endl;
-		if (name.size() > 0 && name[0] != '#') {
+		if (name.size() > 0 && name[0] == '@') {
+			Step step;
+			step.type = EVENT;
+			step.presetName = name.substr(1); // chop initial '@'
+			step.delta = std::stof(delta);
+			step.duration = std::stof(duration);
+
+			//FIXME allow any number or parameters
+			std::string next;
+			std::getline(ss, next, ':');
+			step.params.push_back(std::stof(next));
+			steps.push(step);
+//			 std::cout << name  << ":" << delta << ":" << duration << std::endl;
+		} else if (name.size() > 0 && name[0] != '#') {
 			Step step;
 			step.presetName = name;
 			step.delta = std::stof(delta);
@@ -228,6 +269,18 @@ std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequ
 		std::cout << "Error reading:" << sequenceName << std::endl;
 	}
 	return steps;
+}
+
+void PresetSequencer::registerEventCommand(std::string eventName,
+                                           std::function<void (void *, std::vector<float> &params)> callback,
+                                           void *data)
+{
+	EventCallback cb;
+	cb.eventName = eventName;
+	cb.callback = callback;
+	cb.callbackData = data;
+
+	mEventCallbacks.push_back(cb);
 }
 
 void PresetSequencer::registerBeginCallback(std::function<void(PresetSequencer *sender, void *userData)> beginCallback,

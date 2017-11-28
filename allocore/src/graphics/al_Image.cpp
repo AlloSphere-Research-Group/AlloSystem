@@ -23,9 +23,7 @@ namespace al{
 
 class FreeImageImpl : public Image::Impl {
 public:
-	FreeImageImpl()
-	:	mImage(NULL)
-	{
+	FreeImageImpl(){
 		// Initialization singleton
 		struct Init{
 			Init(){ FreeImage_Initialise(); }
@@ -55,32 +53,32 @@ public:
 		}
 
 		destroy();
-		mImage = FreeImage_Load(type, filename.c_str(), 0);
-		if (mImage == NULL) {
+		mFIBitmap = FreeImage_Load(type, filename.c_str(), 0);
+		if (mFIBitmap == NULL) {
 			AL_WARN("image failed to load: %s", filename.c_str());
 			return false;
 		}
 
-		FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(mImage);
+		FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(mFIBitmap);
 		switch(colorType) {
 			case FIC_MINISBLACK:
 			case FIC_MINISWHITE: {
-					FIBITMAP *res = FreeImage_ConvertToGreyscale(mImage);
-					FreeImage_Unload(mImage);
-					mImage = res;
+					FIBITMAP *res = FreeImage_ConvertToGreyscale(mFIBitmap);
+					FreeImage_Unload(mFIBitmap);
+					mFIBitmap = res;
 				}
 				break;
 
 			case FIC_PALETTE: {
-					if(FreeImage_IsTransparent(mImage)) {
-						FIBITMAP *res = FreeImage_ConvertTo32Bits(mImage);
-						FreeImage_Unload(mImage);
-						mImage = res;
+					if(FreeImage_IsTransparent(mFIBitmap)) {
+						FIBITMAP *res = FreeImage_ConvertTo32Bits(mFIBitmap);
+						FreeImage_Unload(mFIBitmap);
+						mFIBitmap = res;
 					}
 					else {
-						FIBITMAP *res = FreeImage_ConvertTo24Bits(mImage);
-						FreeImage_Unload(mImage);
-						mImage = res;
+						FIBITMAP *res = FreeImage_ConvertTo24Bits(mFIBitmap);
+						FreeImage_Unload(mFIBitmap);
+						mFIBitmap = res;
 					}
 				}
 				break;
@@ -96,7 +94,7 @@ public:
 		}
 
 		// flip vertical for OpenGL:
-		//FreeImage_FlipVertical(mImage);
+		//FreeImage_FlipVertical(mFIBitmap);
 
 		//Freeimage is not tightly packed, so we use
 		//a custom method instead of one of the Matrix
@@ -113,7 +111,7 @@ public:
 				char *o_pix = (char *)(arr.data.ptr);
 				int rowstride = arr.stride(1);
 				for(unsigned j = 0; j < arr.dim(1); ++j) {
-					char *pix = (char *)FreeImage_GetScanLine(mImage, j);
+					char *pix = (char *)FreeImage_GetScanLine(mFIBitmap, j);
 					memcpy(o_pix, pix, rowstride);
 					o_pix += rowstride;
 				}
@@ -127,7 +125,7 @@ public:
 						int rowstride = arr.stride(1);
 
 						for(unsigned j = 0; j < arr.dim(1); ++j) {
-							RGBTRIPLE * pix = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
+							RGBTRIPLE * pix = (RGBTRIPLE *)FreeImage_GetScanLine(mFIBitmap, j);
 							Image::RGBPix<uint8_t> *o_pix = (Image::RGBPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < arr.dim(0); ++i) {
 								o_pix[i].r = pix[i].rgbtRed;
@@ -143,7 +141,7 @@ public:
 						int rowstride = arr.stride(1);
 
 						for(unsigned j = 0; j < arr.dim(1); ++j) {
-							char *pix = (char *)FreeImage_GetScanLine(mImage, j);
+							char *pix = (char *)FreeImage_GetScanLine(mFIBitmap, j);
 							memcpy(o_pix, pix, rowstride);
 							o_pix += rowstride;
 						}
@@ -163,7 +161,7 @@ public:
 						char *bp = (char *)(arr.data.ptr);
 						int rowstride = arr.stride(1);
 						for(unsigned j = 0; j < arr.dim(1); ++j) {
-							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
+							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mFIBitmap, j);
 							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < arr.dim(0); ++i) {
 								o_pix[i].r = pix[i].rgbRed;
@@ -179,7 +177,7 @@ public:
 						char *o_pix = (char *)(arr.data.ptr);
 						int rowstride = arr.stride(1);
 						for(unsigned j = 0; j < arr.dim(1); ++j) {
-							char *pix = (char *)FreeImage_GetScanLine(mImage, j);
+							char *pix = (char *)FreeImage_GetScanLine(mFIBitmap, j);
 							memcpy(o_pix, pix, rowstride);
 							o_pix += rowstride;
 						}
@@ -201,10 +199,10 @@ public:
 
 
 	void resize(int w, int h, int bpp){
-		if(NULL != mImage){ // already allocated image?
-			int oldw = FreeImage_GetWidth(mImage);
-			int oldh = FreeImage_GetHeight(mImage);
-			int oldbpp = FreeImage_GetBPP(mImage);
+		if(NULL != mFIBitmap){ // already allocated image?
+			int oldw = FreeImage_GetWidth(mFIBitmap);
+			int oldh = FreeImage_GetHeight(mFIBitmap);
+			int oldbpp = FreeImage_GetBPP(mFIBitmap);
 			// re-allocate only if dimensions have changed
 			if(oldw != w || oldh != h || oldbpp != bpp){
 				destroy();
@@ -218,12 +216,12 @@ public:
 					1-, 4-, 8-, 16-, 24-, 32-bit per pixel for standard bitmap
 			*/
 			//printf("FreeImage_AllocateT(%d, %d, %d)\n", w,h,bpp);
-			mImage = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp);
+			mFIBitmap = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp);
 		}
 	}
 
 
-	virtual bool save(const std::string& filename, const Array& arr, int compressFlags) {
+	virtual bool save(const std::string& filename, const Array& arr, int compressFlags, int paletteSize) {
 
 		// check existing image type
 		FREE_IMAGE_FORMAT fileType = FreeImage_GetFIFFromFilename(filename.c_str());
@@ -250,7 +248,7 @@ public:
 
 		resize(w,h,bpp);
 
-		if (mImage == NULL) {
+		if (mFIBitmap == NULL) {
 			AL_WARN("image could not be understood");
 			return false;
 		}
@@ -268,7 +266,7 @@ public:
 						char *bp = (char *)(arr.data.ptr);
 						for(unsigned j = 0; j < h; ++j) {
 							memcpy(
-								FreeImage_GetScanLine(mImage, j),
+								FreeImage_GetScanLine(mFIBitmap, j),
 								bp + j*rowstride,
 								w
 							);
@@ -290,7 +288,7 @@ public:
 						char *bp = (char *)(arr.data.ptr);
 						for(unsigned j = 0; j < h; ++j) {
 							memcpy(
-								FreeImage_GetScanLine(mImage, j),
+								FreeImage_GetScanLine(mFIBitmap, j),
 								bp + j*rowstride,
 								w*2
 							);
@@ -316,7 +314,7 @@ public:
 						char *bp = (char *)(arr.data.ptr);
 
 						for(unsigned j = 0; j < h; ++j) {
-							RGBTRIPLE * dst = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
+							RGBTRIPLE * dst = (RGBTRIPLE *)FreeImage_GetScanLine(mFIBitmap, j);
 							const Image::RGBPix<uint8_t> * src = (const Image::RGBPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < w; ++i) {
 								dst[i].rgbtRed  = src[i].r;
@@ -342,7 +340,7 @@ public:
 						char *bp = (char *)(arr.data.ptr);
 
 						for(unsigned j = 0; j < h; ++j) {
-							RGBQUAD * dst = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
+							RGBQUAD * dst = (RGBQUAD *)FreeImage_GetScanLine(mFIBitmap, j);
 							const Image::RGBAPix<uint8_t> * src = (const Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < w; ++i) {
 								dst[i].rgbRed     = src[i].r;
@@ -413,14 +411,22 @@ public:
 			flags = 0;
 		}
 
-		return FreeImage_Save(fileType, mImage, filename.c_str(), flags);
+		auto * outputBitmap = mFIBitmap;
+
+		if(paletteSize > 1){
+			outputBitmap = FreeImage_ColorQuantizeEx(mFIBitmap, FIQ_WUQUANT, paletteSize);
+		}
+
+		auto result = FreeImage_Save(fileType, outputBitmap, filename.c_str(), flags);
+		if(outputBitmap != mFIBitmap) FreeImage_Unload(outputBitmap);
+		return result;
 	}
 
 
 	void getDim(int &w, int &h) {
-		if(mImage) {
-			w = FreeImage_GetWidth(mImage);
-			h = FreeImage_GetHeight(mImage);
+		if(mFIBitmap) {
+			w = FreeImage_GetWidth(mFIBitmap);
+			h = FreeImage_GetHeight(mFIBitmap);
 		}
 		else {
 			w = h = 0;
@@ -429,12 +435,12 @@ public:
 
 	int getPlanes() const {
 		AlloTy type = getDataType();
-		BITMAPINFOHEADER * hdr = FreeImage_GetInfoHeader(mImage);
+		BITMAPINFOHEADER * hdr = FreeImage_GetInfoHeader(mFIBitmap);
 		return (hdr->biBitCount)/(8*allo_type_size(type));
 	}
 
 	AlloTy getDataType() const {
-		FREE_IMAGE_TYPE type = FreeImage_GetImageType(mImage);
+		FREE_IMAGE_TYPE type = FreeImage_GetImageType(mFIBitmap);
 		switch(type) {
 			case FIT_UINT32: return AlloUInt32Ty;
 			case FIT_INT32: return AlloSInt32Ty;
@@ -450,19 +456,17 @@ public:
 	}
 protected:
 	void destroy() {
-		if (mImage) FreeImage_Unload(mImage);
-		mImage = NULL;
+		if (mFIBitmap) FreeImage_Unload(mFIBitmap);
+		mFIBitmap = NULL;
 	}
 
-	FIBITMAP		*mImage;
+	FIBITMAP * mFIBitmap = NULL;
 };
 
-Image :: Image()
-: mImpl(0), mCompression(50), mLoaded(false)
-{}
+Image :: Image(){
+}
 
-Image :: Image(const std::string& filename)
-: mImpl(0), mFilename(filename), mCompression(50), mLoaded(false) {
+Image :: Image(const std::string& filename){
 	load(filename);
 }
 
@@ -487,13 +491,13 @@ bool Image :: save(const std::string& filename) {
 //	// detect by file extension & redirect to appropriate implementation here:
 //	if (mImpl) delete mImpl;
 //	mImpl = new FreeImageImpl();
-	mLoaded = mImpl->save(filename, mArray, mCompression);
+	mLoaded = mImpl->save(filename, mArray, mCompression, mPaletteSize);
 	if (mLoaded) mFilename = filename;
 	return mLoaded;
 }
 
 /*static*/ bool Image::save(
-	const std::string& filePath, const Array& src, int compress
+	const std::string& filePath, const Array& src, int compress, int paletteSize
 ){
 	/*return save(
 		filePath,
@@ -506,6 +510,7 @@ bool Image :: save(const std::string& filename) {
 	a.configure(src.header); // copy over header information
 	a.data.ptr = src.data.ptr;
 	img.compression(compress);
+	img.paletteSize(paletteSize);
 	bool res = img.save(filePath);
 	a.data.ptr = NULL; // prevent ~Array from deleting data
 	return res;

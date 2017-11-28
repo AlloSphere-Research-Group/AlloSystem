@@ -192,6 +192,28 @@ al_nsec al_time_nsec(){			return al_system_time_nsec(); }
 
 namespace al {
 
+struct Date{
+	int year, month, day;
+};
+
+// z is number of days since 1970-01-01
+// From http://howardhinnant.github.io/date_algorithms.html
+Date daysToDate(int z){
+	Date date;
+	auto &y = date.year, &m = date.month, &d = date.day;
+	z += 719468;
+	const int era = (z >= 0 ? z : z - 146096) / 146097;
+	const unsigned doe = static_cast<unsigned>(z - era * 146097);          // [0, 146096]
+	const unsigned yoe = (doe - doe/1460 + doe/36524 - doe/146096) / 365;  // [0, 399]
+	y = static_cast<int>(yoe) + era * 400;
+	const unsigned doy = doe - (365*yoe + yoe/4 - yoe/100);                // [0, 365]
+	const unsigned mp = (5*doy + 2)/153;                                   // [0, 11]
+	d = doy - (153*mp+2)/5 + 1;                             // [1, 31]
+	m = mp + (mp < 10 ? 3 : -9);                            // [1, 12]
+	y = y + (m <= 2);
+	return date;
+}
+
 std::string toTimecode(al_nsec t, const std::string& format){
 	unsigned day = t/(al_nsec(1000000000) * 60 * 60 * 24); // basically for overflow
 	unsigned hrs = t/(al_nsec(1000000000) * 60 * 60) % 24;
@@ -206,13 +228,18 @@ std::string toTimecode(al_nsec t, const std::string& format){
 	for(unsigned i=0; i<format.size(); ++i){
 		const auto c = format[i];
 		switch(c){
-		case 'D': s << day; break;
+		case 'D':{
+			auto date = daysToDate(day);
+			s << std::setw(4) << date.year;
+			s << std::setw(2) << date.month;
+			s << std::setw(2) << date.day;
+		} break;
 		case 'H': s << std::setw(2) << hrs; break;
 		case 'M': s << std::setw(2) << min; break;
 		case 'S': s << std::setw(2) << sec; break;
 		case 'm': s << std::setw(3) << msc; break;
 		case 'u': s << std::setw(3) << usc; break;
-		default:  s << c;
+		default:  s << c; // delimiter
 		}
 	}
 

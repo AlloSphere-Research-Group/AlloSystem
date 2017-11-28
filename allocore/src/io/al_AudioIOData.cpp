@@ -9,6 +9,9 @@
 
 namespace al {
 
+template <class T>
+void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
+
 //==============================================================================
 
 AudioDeviceInfo::AudioDeviceInfo(int deviceNum)
@@ -17,14 +20,13 @@ AudioDeviceInfo::AudioDeviceInfo(int deviceNum)
 
 bool AudioDeviceInfo::valid() const { return true; }
 int AudioDeviceInfo::id() const { return mID; }
-const char *AudioDeviceInfo::name() const { return mName; }
+const std::string& AudioDeviceInfo::name() const { return mName; }
 int AudioDeviceInfo::channelsInMax() const { return mChannelsInMax; }
 int AudioDeviceInfo::channelsOutMax() const { return mChannelsOutMax; }
 double AudioDeviceInfo::defaultSampleRate() const { return mDefaultSampleRate; }
 
-void AudioDeviceInfo::setName(char *name) {
-	strncpy(mName, name, 127);
-	mName[127] = '\0';
+void AudioDeviceInfo::setName(const std::string& name) {
+	mName = name;
 }
 void AudioDeviceInfo::setID(int iD) { mID = iD; }
 void AudioDeviceInfo::setChannelsInMax(int num) { mChannelsInMax = num; }

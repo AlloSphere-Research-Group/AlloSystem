@@ -121,8 +121,14 @@ public:
 	/// Reset all buffers
 	Mesh& reset();
 
-	/// Scale all vertices to lie in [-1,1]
-	void unitize(bool proportional=true);
+	/// Scales vertices to lie in sphere
+	Mesh& fitToSphere(float radius=1);
+
+	/// Scales vertices to lie in cube
+	Mesh& fitToCube(float radius=1, bool proportional=true);
+
+	/// Scales vertices to lie in cube with extrema [-1,1]
+	Mesh& unitize(bool proportional=true);
 
 	/// Scale all vertices
 	Mesh& scale(float x, float y, float z);

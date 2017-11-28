@@ -99,6 +99,10 @@ public:
 	                         float presetLow, int noteLow,
 	                         float presetHigh = -1, int noteHigh = -1);
 
+	void connectProgramToPreset(int channel,
+	                            float presetLow, int programLow,
+	                            float presetHigh = -1, int programHigh = -1);
+
 	void setMorphControl(int controlNumber, int channel, float min, float max);
 
 	virtual void onMIDIMessage(const MIDIMessage& m) override;
@@ -107,6 +111,12 @@ private:
 
 	struct NoteBinding {
 		int noteNumber;
+		int channel;
+		int presetIndex;
+	};
+
+	struct ProgramBinding {
+		int programNumber;
 		int channel;
 		int presetIndex;
 	};
@@ -124,6 +134,7 @@ private:
 
 	MIDIIn mMidiIn;
 	std::vector<NoteBinding> mBindings;
+	std::vector<ProgramBinding> mProgramBindings;
 
 };
 

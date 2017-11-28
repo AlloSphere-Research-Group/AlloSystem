@@ -244,6 +244,49 @@ std::string PresetHandler::recallPreset(int index)
 	return "";
 }
 
+void PresetHandler::recallPresetSynchronous(std::string name)
+{
+	{
+		if (mMorphRemainingSteps.load() >= 0) {
+			mMorphRemainingSteps.store(-1);
+			std::lock_guard<std::mutex> lk(mTargetLock);
+		}
+		mTargetValues = loadPresetValues(name);
+	}
+	for (Parameter *param: mParameters) {
+		if (mTargetValues.find(param->getFullAddress()) != mTargetValues.end()) {
+			param->set(mTargetValues[param->getFullAddress()]);
+		}
+	}
+	int index = -1;
+	for (auto preset: mPresetsMap) {
+		if (preset.second == name) {
+			index = preset.first;
+			break;
+		}
+	}
+	mCurrentPresetName = name;
+	if (mUseCallbacks) {
+		for(int i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](index, this, mCallbackUdata[i]);
+			}
+		}
+	}
+}
+
+std::string PresetHandler::recallPresetSynchronous(int index)
+{
+	auto presetNameIt = mPresetsMap.find(index);
+	if (presetNameIt != mPresetsMap.end()) {
+		recallPresetSynchronous(presetNameIt->second);
+		return presetNameIt->second;
+	} else {
+		std::cout << "No preset index " << index << std::endl;
+	}
+	return "";
+}
+
 std::map<int, std::string> PresetHandler::availablePresets()
 {
 	return mPresetsMap;

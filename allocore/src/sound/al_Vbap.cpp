@@ -427,7 +427,7 @@ void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float 
 			float * outBuff1 = io.outBuffer(triple.s1Chan);
 			float * outBuff2 = io.outBuffer(triple.s2Chan);
 			float * outBuff3 = nullptr;
-			if(mIs3D) {
+			if(mIs3D){
 				outBuff3 = io.outBuffer(triple.s3Chan);
 			}
 
@@ -543,7 +543,7 @@ void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, const float 
 		io.out(triple.s2Chan,frameIndex) += sample * gains[1];
 	}
 	if(mIs3D){
-		if (it3 != mPhantomChannels.end()) {
+		if (it2 != mPhantomChannels.end()) {
 			float splitGain = gains[2]* gains[2] /2.0;
 			io.out(triple.s1Chan,frameIndex) += sample*splitGain;
 			io.out(triple.s2Chan,frameIndex) += sample*splitGain;
@@ -567,8 +567,7 @@ void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, const float 
 void Vbap::print() {
 	printf("Number of Triplets: %d\n", (int) mTriplets.size());
 	for (unsigned i = 0; i < mTriplets.size(); i++) {
-		printf("Triple #%02d: %d,%d,%d \n",i,mTriplets[i].s1Chan,mTriplets[i].s2Chan,mTriplets[i].s3Chan);
-		printf("    number: %d,%d,%d \n",mTriplets[i].s1,mTriplets[i].s2,mTriplets[i].s3);
+		printf("Triple #%d: %d,%d,%d \n",i,mTriplets[i].s1Chan,mTriplets[i].s2Chan,mTriplets[i].s3Chan);
 	}
 }
 
@@ -581,7 +580,6 @@ void Vbap::makeTriple(int s1, int s2, int s3)
 	triple.loadVectors(mSpeakers);
 	addTriple(triple);
 }
-
 std::vector<SpeakerTriple> Vbap::triplets() const
 {
 	return mTriplets;

@@ -25,7 +25,7 @@ public:
 
     // Load a .jpg file
     //
-    const char *filename = "../../share/images/tiny.jpg";
+    const char *filename = "Fotos/MO_05alpha.png";
 
     if (image.load(filename)) {
       printf("Read image from %s\n", filename);

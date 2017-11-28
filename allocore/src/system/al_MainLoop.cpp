@@ -12,7 +12,25 @@ extern "C" void al_main_native_attach(al_sec interval);
 extern "C" void al_main_native_enter(al_sec interval);
 extern "C" void al_main_native_stop();
 
-#ifdef AL_LINUX
+#ifdef __EMSCRIPTEN__
+	#include <emscripten.h>
+
+	extern "C" void al_main_native_init(){}
+	extern "C" void al_main_native_attach(al_sec interval){}
+	extern "C" void al_main_native_enter(al_sec interval){
+		// If fps<=0, uses the browser’s requestAnimationFrame mechanism
+		// to call the function.
+		int fps = int(1./interval);
+		emscripten_set_main_loop(
+			[](){ al::Main::get().tick(); },
+			fps, 1
+		);
+	}
+	extern "C" void al_main_native_stop(){
+		emscripten_cancel_main_loop();
+	}
+
+#elif defined AL_LINUX
 	extern "C" void al_main_native_init(){
 		AL_WARN("Linux native loop not yet implemented");
 	}
@@ -119,26 +137,42 @@ Main::Handler :: ~Handler() {
 
 ////////////////////////////////////////////////////////////////
 
+al_sec timeInSec(){ return al_steady_time(); }
+
 Main::Main()
 :	mT0(timeInSec()), mT1(0),
 	mInterval(0.01),
 	mIntervalActual(0.01),
 	mLogicalTime(0),
 	mCPU(0),
-	mDriver(Main::SLEEP),
 	mActive(false)
 {
-	for(unsigned i=0; i<NUM_DRIVERS; ++i){
-		mInited[i] = false;
-	}
+	for(auto& v : mInited) v = false;
+	driver(Main::DEFAULT);
 }
 
 Main::~Main() {
 	Main::exit();
 }
 
+/*static*/ Main& Main::get() {
+	// This has to be dynamically allocated,
+	// otherwise it can get destroyed at some random time
+	static Main * gMain = new Main;
+	return *gMain;
+}
+
 Main& Main::driver(Driver v) {
 	//if (mDriver != GLUT) mDriver = v;
+
+	if(v == Main::DEFAULT){
+		#ifdef __EMSCRIPTEN__
+		v = NATIVE;
+		#else
+		v = SLEEP;
+		#endif
+	}
+
 	if(!mInited[v]){
 		switch(v){
 			case GLUT: al_main_glut_init(); break;
@@ -152,6 +186,15 @@ Main& Main::driver(Driver v) {
 	return *this;
 }
 
+Main& Main::interval(al_sec v) {
+	mInterval = v > 0.001 ? v : 0.001;
+	return *this;
+}
+
+al_sec Main::realtime() {
+	return timeInSec() - get().mT0;
+}
+
 void Main::tick() {
 	al_sec t1 = timeInSec();
 	mLogicalTime = t1 - mT0;
@@ -163,11 +206,7 @@ void Main::tick() {
 	mQueue.update(mLogicalTime);
 
 	// call tick handlers...
-	std::vector<Handler *>::iterator it = mHandlers.begin();
-	while(it != mHandlers.end()){
-		(*it)->onTick();
-		++it;
-	}
+	for(auto * h : mHandlers) h->onTick();
 
 	// measure CPU usage:
 	al_sec t2 = timeInSec();
@@ -175,21 +214,6 @@ void Main::tick() {
 	// running average:
 	mCPU += 0.1 * (used - mCPU);
 }
-
-Main& Main::get() {
-	// This has to be dynamically allocated,
-	// otherwise it can get destroyed at some random time
-	static Main * gMain = new Main;
-	return *gMain;
-}
-
-struct ForceMainThreadMain {
-	ForceMainThreadMain() {
-		Main::get();
-	}
-};
-
-static ForceMainThreadMain fmtm;
 
 void Main::start() {
 	if (!mActive) {
@@ -228,11 +252,7 @@ void Main::stop() {
 
 void Main::exit() {
 	// call exit handlers...
-	std::vector<Handler *>::iterator it = mHandlers.begin();
-	while(it != mHandlers.end()){
-		(*it)->onExit();
-		++it;
-	}
+	for(auto * h : mHandlers) h->onExit();
 }
 
 
@@ -244,7 +264,7 @@ Main& Main::add(Main::Handler& v) {
 }
 
 Main& Main::remove(Main::Handler& v) {
-	std::vector<Handler *>::iterator it = std::find(mHandlers.begin(), mHandlers.end(), &v);
+	auto it = std::find(mHandlers.begin(), mHandlers.end(), &v);
 	if (it != mHandlers.end()) {
 		mHandlers.erase(it);
 	}
