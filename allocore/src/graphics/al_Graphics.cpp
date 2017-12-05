@@ -232,12 +232,12 @@ void Graphics::draw(int num_vertices, const Mesh& m){
 	draw(m, num_vertices);
 }
 
-void Graphics::draw(const Mesh& v, int count, int begin){
+void Graphics::draw(const Mesh& m, int count, int begin){
 
-	const int Nv = v.vertices().size();
+	const int Nv = m.vertices().size();
 	if(0 == Nv) return; // nothing to draw, so just return...
 
-	const int Ni = v.indices().size();
+	const int Ni = m.indices().size();
 
 	const int Nmax = Ni ? Ni : Nv;
 
@@ -254,32 +254,32 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 		count = Nmax - begin;
 	}
 
-	const int Nc = v.colors().size();
-	const int Nci= v.coloris().size();
-	const int Nn = v.normals().size();
-	const int Nt1= v.texCoord1s().size();
-	const int Nt2= v.texCoord2s().size();
-	const int Nt3= v.texCoord3s().size();
+	const int Nc = m.colors().size();
+	const int Nci= m.coloris().size();
+	const int Nn = m.normals().size();
+	const int Nt1= m.texCoord1s().size();
+	const int Nt2= m.texCoord2s().size();
+	const int Nt3= m.texCoord3s().size();
 
 	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
 
 	// Enable arrays and set pointers...
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, &v.vertices()[0]);
+	glVertexPointer(3, GL_FLOAT, 0, &m.vertices()[0]);
 
 	if(Nn >= Nv){
 		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
+		glNormalPointer(GL_FLOAT, 0, &m.normals()[0]);
 	}
 
 	if(Nc >= Nv){
 		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
+		glColorPointer(4, GL_FLOAT, 0, &m.colors()[0]);
 	}
 	else if(Nci >= Nv){
 		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_UNSIGNED_BYTE, 0, &v.coloris()[0]);
+		glColorPointer(4, GL_UNSIGNED_BYTE, 0, &m.coloris()[0]);
 		//printf("using integer colors\n");
 	}
 	else if(0 == Nc && 0 == Nci){
@@ -287,40 +287,46 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	}
 	else{
 		if(Nc)
-			//glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
-			glColor4fv(v.colors()[0].components);
+			//glColor4f(m.colors()[0][0], m.colors()[0][1], m.colors()[0][2], m.colors()[0][3]);
+			glColor4fv(m.colors()[0].components);
 		else
-			glColor3ubv(v.coloris()[0].components);
+			glColor3ubv(m.coloris()[0].components);
 	}
 
 	if(Nt1 >= Nv){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(1, GL_FLOAT, 0, &v.texCoord1s()[0]);
+		glTexCoordPointer(1, GL_FLOAT, 0, &m.texCoord1s()[0]);
 	}
 	else if(Nt2 >= Nv){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
+		glTexCoordPointer(2, GL_FLOAT, 0, &m.texCoord2s()[0]);
 	}
 	else if(Nt3 >= Nv){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
+		glTexCoordPointer(3, GL_FLOAT, 0, &m.texCoord3s()[0]);
+	}
+
+	auto prim = (Graphics::Primitive)m.primitive();
+
+	if(m.stroke() > 0.f){
+		switch(prim){
+		case LINES: case LINE_STRIP: case LINE_LOOP:
+			glLineWidth(m.stroke());
+			break;
+		case POINTS:
+			glPointSize(m.stroke());
+			break;
+		default:;
+		}
 	}
 
 	// Draw
 	if(Ni){
-		glDrawElements(
-			((Graphics::Primitive)v.primitive()),
-			count, // number of indexed elements to render
-			GL_UNSIGNED_INT,
-			&v.indices()[begin]
-		);
+		// Here, 'count' is the number of indexed elements to render
+		glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
 	}
 	else{
-		glDrawArrays(
-			((Graphics::Primitive)v.primitive()),
-			begin,
-			count
-		);
+		glDrawArrays(prim, begin, count);
 	}
 
 	// Disable arrays
