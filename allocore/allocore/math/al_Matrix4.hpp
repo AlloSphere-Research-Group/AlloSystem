@@ -392,12 +392,9 @@ public:
 	/// @param[in] ub		eye backward direction unit vector
 	/// @param[in] eyePos	eye position
 	static Matrix4 lookAt(const Vec<3,T>& ur, const Vec<3,T>& uu, const Vec<3,T>& ub, const Vec<3,T>& eyePos) {
-		return Matrix4(
-			ur[0], ur[1], ur[2], -(ur.dot(eyePos)),
-			uu[0], uu[1], uu[2], -(uu.dot(eyePos)),
-			ub[0], ub[1], ub[2], -(ub.dot(eyePos)),
-			0, 0, 0, 1
-		);
+		auto m = Matrix4(ur,uu,ub, eyePos);
+		invertRigid(m);
+		return m;
 	}
 
 	/// Get a view matrix based on look-at parameters
