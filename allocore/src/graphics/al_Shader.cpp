@@ -189,6 +189,34 @@ const ShaderProgram& ShaderProgram::detach(const Shader& s) const {
 	return *this;
 }
 const ShaderProgram& ShaderProgram::link(bool doValidate) const {
+	#if defined(GL_ARB_transform_feedback2) || defined(GL_ARB_transform_feedback3)
+		#define TRANSFORM_FEEDBACK_EXT "GL_ARB_transform_feedback2"
+		#define transformFeedbackVaryings glTransformFeedbackVaryings
+		#define INTERLEAVED_ATTRIBS GL_INTERLEAVED_ATTRIBS
+
+	#elif defined(GL_EXT_transform_feedback2) || defined(GL_EXT_transform_feedback3)
+		#define TRANSFORM_FEEDBACK_EXT "GL_EXT_transform_feedback2"
+		#define transformFeedbackVaryings glTransformFeedbackVaryingsEXT
+		#define INTERLEAVED_ATTRIBS GL_INTERLEAVED_ATTRIBS_EXT
+	#endif
+
+	if(!mTFVaryings.empty()){
+		#ifdef TRANSFORM_FEEDBACK_EXT
+			if(Graphics::extensionSupported(TRANSFORM_FEEDBACK_EXT)){
+				std::vector<const GLchar *> varyings;
+				for(unsigned i=0; i<mTFVaryings.size(); ++i)
+					varyings.push_back(mTFVaryings[i].c_str());
+				transformFeedbackVaryings(
+					id(), mTFVaryings.size(), &varyings[0], INTERLEAVED_ATTRIBS
+				);
+			} else {
+				AL_WARN_ONCE("Platform does not support transform feedback (" TRANSFORM_FEEDBACK_EXT ")");
+			}
+		#else
+			AL_WARN_ONCE("al::ShaderProgram built without support for transform feedback");
+		#endif
+	}
+
 	glLinkProgram(id());
 	if(doValidate) validateProgram();
 	return *this;
