@@ -241,6 +241,8 @@ public:
 	ShaderProgram& setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; return *this; }
 	ShaderProgram& setGeometryOutputVertices(unsigned i){ mOutVertices = i; return *this; }
 
+	std::vector<std::string>& transformFeedbackVaryings(){ return mTFVaryings; }
+	const std::vector<std::string>& transformFeedbackVaryings() const { return mTFVaryings; }
 
 	/// Print out all the input parameters to the shader
 	void listParams() const;
@@ -373,6 +375,7 @@ protected:
 	unsigned int mOutVertices;
 	std::string mVertSource, mFragSource, mGeomSource;
 	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
+	std::vector<std::string> mTFVaryings;
 	bool mActive;
 
 	virtual void get(int pname, void * params) const;
