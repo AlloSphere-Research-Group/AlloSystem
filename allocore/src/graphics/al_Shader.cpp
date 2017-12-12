@@ -189,13 +189,13 @@ const ShaderProgram& ShaderProgram::detach(const Shader& s) const {
 	return *this;
 }
 const ShaderProgram& ShaderProgram::link(bool doValidate) const {
-	#if defined(GL_ARB_transform_feedback2) || defined(GL_ARB_transform_feedback3)
-		#define TRANSFORM_FEEDBACK_EXT "GL_ARB_transform_feedback2"
+	#if defined(GL_ARB_transform_feedback) || defined(GL_ARB_transform_feedback2) || defined(GL_ARB_transform_feedback3)
+		#define TRANSFORM_FEEDBACK_EXT "GL_ARB_transform_feedback"
 		#define transformFeedbackVaryings glTransformFeedbackVaryings
 		#define INTERLEAVED_ATTRIBS GL_INTERLEAVED_ATTRIBS
 
-	#elif defined(GL_EXT_transform_feedback2) || defined(GL_EXT_transform_feedback3)
-		#define TRANSFORM_FEEDBACK_EXT "GL_EXT_transform_feedback2"
+	#elif defined(GL_EXT_transform_feedback) || defined(GL_EXT_transform_feedback2) || defined(GL_EXT_transform_feedback3)
+		#define TRANSFORM_FEEDBACK_EXT "GL_EXT_transform_feedback"
 		#define transformFeedbackVaryings glTransformFeedbackVaryingsEXT
 		#define INTERLEAVED_ATTRIBS GL_INTERLEAVED_ATTRIBS_EXT
 	#endif
