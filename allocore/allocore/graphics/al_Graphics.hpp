@@ -541,7 +541,7 @@ public:
 	static const std::string& extensions();
 
 	/// Perform a check at run-time to see if an extension is supported
-	static bool extensionSupported(const std::string& name);
+	static bool extensionSupported(const std::string& name, bool exactMatch=false);
 
 	/// Returns number of components for given color type
 	static int numComponents(Format v);

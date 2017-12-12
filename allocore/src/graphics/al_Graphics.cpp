@@ -146,23 +146,23 @@ bool Graphics::error(const char * msg, int ID){
 	return str;
 }
 
-/*static*/ bool Graphics::extensionSupported(const std::string& name){
+/*static*/ bool Graphics::extensionSupported(const std::string& name, bool exactMatch){
 	static std::map<std::string, bool> extMap;
 
 	// First check for extension in the map...
-	const auto nameDelim = name + " ";
-	auto it = extMap.find(nameDelim);
+	const auto searchTerm = name + (exactMatch?" ":"");
+	auto it = extMap.find(searchTerm);
 	if(it != extMap.end()){
 		return it->second;
 	}
 
 	// Extension not in map, so search string and cache the result
 	else{
-		if(extensions().find(nameDelim) != std::string::npos){
-			extMap[nameDelim] = true;
+		if(extensions().find(searchTerm) != std::string::npos){
+			extMap[searchTerm] = true;
 			return true;
 		} else {
-			extMap[nameDelim] = false;
+			extMap[searchTerm] = false;
 			return false;
 		}
 	}
