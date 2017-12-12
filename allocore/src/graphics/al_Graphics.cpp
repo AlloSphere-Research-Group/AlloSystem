@@ -1,10 +1,5 @@
-//#include <vector>
-//#include <map>
-//#include <string>
+#include <map>
 #include <stdio.h>
-
-#include "allocore/system/al_Printing.hpp"
-#include "allocore/types/al_Array.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
 namespace al{
@@ -140,6 +135,38 @@ bool Graphics::error(const char * msg, int ID){
 	return false;
 }
 
+/*static*/ const std::string& Graphics::extensions(){
+	static bool getExts = true;
+	static std::string str;
+	if(getExts){ // Get extensions string (once)
+		str = (const char *)glGetString(GL_EXTENSIONS);
+		str += " ";
+		getExts = false;
+	}
+	return str;
+}
+
+/*static*/ bool Graphics::extensionSupported(const std::string& name){
+	static std::map<std::string, bool> extMap;
+
+	// First check for extension in the map...
+	const auto nameDelim = name + " ";
+	auto it = extMap.find(nameDelim);
+	if(it != extMap.end()){
+		return it->second;
+	}
+
+	// Extension not in map, so search string and cache the result
+	else{
+		if(extensions().find(nameDelim) != std::string::npos){
+			extMap[nameDelim] = true;
+			return true;
+		} else {
+			extMap[nameDelim] = false;
+			return false;
+		}
+	}
+}
 
 void Graphics::antialiasing(AntiAliasMode v){
 	glHint(GL_POINT_SMOOTH_HINT, v);

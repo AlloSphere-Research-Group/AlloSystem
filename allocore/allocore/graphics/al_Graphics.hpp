@@ -44,13 +44,13 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include <string>
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
 #include "allocore/system/al_Printing.hpp"
-
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
@@ -540,6 +540,12 @@ public:
 	/// \returns the error string or an empty string if no error
 	///
 	static const char * errorString(bool verbose=false);
+
+	/// Get a space-separated list of extensions
+	static const std::string& extensions();
+
+	/// Perform a check at run-time to see if an extension is supported
+	static bool extensionSupported(const std::string& name);
 
 	/// Returns number of components for given color type
 	static int numComponents(Format v);
