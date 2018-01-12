@@ -185,9 +185,9 @@ elif uname -o | grep "Msys"; then
 			PKG=apr-1.3.6-iconv-1.2.1-util-1.3.8-win32-x86-msvcrt60
 			DIR=$PWD
 			cd /tmp
-				#wget http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
-				#wget http://www.powertech.no/apache/dist/apr/binaries/win32/$PKG.zip
-				wget http://archive.apache.org/dist/apr/binaries/win32/$PKG.zip
+				#wget --no-check-certificate http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
+				#wget --no-check-certificate http://www.powertech.no/apache/dist/apr/binaries/win32/$PKG.zip
+				wget --no-check-certificate http://archive.apache.org/dist/apr/binaries/win32/$PKG.zip
 				unzip -q $PKG
 				mv apr-dist "$PKG"
 				cp $PKG/bin/libapr-1.dll		$DESTDIR/bin/
@@ -218,7 +218,7 @@ elif uname -o | grep "Msys"; then
 			PKG=freetype-2.3.5-1-bin
 			DIR=$PWD
 			cd /tmp
-				wget http://downloads.sourceforge.net/project/gnuwin32/freetype/2.3.5-1/$PKG.zip
+				wget --no-check-certificate http://downloads.sourceforge.net/project/gnuwin32/freetype/2.3.5-1/$PKG.zip
 				unzip -q $PKG -d $PKG
 				cp $PKG/bin/freetype*.dll $DESTDIR/bin/
 				cp $PKG/lib/libfreetype.dll.a $DESTDIR/lib/
@@ -238,7 +238,7 @@ elif uname -o | grep "Msys"; then
 			PKG=FreeImage3160Win32
 			DIR=$PWD
 			cd /tmp
-				wget http://downloads.sourceforge.net/project/freeimage/Binary%20Distribution/3.16.0/$PKG.zip
+				wget --no-check-certificate http://downloads.sourceforge.net/project/freeimage/Binary%20Distribution/3.16.0/$PKG.zip
 				unzip -q $PKG
 				mv FreeImage $PKG
 				cp $PKG/Dist/FreeImage.dll $DESTDIR/bin/
@@ -266,8 +266,8 @@ elif uname -o | grep "Msys"; then
 			#PKG=assimp-3.1.1-win-binaries
 			DIR=$PWD
 			cd /tmp
-				wget -nc http://downloads.sourceforge.net/project/assimp/assimp-3.0/$PKG.zip
-				#wget -nc http://downloads.sourceforge.net/project/assimp/assimp-3.1/$PKG.zip
+				wget --no-check-certificate -nc http://downloads.sourceforge.net/project/assimp/assimp-3.0/$PKG.zip
+				#wget --no-check-certificate -nc http://downloads.sourceforge.net/project/assimp/assimp-3.1/$PKG.zip
 				unzip -q $PKG
 
 				# 3.0.1270
@@ -292,7 +292,7 @@ elif uname -o | grep "Msys"; then
 		else
 			# These MSVC binaries don't work with MinGW/Msys :(
 			#PKG=glew-1.9.0-win32
-			#wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+			#wget --no-check-certificate http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
 			#unzip $PKG.zip
 			#mv glew-1.9.0 $PKG
 			#cp $PKG/bin/*.dll $DESTDIR/bin/
@@ -302,7 +302,7 @@ elif uname -o | grep "Msys"; then
 			PKG=glew-$GLEW_VERSION
 			DIR=$PWD
 			cd /tmp
-				wget http://downloads.sourceforge.net/project/glew/glew/$GLEW_VERSION/$PKG.zip
+				wget --no-check-certificate http://downloads.sourceforge.net/project/glew/glew/$GLEW_VERSION/$PKG.zip
 				unzip -q $PKG
 				cd $PKG
 					make install GLEW_DEST=$DESTDIR
@@ -320,7 +320,7 @@ elif uname -o | grep "Msys"; then
 			PKG=glutdlls37beta
 			DIR=$PWD
 			cd /tmp
-				wget --no-check-certificate https://www.opengl.org/resources/libraries/glut/$PKG.zip
+				wget --no-check-certificate --no-check-certificate https://www.opengl.org/resources/libraries/glut/$PKG.zip
 				unzip -q $PKG -d $PKG
 				install -d $DESTDIR/include/GL/
 				cp $PKG/glut.h $DESTDIR/include/GL/
