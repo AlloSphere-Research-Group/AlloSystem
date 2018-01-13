@@ -402,7 +402,7 @@ bool Window::implCreate(){
 		fullScreen(fs);
 	}
 
-	#ifdef EMSCRIPTEN
+	#ifdef __EMSCRIPTEN__
 	{
 		int infiniteLoop = 1;
 		int fps = asap() ? -1 : fps();
