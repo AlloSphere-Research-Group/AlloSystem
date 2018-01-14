@@ -53,12 +53,14 @@ struct WsInit{
 	}
 };
 
-static const wchar_t * errorString(){
-	static wchar_t s[4096];
-	FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
-					NULL, WSAGetLastError(),
-					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-					s, sizeof(s), NULL);
+const char * errorString(){
+	static char s[4096];
+	FormatMessage(
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, WSAGetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		s, sizeof(s), NULL
+	);
 	return s;
 }
 
@@ -183,7 +185,7 @@ public:
 			s.copy(portAsString, s.size());
 		}
 		if(0 !=	getaddrinfo(addr, portAsString, &hints, &mAddrInfo)){
-			AL_WARN("failed to resolve %s:%i: %S", address.c_str(), port, errorString());
+			AL_WARN("failed to resolve %s:%i: %s", address.c_str(), port, errorString());
 			close();
 			return false;
 		}
@@ -192,7 +194,7 @@ public:
 		// Create socket
 		mSocket = socket(mAddrInfo->ai_family, mAddrInfo->ai_socktype, mAddrInfo->ai_protocol);
 		if(!opened()){
-			AL_WARN("failed to create socket at %s:%i: %S", address.c_str(), port, errorString());
+			AL_WARN("failed to create socket at %s:%i: %s", address.c_str(), port, errorString());
 			close();
 			return false;
 		}
@@ -222,7 +224,7 @@ public:
 	bool bind(){ // for server-side
 		if(opened()){
 			if(SOCKET_ERROR == ::bind(mSocket, mAddrInfo->ai_addr, (int)mAddrInfo->ai_addrlen)){
-				AL_WARN("unable to bind socket at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+				AL_WARN("unable to bind socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 				close();
 				return false;
 			}
@@ -233,7 +235,7 @@ public:
 	bool connect(){ // for client-side
 		if(opened()){
 			if(SOCKET_ERROR == ::connect(mSocket, mAddrInfo->ai_addr, (int)mAddrInfo->ai_addrlen)){
-				AL_WARN("unable to connect socket at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+				AL_WARN("unable to connect socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 				close();
 				return false;
 			}
@@ -245,10 +247,10 @@ public:
 		mTimeout = v;
 		auto to = secToTimeout(v);
 		if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&to, sizeof(to))){
-			AL_WARN("unable to set snd timeout on socket at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+			AL_WARN("unable to set snd timeout on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 		}
 		if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&to, sizeof(to))){
-			AL_WARN("unable to set rcv timeout on socket at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+			AL_WARN("unable to set rcv timeout on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 		}
 	}
 
@@ -263,7 +265,7 @@ public:
 			return false;
 		}*/
 		if(SOCKET_ERROR == ::listen(mSocket, SOMAXCONN)){
-			AL_WARN("unable to listen at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+			AL_WARN("unable to listen at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 			return false;
 		}
 		return true;
@@ -307,7 +309,7 @@ public:
 /*static*/ std::string Socket::hostIP(){
 	hostent * host = gethostbyname(hostName().c_str());
 	if(NULL == host){
-		AL_WARN("unable to obtain host IP: ", errorString());
+		AL_WARN("unable to obtain host IP: %s", errorString());
 		return "";
 	}
 
@@ -326,7 +328,7 @@ public:
 	INIT_SOCKET;
 	char buf[256] = {0};
 	if(SOCKET_ERROR == gethostname(buf, sizeof(buf))){
-		AL_WARN("unable to obtain host name: ", errorString());
+		AL_WARN("unable to obtain host name: %s", errorString());
 	}
 	return buf;
 }
