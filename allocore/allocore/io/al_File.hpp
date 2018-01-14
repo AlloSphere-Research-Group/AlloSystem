@@ -435,7 +435,7 @@ public:
 	iterator begin() { return mFiles.begin(); }
 	iterator end() { return mFiles.end(); }
 
-	void add(FilePath& fp){ mFiles.push_back(fp); }
+	void add(const FilePath& fp){ mFiles.push_back(fp); }
 	void sort(bool (*f)(FilePath,FilePath)){ std::sort(begin(),end(),f); }
 
 protected:
@@ -450,9 +450,9 @@ protected:
 /// @ingroup allocore
 class SearchPaths {
 public:
-	typedef std::pair<std::string, bool> searchpath;
-	typedef std::list<searchpath> searchpathlist;
-	typedef std::list<searchpath>::iterator iterator;
+	typedef std::pair<std::string, bool> SearchPath;
+	typedef std::list<SearchPath> SearchPathList;
+	typedef std::list<SearchPath>::iterator iterator;
 
 	SearchPaths(){}
 	SearchPaths(const std::string& file);
@@ -460,8 +460,8 @@ public:
 	SearchPaths(const SearchPaths& cpy);
 
 	/// find a file in the searchpaths
-	FilePath find(const std::string& filename);
-	FileList glob(const std::string& regex);
+	FilePath find(const std::string& filename) const;
+	FileList glob(const std::string& regex) const;
 
 	/// add a path to search in; recursive searching is optional
 	void addSearchPath(const std::string& path, bool recursive = true);
@@ -484,7 +484,7 @@ public:
 	iterator end() { return mSearchPaths.end(); }
 
 protected:
-	std::list<searchpath> mSearchPaths;
+	std::list<SearchPath> mSearchPaths;
 	std::string mAppPath;
 };
 
