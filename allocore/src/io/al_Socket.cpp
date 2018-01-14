@@ -226,6 +226,12 @@ public:
 
 	bool bind(){ // for server-side
 		if(opened()){
+			// SO_REUSEADDR: "The rules used in validating addresses supplied to bind should allow reuse of local addresses."
+			int r=1;
+			if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, (char *)&r, sizeof(r))){
+				AL_WARN("unable to set SO_REUSEADDR on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
+			}
+
 			if(SOCKET_ERROR == ::bind(mSocket, mAddrInfo->ai_addr, (int)mAddrInfo->ai_addrlen)){
 				AL_WARN("unable to bind socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 				close();
@@ -258,15 +264,6 @@ public:
 	}
 
 	bool listen(){
-		/* APR_SO_REUSEADDR is useful for a socket listening process.
-		It specifies that the "The rules used in validating addresses supplied
-		to bind should allow reuse of local addresses." */
-		/*apr_socket_opt_set(mSock, APR_SO_REUSEADDR, 1);
-		apr_status_t res = apr_socket_listen(mSock, SOMAXCONN);
-		if(APR_SUCCESS != res){
-			//AL_WARN("Failed to listen on socket");
-			return false;
-		}*/
 		if(SOCKET_ERROR == ::listen(mSocket, SOMAXCONN)){
 			AL_WARN("unable to listen at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 			return false;
