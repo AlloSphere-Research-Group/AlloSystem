@@ -67,7 +67,9 @@ const char * errorString(){
 #define SOCKET_INIT WsInit::get()
 typedef SOCKET SocketHandle;
 #define SHUT_RDWR SD_BOTH
-DWORD secToTimeout(al_sec t){ return DWORD(t*1000. + 0.5) /*msec*/; }
+DWORD secToTimeout(al_sec t){
+	return DWORD(t>0. ? t*1000. + 0.5 : -1); /*msec*/
+}
 
 
 #else // POSIX
@@ -86,6 +88,7 @@ const char * errorString(){ return strerror(errno); }
 #define INIT_SOCKET
 typedef int SocketHandle;
 timeval secToTimeout(al_sec t){
+	if(t<0) t = 2147483647.;
 	timeval tv;
 	tv.tv_sec = int(t);
 	tv.tv_usec = (t - tv.tv_sec) * 1000000;
