@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <memory>
+#include <regex>
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Config.h"
 #include <stdlib.h> // realpath (POSIX), _fullpath (Windows)
@@ -285,11 +286,8 @@ FilePath::FilePath(const std::string& fullpath) {
 
 void FileList::print() const {
 	printf("FileList:\n");
-	std::vector<FilePath>::const_iterator it = mFiles.begin();
-	while (it != mFiles.end()) {
-		const FilePath& f = (*it++);
+	for(const auto& f : mFiles)
 		printf("%s\n", f.filepath().c_str());
-	}
 }
 
 
@@ -339,23 +337,76 @@ void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
 	std::string path=File::conformDirectory(src);
 
 	// check for duplicates
-	std::list<searchpath>::iterator iter = mSearchPaths.begin();
-	while (iter != mSearchPaths.end()) {
-		//printf("path %s\n", iter->first.c_str());
-		if (path == iter->first) {
-			return;
-		}
-		iter++;
+	for(const auto& sp : mSearchPaths){
+		//printf("path %s\n", sp.first.c_str());
+		if(path == sp.first) return;
 	}
-//	printf("adding path %s\n", path.data());
-	mSearchPaths.push_front(searchpath(path, recursive));
+
+	//printf("adding path %s\n", path.data());
+	mSearchPaths.emplace_front(path, recursive);
+}
+
+// Returns true if one or more matches, otherwise false
+template <class PredicateOnFileAndDir>
+bool findFile(
+	FileList& result,
+	const std::string& dir, bool recursive, bool findFirst,
+	PredicateOnFileAndDir pred
+){
+	bool found = false;
+	Dir d;
+	if(d.open(dir)){
+		while(d.read()){
+			const auto& entry = d.entry();
+			if((entry.type()==FileInfo::DIR) && recursive && (entry.name()[0]!='.')){
+				if(findFile(result, dir+AL_FILE_DELIMITER+entry.name(), true, findFirst, pred)){
+					if(findFirst) return true;
+					found = true;
+				}
+			}
+			else if((entry.type()==FileInfo::REG) && pred(entry.name(), dir)){
+				result.add(FilePath(entry.name(), dir));
+				if(findFirst) return true;
+				found = true;
+			}
+		}
+	}
+	return found;
+}
+
+FilePath SearchPaths::find(const std::string& file) const {
+	FileList fileList;
+	for(const auto& searchPath : mSearchPaths){
+		if(
+			findFile(
+				fileList,
+				searchPath.first, searchPath.second, true,
+				[&file](std::string f, std::string d){ return f==file; }
+			)
+		){
+			return fileList[0];
+		}
+	}
+	return FilePath();
+}
+
+FileList SearchPaths::glob(const std::string& regex) const {
+	FileList fileList;
+	for(const auto& searchPath : mSearchPaths){
+		findFile(
+			fileList,
+			searchPath.first, searchPath.second, false,
+			[&regex](std::string f, std::string d){
+				return std::regex_match(d+f,std::regex(regex));
+			}
+		);
+	}
+	return fileList;
 }
 
 void SearchPaths::print() const {
 	printf("SearchPath %p appPath: %s\n", this, appPath().c_str());
-	std::list<searchpath>::const_iterator it = mSearchPaths.begin();
-	while (it != mSearchPaths.end()) {
-		const SearchPaths::searchpath& sp = (*it++);
+	for(const auto& sp : mSearchPaths){
 		printf("SearchPath %p path: %s (recursive: %d)\n", this, sp.first.c_str(), sp.second);
 	}
 }
