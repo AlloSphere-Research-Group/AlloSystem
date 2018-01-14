@@ -27,6 +27,36 @@ You can actually use connect() on UDP socket as an option. In that case, you can
 
 using namespace al;
 
+#if defined(AL_SOCKET_DUMMY)
+
+class Socket::Impl{
+public:
+	Impl(){}
+	Impl(uint16_t port, const char * address, al_sec timeout_, int type){}
+
+	const std::string& address() const { static std::string s; return s; }
+	uint16_t port() const { return 0; }
+	al_sec timeout() const { return 0; }
+
+	bool open(uint16_t port, std::string address, al_sec timeoutSec, int type){ return false; }
+	void close(){}
+	bool reopen(){ return false; }
+	bool bind(){ return false; }
+	bool connect(){ return false; }
+	void timeout(al_sec v){}
+	bool listen(){ return false; }
+	bool accept(Socket::Impl * newSock){ return false; }
+	bool opened() const { return false;	}
+	size_t recv(char * buffer, size_t maxlen, char *from){ return 0; }
+	size_t send(const char * buffer, size_t len){ return 0;	}
+};
+
+/*static*/ std::string Socket::hostIP(){ return "0.0.0.0"; }
+/*static*/ std::string Socket::hostName(){ return "dummy_invalid"; }
+
+
+// Native socket code
+#else
 
 // Windows and POSIX socket code match very closely, so we will just conform
 // the differences with some new types
@@ -103,13 +133,6 @@ timeval secToTimeout(al_sec t){
 
 class Socket::Impl{
 public:
-	int mType = 0;
-	al_sec mTimeout = -1;
-	std::string mAddress;
-	uint16_t mPort = 0;
-	struct addrinfo * mAddrInfo = NULL;
-	SocketHandle mSocket = INVALID_SOCKET;
-
 	Impl(){
 		INIT_SOCKET;
 	}
@@ -122,7 +145,10 @@ public:
 			AL_WARN("Socket::Impl failed to open port %d / address \"%s\"\n", port, address);
 		}
 	}
-	
+
+	const std::string& address() const { return mAddress; }
+	uint16_t port() const { return mPort; }
+	al_sec timeout() const { return mTimeout; }
 
 	bool open(uint16_t port, std::string address, al_sec timeoutSec, int type){
 
@@ -304,6 +330,14 @@ public:
 	size_t send(const char * buffer, size_t len){
 		return ::send(mSocket, buffer, len, 0);
 	}
+
+private:
+	int mType = 0;
+	al_sec mTimeout = -1;
+	std::string mAddress;
+	uint16_t mPort = 0;
+	struct addrinfo * mAddrInfo = NULL;
+	SocketHandle mSocket = INVALID_SOCKET;
 };
 
 /*static*/ std::string Socket::hostIP(){
@@ -333,6 +367,8 @@ public:
 	return buf;
 }
 
+#endif // native socket
+
 
 // Everything below is common across all platforms
 
@@ -349,13 +385,13 @@ Socket::~Socket(){
 	delete mImpl;
 }
 
-const std::string& Socket::address() const { return mImpl->mAddress; }
+const std::string& Socket::address() const { return mImpl->address(); }
 
 bool Socket::opened() const { return mImpl->opened(); }
 
-uint16_t Socket::port() const { return mImpl->mPort; }
+uint16_t Socket::port() const { return mImpl->port(); }
 
-al_sec Socket::timeout() const { return mImpl->mTimeout; }
+al_sec Socket::timeout() const { return mImpl->timeout(); }
 
 bool Socket::bind(){ return mImpl->bind(); }
 
