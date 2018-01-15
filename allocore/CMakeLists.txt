@@ -19,6 +19,7 @@ list(APPEND ALLOCORE_SRC
   src/system/al_Info.cpp
   src/system/al_PeriodicThread.cpp
   src/system/al_Printing.cpp
+  src/system/al_Time.cpp
   src/system/al_Watcher.cpp
   src/types/al_Array.cpp
   src/types/al_Array_C.c
@@ -65,6 +66,8 @@ list(APPEND ALLOCORE_HEADERS
     allocore/system/al_PeriodicThread.hpp
     allocore/system/al_Printing.hpp
     allocore/system/al_Thread.hpp
+    allocore/system/al_Time.h
+    allocore/system/al_Time.hpp
     allocore/system/al_Watcher.hpp
     allocore/system/pstdint.h
     allocore/types/al_Array.h
