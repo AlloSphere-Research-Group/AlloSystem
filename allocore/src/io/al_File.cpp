@@ -359,7 +359,7 @@ bool findFile(
 		while(d.read()){
 			const auto& entry = d.entry();
 			if((entry.type()==FileInfo::DIR) && recursive && (entry.name()[0]!='.')){
-				if(findFile(result, dir+AL_FILE_DELIMITER+entry.name(), true, findFirst, pred)){
+				if(findFile(result, dir+entry.name()+AL_FILE_DELIMITER_STR, true, findFirst, pred)){
 					if(findFirst) return true;
 					found = true;
 				}
