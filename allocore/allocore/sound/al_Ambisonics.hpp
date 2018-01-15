@@ -303,7 +303,7 @@ public:
 
 	void setSpeakerLayout(const SpeakerLayout& sl);
 
-	virtual void prepare();
+	virtual void prepare() override;
 
 	virtual void renderBuffer(AudioIOData& io,
 	                  const Pose& listeningPose,

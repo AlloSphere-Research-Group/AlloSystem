@@ -323,7 +323,7 @@ public:
 	static int bufferSize(double samplerate, double speedOfSound, double distance);
 
 	/// Set speed of sound for computation in m/s
-	int setSpeedOfSound(float speedOfSound) {mSpeedOfSound = speedOfSound; }
+	void setSpeedOfSound(float speedOfSound) {mSpeedOfSound = speedOfSound; }
 
 	void cachedIndex(unsigned int v){ mCachedIndex = v; } // FIXME: For VBAP. There should be a better place for this
 	unsigned int cachedIndex(){ return mCachedIndex; }
