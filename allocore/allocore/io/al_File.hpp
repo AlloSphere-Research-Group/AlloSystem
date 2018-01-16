@@ -77,7 +77,6 @@ public:
 
 	/// File types
 	enum Type{
-		NOFILE,				/**< No file type determined */
 		REG,				/**< Regular file */
 		DIR,				/**< Directory */
 		CHR,				/**< Character device */
@@ -85,7 +84,7 @@ public:
 		PIPE,				/**< FIFO or pipe */
 		LINK,				/**< Symbolic link */
 		SOCKET,				/**< Socket */
-		UNKNOWN = 127		/**< File type exists, but doesn't match any known types */
+		UNKNOWN = 127		/**< Not a known type */
 	};
 
 	/// Set type
@@ -292,15 +291,12 @@ public:
 	static size_t storage (const std::string& path){ return File(path).storage(); }
 
 protected:
-	class Impl; Impl * mImpl;
-
 	std::string mPath;
 	std::string mMode;
 	char * mContent;
 	int mSizeBytes;
 	FILE * mFP;
 
-	void dtor();
 	void freeContent();
 	void allocContent(int n);
 	void getSize();
@@ -358,6 +354,9 @@ public:
 
 	/// Remove a directory recursively
 	static bool removeRecursively(const std::string& path);
+
+	/// Get the current working directory
+	static std::string cwd();
 
 private:
 	class Impl; Impl * mImpl;
