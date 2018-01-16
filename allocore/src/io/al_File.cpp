@@ -7,6 +7,15 @@
 
 using namespace al;
 
+
+static std::string stripEndSlash(const std::string& path){
+	if(path.back() == '\\' || path.back() == '/'){
+		return path.substr(0, path.size()-1);
+	}
+	return path;
+}
+
+
 #if defined(AL_OSX) || defined(AL_LINUX)
 #include <dirent.h>
 #include <unistd.h> // rmdir, getcwd
@@ -60,6 +69,22 @@ size_t File::storage() const {
 	char temp[PATH_MAX];
 	char * result = realpath(path.c_str(), temp);
 	return result ? result : "";
+}
+
+/*static*/ bool File::exists(const std::string& path){
+	struct stat s;
+	return ::stat(stripEndSlash(path).c_str(), &s) == 0;
+}
+
+/*static*/ bool File::isDirectory(const std::string& path){
+	struct stat s;
+	if(0 == ::stat(stripEndSlash(path).c_str(), &s)){	// exists?
+		if(s.st_mode & S_IFDIR){		// is dir?
+			return true;
+		}
+	}
+	// if(s.st_mode & S_IFREG) // is file?
+	return false;
 }
 
 
@@ -164,6 +189,7 @@ public:
 #define VC_EXTRALEAN
 #include <windows.h>
 #include <direct.h> // _getcwd
+#include <Shlwapi.h> // PathFileExists, PathIsDirectory
 
 struct ReadOnlyFileHandle{
 	HANDLE mHandle = INVALID_HANDLE_VALUE;
@@ -249,6 +275,14 @@ size_t File::storage() const {
 		result += (char *)*filePart;
 	}
 	return result;
+}
+
+/*static*/ bool File::exists(const std::string& path){
+	return PathFileExists(path.c_str());
+}
+
+/*static*/ bool File::isDirectory(const std::string& path){
+	return PathIsDirectory(path.c_str());
 }
 
 
@@ -522,29 +556,6 @@ std::string File::extension(const std::string& path){
 		return path.substr(pos);
 	}
 	return "";
-}
-
-static std::string stripEndSlash(const std::string& path){
-	if(path.back() == '\\' || path.back() == '/'){
-		return path.substr(0, path.size()-1);
-	}
-	return path;
-}
-
-bool File::exists(const std::string& path){
-	struct stat s;
-	return ::stat(stripEndSlash(path).c_str(), &s) == 0;
-}
-
-bool File::isDirectory(const std::string& path){
-	struct stat s;
-	if(0 == ::stat(stripEndSlash(path).c_str(), &s)){	// exists?
-		if(s.st_mode & S_IFDIR){		// is dir?
-			return true;
-		}
-	}
-	// if(s.st_mode & S_IFREG) // is file?
-	return false;
 }
 
 bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
