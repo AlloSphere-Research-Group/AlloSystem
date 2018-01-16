@@ -214,7 +214,7 @@ public:
 		}
 
 		// Resolve address and port
-		char portAsString[5+1]; // max port number 65535
+		char portAsString[5+1] = {0}; // max port number 65535
 		{	auto s = std::to_string(mPort);
 			s.copy(portAsString, s.size());
 		}
