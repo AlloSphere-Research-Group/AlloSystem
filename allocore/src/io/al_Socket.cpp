@@ -62,9 +62,8 @@ public:
 // the differences with some new types
 
 #if defined(AL_WINDOWS)
-
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include <Winsock2.h>
+#include <Ws2tcpip.h>
 #include <string.h> // memset
 
 // Initialization singleton
@@ -94,7 +93,7 @@ const char * errorString(){
 	return s;
 }
 
-#define SOCKET_INIT WsInit::get()
+#define INIT_SOCKET WsInit::get()
 typedef SOCKET SocketHandle;
 #define SHUT_RDWR SD_BOTH
 DWORD secToTimeout(al_sec t){
@@ -162,7 +161,13 @@ public:
 		switch(sockProto){
 		case TCP:  sockProto = IPPROTO_TCP; break;
 		case UDP:  sockProto = IPPROTO_UDP; break;
-		case SCTP: sockProto = IPPROTO_SCTP; break;
+		case SCTP:
+			#ifdef IPPROTO_SCTP
+			sockProto = IPPROTO_SCTP; break;
+			#else
+			AL_WARN("Socket::SCTP not supported on this platform.");
+			return false;
+			#endif
 		default:;
 		}
 
@@ -185,12 +190,12 @@ public:
 		case 0:
 		case INET:  sockFamily = AF_INET; break;
 		case INET6:
-		#ifdef AF_INET6
+			#ifdef AF_INET6
 			sockFamily = AF_INET6; break;
-		#else
+			#else
 			AL_WARN("Socket::INET6 not supported on this platform.");
 			return false;
-		#endif
+			#endif
 		default:;
 		}
 
@@ -213,6 +218,7 @@ public:
 		{	auto s = std::to_string(mPort);
 			s.copy(portAsString, s.size());
 		}
+
 		if(0 !=	getaddrinfo(addr, portAsString, &hints, &mAddrInfo)){
 			AL_WARN("failed to resolve %s:%i: %s", address.c_str(), port, errorString());
 			close();
