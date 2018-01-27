@@ -1,19 +1,12 @@
 #=========================================================================
 # AlloCore main makefile
 #=========================================================================
-
-# We used to include another configuration file here, but it doesn't seem
-# to serve any purpose other than add complexity.
-#include Makefile.config
-# BEGIN old Makefile.config
 LIB_NAME	= allocore
 include ../Makefile.common
-
 
 BIG_ENDIAN	= 0
 AUDIO_BINDING	= PortAudio
 WINDOW_BINDING	= GLUT
-RUNTIME_BINDING	= APR
 IMAGE_BINDING	= FreeImage
 AUTORUN_TESTS	= 1
 STRICT_WARNINGS = 1
@@ -24,7 +17,6 @@ INC_DIRS	=
 #-------------------------------------------------------------------------
 # Default variables
 #-------------------------------------------------------------------------
-#INC_DIR		= $(LIB_NAME)/
 INC_DIR		= ./
 SRC_DIR		= src/
 GFX_DIR		= graphics/
@@ -36,10 +28,6 @@ SND_DIR		= sound/
 SYS_DIR		= system/
 TYP_DIR		= types/
 TEST_DIR	= unitTests/
-
-# These are defined below according to platform
-DEV_DIR		=
-DEV_LIB_DIR 	=
 
 # Source file directories for running executables
 RUN_INC_DIRS	?=
@@ -54,14 +42,10 @@ RUN_DIRS	+= examples/
 ifeq ($(PLATFORM), linux)
 	INC_DIRS += $(PREFIX)include/
 	LIB_DIRS += $(PREFIX)lib/
-#	DEV_DIR   = linux/
-#	DEV_LIB_DIR = linux/lib$(ARCH)
 
 # Mac OS X:
 else ifeq ($(PLATFORM), macosx)
 	LDFLAGS	+= -framework Carbon -framework Cocoa -framework IOKit
-#	DEV_DIR  = osx/
-#	DEV_LIB_DIR = osx/lib
 
 # Windows
 else ifeq ($(PLATFORM), windows)
@@ -72,18 +56,7 @@ endif
 #-------------------------------------------------------------------------
 INC_DIRS += $(INC_DIR)
 
-#INC_DIRS += $(DEV_DIR)include/
-#LIB_DIRS += $(DEV_DIR)lib/
-
-ifeq ($(RUNTIME_BINDING), APR)
-	LINK_LDFLAGS += -lapr-1 -laprutil-1
-endif
-
 VPATH += $(addprefix $(SRC_DIR), $(GFX_DIR) $(IO_DIR) $(PRO_DIR) $(MATH_DIR) $(SND_DIR) $(SPA_DIR) $(SYS_DIR) $(TYP_DIR))
-
-# END old Makefile.config
-
-
 
 # Include configuration files of AlloCore modules
 # TODO: Permit selective inclusive of modules for building a library
@@ -121,7 +94,7 @@ CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(BUILD_DIR)/include)
 LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 
 
-
+# Precompiled headers
 #VPATH += allocore/graphics/ allocore/io/ allocore/math/
 #PCHS		=
 #PCHS		+= $(addsuffix .gch, $(notdir $(wildcard allocore/graphics/*.hpp)))
@@ -134,28 +107,6 @@ LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 
 include ../Makefile.rules
 include ../Makefile.buildandrun
-
-# Build library
-#allocore: $(LIB_PATH)
-## 	Copy library header files to build directory
-#	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'` .; do\
-#		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v;\
-#		$(INSTALL) -C -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
-#	done
-
-##	Copy dependency headers to build folder
-#	@(cd $(DEV_DIR)/include && tar -cf - `find . -type f ! -name ".*" ! -path "*.svn*" -print` )\
-#		| ( cd $(BUILD_DIR)/include && tar xBf - )
-
-## 	Copy dependency binaries to build folder
-##	Copying only occurs if the destination file doesn't exist or the source file is newer
-#	@for v in `cd $(DEV_LIB_DIR) && find . -name \*.$(SLIB_EXT) -or -name \*.$(DLIB_EXT)`; do\
-#		if [ $(DEV_LIB_DIR)/$$v -nt $(BUILD_DIR)/lib/$$v ] || [ ! -e $(BUILD_DIR)/lib/$$v ]; then\
-#			echo Copying $(DEV_LIB_DIR)/$$v to $(BUILD_DIR)/lib/;\
-#			$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/$$v $(BUILD_DIR)/lib/;\
-#		fi;\
-#	done
-
 
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/LIB_NAME

@@ -36,16 +36,15 @@ build_and_install_assimp(){
 if binary_exists "apt-get"; then
 	echo 'Found apt-get'
 	sudo apt-get update
-	sudo apt-get install build-essential \
-						 cmake \
-						 libapr1-dev libaprutil1-dev \
-						 portaudio19-dev libsndfile1-dev \
-						 libglew-dev freeglut3-dev \
-						 libavahi-client-dev \
-						 libbluetooth-dev \
-						 libudev-dev \
-						 libfreeimage-dev libfreetype6-dev \
-						 libxi-dev libxmu-dev
+	sudo apt-get install \
+		build-essential \
+		portaudio19-dev libsndfile1-dev \
+		libglew-dev freeglut3-dev \
+		libavahi-client-dev \
+		libbluetooth-dev \
+		libudev-dev \
+		libfreeimage-dev libfreetype6-dev \
+		libxi-dev libxmu-dev
 
 	# Get version of installed assimp
 	assimp_version=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
@@ -77,11 +76,11 @@ if binary_exists "apt-get"; then
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
 	brew update
-	brew install cmake \
-				 portaudio libsndfile \
-				 glew \
-				 freeimage \
-				 freetype
+	brew install \
+		portaudio libsndfile \
+		glew \
+		freeimage \
+		freetype
 
 	# Use precompiled library if on Mountain Lion or higher.
 	osx_version="$(sw_vers -productVersion | cut -d . -f 2)"
@@ -95,11 +94,11 @@ elif binary_exists "brew"; then
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
-	sudo port install cmake \
-					  portaudio libsndfile \
-					  glew \
-					  freeimage \
-					  freetype
+	sudo port install \
+		portaudio libsndfile \
+		glew \
+		freeimage \
+		freetype
 
 	build_and_install_assimp
 
@@ -171,32 +170,6 @@ elif uname -o | grep "Msys"; then
 				# DX7 headers only needed to build PA, so we can remove them
 				rm -rf $DXDIR/..
 				
-				# Cleanup.
-				rm -rf $PKG
-				rm $PKG.*
-			cd $DIR
-		fi
-
-		if files_exist $DESTDIR/lib/libapr*; then
-			echo 'Found APR'
-		else
-			#http://www.apachelounge.com/download/win32/binaries/httpd-2.4.7-win32.zip
-			#http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.7-win32-VC11.zip
-			PKG=apr-1.3.6-iconv-1.2.1-util-1.3.8-win32-x86-msvcrt60
-			DIR=$PWD
-			cd /tmp
-				#wget http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
-				#wget http://www.powertech.no/apache/dist/apr/binaries/win32/$PKG.zip
-				wget http://archive.apache.org/dist/apr/binaries/win32/$PKG.zip
-				unzip -q $PKG
-				mv apr-dist "$PKG"
-				cp $PKG/bin/libapr-1.dll		$DESTDIR/bin/
-				cp $PKG/bin/libaprutil-1.dll	$DESTDIR/bin/
-				cp $PKG/lib/libapr-1.lib		$DESTDIR/lib/libapr-1.dll.a
-				cp $PKG/lib/libaprutil-1.lib	$DESTDIR/lib/libaprutil-1.dll.a
-				install -d $DESTDIR/include/apr-1/
-				cp -r $PKG/include/*			$DESTDIR/include/apr-1/
-
 				# Cleanup.
 				rm -rf $PKG
 				rm $PKG.*
