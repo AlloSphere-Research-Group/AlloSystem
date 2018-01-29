@@ -77,5 +77,4 @@ linkfile:
 
 .PHONY: clean
 clean:
-	@echo "cleaning allovsr	"
 	$(call RemoveBuildDir)
