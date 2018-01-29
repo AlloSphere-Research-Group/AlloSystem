@@ -9,15 +9,21 @@ files_exist(){
 	ls -u "$@" >/dev/null 2>&1;
 }
 
-# Build executable first as we may need it to check for library dependencies
-./run.sh $1 AUTORUN=0
-
 BUILDDIR="build"
 EXENAME=$(basename "$1" | cut -d. -f1)
 BUILDEXEBASE=$BUILDDIR/bin/$EXENAME
 EXEDIR="$BUILDDIR/$EXENAME"
 LIBS=
 COPY="cp -u"
+
+# Build executable first as we may need it to check for library dependencies
+./run.sh $1 AUTORUN=0
+
+# Check if executable built
+if [ "`files_exist ${BUILDEXEBASE}*`" == "" ]; then
+	echo "No standalone created: failed to build $EXENAME"
+	exit
+fi
 
 # MSYS
 if files_exist /msys.bat; then
