@@ -22,16 +22,34 @@ COPY="cp -u"
 # MSYS
 if files_exist /msys.bat; then
 
-	LIBNAMES="`objdump -p ${BUILDEXEBASE}.exe | grep "DLL Name"`"
-	LIBNAMES="${LIBNAMES//DLL Name: /}"
-	#echo $LIBNAMES
-	LIBDIRS="/mingw/bin/ /usr/local/bin/"
-
-	for dir in $LIBDIRS; do
-		for lib in $LIBNAMES; do
-			DIR_LIB=$dir$lib
-			if files_exist $DIR_LIB; then LIBS="$LIBS $DIR_LIB"; fi
+	getDeps(){
+		LIBNAMES="`objdump -p $1 | grep "DLL Name"`"
+		LIBNAMES="${LIBNAMES//DLL Name: /}"
+		LIBPATHS=
+		#echo $LIBNAMES
+		for dir in $LIBDIRS; do
+			for lib in $LIBNAMES; do
+				DIR_LIB=$dir$lib
+				if files_exist $DIR_LIB; then LIBPATHS+=" $DIR_LIB"; fi
+			done
 		done
+		echo $LIBPATHS
+	}
+
+	LIBDIRS="/mingw/bin/ /usr/local/bin/"
+	LIBS=`getDeps "${BUILDEXEBASE}.exe"`
+
+	# TODO: make this recursive!!!
+	for lib in $LIBS; do
+		FILE="`basename $lib`"
+		if [ $FILE == "libgomp-1.dll" ]; then
+			NEWLIBS="`getDeps $lib`"
+			for newlib in $NEWLIBS; do
+				if [[ $LIBS != *"$newlib"* ]]; then
+					LIBS+=" $newlib"
+				fi
+			done
+		fi
 	done
 	#echo $LIBS
 
