@@ -20,10 +20,10 @@ COPY="cp -u"
 ./run.sh $1 AUTORUN=0
 
 # Check if executable built
-if [ "`files_exist ${BUILDEXEBASE}*`" == "" ]; then
-	echo "No standalone created: failed to build $EXENAME"
+files_exist ${BUILDEXEBASE}* || {
+	echo "No standalone created: failed to build $1"
 	exit
-fi
+}
 
 # MSYS
 if files_exist /msys.bat; then
