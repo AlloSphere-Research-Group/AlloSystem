@@ -378,7 +378,31 @@ private:
 	return "";
 }
 
-#endif // End Windows
+// End Windows
+
+
+#else // Unsupported platform
+
+al_sec File::modified() const {	return 0.; }
+al_sec File::accessed() const {	return 0.; }
+al_sec File::created() const { return 0.; }
+size_t File::sizeFile() const {	return 0; }
+size_t File::storage() const { return 0; }
+/*static*/ std::string File::absolutePath(const std::string& path){ return path; }
+/*static*/ bool File::exists(const std::string& path){ return false; }
+/*static*/ bool File::isDirectory(const std::string& path){	return false; }
+class Dir::Impl{
+public:
+	bool open(const std::string& path){ return false; }
+	bool close(){ return false; }
+	bool read(FileInfo& fileInfo){ return false; }
+	bool rewind(){ return true; }
+};
+/*static*/ bool Dir::make(const std::string& path, bool recursive){ return false; }
+/*static*/ bool Dir::remove(const std::string& path){ return false; }
+/*static*/ std::string Dir::cwd(){ return "."; }
+
+#endif
 
 
 
