@@ -16,7 +16,7 @@ static std::string stripEndSlash(const std::string& path){
 }
 
 
-#if defined(AL_OSX) || defined(AL_LINUX)
+#if defined(AL_OSX) || defined(AL_LINUX) || defined(AL_EMSCRIPTEN)
 #include <dirent.h>
 #include <unistd.h> // rmdir, getcwd
 #include <stdlib.h> // realpath
