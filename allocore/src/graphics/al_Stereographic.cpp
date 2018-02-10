@@ -14,9 +14,9 @@ Stereographic::Stereographic()
  // each component of input vector should be normalized from -1. to 1.
 // template<class T>
 Vec3d Stereographic::unproject(Vec3d screenPos){
-  Matrix4d invprojview = Matrix4d::inverse(this->modelViewProjection());
-  Vec4d worldPos4 = invprojview.transform(screenPos);
-  return worldPos4.sub<3>(0) / worldPos4.w;
+	Matrix4d invprojview = Matrix4d::inverse(this->modelViewProjection());
+	Vec4d worldPos4 = invprojview.transform(screenPos);
+	return worldPos4.sub<3>(0) / worldPos4.w;
 }
 
 void Stereographic::pushDrawPop(Graphics& gl, Drawable& draw){
@@ -64,7 +64,7 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 	const Vec3d& pos = pose.pos();
 
 	// We must configure scissoring BEFORE clearing buffers
-	glEnable(GL_SCISSOR_TEST);
+	gl.scissorTest(true);
 	sendViewport(gl, vp);
 
 	// gl.drawBuffer(Graphics::BACK);	// << breaks usage under FBO
@@ -110,7 +110,7 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 		pushDrawPop(gl,draw);
 	}
 
-	glDisable(GL_SCISSOR_TEST);
+	gl.scissorTest(false);
 }
 
 
@@ -118,13 +118,13 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 Before calling this function, you must enable scissoring and set the
 appropriate draw buffer. Thus, to draw the right eye:
 
-	glEnable(GL_SCISSOR_TEST);
-	glDrawBuffer(GL_BACK_RIGHT);
+	gl.scissorTest(true);
+	gl.drawBuffer(Graphics::BACK_RIGHT);
 
 	drawOffAxis(RIGHT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
 
-	glDrawBuffer(GL_BACK);
-	glDisable(GL_SCISSOR_TEST);
+	gl.drawBuffer(Graphics::BACK);
+	gl.scissorTest(false);
 */
 void Stereographic::drawEye(StereoMode eye, Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect){
 
@@ -225,7 +225,7 @@ void Stereographic::drawEye(StereoMode eye, Graphics& gl, const Lens& lens, cons
 
 void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
+	gl.scissorTest(true);
 
 	// We must clear here since color masks affect glClear
 	if(clear){
@@ -236,11 +236,11 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 	switch(mAnaglyphMode){
 		case RED_BLUE:
 		case RED_GREEN:
-		case RED_CYAN:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
-		case BLUE_RED:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
-		case GREEN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
-		case CYAN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
-		default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
+		case RED_CYAN:	gl.colorMask(1,0,0,1); break;
+		case BLUE_RED:	gl.colorMask(0,0,1,1); break;
+		case GREEN_RED:	gl.colorMask(0,1,0,1); break;
+		case CYAN_RED:	gl.colorMask(0,1,1,1); break;
+		default:		gl.colorMask(1);
 	}
 
 	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
@@ -253,26 +253,26 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 	gl.clear(gl.DEPTH_BUFFER_BIT);
 
 	switch(mAnaglyphMode){
-		case RED_BLUE:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
-		case RED_GREEN:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
-		case RED_CYAN:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
+		case RED_BLUE:	gl.colorMask(0,0,1,1); break;
+		case RED_GREEN:	gl.colorMask(0,1,0,1); break;
+		case RED_CYAN:	gl.colorMask(0,1,1,1); break;
 		case BLUE_RED:
 		case GREEN_RED:
-		case CYAN_RED:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
-		default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
+		case CYAN_RED:	gl.colorMask(1,0,0,1); break;
+		default:		gl.colorMask(1);
 	}
 
 	drawEye(LEFT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
 
-	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-	glDisable(GL_SCISSOR_TEST);
+	gl.colorMask(1);
+	gl.scissorTest(false);
 }
 
 
 
 void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
+	gl.scissorTest(true);
 
 	gl.drawBuffer(Graphics::BACK_RIGHT);
 	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
@@ -281,32 +281,28 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 	drawEye(LEFT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
 
 	gl.drawBuffer(Graphics::BACK); // set back (?) to default
-	glDisable(GL_SCISSOR_TEST);
+	gl.scissorTest(false);
 }
 
 
 void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
-
+	gl.scissorTest(true);
 	drawEye(LEFT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
-
-	glDisable(GL_SCISSOR_TEST);
+	gl.scissorTest(false);
 }
 
 void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
-
+	gl.scissorTest(true);
 	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
-
-	glDisable(GL_SCISSOR_TEST);
+	gl.scissorTest(false);
 }
 
 
 void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
+	gl.scissorTest(true);
 
 	// Clear the whole viewport in one go (not once for each half)
 	if(clear){
@@ -321,7 +317,7 @@ void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose,
 
 	drawEye(LEFT_EYE, gl, lens, pose, vpleft, draw, /*clear*/false, pixelaspect);
 
-	glDisable(GL_SCISSOR_TEST);
+	gl.scissorTest(false);
 }
 
 
