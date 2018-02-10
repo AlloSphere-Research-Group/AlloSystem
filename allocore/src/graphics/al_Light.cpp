@@ -3,7 +3,7 @@
 
 namespace al{
 
-Material::Material(Graphics::Face f)
+Material::Material(Graphics::Direction f)
 :	mAmbient(0.2),		// These are the default OpenGL values. Do not change!
 	mDiffuse(0.8),		// See http://www.khronos.org/opengles/sdk/1.1/docs/man/glMaterial.xml
 	mEmission(0),
@@ -52,7 +52,7 @@ Material& Material::diffuse(const Color& v){
 Material& Material::emission(const Color& v){ mEmission=v; return *this; }
 Material& Material::specular(const Color& v){ mSpecular=v; return *this; }
 Material& Material::shininess(float v){ mShine=v; return *this; }
-Material& Material::face(Graphics::Face f){ mFace=f; return *this; }
+Material& Material::face(Graphics::Direction f){ mFace=f; return *this; }
 
 
 

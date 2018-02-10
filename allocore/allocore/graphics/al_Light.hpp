@@ -58,13 +58,13 @@ namespace al{
 class Material {
 public:
 
-	Material(Graphics::Face f=Graphics::FRONT);
+	Material(Graphics::Direction faceDir=Graphics::FRONT);
 
 	/// Send current material settings to GPU
 	void operator()() const;
 
 	/// Set the polygon face that material will be applied to
-	Material& face(Graphics::Face f);
+	Material& face(Graphics::Direction faceDir);
 
 	/// Set specular exponent [0, 128]
 	Material& shininess(float v);
@@ -83,7 +83,7 @@ public:
 	Material& bumpMap(const std::string& map) { mMapBump = map; return *this; }
 	Material& useColorMaterial(bool v) { mUseColorMaterial = v; return *this; }
 
-	Graphics::Face face() const { return mFace; }
+	Graphics::Direction face() const { return mFace; }
 
 	float shininess() const { return mShine; }
 	float opticalDensity() const { return mOpticalDensity; }
@@ -105,7 +105,7 @@ protected:
 	Color mEmission;
 	Color mSpecular;
 	float mShine, mOpticalDensity, mIllumination;
-	Graphics::Face mFace;
+	Graphics::Direction mFace;
 	std::string mMapKa, mMapKs, mMapKd, mMapBump;
 	bool mUseColorMaterial;
 };
