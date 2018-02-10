@@ -172,10 +172,17 @@ public:
 		DOUBLE					= GL_DOUBLE					/**< */
 	};
 
-	enum Face {
-		FRONT					= GL_FRONT,					/**< Front face */
-		BACK					= GL_BACK,					/**< Back face */
-		FRONT_AND_BACK			= GL_FRONT_AND_BACK			/**< Front and back face */
+	enum Direction {
+		NONE					= GL_NONE,
+		FRONT_LEFT				= GL_FRONT_LEFT,
+		FRONT_RIGHT				= GL_FRONT_RIGHT,
+		BACK_LEFT				= GL_BACK_LEFT,
+		BACK_RIGHT				= GL_BACK_RIGHT,
+		FRONT					= GL_FRONT,
+		BACK					= GL_BACK,
+		LEFT					= GL_LEFT,
+		RIGHT					= GL_RIGHT,
+		FRONT_AND_BACK			= GL_FRONT_AND_BACK
 	};
 
 	enum Format {
@@ -267,8 +274,8 @@ public:
 	/// Turn face culling on/off
 	void cullFace(bool b);
 
-	/// Turn face culling on/off and set the culled face
-	void cullFace(bool b, Face face);
+	/// Turn face culling on/off and set the face direction to cull
+	void cullFace(bool b, Direction d);
 
 
 	/// Set antialiasing mode
@@ -294,13 +301,13 @@ public:
 
 
 	/// Set polygon drawing mode
-	void polygonMode(PolygonMode m, Face f=FRONT_AND_BACK);
+	void polygonMode(PolygonMode m, Direction d=FRONT_AND_BACK);
 
 	/// Draw only edges of polygons with lines
-	void polygonLine(Face f=FRONT_AND_BACK){ polygonMode(LINE,f); }
+	void polygonLine(Direction d=FRONT_AND_BACK){ polygonMode(LINE,d); }
 
 	/// Draw filled polygons
-	void polygonFill(Face f=FRONT_AND_BACK){ polygonMode(FILL,f); }
+	void polygonFill(Direction d=FRONT_AND_BACK){ polygonMode(FILL,d); }
 
 	/// Set shading model
 	void shadeModel(ShadeModel m);
@@ -589,10 +596,25 @@ const char * toString(Graphics::Format v);
 
 
 // ============== INLINE ==============
+#if defined(AL_GRAPHICS_USE_OPENGLES2)
+inline void Graphics::pointSize(float v){}
+inline void Graphics::pushMatrix(){}
+inline void Graphics::popMatrix(){}
+inline void Graphics::loadMatrix(const Matrix4d& m){}
+inline void Graphics::loadMatrix(const Matrix4f& m){}
+
+#else
+inline void Graphics::pointSize(float v){ glPointSize(v); }
+inline void Graphics::pushMatrix(){ glPushMatrix(); }
+inline void Graphics::popMatrix(){ glPopMatrix(); }
+inline void Graphics::loadMatrix(const Matrix4d& m){ glLoadMatrixd(m.elems()); }
+inline void Graphics::loadMatrix(const Matrix4f& m){ glLoadMatrixf(m.elems()); }
+#endif
+
 
 inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
 inline void Graphics::clearColor(float r, float g, float b, float a){ glClearColor(r, g, b, a); }
-inline void Graphics::clearColor(const Color& c) { clearColor(c.r, c.g, c.b, c.a); }
+inline void Graphics::clearColor(const Color& c){ clearColor(c.r, c.g, c.b, c.a); }
 
 inline void Graphics::blendMode(BlendFunc src, BlendFunc dst, BlendEq eq){
 	glBlendEquation(eq);
@@ -618,16 +640,12 @@ inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
 inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
 inline void Graphics::scissorTest(bool b){ capability(SCISSOR_TEST, b); }
 inline void Graphics::cullFace(bool b){ capability(CULL_FACE, b); }
-inline void Graphics::cullFace(bool b, Face face) {
+inline void Graphics::cullFace(bool b, Direction d) {
 	capability(CULL_FACE, b);
-	glCullFace(face);
+	glCullFace(d);
 }
 inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
-inline void Graphics::pushMatrix(){ glPushMatrix(); }
-inline void Graphics::popMatrix(){ glPopMatrix(); }
 inline void Graphics::loadIdentity(){ glLoadIdentity(); }
-inline void Graphics::loadMatrix(const Matrix4d& m){ glLoadMatrixd(m.elems()); }
-inline void Graphics::loadMatrix(const Matrix4f& m){ glLoadMatrixf(m.elems()); }
 inline void Graphics::multMatrix(const Matrix4d& m){ glMultMatrixd(m.elems()); }
 inline void Graphics::multMatrix(const Matrix4f& m){ glMultMatrixf(m.elems()); }
 inline void Graphics::translate(double x, double y, double z){ glTranslated(x,y,z); }
@@ -653,12 +671,11 @@ inline void Graphics::scale(double x, double y, double z){
 	glScaled(x, y, z);
 }
 inline void Graphics::lineWidth(float v) { glLineWidth(v); }
-inline void Graphics::pointSize(float v) { glPointSize(v); }
 inline void Graphics::pointAtten(float c2, float c1, float c0){
 	GLfloat att[3] = {c0, c1, c2};
 	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
 }
-inline void Graphics::polygonMode(PolygonMode m, Face f){ glPolygonMode(f,m); }
+inline void Graphics::polygonMode(PolygonMode m, Direction d){ glPolygonMode(d,m); }
 inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
 
