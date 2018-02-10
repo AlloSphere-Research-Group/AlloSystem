@@ -47,7 +47,6 @@
 #include <string>
 #include <unordered_map>
 #include "allocore/graphics/al_GPUObject.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
 
 #define AL_SHADER_MAX_LOG_SIZE	4096
 
@@ -232,13 +231,13 @@ public:
 	/// This must be called before attaching the geometry shader.
 	/// For GLSL, the geometry shader must include the line:
 	///		#extension GL_EXT_geometry_shader4 : enable
-	ShaderProgram& setGeometry(Graphics::Primitive inPrim, Graphics::Primitive outPrim, unsigned outVert){
+	ShaderProgram& setGeometry(int inPrim, int outPrim, unsigned outVert){
 		mInPrim=inPrim; mOutPrim=outPrim; mOutVertices=outVert; return *this;
 	}
 
 	// These parameters must be set before attaching geometry shaders
-	ShaderProgram& setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; return *this; }
-	ShaderProgram& setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; return *this; }
+	ShaderProgram& setGeometryInputPrimitive(int prim){ mInPrim = prim; return *this; }
+	ShaderProgram& setGeometryOutputPrimitive(int prim){ mOutPrim = prim; return *this; }
 	ShaderProgram& setGeometryOutputVertices(unsigned i){ mOutVertices = i; return *this; }
 
 	std::vector<std::string>& transformFeedbackVaryings(){ return mTFVaryings; }
@@ -371,7 +370,7 @@ public:
 	static void use(unsigned programID);
 
 protected:
-	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
+	int mInPrim, mOutPrim;	// IO primitives for geometry shaders
 	unsigned int mOutVertices;
 	std::string mVertSource, mFragSource, mGeomSource;
 	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
