@@ -338,10 +338,10 @@ void Graphics::draw(const Mesh& m, int count, int begin){
 	if(m.stroke() > 0.f){
 		switch(prim){
 		case LINES: case LINE_STRIP: case LINE_LOOP:
-			glLineWidth(m.stroke());
+			lineWidth(m.stroke());
 			break;
 		case POINTS:
-			glPointSize(m.stroke());
+			pointSize(m.stroke());
 			break;
 		default:;
 		}
