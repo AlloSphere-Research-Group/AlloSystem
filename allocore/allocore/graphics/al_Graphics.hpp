@@ -363,6 +363,12 @@ public:
 	/// Set clear color
 	void clearColor(const Color& color);
 
+	/// Set draw buffer
+	void drawBuffer(Direction d);
+
+	/// Set read buffer
+	void readBuffer(Direction d);
+
 
 	/// Set linear fog parameters
 
@@ -601,6 +607,8 @@ const char * toString(Graphics::Format v);
 
 // ============== INLINE ==============
 #if defined(AL_GRAPHICS_USE_OPENGLES2)
+inline void Graphics::drawBuffer(Direction d){}
+inline void Graphics::readBuffer(Direction d){}
 inline void Graphics::pointSize(float v){}
 inline void Graphics::pushMatrix(){}
 inline void Graphics::popMatrix(){}
@@ -608,6 +616,8 @@ inline void Graphics::loadMatrix(const Matrix4d& m){}
 inline void Graphics::loadMatrix(const Matrix4f& m){}
 
 #else
+inline void Graphics::drawBuffer(Direction d){ glDrawBuffer(d); }
+inline void Graphics::readBuffer(Direction d){ glReadBuffer(d); }
 inline void Graphics::pointSize(float v){ glPointSize(v); }
 inline void Graphics::pushMatrix(){ glPushMatrix(); }
 inline void Graphics::popMatrix(){ glPopMatrix(); }

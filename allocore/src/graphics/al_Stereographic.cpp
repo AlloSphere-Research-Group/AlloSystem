@@ -67,7 +67,7 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 
-	// glDrawBuffer(GL_BACK);	// << breaks usage under FBO
+	// gl.drawBuffer(Graphics::BACK);	// << breaks usage under FBO
 	if(clear) sendClear(gl);
 
 	mEye = pos;
@@ -274,13 +274,13 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 {
 	glEnable(GL_SCISSOR_TEST);
 
-	glDrawBuffer(GL_BACK_RIGHT);
+	gl.drawBuffer(Graphics::BACK_RIGHT);
 	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
 
-	glDrawBuffer(GL_BACK_LEFT);
+	gl.drawBuffer(Graphics::BACK_LEFT);
 	drawEye(LEFT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
 
-	glDrawBuffer(GL_BACK); // set back (?) to default
+	gl.drawBuffer(Graphics::BACK); // set back (?) to default
 	glDisable(GL_SCISSOR_TEST);
 }
 
@@ -328,8 +328,9 @@ void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose,
 
 /// blue line sync for active stereo
 /// @see http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/GLUTStereo/glutStereo.cpp
-void Stereographic :: drawBlueLine(double window_width, double window_height)
-{
+void Stereographic :: drawBlueLine(double window_width, double window_height){
+// FIXME: This will not compile with OpenGL ES
+#if defined(AL_GRAPHICS_USE_OPENGL)
 	GLint i;
 	unsigned long buffer;
 
@@ -401,6 +402,7 @@ void Stereographic :: drawBlueLine(double window_width, double window_height)
 	glPopAttrib();
 
 	glDrawBuffer(GL_BACK);
+#endif
 }
 
 } // al::
