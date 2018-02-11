@@ -61,6 +61,10 @@
 	#if !defined(AL_OSX)
 		#define AL_OSX 1
 	#endif
+#elif (defined(__EMSCRIPTEN__))
+	#if !defined(AL_EMSCRIPTEN)
+		#define AL_EMSCRIPTEN 1
+	#endif
 #elif !defined(AL_LINUX)
 	#define AL_LINUX 1
 #endif
