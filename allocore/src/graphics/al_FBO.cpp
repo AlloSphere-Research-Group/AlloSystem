@@ -8,13 +8,13 @@ RBO::RBO(Graphics::Format format)
 
 void RBO::onCreate(){
 	GLuint i;
-	glGenRenderbuffersEXT(1,&i);
+	glGenRenderbuffers(1,&i);
 	mID=i;
 }
 
 void RBO::onDestroy(){
 	GLuint i=id();
-	glDeleteRenderbuffersEXT(1,&i);
+	glDeleteRenderbuffers(1,&i);
 }
 
 Graphics::Format RBO::format() const { return mFormat; }
@@ -35,16 +35,16 @@ bool RBO::resize(unsigned w, unsigned h){
 // static functions
 unsigned RBO::maxSize(){
 	int s;
-	glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE_EXT, &s);
+	glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &s);
 	return s;
 }
 
-void RBO::bind(unsigned id){ glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id); }
+void RBO::bind(unsigned id){ glBindRenderbuffer(GL_RENDERBUFFER, id); }
 
 bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 	unsigned mx = maxSize();
 	if(w > mx || h > mx) return false;
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, w, h);
+	glRenderbufferStorage(GL_RENDERBUFFER, format, w, h);
 	return true;
 }
 
@@ -53,13 +53,13 @@ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 
 void FBO::onCreate(){
 	GLuint i;
-	glGenFramebuffersEXT(1,&i);
+	glGenFramebuffers(1,&i);
 	mID=i;
 }
 
 void FBO::onDestroy(){
 	GLuint i=id();
-	glDeleteFramebuffersEXT(1,&i);
+	glDeleteFramebuffers(1,&i);
 }
 
 FBO& FBO::attachRBO(const RBO& rbo, Attachment att){
@@ -94,7 +94,7 @@ void FBO::unbind(){ bind(0); }
 
 GLenum FBO::status(){
 	begin();
-	int r=glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	int r=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	end();
 	return r;
 }
@@ -104,22 +104,23 @@ const char * FBO::statusString(){ return statusString(status()); }
 const char * FBO::statusString(GLenum stat){
 	#define CS(v) case v: return #v;
 	switch(stat){
-	CS(GL_FRAMEBUFFER_COMPLETE_EXT)
-	CS(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT)
-	CS(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT)
-	CS(GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT)
-	CS(GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT)
-	CS(GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT)
-	CS(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT)
-	CS(GL_FRAMEBUFFER_UNSUPPORTED_EXT)
-	default: return "GL_FRAMEBUFFER_UNKNOWN";
+	CS(GL_FRAMEBUFFER_COMPLETE)
+	CS(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
+	CS(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
+	CS(GL_FRAMEBUFFER_UNSUPPORTED)
+	#ifdef AL_GRAPHICS_USE_OPENGL
+		CS(GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER)
+		CS(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER)
+		CS(GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE)
+	#endif
+	default: return "Unknown status";
 	};
 }
 
 // static functions
 void FBO::bind(unsigned fboID){
 	AL_GRAPHICS_ERROR("(before FBO::bind)", fboID);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
+	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
 	AL_GRAPHICS_ERROR("binding FBO", fboID);
 }
 
@@ -130,11 +131,11 @@ void FBO::end(){
 }
 
 void FBO::renderBuffer(unsigned rboID, Attachment att){
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, att, GL_RENDERBUFFER_EXT, rboID);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, att, GL_RENDERBUFFER, rboID);
 }
 
 void FBO::texture2D(GLuint texID, Attachment att, int level){
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, att, GL_TEXTURE_2D, texID, level);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, att, GL_TEXTURE_2D, texID, level);
 }
 
 } // al::
