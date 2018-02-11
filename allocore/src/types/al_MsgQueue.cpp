@@ -43,14 +43,14 @@ void MsgQueue :: growPool(int size) {
 
 /* push a message back into the pool */
 void MsgQueue :: recycle(Msg * m) {
-	assert(mLen); // LJP
-	m->next = mPool;
-	mPool = m;
+	m->next = mPool;	// Place msg at head ...
+	mPool = m;			// ... of pool
 	if (m->isBigMessage()) {
 		char * args = *(char **)(m->mArgs);
 		mFree(args);
 	}
-	mLen--;
+	// LJP: Add check in case this was called (accidently) with an empty queue
+	if(mLen) --mLen;
 }
 
 /* schedule a new message */
