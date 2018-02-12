@@ -99,8 +99,12 @@ private:
 			CS(GL_INVALID_FRAMEBUFFER_OPERATION, "The framebuffer object is not complete.")
 		#endif
 			CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
+		#ifdef GL_STACK_OVERFLOW
 			CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
+		#endif
+		#ifdef GL_STACK_UNDERFLOW
 			CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
+		#endif
 		#ifdef GL_TABLE_TOO_LARGE
 			CS(GL_TABLE_TOO_LARGE, "The specified table exceeds the implementation's maximum supported table size.")
 		#endif
