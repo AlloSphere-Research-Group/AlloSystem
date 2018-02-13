@@ -90,7 +90,7 @@
 		#include <GL/gl.h>
 		#pragma comment( lib, "winmm.lib")
 		#pragma comment( lib, "opengl32.lib" )
-		#define AL_GRAPHICS_IsNIT_CONTEXT\
+		#define AL_GRAPHICS_INIT_CONTEXT\
 			{	GLenum err = glewInit();\
 				if (GLEW_OK != err){\
 					/* Problem: glewInit failed, something is seriously wrong. */\
