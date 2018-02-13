@@ -59,8 +59,6 @@ void Stereographic :: draw(Graphics& gl, const Lens& lens, const Pose& pose, con
 
 void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	double near = lens.near();
-	double far = lens.far();
 	const Vec3d& pos = pose.pos();
 
 	// We must configure scissoring BEFORE clearing buffers
@@ -83,14 +81,10 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
 			double aspect = vp1.aspect() * pixelaspect;
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
+			mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
 
-			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
-			Vec3d ux = q.toVectorX();
-			Vec3d uy = q.toVectorY();
-			Vec3d uz = q.toVectorZ();
-
-			mProjection = Matrix4d::perspective(fovy, aspect, near, far);
-			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+			mModelView = (pose * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0)).matrix();
+			invertRigid(mModelView);
 
 			sendViewport(gl, vp1);
 			if(clear) sendClear(gl);
@@ -103,9 +97,10 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 	} else {
 		double fovy = lens.fovy();
 		double aspect = vp.aspect() * pixelaspect;
-		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
-		mProjection = Matrix4d::perspective(fovy, aspect, near, far);
-		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+		mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
+		
+		mModelView = pose.matrix();
+		invertRigid(mModelView);
 
 		pushDrawPop(gl,draw);
 	}
