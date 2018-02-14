@@ -81,32 +81,32 @@ public:
 
 	/// Draw the scene according to the stored stereographic mode
 
-	/// @param[in] gl		graphics interface
+	/// @param[in] g		graphics interface
 	/// @param[in] lens		local viewing frustum
 	/// @param[in] pose		viewer position and orientation
 	/// @param[in] vp		region of screen to render to
 	/// @param[in] draw		function object with drawing commands
 	/// @param[in] clear	whether to clear the color/depth buffers
 	/// @param[in] pixelaspect	additional aspect multipler (for non-square pixels)
-	void draw			(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void draw			(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw mono
-	void drawMono		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawMono		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw active stereo
-	void drawActive		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawActive		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw anaglyph stereo
-	void drawAnaglyph	(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawAnaglyph	(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw dual (side-by-side, left-right) stereo
-	void drawDual		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawDual		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw left eye only
-	void drawLeft		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawLeft		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw right eye only
-	void drawRight		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawRight		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw blue line for active stereo sync (for those projectors that need it)
 
@@ -221,11 +221,11 @@ protected:
 	bool mStereo;
 	bool mOmni;
 
-	void pushDrawPop(Graphics& gl, Drawable& draw);
-	void sendViewport(Graphics& gl, const Viewport& vp);
-	void sendClear(Graphics& gl);
+	void pushDrawPop(Graphics& g, Drawable& draw);
+	void sendViewport(Graphics& g, const Viewport& vp);
+	void sendClear(Graphics& g);
 
-	void drawEye(StereoMode eye, Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
+	void drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
 };
 
 
