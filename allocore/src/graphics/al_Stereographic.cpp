@@ -229,13 +229,14 @@ void Stereographic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& po
 		sendClear(g);
 	}
 
+	// Note: color order is left-right by convention
 	switch(mAnaglyphMode){
-		case RED_BLUE:
-		case RED_GREEN:
-		case RED_CYAN:	g.colorMask(1,0,0,1); break;
-		case BLUE_RED:	g.colorMask(0,0,1,1); break;
-		case GREEN_RED:	g.colorMask(0,1,0,1); break;
-		case CYAN_RED:	g.colorMask(0,1,1,1); break;
+		case RED_CYAN:	g.colorMask(0,1,1,1); break;
+		case RED_BLUE:	g.colorMask(0,0,1,1); break;
+		case RED_GREEN:	g.colorMask(0,1,0,1); break;
+		case CYAN_RED:
+		case BLUE_RED:
+		case GREEN_RED:	g.colorMask(1,0,0,1); break;
 		default:		g.colorMask(1);
 	}
 
@@ -249,12 +250,12 @@ void Stereographic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& po
 	g.clear(g.DEPTH_BUFFER_BIT);
 
 	switch(mAnaglyphMode){
-		case RED_BLUE:	g.colorMask(0,0,1,1); break;
-		case RED_GREEN:	g.colorMask(0,1,0,1); break;
-		case RED_CYAN:	g.colorMask(0,1,1,1); break;
-		case BLUE_RED:
-		case GREEN_RED:
-		case CYAN_RED:	g.colorMask(1,0,0,1); break;
+		case RED_CYAN:
+		case RED_BLUE:
+		case RED_GREEN:	g.colorMask(1,0,0,1); break;
+		case CYAN_RED:	g.colorMask(0,1,1,1); break;
+		case BLUE_RED:	g.colorMask(0,0,1,1); break;
+		case GREEN_RED:	g.colorMask(0,1,0,1); break;
 		default:		g.colorMask(1);
 	}
 

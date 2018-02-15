@@ -67,12 +67,12 @@ public:
 
 	/// Anaglyph mode
 	enum AnaglyphMode {
-		RED_BLUE = 0,	/**< */
-		RED_GREEN,		/**< */
-		RED_CYAN,		/**< */
-		BLUE_RED,		/**< */
-		GREEN_RED,		/**< */
-		CYAN_RED		/**< */
+		RED_CYAN,		/**< Left eye red, right eye cyan (the norm) */
+		RED_BLUE,		/**< Left eye red, right eye blue */
+		RED_GREEN,		/**< Left eye red, right eye green */
+		CYAN_RED,		/**< Left eye cyan, right eye red */
+		BLUE_RED,		/**< Left eye blue, right eye red */
+		GREEN_RED		/**< Left eye green, right eye red */
 	};
 
 
