@@ -50,6 +50,7 @@
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Vec.hpp"
+#include "allocore/types/al_Color.hpp"
 
 #define AL_SHADER_MAX_LOG_SIZE	4096
 
@@ -243,6 +244,12 @@ public:
 	const ShaderProgram& uniform(int loc, const Mat<4,T>& m) const{
 		return uniform(loc, Mat4f(m));
 	}
+	const ShaderProgram& uniform(int loc, const Color& c) const {
+		return uniform(loc, c.r, c.g, c.b, c.a);
+	}
+	const ShaderProgram& uniform(int loc, const RGB& c) const {
+		return uniform(loc, c.r, c.g, c.b);
+	}
 
 	const ShaderProgram& uniform(const char * name, int v) const;
 	const ShaderProgram& uniform(const char * name, float v) const;
@@ -255,32 +262,32 @@ public:
 	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) const {
 		return uniform(name, v.x, v.y);
 	}
-
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<3,T>& v) const {
 		return uniform(name, v.x, v.y, v.z);
 	}
-
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<4,T>& v) const {
 		return uniform(name, v.x, v.y, v.z, v.w);
 	}
-
 	const ShaderProgram& uniform(const char * name, const Mat<4,float>& m) const{
 		return uniformMatrix4(name, m.elems());
 	}
-
 	template<typename T>
 	const ShaderProgram& uniform(const char * name, const Mat<4,T>& m) const{
 		return uniform(name, Mat4f(m));
 	}
-
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Quat<T>& q) const {
 		// note wxyz => xyzw for GLSL vec4:
 		return uniform(name, q.x, q.y, q.z, q.w);
 	}
-
+	const ShaderProgram& uniform(const char * name, const Color& c) const {
+		return uniform(name, c.r, c.g, c.b, c.a);
+	}
+	const ShaderProgram& uniform(const char * name, const RGB& c) const {
+		return uniform(name, c.r, c.g, c.b);
+	}
 
 	const ShaderProgram& uniform1(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform2(const char * name, const float * v, int count=1) const;
