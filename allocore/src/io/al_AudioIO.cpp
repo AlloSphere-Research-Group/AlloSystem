@@ -20,7 +20,11 @@
 
 #elif defined(AL_AUDIO_SDL)
 	#define SDL_MAIN_HANDLED
-	#include <SDL2/SDL.h>
+	#ifdef AL_EMSCRIPTEN
+		#include <SDL/SDL.h>
+	#else
+		#include <SDL2/SDL.h>
+	#endif
 #endif
 
 namespace al {
