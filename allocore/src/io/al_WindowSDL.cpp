@@ -10,10 +10,12 @@
 // SDL API:
 // https://wiki.libsdl.org/APIByCategory
 #define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
 
-#ifdef EMSCRIPTEN
+#ifdef AL_EMSCRIPTEN
+#include <SDL/SDL.h>
 #include <emscripten.h>
+#else
+#include <SDL2/SDL.h>
 #endif
 
 namespace al{
@@ -406,7 +408,7 @@ bool Window::implCreate(){
 		fullScreen(fs);
 	}
 
-	#ifdef __EMSCRIPTEN__
+	#ifdef AL_EMSCRIPTEN
 	{
 		int infiniteLoop = 1;
 		int emFPS = asap() ? -1 : fps();
@@ -433,7 +435,7 @@ void Window::destroyAll(){ //printf("Window::destroyAll\n");
 			++it;
 		}
 	}
-	#ifdef EMSCRIPTEN
+	#ifdef AL_EMSCRIPTEN
 		emscripten_cancel_main_loop();
 	#endif
 	//SDL_Quit();
@@ -472,13 +474,17 @@ void Window::implSetFPS(){
 }
 
 void Window::implSetFullScreen(){
-	auto err = SDL_SetWindowFullscreen(
-		mImpl->mSDLWindow,
-		mFullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0
-	);
-	if(err<0){
-		//printf("Error %s fullscreen (err = %d)\n", mFullScreen ? "entering" : "exiting", err);
-	}
+	#ifdef AL_EMSCRIPTEN
+		mFullScreen = false; // SDL_WINDOW_FULLSCREEN_DESKTOP not supported
+	#else
+		auto err = SDL_SetWindowFullscreen(
+			mImpl->mSDLWindow,
+			mFullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0
+		);
+		if(err<0){
+			//printf("Error %s fullscreen (err = %d)\n", mFullScreen ? "entering" : "exiting", err);
+		}
+	#endif
 }
 
 void Window::implSetTitle(){
