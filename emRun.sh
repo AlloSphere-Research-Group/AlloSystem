@@ -14,7 +14,8 @@ CPPFLAGS="-I$BUILD_DIR/include -O2"
 CXXFLAGS="-std=c++11"
 EMFLAGS+=" -s USE_SDL=2"
 #EMFLAGS+=" -s LEGACY_GL_EMULATION=1"
-EMFLAGS+=" -s USE_WEBGL2=1"
+#EMFLAGS+=" -s USE_WEBGL2=1" #default, recommended setting
+EMFLAGS+=" -s FULL_ES2=1" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
 #EMFLAGS+=" -s EMTERPRETIFY=1"
 #EMFLAGS+=" -s LINKABLE=1"
 EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit

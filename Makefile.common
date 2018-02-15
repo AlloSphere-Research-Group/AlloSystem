@@ -174,13 +174,9 @@ endif
 
 # Emscripten (is Unix-like)
 ifeq ($(PLATFORM), em)
+	#AR = llvm-ar
+	#RANLIB = llvm-ranlib
 
-	ifdef HAS_OPT_LOCAL
-		LDFLAGS  += -L/opt/local/lib/
-		CPPFLAGS += -I/opt/local/include/
-	endif
-
-	CPPFLAGS += -I/usr/local/include/
 	LDFLAGS	 += -lm
 	LDFLAGS	 += -lstdc++
 
