@@ -271,7 +271,8 @@ void Scene :: mesh(unsigned int i, Mesh& mesh) const {
 				case 1: prim = Graphics::POINTS; break;
 				case 2: prim = Graphics::LINES; break;
 				case 3: prim = Graphics::TRIANGLES; break;
-				default: prim = Graphics::POLYGON; break;
+				default: prim = Graphics::POINTS; break;
+				//default: prim = Graphics::POLYGON; break;
 			}
 			mesh.primitive(prim);
 
@@ -313,7 +314,8 @@ void Scene :: meshAlt(unsigned int i, Mesh& mesh) const {
 				case 1: prim = Graphics::POINTS; break;
 				case 2: prim = Graphics::LINES; break;
 				case 3: prim = Graphics::TRIANGLES; break;
-				default: prim = Graphics::POLYGON; break;
+				default: prim = Graphics::POINTS; break;
+				//default: prim = Graphics::POLYGON; break;
 			}
 			mesh.primitive(prim);
 	
