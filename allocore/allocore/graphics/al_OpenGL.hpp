@@ -110,6 +110,9 @@
 		#include <GLES2/gl2.h>
 		//#include <GLES2/gl2ext.h> // just include core API for now
 		#define AL_GRAPHICS_INIT_CONTEXT
+	#elif defined AL_GRAPHICS_USE_OPENGLES1
+		#include <GLES/gl.h>
+		#define AL_GRAPHICS_INIT_CONTEXT
 	#else
 		#error "Specified graphics backend not supported on this platform"
 	#endif
@@ -137,5 +140,101 @@
 	#endif
 
 #endif // platform-specific
+
+
+/* Define what parts of the OpenGL API are available.
+We could possibly check directly for GLenums (e.g. GL_UNSIGNED_INT, GL_TEXTURE_1D)
+but are these always guaranteed to be #define'ed?
+A bit on GLenum allocations:
+https://www.khronos.org/registry/OpenGL/docs/enums.html
+*/
+
+#if defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_USE_PROG_PIPELINE
+#else
+	#define AL_GRAPHICS_USE_FIXED_PIPELINE
+#endif
+
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_SUPPORTS_INT32
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_DOUBLE
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_POLYGON_MODE
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_POLYGON_SMOOTH
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES1)
+	#define AL_GRAPHICS_SUPPORTS_STROKE_SMOOTH
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_SHADE_MODEL
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_LR_BUFFERS
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_SUPPORTS_DEPTH_COMP
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_SUPPORTS_BLEND_EQ
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_SUPPORTS_SHADER
+	#if defined(AL_GRAPHICS_USE_OPENGL)
+		#define AL_GRAPHICS_SUPPORTS_GEOMETRY_SHADER
+	#endif
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_SUPPORTS_STREAM_DRAW
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_DRAW_RANGE
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_SUPPORTS_FBO
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_PBO
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_MAP_BUFFER
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_TEXTURE_1D
+	#define AL_GRAPHICS_SUPPORTS_TEXTURE_3D
+	#define AL_GRAPHICS_SUPPORTS_WRAP_EXTRA
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_SUPPORTS_MIPMAP
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_COLOR_MATERIAL_SPEC
+#endif
 
 #endif /* include guard */
