@@ -3,11 +3,13 @@
 namespace al {
 
 NavInputControl::NavInputControl(const NavInputControl& v)
-:	mNav(v.mNav), mVScale(v.vscale()), mTScale(v.tscale()), mUseMouse(true)
+:	mNav(v.mNav),
+	mVScale(v.vscale()), mTScale(v.tscale()), mMouseSens(v.mouseSens()),
+	mUseMouse(true)
 {}
 
-NavInputControl::NavInputControl(Nav& nav, double vscale, double tscale)
-:	mNav(&nav), mVScale(vscale), mTScale(tscale), mUseMouse(true)
+NavInputControl::NavInputControl(Nav& nav, float vscale, float tscale, float mouseSens)
+:	mNav(&nav), mVScale(vscale), mTScale(tscale), mMouseSens(mouseSens), mUseMouse(true)
 {}
 
 
@@ -70,12 +72,12 @@ bool NavInputControl::onKeyUp(const Keyboard& k) {
 bool NavInputControl::onMouseDrag(const Mouse& m){
 	if(mUseMouse){
 		if(m.left()){
-			nav().turnU(-m.dx() * 0.2 * M_DEG2RAD);
-			nav().turnR(-m.dy() * 0.2 * M_DEG2RAD);
+			nav().turnU(-m.dx() * (mMouseSens * M_DEG2RAD));
+			nav().turnR(-m.dy() * (mMouseSens * M_DEG2RAD));
 			return false;
 		}
 		else if(m.right()){
-			nav().turnF( m.dx() * 0.2 * M_DEG2RAD);
+			nav().turnF( m.dx() * (mMouseSens * M_DEG2RAD));
 			nav().pullBack(nav().pullBack() + m.dy()*0.02);
 			return false;
 		}
