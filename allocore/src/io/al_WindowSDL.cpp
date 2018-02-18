@@ -159,32 +159,32 @@ private:
 				if(ev.window.windowID == ID()){
 					switch(ev.window.event){
 					case SDL_WINDOWEVENT_SHOWN:
-						//printf("Window %d shown\n", sdlWindowID);
+						//printf("Window %d shown\n", ID());
 						win->mVisible = true;
 						win->callHandlersOnVisibility(win->mVisible);
 						win->dimensions(win->dimensions());
 						break;
 					case SDL_WINDOWEVENT_HIDDEN:
-						//printf("Window %d hidden\n", sdlWindowID);
+						//printf("Window %d hidden\n", ID());
 						win->mVisible = false;
 						win->callHandlersOnVisibility(win->mVisible);
 						break;
 					case SDL_WINDOWEVENT_EXPOSED:
-						//printf("Window %d exposed\n", sdlWindowID);
+						//printf("Window %d exposed\n", ID());
 						break;
 					case SDL_WINDOWEVENT_MOVED:
-						//printf("Window %d moved to %d,%d\n", sdlWindowID, ev.window.data1, ev.window.data2);
+						//printf("Window %d moved to %d,%d\n", ID(), ev.window.data1, ev.window.data2);
 						win->mDim.l = ev.window.data1;
 						win->mDim.t = ev.window.data2;
 						break;
 					case SDL_WINDOWEVENT_RESIZED:
-						//printf("Window %d resized to %dx%d\n", sdlWindowID, ev.window.data1, ev.window.data2);
+						//printf("Window %d resized to %dx%d\n", ID(), ev.window.data1, ev.window.data2);
 						win->mDim.w = ev.window.data1;
 						win->mDim.h = ev.window.data2;
 						win->callHandlersOnResize(win->mDim.w, win->mDim.h);
 						break;
 					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						//printf("Window %d size changed to %dx%d\n",	sdlWindowID, ev.window.data1, ev.window.data2);
+						//printf("Window %d size changed to %dx%d\n", ID(), ev.window.data1, ev.window.data2);
 						win->mDim.w = ev.window.data1;
 						win->mDim.h = ev.window.data2;
 						win->callHandlersOnResize(win->mDim.w, win->mDim.h);
@@ -359,19 +359,7 @@ bool Window::implCreate(){
 		return false;
 	}
 
-	auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.l,mDim.t, mDim.w,mDim.h, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
-	if(!sdlWin){
-		printf("SDL ERROR: Could not create window.\n");
-		return false;
-	}
-	mImpl->mSDLWindow = sdlWin;
-	WindowImpl::windows()[mImpl->ID()] = mImpl;
-
-	auto glContext = SDL_GL_CreateContext(sdlWin);
-	if(!glContext){
-		printf("SDL ERROR: Could not create GL context.\n");
-	}
-	mImpl->mGLContext = glContext;
+	// SDL setup code: https://wiki.libsdl.org/SDL_GL_SetAttribute
 
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -388,19 +376,27 @@ bool Window::implCreate(){
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	}
 
+	auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.l,mDim.t, mDim.w,mDim.h, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+	if(!sdlWin){
+		printf("SDL ERROR: Could not create window.\n");
+		return false;
+	}
+	mImpl->mSDLWindow = sdlWin;
+	WindowImpl::windows()[mImpl->ID()] = mImpl;
+
+	auto glContext = SDL_GL_CreateContext(sdlWin);
+	if(!glContext){
+		printf("SDL ERROR: Could not create GL context.\n");
+	}
+	mImpl->mGLContext = glContext;
+
 	AL_GRAPHICS_INIT_CONTEXT;
 	vsync(mVSync);
 
 	callHandlersOnCreate();
 
-	/*{ // SDL doesn't trigger a resize on window creation, so do it here
-		SDL_Event ev;
-		ev.type = SDL_WINDOWEVENT_SIZE_CHANGED;
-		ev.window.windowID = SDL_GetWindowID(sdlWin);
-		ev.window.data1 = mDim.w;
-		ev.window.data2 = mDim.h;
-		SDL_PushEvent(&ev);
-	}*/
+	// SDL doesn't trigger a resize on window creation, so do it here
+	callHandlersOnResize(mDim.w, mDim.h);
 
 	// Set fullscreen according to mFullScreen member
 	{	bool fs = fullScreen();
