@@ -6,7 +6,7 @@ namespace al{
 
 Viewpoint::Viewpoint(const Pose& transform)
 :	mViewport(0,0,0,0),
-	mParentTransform(NULL),
+	mParentTransform(NULL), mTransform(transform),
 	mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
 	mLens(NULL), mClearColor(NULL)
 {}
@@ -35,7 +35,7 @@ void Viewpoint::onParentResize(int w, int h){
 //______________________________________________________________________________
 
 ViewpointWindow::ViewpointWindow(){
-	init();
+	append(mStandardKeyControls);
 }
 
 ViewpointWindow::ViewpointWindow(
@@ -43,8 +43,9 @@ ViewpointWindow::ViewpointWindow(
 	const std::string title,
 	double fps,
 	DisplayMode mode
-){
-	init();
+)
+:	ViewpointWindow()
+{
 	create(dims, title, fps, mode);
 }
 
@@ -72,10 +73,6 @@ ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
 		v.onParentResize(width(), height());
 	}
 	return *this;
-}
-
-void ViewpointWindow::init(){
-	append(mStandardKeyControls);
 }
 
 //______________________________________________________________________________
