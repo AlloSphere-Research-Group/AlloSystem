@@ -47,6 +47,7 @@
 
 namespace al{
 
+#ifdef AL_GRAPHICS_USE_OPENGL
 
 /// Display list for drawing static geometry
 ///
@@ -72,6 +73,8 @@ protected:
 		glDeleteLists(mID, 1);
 	}
 };
+
+#endif
 
 } // al::
 

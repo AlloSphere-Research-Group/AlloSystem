@@ -269,16 +269,21 @@ void Stereographic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& po
 
 void Stereographic :: drawActive(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	g.scissorTest(true);
+	#ifdef AL_GRAPHICS_SUPPORTS_LR_BUFFERS
+		g.scissorTest(true);
 
-	g.drawBuffer(Graphics::BACK_RIGHT);
-	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+		g.drawBuffer(Graphics::BACK_RIGHT);
+		drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
 
-	g.drawBuffer(Graphics::BACK_LEFT);
-	drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+		g.drawBuffer(Graphics::BACK_LEFT);
+		drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
 
-	g.drawBuffer(Graphics::BACK); // set back (?) to default
-	g.scissorTest(false);
+		g.drawBuffer(Graphics::BACK); // set back (?) to default
+		g.scissorTest(false);
+
+	#else
+		AL_WARN_ONCE("Active stereo rendering not supported");
+	#endif
 }
 
 

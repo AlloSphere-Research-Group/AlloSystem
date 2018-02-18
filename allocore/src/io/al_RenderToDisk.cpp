@@ -332,6 +332,7 @@ void RenderToDisk::saveImage(
 
 	unsigned char * pixs = &mPixels[0];
 
+	#ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
 	// Set read buffer
 	//glReadBuffer(GL_COLOR_ATTACHMENT0); // for FBO
 	//glReadBuffer(GL_BACK);
@@ -344,9 +345,11 @@ void RenderToDisk::saveImage(
 	if(mGraphicsBuf != GLenum(-1)){
 		glReadBuffer(mGraphicsBuf);
 	}
+	#endif
 
 	bool readPixels = false;
 
+	#ifdef AL_GRAPHICS_SUPPORTS_PBO
 	/* Copy pixels out of framebuffer into client memory.
 	A PBO FIFO is used to avoid stalling on glReadPixels. See:
 	http://www.roxlu.com/2014/048/fast-pixel-transfers-with-pixel-buffer-objects
@@ -386,8 +389,9 @@ void RenderToDisk::saveImage(
 		mPBOIdx = (mPBOIdx + 1) % Npbos;
 		mReadPBO = mReadPBO || (mPBOIdx == 0); // written to all PBOs at least once
 	}
-	else{
-		// This will block until all draw commands finish
+	else
+	#endif
+	{	// This will block until all draw commands finish
 		glReadPixels(l,b,w,h, GL_RGB, GL_UNSIGNED_BYTE, pixs);
 		readPixels = true;
 	}

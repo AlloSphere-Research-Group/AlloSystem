@@ -44,6 +44,11 @@
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
+
+#include "allocore/graphics/al_OpenGL.hpp"
+
+#ifdef AL_GRAPHICS_SUPPORTS_SHADER
+
 #include <string>
 #include <unordered_map>
 #include "allocore/graphics/al_GPUObject.hpp"
@@ -355,5 +360,7 @@ protected:
 };
 
 } // ::al
+
+#endif //AL_GRAPHICS_SUPPORTS_SHADER
 
 #endif

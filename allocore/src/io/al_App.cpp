@@ -112,10 +112,14 @@ struct SceneWindowHandler : public WindowEventHandler{
 
 	bool onCreate(){
 
+		#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
 		// Enable color material to simplify cases where materials are not used 
 		// explicitly (e.g., only mesh colors are used).
 		glEnable(GL_COLOR_MATERIAL);
-		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+			#ifdef AL_GRAPHICS_SUPPORTS_COLOR_MATERIAL_SPEC
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+			#endif
+		#endif
 
 		app.onCreate(win);
 		return true;
@@ -317,7 +321,7 @@ ViewpointWindow * App::initWindow(
 
 	win.fps(fps);
 	win.displayMode(mode);
-	
+
 	auto& newVP = *new Viewpoint;
 	mFacViewpoints.push_back(&newVP);
 	newVP.parentTransform(nav().transformed());

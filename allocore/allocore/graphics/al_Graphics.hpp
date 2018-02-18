@@ -55,13 +55,14 @@
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
 #include "allocore/graphics/al_MeshVBO.hpp"
+#include "allocore/graphics/al_Shader.hpp"
 
 /*!
 	\def AL_GRAPHICS_ERROR(msg, ID)
 	Used for reporting graphics errors from source files
 
 */
-//#define AL_ENABLE_DEBUG
+#define AL_ENABLE_DEBUG
 #ifdef AL_ENABLE_DEBUG
 #define AL_GRAPHICS_ERROR(msg, ID)\
 {	const char * errStr = al::Graphics::errorString();\
@@ -121,8 +122,6 @@ public:
 	enum AttributeBit {
 		COLOR_BUFFER_BIT		= GL_COLOR_BUFFER_BIT,		/**< Color-buffer bit */
 		DEPTH_BUFFER_BIT		= GL_DEPTH_BUFFER_BIT,		/**< Depth-buffer bit */
-		ENABLE_BIT				= GL_ENABLE_BIT,			/**< Enable bit */
-		VIEWPORT_BIT			= GL_VIEWPORT_BIT			/**< Viewport bit */
 	};
 
 	enum BlendFunc {
@@ -140,23 +139,30 @@ public:
 	};
 
 	enum BlendEq {
+		#ifdef AL_GRAPHICS_SUPPORTS_BLEND_EQ
 		FUNC_ADD				= GL_FUNC_ADD,				/**< Source + destination */
 		FUNC_SUBTRACT			= GL_FUNC_SUBTRACT,			/**< Source - destination */
 		FUNC_REVERSE_SUBTRACT	= GL_FUNC_REVERSE_SUBTRACT, /**< Destination - source */
-		MIN						= GL_MIN,					/**< Minimum value of source and destination */
-		MAX						= GL_MAX					/**< Maximum value of source and destination */
+		#else
+		FUNC_ADD,
+		FUNC_SUBTRACT,
+		FUNC_REVERSE_SUBTRACT
+		#endif
 	};
 
 	enum Capability {
 		BLEND					= GL_BLEND,					/**< Blend rather than replace existing colors with new colors */
-		COLOR_MATERIAL			= GL_COLOR_MATERIAL,		/**< Use vertex colors with materials */
 		DEPTH_TEST				= GL_DEPTH_TEST,			/**< Test depth of incoming fragments */
-		FOG						= GL_FOG,					/**< Apply fog effect */
-		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
 		SCISSOR_TEST			= GL_SCISSOR_TEST,			/**< Crop fragments according to scissor region */
 		CULL_FACE				= GL_CULL_FACE,				/**< Cull faces */
+
+		#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
+		COLOR_MATERIAL			= GL_COLOR_MATERIAL,		/**< Use vertex colors with materials */
+		FOG						= GL_FOG,					/**< Apply fog effect */
+		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
+		NORMALIZE				= GL_NORMALIZE,				/**< Rescale normals to counteract non-isotropic modelview scaling */
 		RESCALE_NORMAL			= GL_RESCALE_NORMAL,		/**< Rescale normals to counteract an isotropic modelview scaling */
-		NORMALIZE				= GL_NORMALIZE				/**< Rescale normals to counteract non-isotropic modelview scaling */
+		#endif
 	};
 
 	enum DataType {
@@ -164,51 +170,63 @@ public:
 		UBYTE					= GL_UNSIGNED_BYTE,			/**< */
 		SHORT					= GL_SHORT,					/**< */
 		USHORT					= GL_UNSIGNED_SHORT,		/**< */
+		#ifdef AL_GRAPHICS_SUPPORTS_INT32
 		INT						= GL_INT,					/**< */
 		UINT					= GL_UNSIGNED_INT,			/**< */
-		BYTES_2					= GL_2_BYTES,				/**< */
-		BYTES_3					= GL_3_BYTES,				/**< */
-		BYTES_4					= GL_4_BYTES,				/**< */
+		#endif
 		FLOAT					= GL_FLOAT,					/**< */
-		DOUBLE					= GL_DOUBLE					/**< */
+		#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
+		DOUBLE					= GL_DOUBLE
+		#endif
 	};
 
 	enum Direction {
-		NONE					= GL_NONE,
+		NONE					= 0,
+		FRONT					= GL_FRONT,
+		BACK					= GL_BACK,
+		FRONT_AND_BACK			= GL_FRONT_AND_BACK,
+
+		#ifdef AL_GRAPHICS_SUPPORTS_LR_BUFFERS
 		FRONT_LEFT				= GL_FRONT_LEFT,
 		FRONT_RIGHT				= GL_FRONT_RIGHT,
 		BACK_LEFT				= GL_BACK_LEFT,
 		BACK_RIGHT				= GL_BACK_RIGHT,
-		FRONT					= GL_FRONT,
-		BACK					= GL_BACK,
 		LEFT					= GL_LEFT,
 		RIGHT					= GL_RIGHT,
-		FRONT_AND_BACK			= GL_FRONT_AND_BACK
+		#endif
 	};
 
 	enum Format {
-		DEPTH_COMPONENT			= GL_DEPTH_COMPONENT,		/**< */
 		LUMINANCE				= GL_LUMINANCE,				/**< */
 		LUMINANCE_ALPHA			= GL_LUMINANCE_ALPHA,		/**< */
-		RED						= GL_RED,					/**< */
-		GREEN					= GL_GREEN,					/**< */
-		BLUE					= GL_BLUE,					/**< */
 		ALPHA					= GL_ALPHA,					/**< */
 		RGB						= GL_RGB,					/**< */
-		BGR						= GL_BGR,					/**< */
 		RGBA					= GL_RGBA,					/**< */
-		BGRA					= GL_BGRA					/**< */
+		#ifdef AL_GRAPHICS_SUPPORTS_DEPTH_COMP
+		DEPTH_COMPONENT			= GL_DEPTH_COMPONENT,		/**< */
+		#endif
 	};
 
 	enum MatrixMode {
+		#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
 		MODELVIEW				= GL_MODELVIEW,				/**< Modelview matrix */
 		PROJECTION				= GL_PROJECTION				/**< Projection matrix */
+		#else
+		MODELVIEW				= 0,
+		PROJECTION				= 1
+		#endif
 	};
 
 	enum PolygonMode {
-		POINT					= GL_POINT,					/**< Render only points at each vertex */
-		LINE					= GL_LINE,					/**< Render only lines along vertex path */
+		#ifdef AL_GRAPHICS_SUPPORTS_POLYGON_MODE
+		POINT					= GL_POINT,					/**< Render only points at vertices */
+		LINE					= GL_LINE,					/**< Render only lines along edges */
 		FILL					= GL_FILL					/**< Render vertices normally according to primitive */
+		#else
+		POINT,
+		LINE,
+		FILL
+		#endif
 	};
 
 	enum Primitive {
@@ -218,15 +236,17 @@ public:
 		LINE_LOOP				= GL_LINE_LOOP,				/**< Connect sequential vertices with a continuous line loop */
 		TRIANGLES				= GL_TRIANGLES,				/**< Draw triangles using sequential vertex triplets */
 		TRIANGLE_STRIP			= GL_TRIANGLE_STRIP,		/**< Draw triangle strip using sequential vertices */
-		TRIANGLE_FAN			= GL_TRIANGLE_FAN,			/**< Draw triangle fan using sequential vertices */
-		QUADS					= GL_QUADS,					/**< Draw quadrilaterals using sequential vertex quadruplets */
-		QUAD_STRIP				= GL_QUAD_STRIP,			/**< Draw quadrilateral strip using sequential vertices */
-		POLYGON					= GL_POLYGON				/**< Draw polygon using sequential vertices */
+		TRIANGLE_FAN			= GL_TRIANGLE_FAN			/**< Draw triangle fan using sequential vertices */
 	};
 
 	enum ShadeModel {
+		#ifdef AL_GRAPHICS_SUPPORTS_SHADE_MODEL
 		FLAT					= GL_FLAT,					/**< */
 		SMOOTH					= GL_SMOOTH					/**< */
+		#else
+		FLAT,
+		SMOOTH
+		#endif
 	};
 
 
@@ -409,20 +429,20 @@ public:
 	void loadIdentity();
 
 	/// Set current matrix
-	void loadMatrix(const Matrix4d &m);
-	void loadMatrix(const Matrix4f &m);
+	void loadMatrix(const Mat4d& m);
+	void loadMatrix(const Mat4f& m);
 
 	/// Multiply current matrix
-	void multMatrix(const Matrix4d &m);
-	void multMatrix(const Matrix4f &m);
+	void multMatrix(const Mat4d& m);
+	void multMatrix(const Mat4f& m);
 
 	/// Set modelview matrix
-	void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
-	void modelView(const Matrix4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	void modelView(const Mat4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	void modelView(const Mat4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 
 	/// Set projection matrix
-	void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
-	void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
+	void projection(const Mat4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
+	void projection(const Mat4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
 
 
 
@@ -432,7 +452,7 @@ public:
 	/// \param[in] x		x component of rotation axis
 	/// \param[in] y		y component of rotation axis
 	/// \param[in] z		z component of rotation axis
-	void rotate(double angle, double x=0., double y=0., double z=1.);
+	void rotate(float angle, float x=0., float y=0., float z=1.);
 
 	/// Rotate current matrix
 	void rotate(const Quatd& q);
@@ -442,14 +462,14 @@ public:
 	/// \param[in] angle	angle, in degrees
 	/// \param[in] axis		rotation axis
 	template <class T>
-	void rotate(double angle, const Vec<3,T>& axis){
+	void rotate(float angle, const Vec<3,T>& axis){
 		rotate(angle, axis[0],axis[1],axis[2]); }
 
 	/// Scale current matrix uniformly
-	void scale(double s);
+	void scale(float s);
 
 	/// Scale current matrix along each dimension
-	void scale(double x, double y, double z=1.);
+	void scale(float x, float y, float z=1.);
 
 	/// Scale current matrix along each dimension
 	template <class T>
@@ -460,7 +480,7 @@ public:
 	void scale(const Vec<2,T>& v){ scale(v[0],v[1]); }
 
 	/// Translate current matrix
-	void translate(double x, double y, double z=0.);
+	void translate(float x, float y, float z=0.);
 
 	/// Translate current matrix
 	template <class T>
@@ -580,6 +600,19 @@ public:
 	void draw(int numVertices, const Mesh& v);
 
 protected:
+#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
+	Mat4f mMatrices[2] = {Mat4f::identity(), Mat4f::identity()};
+	MatrixMode mMatrixMode = MODELVIEW;
+	const Mat4f& modelView() const { return mMatrices[MODELVIEW]; }
+	const Mat4f& projection() const { return mMatrices[PROJECTION]; }
+	Mat4f& currentMatrix(){ return mMatrices[mMatrixMode]; }
+	ShaderProgram mShader;
+	int mLocPos, mLocColor, mLocNormal, mLocTexCoord2;
+	Color mCurrentColor;
+	bool mCompileShader = true;
+#endif
+
+	std::vector<unsigned short> mIndices16;
 	Mesh mMesh;				// used for immediate mode style rendering
 	int mRescaleNormal;
 	bool mInImmediateMode;	// flag for whether or not in immediate mode
@@ -606,32 +639,95 @@ const char * toString(Graphics::Format v);
 
 
 // ============== INLINE ==============
-#if defined(AL_GRAPHICS_USE_OPENGLES2)
-inline void Graphics::drawBuffer(Direction d){}
-inline void Graphics::readBuffer(Direction d){}
+#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
+inline void Graphics::currentColor(float r, float g, float b, float a){
+	mCurrentColor.set(r,g,b,a);
+}
+inline void Graphics::lighting(bool b){}
 inline void Graphics::pointSize(float v){}
+inline void Graphics::matrixMode(MatrixMode mode){ mMatrixMode=mode;}
 inline void Graphics::pushMatrix(){}
 inline void Graphics::popMatrix(){}
-inline void Graphics::loadMatrix(const Matrix4d& m){}
-inline void Graphics::loadMatrix(const Matrix4f& m){}
+inline void Graphics::loadIdentity(){ currentMatrix().setIdentity(); }
+inline void Graphics::loadMatrix(const Mat4d& m){ currentMatrix() = m; }
+inline void Graphics::loadMatrix(const Mat4f& m){ currentMatrix() = m; }
+inline void Graphics::multMatrix(const Mat4d& m){ currentMatrix() *= m; }
+inline void Graphics::multMatrix(const Mat4f& m){ currentMatrix() *= m; }
+inline void Graphics::translate(float x, float y, float z){ currentMatrix().translate(x,y,z); }
+inline void Graphics::rotate(float angle, float x, float y, float z){}
+inline void Graphics::scale(float s){ currentMatrix().scale(s); }
+inline void Graphics::scale(float x, float y, float z){ currentMatrix().scale(x,y,z); }
+inline void Graphics::pointAtten(float c2, float c1, float c0){}
 
 #else
-inline void Graphics::drawBuffer(Direction d){ glDrawBuffer(d); }
-inline void Graphics::readBuffer(Direction d){ glReadBuffer(d); }
+inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
+inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
 inline void Graphics::pointSize(float v){ glPointSize(v); }
+inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
 inline void Graphics::pushMatrix(){ glPushMatrix(); }
 inline void Graphics::popMatrix(){ glPopMatrix(); }
-inline void Graphics::loadMatrix(const Matrix4d& m){ glLoadMatrixd(m.elems()); }
-inline void Graphics::loadMatrix(const Matrix4f& m){ glLoadMatrixf(m.elems()); }
+inline void Graphics::loadIdentity(){ glLoadIdentity(); }
+inline void Graphics::loadMatrix(const Mat4f& m){ glLoadMatrixf(m.elems()); }
+inline void Graphics::multMatrix(const Mat4f& m){ glMultMatrixf(m.elems()); }
+	#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
+	inline void Graphics::loadMatrix(const Mat4d& m){ glLoadMatrixd(m.elems()); }
+	inline void Graphics::multMatrix(const Mat4d& m){ glMultMatrixd(m.elems()); }
+	#else
+	inline void Graphics::loadMatrix(const Mat4d& m){ loadMatrix(Mat4f(m)); }
+	inline void Graphics::multMatrix(const Mat4d& m){ multMatrix(Mat4f(m)); }
+	#endif
+inline void Graphics::translate(float x, float y, float z){ glTranslatef(x,y,z); }
+inline void Graphics::rotate(float angle, float x, float y, float z){ glRotatef(angle,x,y,z); }
+inline void Graphics::scale(float s){
+	if(mRescaleNormal < 1){
+		mRescaleNormal = 1;
+		enable(RESCALE_NORMAL);
+	}
+	glScalef(s, s, s);
+}
+inline void Graphics::scale(float x, float y, float z){
+	if(mRescaleNormal < 3){
+		mRescaleNormal = 3;
+		disable(RESCALE_NORMAL);
+		enable(NORMALIZE);
+	}
+	glScalef(x, y, z);
+}
+inline void Graphics::pointAtten(float c2, float c1, float c0){
+	GLfloat att[3] = {c0, c1, c2};
+	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
+}
 #endif
 
+#ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
+inline void Graphics::drawBuffer(Direction d){ glDrawBuffer(d); }
+inline void Graphics::readBuffer(Direction d){ glReadBuffer(d); }
+#else
+inline void Graphics::drawBuffer(Direction d){}
+inline void Graphics::readBuffer(Direction d){}
+#endif
 
+#ifdef AL_GRAPHICS_SUPPORTS_POLYGON_MODE
+inline void Graphics::polygonMode(PolygonMode m, Direction d){ glPolygonMode(d,m); }
+#else
+inline void Graphics::polygonMode(PolygonMode m, Direction d){}
+#endif
+
+#ifdef AL_GRAPHICS_SUPPORTS_SHADE_MODEL
+inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
+#else
+inline void Graphics::shadeModel(ShadeModel m){}
+#endif
+
+// Supported across all backends
 inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
 inline void Graphics::clearColor(float r, float g, float b, float a){ glClearColor(r, g, b, a); }
 inline void Graphics::clearColor(const Color& c){ clearColor(c.r, c.g, c.b, c.a); }
 
 inline void Graphics::blendMode(BlendFunc src, BlendFunc dst, BlendEq eq){
-	glBlendEquation(eq);
+	#ifdef AL_GRAPHICS_SUPPORTS_BLEND_EQ
+		glBlendEquation(eq);
+	#endif
 	glBlendFunc(src, dst);
 }
 
@@ -651,47 +747,18 @@ inline void Graphics::colorMask(bool r, bool g, bool b, bool a){
 inline void Graphics::colorMask(bool b){ colorMask(b,b,b,b); }
 inline void Graphics::depthMask(bool b){ glDepthMask(b?GL_TRUE:GL_FALSE); }
 inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
-inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
 inline void Graphics::scissorTest(bool b){ capability(SCISSOR_TEST, b); }
 inline void Graphics::cullFace(bool b){ capability(CULL_FACE, b); }
 inline void Graphics::cullFace(bool b, Direction d) {
 	capability(CULL_FACE, b);
 	glCullFace(d);
 }
-inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
-inline void Graphics::loadIdentity(){ glLoadIdentity(); }
-inline void Graphics::multMatrix(const Matrix4d& m){ glMultMatrixd(m.elems()); }
-inline void Graphics::multMatrix(const Matrix4f& m){ glMultMatrixf(m.elems()); }
-inline void Graphics::translate(double x, double y, double z){ glTranslated(x,y,z); }
-inline void Graphics::rotate(double angle, double x, double y, double z){ glRotated(angle,x,y,z); }
 inline void Graphics::rotate(const Quatd& q) {
-	Matrix4d m;
+	Mat4d m;
 	q.toMatrix(m.elems());
 	multMatrix(m);
 }
-inline void Graphics::scale(double s){
-	if(mRescaleNormal < 1){
-		mRescaleNormal = 1;
-		enable(RESCALE_NORMAL);
-	}
-	glScaled(s, s, s);
-}
-inline void Graphics::scale(double x, double y, double z){
-	if(mRescaleNormal < 3){
-		mRescaleNormal = 3;
-		disable(RESCALE_NORMAL);
-		enable(NORMALIZE);
-	}
-	glScaled(x, y, z);
-}
 inline void Graphics::lineWidth(float v) { glLineWidth(v); }
-inline void Graphics::pointAtten(float c2, float c1, float c0){
-	GLfloat att[3] = {c0, c1, c2};
-	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
-}
-inline void Graphics::polygonMode(PolygonMode m, Direction d){ glPolygonMode(d,m); }
-inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
-inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
 
 inline Graphics::AttributeBit operator| (
 	const Graphics::AttributeBit& a, const Graphics::AttributeBit& b
