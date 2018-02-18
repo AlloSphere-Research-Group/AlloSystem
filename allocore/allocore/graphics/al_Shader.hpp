@@ -164,6 +164,11 @@ public:
 		const std::string& geomSource=""
 	);
 
+	/// Set preamble to be inserted before sources specified by compile
+
+	/// This is useful for inserting code that is used across all shader stages,
+	/// e.g. version, common uniforms, etc.
+	ShaderProgram& preamble(const std::string& s){ mPreamble=s; return *this; }
 
 	const ShaderProgram& use();
 
@@ -350,6 +355,7 @@ protected:
 	std::string mVertSource, mFragSource, mGeomSource;
 	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
 	std::vector<std::string> mTFVaryings;
+	std::string mPreamble;
 	bool mActive;
 
 	virtual void get(int pname, void * params) const;
