@@ -13,18 +13,24 @@ Graphics::~Graphics(){}
 #define CS(t) case Graphics::t: return #t;
 const char * toString(Graphics::DataType v){
 	switch(v){
-		CS(BYTE) CS(UBYTE) CS(SHORT) CS(USHORT) CS(INT) CS(UINT)
-		CS(BYTES_2) CS(BYTES_3) CS(BYTES_4)
-		CS(FLOAT) CS(DOUBLE)
+		CS(BYTE) CS(UBYTE) CS(SHORT) CS(USHORT) CS(FLOAT)
+		#ifdef AL_GRAPHICS_SUPPORTS_INT32
+		CS(INT) CS(UINT)
+		#endif
+		#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
+		CS(DOUBLE)
+		#endif
 		default: return "";
 	}
 }
 
 const char * toString(Graphics::Format v){
 	switch(v){
-		CS(DEPTH_COMPONENT) CS(LUMINANCE) CS(LUMINANCE_ALPHA)
-		CS(RED) CS(GREEN) CS(BLUE) CS(ALPHA)
-		CS(RGB) CS(BGR) CS(RGBA) CS(BGRA)
+		#ifdef AL_GRAPHICS_SUPPORTS_DEPTH_COMP
+		CS(DEPTH_COMPONENT)
+		#endif
+		CS(LUMINANCE) CS(LUMINANCE_ALPHA)
+		CS(ALPHA) CS(RGB) CS(RGBA)
 		default: return "";
 	}
 }
@@ -32,16 +38,13 @@ const char * toString(Graphics::Format v){
 
 int Graphics::numComponents(Format v){
 	switch(v){
-		case RGBA:
-		case BGRA:				return 4;
-		case RGB:
-		case BGR:				return 3;
+		case RGBA:				return 4;
+		case RGB:				return 3;
 		case LUMINANCE_ALPHA:	return 2;
+		#ifdef AL_GRAPHICS_SUPPORTS_DEPTH_COMP
 		case DEPTH_COMPONENT:
+		#endif
 		case LUMINANCE:
-		case RED:
-		case GREEN:
-		case BLUE:
 		case ALPHA:				return 1;
 		default:				return 0;
 	};
@@ -54,13 +57,14 @@ int Graphics::numBytes(DataType v){
 		CS(UBYTE, GLubyte)
 		CS(SHORT, GLshort)
 		CS(USHORT, GLushort)
+		CS(FLOAT, GLfloat)
+		#ifdef AL_GRAPHICS_SUPPORTS_INT32
 		CS(INT, GLint)
 		CS(UINT, GLuint)
-		CS(BYTES_2, char[2])
-		CS(BYTES_3, char[3])
-		CS(BYTES_4, char[4])
-		CS(FLOAT, GLfloat)
+		#endif
+		#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
 		CS(DOUBLE, GLdouble)
+		#endif
 		default: return 0;
 	};
 	#undef CS
@@ -70,35 +74,47 @@ template<> Graphics::DataType Graphics::toDataType<char>(){ return BYTE; }
 template<> Graphics::DataType Graphics::toDataType<unsigned char>(){ return UBYTE; }
 template<> Graphics::DataType Graphics::toDataType<short>(){ return SHORT; }
 template<> Graphics::DataType Graphics::toDataType<unsigned short>(){ return USHORT; }
+#ifdef AL_GRAPHICS_SUPPORTS_INT32
 template<> Graphics::DataType Graphics::toDataType<int>(){ return INT; }
 template<> Graphics::DataType Graphics::toDataType<unsigned int>(){ return UINT; }
+#endif
 template<> Graphics::DataType Graphics::toDataType<float>(){ return FLOAT; }
+#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
 template<> Graphics::DataType Graphics::toDataType<double>(){ return DOUBLE; }
+#endif
 
 Graphics::DataType Graphics::toDataType(AlloTy v){
 	switch(v){
 		case AlloFloat32Ty: return FLOAT;
+		#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
 		case AlloFloat64Ty: return DOUBLE;
+		#endif
 		case AlloSInt8Ty:	return BYTE;
 		case AlloUInt8Ty:	return UBYTE;
 		case AlloSInt16Ty:	return SHORT;
 		case AlloUInt16Ty:	return USHORT;
+		#ifdef AL_GRAPHICS_SUPPORTS_INT32
 		case AlloSInt32Ty:	return INT;
 		case AlloUInt32Ty:	return UINT;
+		#endif
 		default:			return BYTE;
 	}
 }
 
-AlloTy Graphics :: toAlloTy(Graphics::DataType v) {
-	switch (v) {
+AlloTy Graphics::toAlloTy(Graphics::DataType v) {
+	switch(v){
 		case BYTE:		return AlloSInt8Ty;
 		case UBYTE:		return AlloUInt8Ty;
 		case SHORT:		return AlloSInt16Ty;
 		case USHORT:	return AlloUInt16Ty;
+		#ifdef AL_GRAPHICS_SUPPORTS_INT32
 		case INT:		return AlloSInt32Ty;
 		case UINT:		return AlloUInt32Ty;
+		#endif
 		case FLOAT:		return AlloFloat32Ty;
+		#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
 		case DOUBLE:	return AlloFloat64Ty;
+		#endif
 		default:		return AlloVoidTy;
 	}
 }
@@ -111,14 +127,18 @@ const char * Graphics::errorString(bool verbose){
 		CS(GL_INVALID_ENUM, "An unacceptable value is specified for an enumerated argument.")
 		CS(GL_INVALID_VALUE, "A numeric argument is out of range.")
 		CS(GL_INVALID_OPERATION, "The specified operation is not allowed in the current state.")
+		CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
 	#ifdef GL_INVALID_FRAMEBUFFER_OPERATION
 		CS(GL_INVALID_FRAMEBUFFER_OPERATION, "The framebuffer object is not complete.")
 	#endif
-		CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
-		CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
-		CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
 	#ifdef GL_TABLE_TOO_LARGE
 		CS(GL_TABLE_TOO_LARGE, "The specified table exceeds the implementation's maximum supported table size.")
+	#endif
+	#ifdef GL_STACK_OVERFLOW
+		CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
+	#endif
+	#ifdef GL_STACK_UNDERFLOW
+		CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
 	#endif
 		default: return "Unknown error code.";
 	}
@@ -169,28 +189,39 @@ bool Graphics::error(const char * msg, int ID){
 }
 
 void Graphics::antialiasing(AntiAliasMode v){
+	#ifdef AL_GRAPHICS_SUPPORTS_STROKE_SMOOTH
 	glHint(GL_POINT_SMOOTH_HINT, v);
 	glHint(GL_LINE_SMOOTH_HINT, v);
-	glHint(GL_POLYGON_SMOOTH_HINT, v);
-
-	if (FASTEST != v) {
-		glEnable(GL_POLYGON_SMOOTH);
+	if(FASTEST != v){
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_POINT_SMOOTH);
 	} else {
-		glDisable(GL_POLYGON_SMOOTH);
 		glDisable(GL_LINE_SMOOTH);
 		glDisable(GL_POINT_SMOOTH);
 	}
+	#endif
+
+	#ifdef AL_GRAPHICS_SUPPORTS_POLYGON_SMOOTH
+	glHint(GL_POLYGON_SMOOTH_HINT, v);
+	if(FASTEST != v){
+		glEnable(GL_POLYGON_SMOOTH);
+	} else {
+		glDisable(GL_POLYGON_SMOOTH);
+	}
+	#endif
 }
 
+#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
 void Graphics::fog(float end, float start, const Color& c){
 	glEnable(GL_FOG);
-	glFogi(GL_FOG_MODE, GL_LINEAR);
+	glFogf(GL_FOG_MODE, GL_LINEAR);
 	glFogf(GL_FOG_START, start); glFogf(GL_FOG_END, end);
 	float fogColor[4] = {c.r, c.g, c.b, c.a};
 	glFogfv(GL_FOG_COLOR, fogColor);
 }
+#else
+void Graphics::fog(float end, float start, const Color& c){}
+#endif
 
 void Graphics::viewport(int x, int y, int width, int height) {
 	glViewport(x, y, width, height);
@@ -291,6 +322,116 @@ void Graphics::draw(const Mesh& m, int count, int begin){
 	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
 
+	auto prim = (Graphics::Primitive)m.primitive();
+
+	if(m.stroke() > 0.f){
+		switch(prim){
+		case LINES: case LINE_STRIP: case LINE_LOOP:
+			lineWidth(m.stroke());
+			break;
+		case POINTS:
+			pointSize(m.stroke());
+			break;
+		default:;
+		}
+	}
+
+	#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
+
+	if(mCompileShader){
+		mCompileShader = false; // will only make one attempt
+
+		mShader.compile(
+		R"(
+		uniform mat4 MVP;
+		uniform vec4 singleColor;
+		attribute vec3 posIn;
+		attribute vec4 colorIn;
+		attribute vec3 normalIn;
+		attribute vec2 texCoord2In;
+		varying vec4 color;
+		varying vec3 normal;
+		varying vec2 texCoord2;
+		void main(){
+			gl_Position = MVP * vec4(posIn,1.);
+			color = singleColor.a==8192. ? colorIn : singleColor;
+			normal = normalIn;
+			texCoord2 = texCoord2In;
+		}
+		)",R"(
+		precision mediump float; // yes, this is req'd by ES2
+		varying vec4 color;
+		varying vec3 normal;
+		void main(){
+			gl_FragColor = color;
+			//gl_FragColor = vec4(1.,0.,0.,1.); //debug
+		}
+		)"
+		);
+
+		if(mShader.linked()){
+			mLocPos       = mShader.attribute("posIn");
+			mLocColor     = mShader.attribute("colorIn");
+			mLocNormal    = mShader.attribute("normalIn");
+			mLocTexCoord2 = mShader.attribute("texCoord2In");
+		} else {
+			printf("Critical error: al::Graphics failed to compile shader\n");
+		}
+	}
+
+	// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
+
+	glEnableVertexAttribArray(mLocPos);
+	glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
+
+	if(Nn >= Nv){
+		glEnableVertexAttribArray(mLocNormal);
+		glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
+	}
+
+	Color singleColor(0,0,0,8192); // if unchanged, triggers read from array
+
+	if(Nc >= Nv){
+		glEnableVertexAttribArray(mLocColor);
+		glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, &m.colors()[0]);
+	}
+	else if(Nci >= Nv){
+		glEnableVertexAttribArray(mLocColor);
+		glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, 0, 0, &m.coloris()[0]);
+	}
+	else if(0 == Nc && 0 == Nci){
+		singleColor = mCurrentColor;
+	}
+	else{
+		singleColor = Nc ? m.colors()[0] : Color(m.coloris()[0]);
+	}
+
+	if(Nt2 >= Nv){
+		glEnableVertexAttribArray(mLocTexCoord2);
+		glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, &m.texCoord2s()[0]);
+	}
+
+	mShader.begin();
+		mShader.uniform("MVP", projection()*modelView());
+		mShader.uniform("singleColor", singleColor);
+		if(Ni){
+			// Here, 'count' is the number of indices to render
+			glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
+		}
+		else{
+			glDrawArrays(prim, begin, count);
+		}
+	mShader.end();
+
+	glDisableVertexAttribArray(mLocPos);
+	if(Nc) glDisableVertexAttribArray(mLocColor);
+	if(Nn) glDisableVertexAttribArray(mLocNormal);
+	if(Nt2)glDisableVertexAttribArray(mLocTexCoord2);
+
+
+	//---- FIXED PIPELINE
+	#else
+
 	// Enable arrays and set pointers...
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, &m.vertices()[0]);
@@ -314,10 +455,9 @@ void Graphics::draw(const Mesh& m, int count, int begin){
 	}
 	else{
 		if(Nc)
-			//glColor4f(m.colors()[0][0], m.colors()[0][1], m.colors()[0][2], m.colors()[0][3]);
-			glColor4fv(m.colors()[0].components);
+			glColor4f(m.colors()[0].r, m.colors()[0].g, m.colors()[0].b, m.colors()[0].a);
 		else
-			glColor3ubv(m.coloris()[0].components);
+			glColor4ub(m.coloris()[0].r, m.coloris()[0].g, m.coloris()[0].b, m.coloris()[0].a);
 	}
 
 	if(Nt1 >= Nv){
@@ -333,24 +473,20 @@ void Graphics::draw(const Mesh& m, int count, int begin){
 		glTexCoordPointer(3, GL_FLOAT, 0, &m.texCoord3s()[0]);
 	}
 
-	auto prim = (Graphics::Primitive)m.primitive();
-
-	if(m.stroke() > 0.f){
-		switch(prim){
-		case LINES: case LINE_STRIP: case LINE_LOOP:
-			lineWidth(m.stroke());
-			break;
-		case POINTS:
-			pointSize(m.stroke());
-			break;
-		default:;
-		}
-	}
-
 	// Draw
 	if(Ni){
-		// Here, 'count' is the number of indexed elements to render
-		glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
+		#ifdef AL_GRAPHICS_SUPPORTS_INT32
+			// Here, 'count' is the number of indices to render
+			glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
+		#else
+			mIndices16.clear();
+			for(int i=begin; i<begin+count; ++i){
+				auto idx = m.indices()[i];
+				if(idx > 65535) AL_WARN_ONCE("Mesh index value out of range (> 65535)");
+				mIndices16.push_back(idx);
+			}
+			glDrawElements(prim, count, GL_UNSIGNED_SHORT, &mIndices16[0]);
+		#endif
 	}
 	else{
 		glDrawArrays(prim, begin, count);
@@ -361,6 +497,8 @@ void Graphics::draw(const Mesh& m, int count, int begin){
 	if(Nn)					glDisableClientState(GL_NORMAL_ARRAY);
 	if(Nc || Nci)			glDisableClientState(GL_COLOR_ARRAY);
 	if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	#endif
 }
 
 

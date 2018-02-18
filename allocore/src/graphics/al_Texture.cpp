@@ -25,6 +25,7 @@ Texture::Texture()
 	init();
 }
 
+#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 Texture :: Texture(
 	unsigned width,
 	Graphics::Format format, Graphics::DataType type,
@@ -40,6 +41,7 @@ Texture :: Texture(
 	init();
 	if(alloc) allocate();
 }
+#endif
 
 Texture :: Texture(
 	unsigned width, unsigned height,
@@ -57,6 +59,7 @@ Texture :: Texture(
 	if(alloc) allocate();
 }
 
+#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 Texture :: Texture(
 	unsigned width, unsigned height, unsigned depth,
 	Graphics::Format format, Graphics::DataType type,
@@ -72,6 +75,7 @@ Texture :: Texture(
 	init();
 	if(alloc) allocate();
 }
+#endif
 
 Texture :: Texture(AlloArrayHeader& header)
 {
@@ -134,9 +138,13 @@ Texture& Texture::filterMag(Filter v){
 
 void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
 	switch(hdr.dimcount){
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		case 1: target(TEXTURE_1D); break;
+		#endif
 		case 2: target(TEXTURE_2D); break;
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 		case 3: target(TEXTURE_3D); break;
+		#endif
 		default:
 			AL_WARN("invalid array dimensions for texture");
 			return;
@@ -170,10 +178,14 @@ void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
 		case AlloSInt8Ty:	type(Graphics::BYTE); break;
 		case AlloUInt16Ty:	type(Graphics::SHORT); break;
 		case AlloSInt16Ty:	type(Graphics::USHORT); break;
+		#ifdef AL_GRAPHICS_SUPPORTS_INT32
 		case AlloUInt32Ty:	type(Graphics::INT); break;
 		case AlloSInt32Ty:	type(Graphics::UINT); break;
+		#endif
 		case AlloFloat32Ty:	type(Graphics::FLOAT); break;
+		#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
 		case AlloFloat64Ty:	type(Graphics::DOUBLE); break;
+		#endif
 		default:
 			AL_WARN("invalid array type for texture");
 			return;
@@ -205,13 +217,17 @@ void Texture::shapeFromArray(){
 
 void Texture::deriveTarget(){
 	if(mDepth != 0){
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 		target(TEXTURE_3D);
+		#endif
 	}
 	else if(mHeight != 0){
 		target(TEXTURE_2D);
 	}
 	else if(mWidth != 0){
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		target(TEXTURE_1D);
+		#endif
 	}
 	else{
 		target(NO_TARGET);
@@ -286,6 +302,7 @@ void Texture :: resetArray(unsigned align) {
 			mArray.deriveStride(mArray.header, align);
 			break;
 
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		case TEXTURE_1D:
 			mArray.header.type = Graphics::toAlloTy(mType);
 			mArray.header.components = Graphics::numComponents(mFormat);
@@ -293,7 +310,9 @@ void Texture :: resetArray(unsigned align) {
 			mArray.header.dim[0] = mWidth;
 			mArray.deriveStride(mArray.header, align);
 			break;
+		#endif
 
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 		case TEXTURE_3D:
 			mArray.header.type = Graphics::toAlloTy(mType);
 			mArray.header.components = Graphics::numComponents(mFormat);
@@ -303,6 +322,7 @@ void Texture :: resetArray(unsigned align) {
 			mArray.header.dim[3] = mDepth;
 			mArray.deriveStride(mArray.header, align);
 			break;
+		#endif
 	}
 }
 
@@ -374,7 +394,9 @@ void Texture::sendParams(bool force){
 		glTexParameteri(target(), GL_TEXTURE_MIN_FILTER, filterMin());
 		glTexParameteri(target(), GL_TEXTURE_WRAP_S, mWrapS);
 		glTexParameteri(target(), GL_TEXTURE_WRAP_T, mWrapT);
+		#ifdef GL_TEXTURE_WRAP_R
 		glTexParameteri(target(), GL_TEXTURE_WRAP_R, mWrapR);
+		#endif
 		/*if (filterMin() != LINEAR && filterMin() != NEAREST) {
 			// deprecated in OpenGL 3.0 and above
 			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
@@ -392,6 +414,12 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 		glPixelStorei(GL_UNPACK_ALIGNMENT, align);
 			AL_GRAPHICS_ERROR("Texture::sendPixels (glPixelStorei set)", id());
 
+		auto genMipmap = [this](){
+			#ifdef AL_GRAPHICS_SUPPORTS_MIPMAP
+			if(mMipmap) glGenerateMipmap(target());
+			#endif
+		};
+
 		switch(target()){
 
 			/*void glTexSubImage3D(
@@ -402,18 +430,25 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 				const GLvoid *pixels
 			);*/
 
+			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 			case TEXTURE_1D:
 				glTexSubImage1D(target(), 0, 0, width(), format(), type(), pixels);
-				if(mMipmap) glGenerateMipmap(target());
+				genMipmap();
 				break;
+			#endif
+
 			case TEXTURE_2D:
 				glTexSubImage2D(target(), 0, 0,0, width(), height(), format(), type(), pixels);
-				if(mMipmap) glGenerateMipmap(target());
+				genMipmap();
 				break;
+
+			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 			case TEXTURE_3D:
 				glTexSubImage3D(target(), 0, 0,0,0, width(), height(), depth(), format(), type(), pixels);
-				if(mMipmap) glGenerateMipmap(target());
+				genMipmap();
 				break;
+			#endif
+
 			case NO_TARGET:;
 				// Unconfigured
 			default:
@@ -440,27 +475,8 @@ void Texture::sendShape(bool force){
 	if((mShapeUpdated || force)){
 
 		// Determine texel format (on GPU)
-		int intFmt;
-
-		// Use specified texel format, if defined
-		if(mTexelFormat){
-			intFmt = mTexelFormat;
-		}
-
-		// Derive internal texel format from texture data format.
-		// By default, we can just use the texture data format. In cases where
-		// there is no corresponding texel format, just hand in the number of
-		// components.
-		else{
-			switch(format()){
-			default:				intFmt = format(); break;
-			case Graphics::RED:
-			case Graphics::GREEN:
-			case Graphics::BLUE:	intFmt = 1; break;
-			case Graphics::BGR:		intFmt = 3; break;
-			case Graphics::BGRA:	intFmt = 4; break;
-			}
-		}
+		// Use specified texel format if defined, otherwise pixel format
+		int intFmt = mTexelFormat ? mTexelFormat : format();
 
 		//printf("Texture::sendShape calling glTexImage\n");
 		switch(target()){
@@ -468,16 +484,23 @@ void Texture::sendShape(bool force){
 			GLenum target, GLint level, GLenum internalformat,
 			GLsizei width, GLsizei height, GLsizei depth,
 			GLint border, GLenum format, GLenum type, const GLvoid *pixels);*/
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		case TEXTURE_1D:
 			glTexImage1D(target(), 0, intFmt, width(), 0, format(), type(), NULL);
 			break;
+		#endif
+
 		case TEXTURE_2D:
 			glTexImage2D(target(), 0, intFmt, width(), height(), 0, format(), type(), NULL);
 			//printf("glTexImage2D(%s, 0, %s, %u, %u, 0, %s, %s, NULL)\n", toString(target()), toString(Graphics::Format(intFmt)), width(), height(), toString(format()), toString(type()));
 			break;
+
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 		case TEXTURE_3D:
 			glTexImage3D(target(), 0, intFmt, width(), height(), depth(), 0, format(), type(), NULL);
 			break;
+		#endif
+
 		case NO_TARGET:;
 			// Unconfigured
 		default:;
@@ -540,17 +563,13 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 			AL_WARN("submit failed: source array width does not match");
 			return;
 		}
-		if (target() != TEXTURE_1D) {
-			if (height() && src.height() != height()) {
-				AL_WARN("submit failed: source array height does not match");
-				return;
-			}
-			if (target() == TEXTURE_3D) {
-				if (depth() && src.depth() != depth()) {
-					AL_WARN("submit failed: source array depth does not match");
-					return;
-				}
-			}
+		if (height() && src.height() != height()) {
+			AL_WARN("submit failed: source array height does not match");
+			return;
+		}
+		if (depth() && src.depth() != depth()) {
+			AL_WARN("submit failed: source array depth does not match");
+			return;
 		}
 
 		if (Graphics::toDataType(src.type()) != type()) {
@@ -560,10 +579,9 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 
 		switch (format()) {
 			case Graphics::LUMINANCE:
+			#ifdef AL_GRAPHICS_SUPPORTS_DEPTH_COMP
 			case Graphics::DEPTH_COMPONENT:
-			case Graphics::RED:
-			case Graphics::GREEN:
-			case Graphics::BLUE:
+			#endif
 			case Graphics::ALPHA:
 				if (src.components() != 1) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 1)", src.components());
@@ -577,14 +595,12 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 				}
 				break;
 			case Graphics::RGB:
-			case Graphics::BGR:
 				if (src.components() != 3) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 3)", src.components());
 					return;
 				}
 				break;
 			case Graphics::RGBA:
-			case Graphics::BGRA:
 				if (src.components() != 4) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 4)", src.components());
 					return;
@@ -614,25 +630,22 @@ void Texture::copyFrameBuffer(
 
 	bind();
 	switch(target()){
+	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	case TEXTURE_1D:
 		glCopyTexSubImage1D(GL_TEXTURE_1D, 0, texx, fbx,fby, w);
 		break;
+	#endif
 	case TEXTURE_2D:
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, texx,texy, fbx,fby, w, h);
 		break;
+	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 	case TEXTURE_3D:
 		glCopyTexSubImage3D(GL_TEXTURE_3D, 0, texx,texy,texz, fbx,fby, w, h);
 		break;
+	#endif
 	default:;
 	}
 	unbind();
-}
-
-Texture& Texture::generateMipmap(){
-	bind();
-	glGenerateMipmapEXT(target());
-	unbind();
-	return *this;
 }
 
 void Texture :: quad(Graphics& gl, double w, double h, double x, double y, double z){
@@ -679,18 +692,26 @@ void Texture :: print() {
 	printf("Texture ");
 
 	switch (mTarget) {
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		case TEXTURE_1D:
 			printf("target=%s, %d(%d)", toString(mTarget), width(), mArray.width());
 			break;
+		#endif
+
 		case TEXTURE_2D:
 			printf("target=%s, %dx%d(%dx%d)", toString(mTarget), width(), height(), mArray.width(), mArray.height());
 			break;
+
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 		case TEXTURE_3D:
 			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
+		#endif
+
 		case NO_TARGET:
 			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
+
 		default:
 			printf("target=(unknown)");
 	}
@@ -716,13 +737,23 @@ Texture& Texture::updatePixels(){
 #define CS(t) case Texture::t: return #t;
 const char * toString(Texture::Target v){
 	switch(v){
-		CS(TEXTURE_1D) CS(TEXTURE_2D) CS(TEXTURE_3D) CS(NO_TARGET)
+		CS(TEXTURE_2D)
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
+		CS(TEXTURE_1D)
+		#endif
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
+		CS(TEXTURE_3D)
+		#endif
+		CS(NO_TARGET)
 		default: return "";
 	}
 }
 const char * toString(Texture::Wrap v){
 	switch(v){
-		CS(CLAMP) CS(CLAMP_TO_BORDER) CS(CLAMP_TO_EDGE) CS(MIRRORED_REPEAT) CS(REPEAT)
+		CS(CLAMP_TO_EDGE) CS(REPEAT)
+		#ifdef AL_GRAPHICS_SUPPORTS_WRAP_EXTRA
+		CS(CLAMP) CS(CLAMP_TO_BORDER) CS(MIRRORED_REPEAT)
+		#endif
 		default: return "";
 	}
 }

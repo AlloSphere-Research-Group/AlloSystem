@@ -47,6 +47,7 @@
 
 namespace al{
 
+#ifdef AL_GRAPHICS_SUPPORTS_FBO
 
 /// Render buffer object
 
@@ -173,6 +174,8 @@ public:
 	/// \deprecated
 	static void end();
 };
+
+#endif
 
 } // al::
 #endif

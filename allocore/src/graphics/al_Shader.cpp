@@ -1,13 +1,12 @@
 #include "allocore/graphics/al_Graphics.hpp"
+
+#ifdef AL_GRAPHICS_SUPPORTS_SHADER
+
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/system/al_Printing.hpp"
 #include <stdio.h>
 #include <map>
 #include <string>
-
-#ifdef AL_GRAPHICS_USE_OPENGL
-	#define GEOMETRY_SHADER_SUPPORTED
-#endif
 
 namespace al{
 
@@ -47,7 +46,7 @@ GLenum gl_shader_type(Shader::Type v) {
 	switch(v){
 		case Shader::FRAGMENT:	return GL_FRAGMENT_SHADER;
 		case Shader::VERTEX:	return GL_VERTEX_SHADER;
-		#ifdef GEOMETRY_SHADER_SUPPORTED
+		#ifdef AL_GRAPHICS_SUPPORTS_GEOMETRY_SHADER
 		case Shader::GEOMETRY:	return GL_GEOMETRY_SHADER_EXT;
 		#endif
 		default: return 0;
@@ -163,7 +162,7 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 	#endif
 	//*/
 
-	#ifdef GEOMETRY_SHADER_SUPPORTED
+	#ifdef AL_GRAPHICS_SUPPORTS_GEOMETRY_SHADER
 	if (s.type() == Shader::GEOMETRY) {
 		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT, mInPrim);
 		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT, mOutPrim);
@@ -469,3 +468,5 @@ void ShaderProgram::listParams() const {
 }
 
 } // al::
+
+#endif //AL_GRAPHICS_SUPPORTS_SHADER

@@ -1,5 +1,8 @@
 #include "allocore/graphics/al_FBO.hpp"
 #include <stdio.h>
+
+#ifdef AL_GRAPHICS_SUPPORTS_FBO
+
 namespace al{
 
 RBO::RBO(Graphics::Format format)
@@ -108,9 +111,11 @@ const char * FBO::statusString(GLenum stat){
 	CS(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
 	CS(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
 	CS(GL_FRAMEBUFFER_UNSUPPORTED)
-	#ifdef AL_GRAPHICS_USE_OPENGL
+	#ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFER
 		CS(GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER)
 		CS(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER)
+	#endif
+	#ifdef GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
 		CS(GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE)
 	#endif
 	default: return "Unknown status";
@@ -139,3 +144,5 @@ void FBO::texture2D(GLuint texID, Attachment att, int level){
 }
 
 } // al::
+
+#endif //AL_GRAPHICS_SUPPORTS_FBO
