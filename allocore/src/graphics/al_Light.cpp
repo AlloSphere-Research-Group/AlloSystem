@@ -114,6 +114,8 @@ Material::Material(Graphics::Direction f)
 	mEmission(0),
 	mSpecular(0),		// Specular is 0 to ensure linear lighting (no popping).
 	mShine(5.),
+	mOpticalDensity(0.),
+	mIllumination(0.),
 	mFace(f),
 	mUseColorMaterial(true)
 {}
