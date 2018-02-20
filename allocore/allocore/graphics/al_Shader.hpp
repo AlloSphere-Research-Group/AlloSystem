@@ -233,6 +233,7 @@ public:
 	const ShaderProgram& uniform(int loc, float v0, float v1) const;
 	const ShaderProgram& uniform(int loc, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(int loc, float v0, float v1, float v2, float v3) const;
+
 	template <typename T>
 	const ShaderProgram& uniform(int loc, const Vec<2,T>& v) const {
 		return uniform(loc, v.x, v.y);
@@ -245,15 +246,24 @@ public:
 	const ShaderProgram& uniform(int loc, const Vec<4,T>& v) const {
 		return uniform(loc, v.x, v.y, v.z, v.w);
 	}
+
 	const ShaderProgram& uniformMatrix3(int loc, const float * v, bool transpose=false) const;
 	const ShaderProgram& uniformMatrix4(int loc, const float * v, bool transpose=false) const;
-	const ShaderProgram& uniform(int loc, const Mat<4,float>& m) const{
+	const ShaderProgram& uniform(int loc, const Mat3f& m) const{
+		return uniformMatrix3(loc, m.elems());
+	}
+	template<typename T>
+	const ShaderProgram& uniform(int loc, const Mat<3,T>& m) const{
+		return uniform(loc, Mat3f(m));
+	}
+	const ShaderProgram& uniform(int loc, const Mat4f& m) const{
 		return uniformMatrix4(loc, m.elems());
 	}
 	template<typename T>
 	const ShaderProgram& uniform(int loc, const Mat<4,T>& m) const{
 		return uniform(loc, Mat4f(m));
 	}
+
 	const ShaderProgram& uniform(int loc, const Color& c) const {
 		return uniform(loc, c.r, c.g, c.b, c.a);
 	}
@@ -280,7 +290,15 @@ public:
 	const ShaderProgram& uniform(const char * name, const Vec<4,T>& v) const {
 		return uniform(name, v.x, v.y, v.z, v.w);
 	}
-	const ShaderProgram& uniform(const char * name, const Mat<4,float>& m) const{
+
+	const ShaderProgram& uniform(const char * name, const Mat3f& m) const{
+		return uniformMatrix3(name, m.elems());
+	}
+	template<typename T>
+	const ShaderProgram& uniform(const char * name, const Mat<3,T>& m) const{
+		return uniform(name, Mat3f(m));
+	}
+	const ShaderProgram& uniform(const char * name, const Mat4f& m) const{
 		return uniformMatrix4(name, m.elems());
 	}
 	template<typename T>
@@ -292,6 +310,7 @@ public:
 		// note wxyz => xyzw for GLSL vec4:
 		return uniform(name, q.x, q.y, q.z, q.w);
 	}
+
 	const ShaderProgram& uniform(const char * name, const Color& c) const {
 		return uniform(name, c.r, c.g, c.b, c.a);
 	}
