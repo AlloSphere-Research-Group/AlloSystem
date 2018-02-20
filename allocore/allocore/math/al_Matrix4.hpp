@@ -421,7 +421,7 @@ public:
 
 	/// Get an off-axis viewing matrix
 	static Matrix4 lookAtOffAxis(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeShift){
-		return lookAt(ux, uy, uz, pos + (ux * -eyeShift));
+		return lookAt(ux, uy, uz, pos + (ux * eyeShift));
 	}
 
 	/// Computes product of matrix multiplied by column vector, r = m * vCol
