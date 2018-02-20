@@ -124,22 +124,28 @@ appropriate draw buffer. Thus, to draw the right eye:
 */
 void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect){
 
-	double near = lens.near();
-	double far = lens.far();
-	double focal = lens.focalLength();
-	double iod = lens.eyeSep();
-	const Vec3d& pos = pose.pos();
+	const auto near = lens.near();
+	const auto far = lens.far();
+	const auto focal = lens.focalLength();
+	auto eyeShift = lens.eyeSep()*0.5;
 
 	if(RIGHT_EYE == eye){
-		iod = -iod; // eyes only differ in sign in interocular distance
 		mEyeNumber = 0;
 	}
 	else{
+		eyeShift = -eyeShift; // eyes only differ in sign in interocular distance
 		mEyeNumber = 1;
 	}
 
 	sendViewport(g, vp);		// set scissor/viewport regions
 	if(clear) sendClear(g);	// clear color/depth buffers
+
+	auto setModelView = [this](const Pose& pose, double eyeShift){
+		mModelView = pose.matrix(); // head pose
+		mModelView.Mat4d::translate(pose.ux()*eyeShift); // translate head to eye
+		mEye = mModelView.col(3); // eye pos
+		invertRigid(mModelView); // convert eye pose to modelview
+	};
 
 	// FIXME: geometry is not continuous at slice boundaries
 	if (omni()) {
@@ -149,34 +155,19 @@ void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const
 
 		// Render slices starting on left of viewport
 		for (unsigned i=0; i<mSlices; i++) {
-			// angle at center of slice:
-			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
-
 			// Position of right edge of slice (exclusive)
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
 			double aspect = vp1.aspect() * pixelaspect;
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
 
-			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
-			Vec3d ux = q.toVectorX();
-			Vec3d uy = q.toVectorY();
-			Vec3d uz = q.toVectorZ();
+			mProjection = Matrix4d::perspectiveOffAxis(fovy, aspect, near, far, -eyeShift, focal);
 
-			/* LEFT
-			mEye = pos + (ux * iod);
-			mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-			*/
-			/* RIGHT
-			mEye = pos + (ux * -iod);	// right
-			mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-			*/
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
+			Quatd qrot = Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
 
-			mEye = pos + (ux * iod);
-
-			// Compute projection and modelview matrices
-			mProjection = Matrix4d::perspectiveOffAxis(fovy, aspect, near, far, 0.5*iod, focal);
-			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+			setModelView(pose * qrot, eyeShift);
 
 			// Do the rendering
 			sendViewport(g, vp1);		// set scissor/viewport regions
@@ -186,32 +177,9 @@ void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const
 		}
 
 	} else {
-		double fovy = lens.fovy();
 		double aspect = vp.aspect() * pixelaspect;
-
-		// Get orientation reference frame of viewer
-		Vec3d ux, uy, uz;
-		pose.unitVectors(ux, uy, uz);
-
-		/* LEFT
-		mEye = pos + (ux * iod);
-		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, mEye, iod);
-					(= lookAtOffAxis(ux,uy,uz, pos,-0.5*iod))
-		*/
-
-		/* RIGHT
-				mEye = pos + (ux * -iod);	// right
-		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAtRight(ux, uy, uz, mEye, iod);
-					(= lookAtOffAxis(ux,uy,uz, pos, 0.5*iod))
-		*/
-
-		mEye = pos + (ux * iod);
-
-		// Compute projection and modelview matrices
-		mProjection = Matrix4d::perspectiveOffAxis(fovy, aspect, near, far, 0.5*iod, focal);
-		mModelView = Matrix4d::lookAtOffAxis(ux, uy, uz, mEye, -0.5*iod);
+		mProjection = Matrix4d::perspectiveOffAxis(lens.fovy(), aspect, near, far, -eyeShift, focal);
+		setModelView(pose, eyeShift);
 
 		// Do the rendering
 		pushDrawPop(g,draw);		// onDraw wrapped in push/pop
