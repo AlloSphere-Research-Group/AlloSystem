@@ -57,6 +57,17 @@
 #include "allocore/graphics/al_MeshVBO.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 
+#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
+	#include <stack> // matrix stack
+	#ifndef AL_GRAPHICS_MODELVIEW_STACK_SIZE
+		#define AL_GRAPHICS_MODELVIEW_STACK_SIZE 8
+	#endif
+	#ifndef AL_GRAPHICS_PROJECTION_STACK_SIZE
+		#define AL_GRAPHICS_PROJECTION_STACK_SIZE 4
+	#endif
+#endif
+
+
 /*!
 	\def AL_GRAPHICS_ERROR(msg, ID)
 	Used for reporting graphics errors from source files
@@ -600,13 +611,21 @@ public:
 
 protected:
 #ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-	Mat4f mMatrices[2] = {Mat4f::identity(), Mat4f::identity()};
+	std::stack<Mat4f> mMatrixStacks[2];
+
+	static unsigned maxStackSize(MatrixMode mode){
+		static unsigned s[] = {
+			AL_GRAPHICS_MODELVIEW_STACK_SIZE, AL_GRAPHICS_PROJECTION_STACK_SIZE
+		};
+		return s[mode];
+	};
 	MatrixMode mMatrixMode = MODELVIEW;
-	const Mat4f& modelView() const { return mMatrices[MODELVIEW]; }
-	const Mat4f& projection() const { return mMatrices[PROJECTION]; }
-	Mat4f& currentMatrix(){ return mMatrices[mMatrixMode]; }
+	decltype(*mMatrixStacks)& currentMatrixStack(){ return mMatrixStacks[mMatrixMode]; }
+	const Mat4f& modelView() const { return mMatrixStacks[MODELVIEW].top(); }
+	const Mat4f& projection() const { return mMatrixStacks[PROJECTION].top(); }
+	Mat4f& currentMatrix(){ return currentMatrixStack().top(); }
 	ShaderProgram mShader;
-	int mLocPos, mLocColor, mLocNormal, mLocTexCoord2;
+	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
 	Color mCurrentColor;
 	bool mCompileShader = true;
 #endif
@@ -644,18 +663,37 @@ inline void Graphics::currentColor(float r, float g, float b, float a){
 }
 inline void Graphics::lighting(bool b){}
 inline void Graphics::pointSize(float v){}
-inline void Graphics::matrixMode(MatrixMode mode){ mMatrixMode=mode;}
-inline void Graphics::pushMatrix(){}
-inline void Graphics::popMatrix(){}
+
+inline void Graphics::matrixMode(MatrixMode mode){ mMatrixMode=mode; }
+inline void Graphics::pushMatrix(){
+	if(currentMatrixStack().size() < maxStackSize(mMatrixMode)){
+		currentMatrixStack().emplace(currentMatrix());
+	} else {
+		AL_WARN_ONCE("%s matrix stack overflow", mMatrixMode==MODELVIEW?"MV":"Proj");
+	}
+}
+inline void Graphics::popMatrix(){
+	if(currentMatrixStack().size() > 1){
+		currentMatrixStack().pop();
+	} else {
+		AL_WARN_ONCE("%s matrix stack underflow", mMatrixMode==MODELVIEW?"MV":"Proj");
+	}
+}
 inline void Graphics::loadIdentity(){ currentMatrix().setIdentity(); }
 inline void Graphics::loadMatrix(const Mat4d& m){ currentMatrix() = m; }
 inline void Graphics::loadMatrix(const Mat4f& m){ currentMatrix() = m; }
 inline void Graphics::multMatrix(const Mat4d& m){ currentMatrix() *= m; }
 inline void Graphics::multMatrix(const Mat4f& m){ currentMatrix() *= m; }
-inline void Graphics::translate(float x, float y, float z){ currentMatrix().translate(x,y,z); }
-inline void Graphics::rotate(float angle, float x, float y, float z){}
-inline void Graphics::scale(float s){ currentMatrix().scale(s); }
-inline void Graphics::scale(float x, float y, float z){ currentMatrix().scale(x,y,z); }
+inline void Graphics::translate(float x, float y, float z){
+	multMatrix(Mat4f::translation(x,y,z));
+}
+inline void Graphics::rotate(float angle, float x, float y, float z){
+	multMatrix(Mat4f::rotation(angle*0.01745329251994, Vec3f(x,y,z).normalize()));
+}
+inline void Graphics::scale(float s){ scale(s,s,s); }
+inline void Graphics::scale(float x, float y, float z){
+	multMatrix(Mat4f::scaling(x,y,z));
+}
 inline void Graphics::pointAtten(float c2, float c1, float c0){}
 
 #else
