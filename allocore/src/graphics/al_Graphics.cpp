@@ -6,7 +6,13 @@ namespace al{
 
 Graphics::Graphics()
 :	mRescaleNormal(0), mInImmediateMode(false)
-{}
+{
+	#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
+	for(auto& stack : mMatrixStacks){
+		stack.emplace(1.f);
+	}
+	#endif
+}
 
 Graphics::~Graphics(){}
 
@@ -380,6 +386,10 @@ void Graphics::draw(const Mesh& m, int count, int begin){
 	}
 
 	// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
+
+	//printf("%d %d %d %d\n", mLocPos, mLocColor, mLocNormal, mLocTexCoord2);
+	// Return if shader didn't compile
+	if(mLocPos < 0) return;
 
 	glEnableVertexAttribArray(mLocPos);
 	glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
