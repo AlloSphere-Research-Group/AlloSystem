@@ -174,8 +174,8 @@ endif
 
 # Emscripten (is Unix-like)
 ifeq ($(PLATFORM), em)
-	#AR = llvm-ar
-	#RANLIB = llvm-ranlib
+	AR = emar crs
+	RANLIB = emranlib
 
 	LDFLAGS	 += -lm
 	LDFLAGS	 += -lstdc++
