@@ -157,21 +157,43 @@ public:
 
 	/// Get identity matrix
 	static Mat identity(){
-		return Mat(MAT_NO_INIT).setIdentity();
+		return Mat(T(1));
 	}
 
 	/// Get a rotation transform matrix
+
+	/// @param[in] angle	rotation angle in radians
+	/// @param[in] dim1		first basis vector of rotation plane
+	/// @param[in] dim2		second basis vector of rotation plane
 	static Mat rotation(double angle, int dim1, int dim2){
 		double cs = cos(angle);
 		double sn = sin(angle);
-
-		Mat m(MAT_NO_INIT);
-		m.setIdentity();
+		Mat m(T(1));
 		m(dim1,dim1) = cs;
 		m(dim1,dim2) =-sn;
 		m(dim2,dim1) = sn;
 		m(dim2,dim2) = cs;
 		return m;
+	}
+
+	/// Get a rotation transform matrix
+
+	/// @param[in] angle	rotation angle in radians
+	/// @param[in] axis		rotation axis; should be a unit vector
+	static Mat<4,T> rotation(double angle, const Vec<3,T>& axis){
+		T s = sin(angle);
+		T c = cos(angle);
+		T t = T(1)-c;
+		T x = axis[0], y = axis[1], z = axis[2];
+		T tx = t*x, ty = t*y, tz = t*z;
+		T sx = s*x, sy = s*y, sz = s*z;
+
+		return Mat<4,T>(
+			tx*x + c , tx*y - sz, tx*z + sy, T(0),
+			tx*y + sz, ty*y + c , ty*z - sx, T(0),
+			tx*z - sy, ty*z + sx, tz*z + c , T(0),
+			T(0),T(0),T(0),T(1)
+		);
 	}
 
 	/// Get a scaling transform matrix
@@ -198,8 +220,7 @@ public:
 	/// Get a translation transform matrix
 	template <class V>
 	static Mat translation(const Vec<N-1,V>& v){
-		Mat m(MAT_NO_INIT);
-		m.setIdentity();
+		Mat m(T(1));
 		for(int r=0; r<N-1; ++r) m(r,N-1) = v[r];
 		return m;
 	}
@@ -562,7 +583,6 @@ public:
 	/// Print to file (stream)
 	void print(FILE * file = stderr) const;
 };
-
 
 
 // -----------------------------------------------------------------------------
