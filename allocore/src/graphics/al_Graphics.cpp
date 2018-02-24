@@ -219,14 +219,20 @@ void Graphics::antialiasing(AntiAliasMode v){
 
 #ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
 void Graphics::fog(float end, float start, const Color& c){
-	glEnable(GL_FOG);
+	enable(FOG);
 	glFogf(GL_FOG_MODE, GL_LINEAR);
 	glFogf(GL_FOG_START, start); glFogf(GL_FOG_END, end);
 	float fogColor[4] = {c.r, c.g, c.b, c.a};
 	glFogfv(GL_FOG_COLOR, fogColor);
 }
 #else
-void Graphics::fog(float end, float start, const Color& c){}
+void Graphics::fog(float end, float start, const Color& c){
+	enable(FOG);
+	mFog.start = start;
+	mFog.end = end;
+	mFog.scale = 1./(end-start);
+	mFog.color = c;
+}
 #endif
 
 void Graphics::viewport(int x, int y, int width, int height) {
@@ -347,33 +353,50 @@ void Graphics::draw(const Mesh& m, int count, int begin){
 	if(mCompileShader){
 		mCompileShader = false; // will only make one attempt
 
-		mShader.compile(
+		mShader.preamble(
 		R"(
-		uniform mat4 MVP;
-		uniform vec4 singleColor;
-		attribute vec3 posIn;
-		attribute vec4 colorIn;
-		attribute vec3 normalIn;
-		attribute vec2 texCoord2In;
-		varying vec4 color;
-		varying vec3 normal;
-		varying vec2 texCoord2;
-		void main(){
-			gl_Position = MVP * vec4(posIn,1.);
-			color = singleColor.a==8192. ? colorIn : singleColor;
-			normal = normalIn;
-			texCoord2 = texCoord2In;
-		}
-		)",R"(
-		precision mediump float; // yes, this is req'd by ES2
-		varying vec4 color;
-		varying vec3 normal;
-		void main(){
-			gl_FragColor = color;
-			//gl_FragColor = vec4(1.,0.,0.,1.); //debug
-		}
+			precision mediump float; // yes, this is req'd by ES2
+			struct Fog{
+				vec3 color;
+				float start, end;
+				float scale; // 1/(end-start)
+			};
+			uniform Fog fog;// = Fog(vec3(0.), 0., 1.);
+			varying float fogMix;
 		)"
 		);
+
+		mShader.compile(
+		R"(
+			uniform mat4 MVP;
+			uniform vec4 singleColor;
+			attribute vec3 posIn;
+			attribute vec4 colorIn;
+			attribute vec3 normalIn;
+			attribute vec2 texCoord2In;
+			varying vec4 color;
+			varying vec3 normal;
+			varying vec2 texCoord2;
+
+			void main(){
+				gl_Position = MVP * vec4(posIn,1.);
+				color = singleColor.a==8192. ? colorIn : singleColor;
+				normal = normalIn;
+				texCoord2 = texCoord2In;
+				fogMix = (gl_Position.z - fog.start) * fog.scale;
+				fogMix = clamp(fogMix, 0., 1.);
+			}
+		)",R"(
+			varying vec4 color;
+			varying vec3 normal;
+
+			void main(){
+				vec3 col = color.rgb;
+				col = mix(col, fog.color, fogMix);
+				gl_FragColor = vec4(col, color.a);
+				//gl_FragColor = vec4(1.,0.,0.,1.); //debug
+			}
+		)");
 
 		if(mShader.linked()){
 			mLocPos       = mShader.attribute("posIn");
@@ -424,6 +447,19 @@ void Graphics::draw(const Mesh& m, int count, int begin){
 	mShader.begin();
 		mShader.uniform("MVP", projection()*modelView());
 		mShader.uniform("singleColor", singleColor);
+
+		if(mUpdateFog){
+			mUpdateFog = false;
+			if(mDoFog){
+				mShader.uniform("fog.color", mFog.color);
+				mShader.uniform("fog.start", mFog.start);
+				mShader.uniform("fog.end", mFog.end);
+				mShader.uniform("fog.scale", mFog.scale);
+			} else {
+				mShader.uniform("fog.scale", 0.f);
+			}
+		}
+
 		if(Ni){
 			// Here, 'count' is the number of indices to render
 			glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);

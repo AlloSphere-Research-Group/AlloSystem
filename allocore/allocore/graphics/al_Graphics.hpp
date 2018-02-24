@@ -54,10 +54,10 @@
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
-#include "allocore/graphics/al_Shader.hpp"
 
 #ifdef AL_GRAPHICS_USE_PROG_PIPELINE
 	#include <stack> // matrix stack
+	#include "allocore/graphics/al_Shader.hpp"
 	#ifndef AL_GRAPHICS_MODELVIEW_STACK_SIZE
 		#define AL_GRAPHICS_MODELVIEW_STACK_SIZE 8
 	#endif
@@ -171,6 +171,8 @@ public:
 		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
 		NORMALIZE				= GL_NORMALIZE,				/**< Rescale normals to counteract non-isotropic modelview scaling */
 		RESCALE_NORMAL			= GL_RESCALE_NORMAL,		/**< Rescale normals to counteract an isotropic modelview scaling */
+		#else
+		FOG						= 0x6000,
 		#endif
 	};
 
@@ -272,10 +274,10 @@ public:
 	// Capabilities
 
 	/// Enable a capability
-	void enable(Capability v){ glEnable(v); }
+	void enable(Capability v);
 
 	/// Disable a capability
-	void disable(Capability v){ glDisable(v); }
+	void disable(Capability v);
 
 	/// Set a capability
 	void capability(Capability cap, bool value);
@@ -623,6 +625,16 @@ protected:
 	ShaderProgram mShader;
 	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
 	Color mCurrentColor;
+
+	struct Fog{
+		al::RGB color;
+		float start=0, end=1;
+		float scale = 1; // 1 / (end - start)
+	};
+
+	Fog mFog;
+
+	bool mDoFog = false, mUpdateFog = true;
 	bool mCompileShader = true;
 #endif
 
@@ -654,6 +666,18 @@ const char * toString(Graphics::Format v);
 
 // ============== INLINE ==============
 #ifdef AL_GRAPHICS_USE_PROG_PIPELINE
+inline void Graphics::enable(Capability v){
+	switch(v){
+	case FOG: mDoFog=true; mUpdateFog=true; break;
+	default: glEnable(v);
+	}
+}
+inline void Graphics::disable(Capability v){
+	switch(v){
+	case FOG: mDoFog=false; mUpdateFog=true; break;
+	default: glDisable(v);
+	}
+}
 inline void Graphics::currentColor(float r, float g, float b, float a){
 	mCurrentColor.set(r,g,b,a);
 }
@@ -693,6 +717,8 @@ inline void Graphics::scale(float x, float y, float z){
 inline void Graphics::pointAtten(float c2, float c1, float c0){}
 
 #else
+inline void Graphics::enable(Capability v){ glEnable(v); }
+inline void Graphics::disable(Capability v){ glDisable(v); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
 inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
 inline void Graphics::pointSize(float v){ glPointSize(v); }
