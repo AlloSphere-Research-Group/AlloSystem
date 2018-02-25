@@ -23,7 +23,7 @@ void Stereographic::pushDrawPop(Graphics& g, Drawable& draw){
 	g.pushMatrix(g.PROJECTION);
 	g.loadMatrix(projection());
 	g.pushMatrix(g.MODELVIEW);
-	g.loadMatrix(modelView());
+	g.loadMatrix(view());
 		draw.onDraw(g);
 	g.popMatrix(g.PROJECTION);
 	g.popMatrix(g.MODELVIEW);
@@ -84,8 +84,8 @@ void Stereographic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, 
 			mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
 
 			// TODO: lerp quat instead of computing anew each iteration
-			mModelView = (pose * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0)).matrix();
-			invertRigid(mModelView);
+			mView = (pose * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0)).matrix();
+			invertRigid(mView);
 
 			sendViewport(g, vp1);
 			if(clear) sendClear(g);
@@ -100,8 +100,8 @@ void Stereographic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, 
 		double aspect = vp.aspect() * pixelaspect;
 		mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
 		
-		mModelView = pose.matrix();
-		invertRigid(mModelView);
+		mView = pose.matrix();
+		invertRigid(mView);
 
 		pushDrawPop(g,draw);
 	}
@@ -140,11 +140,11 @@ void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const
 	sendViewport(g, vp);		// set scissor/viewport regions
 	if(clear) sendClear(g);	// clear color/depth buffers
 
-	auto setModelView = [this](const Pose& pose, double eyeShift){
-		mModelView = pose.matrix(); // head pose
-		mModelView.Mat4d::translate(pose.ux()*eyeShift); // translate head to eye
-		mEye = mModelView.col(3); // eye pos
-		invertRigid(mModelView); // convert eye pose to modelview
+	auto setView = [this](const Pose& pose, double eyeShift){
+		mView = pose.matrix(); // head pose
+		mView.Mat4d::translate(pose.ux()*eyeShift); // translate head to eye
+		mEye = mView.col(3); // eye pos
+		invertRigid(mView); // convert eye pose to view
 	};
 
 	// FIXME: geometry is not continuous at slice boundaries
@@ -167,7 +167,7 @@ void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const
 			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			Quatd qrot = Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
 
-			setModelView(pose * qrot, eyeShift);
+			setView(pose * qrot, eyeShift);
 
 			// Do the rendering
 			sendViewport(g, vp1);		// set scissor/viewport regions
@@ -179,7 +179,7 @@ void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const
 	} else {
 		double aspect = vp.aspect() * pixelaspect;
 		mProjection = Matrix4d::perspectiveOffAxis(lens.fovy(), aspect, near, far, -eyeShift, focal);
-		setModelView(pose, eyeShift);
+		setView(pose, eyeShift);
 
 		// Do the rendering
 		pushDrawPop(g,draw);		// onDraw wrapped in push/pop

@@ -166,14 +166,11 @@ public:
 	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.modelViewProjection(), Vec4d objectspace);
 	// to convert in the opposite direction, use Matrix4::inverse().
 
-	/// Get current modelview matrix
-	const Matrix4d& modelView() const { return mModelView; }
-
 	/// Get current projection matrix
 	const Matrix4d& projection() const { return mProjection; }
 
-	/// Get product of current projection and modelview matrices
-	Matrix4d modelViewProjection() const { return mProjection * mModelView; }
+	/// Get current view matrix
+	const Matrix4d& view() const { return mView; }
 
 	/// Get current eye position
 	const Vec3d& eye() const { return mEye; }
@@ -214,7 +211,7 @@ protected:
 	Color mClearColor;
 	unsigned mSlices;	// number of omni slices
 	double mOmniFov;	// field of view of omnigraphics
-	Matrix4d mProjection, mModelView;
+	Matrix4d mProjection, mView;
 	Vec3d mEye;
 	unsigned mEyeNumber;
 	Viewport mVP;
@@ -226,6 +223,13 @@ protected:
 	void sendClear(Graphics& g);
 
 	void drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
+
+public:
+	// \deprecated Use view()
+	const Matrix4d& modelView() const { return mView; }
+
+	// Get product of current projection and modelview matrices
+	Matrix4d modelViewProjection() const { return mProjection * mView; }
 };
 
 
