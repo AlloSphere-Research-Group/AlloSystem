@@ -261,6 +261,7 @@ public:
 
 	/// Return column i as vector
 	Vec<N,T> col(int i) const { return Vec<N,T>(elems() + i*N); }
+	Vec<N,T>& col(int i){ return Vec<N,T>::pun(elems() + i*N); }
 
 	/// Return row i as vector
 	Vec<N,T> row(int i) const { return Vec<N,T>(elems()+i, N); }
