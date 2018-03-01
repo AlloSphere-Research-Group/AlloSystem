@@ -270,12 +270,13 @@ public:
 	Vec<N,T> diagonal() const { return Vec<N,T>(elems(), N+1); }
 
 	/// Transpose elements
-	Mat& transpose(){
-		for(int j=0; j<N-1; ++j){	// row and column
-		for(int i=j+1; i<N; ++i){	// offset into row or column
-			T& a = (*this)(i,j);
-			T& b = (*this)(j,i);
-			T c = a; a = b;	b = c;	// swap elements
+
+	/// @param[in] size		Size of upper-left submatrix to transpose
+	///
+	Mat& transpose(int size=N){
+		for(int j=0; j<size-1; ++j){	// row and column
+		for(int i=j+1; i<size; ++i){	// offset into row or column
+			std::swap((*this)(i,j), (*this)(j,i));
 		}}
 		return *this;
 	}
@@ -727,11 +728,7 @@ void invertRigid(Mat<N,T>& m){
 		m(r,N-1) = it[r];
 
 	// Transpose rotation part to get R^-1
-	for(int c=0; c<N-1; ++c){
-		for(int r=c+1; r<N-1; ++r){
-			std::swap(m(r,c), m(c,r));
-		}
-	}
+	m.transpose(N-1);
 }
 
 /// Get rotation matrix that rotates one unit vector onto another
