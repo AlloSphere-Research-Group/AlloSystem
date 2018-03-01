@@ -734,6 +734,33 @@ void invertRigid(Mat<N,T>& m){
 	}
 }
 
+/// Get "normal" matrix from modelview
+
+/// This matrix is used to convert normals from object to eye space.
+/// It assumes the input matrix is composed of rotation, scaling, and
+/// translation. It is normally obtained as the inverse transpose of the
+/// modelview, however, this computes it much faster under the given assumption.
+template <int N, class T> Mat<N-1,T> normalMatrix(const Mat<N,T>& mv){
+	// Given A = S * R,
+	//       N = (A^-1)^T
+	//         = (R^-1 * S^-1)^T
+	//         =  S^-1 * R
+
+	// Compute S^-2
+	T iss[N-1];
+	for(int i=0; i<N-1; ++i)
+		iss[i] = T(1)/sub<N-1>(mv.col(i)).magSqr();
+
+	Mat<N-1,T> res = mv;
+
+	// Apply S^-2
+	for(int i=0; i<N-1; ++i)
+		res.col(i) *= iss[i];
+
+	return res;
+}
+
+
 /// Get rotation matrix that rotates one unit vector onto another
 
 /// @param[in] from		Unit vector to rotate from
