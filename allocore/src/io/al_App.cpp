@@ -149,7 +149,7 @@ bool SceneWindowHandler::onFrame(){
 
 	Graphics& g = app.graphics();
 	g.depthTesting(true);
-	g.lighting(false);
+	//g.lighting(false); // should be disabled by default
 
 	struct DrawFunc : public Drawable {
 		App& app;

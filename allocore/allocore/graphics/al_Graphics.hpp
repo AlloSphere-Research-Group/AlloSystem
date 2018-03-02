@@ -39,9 +39,9 @@
 	A general high-level interface to graphics rendering
 
 	File author(s):
-	Wesley Smith, 2010, wesley.hoke@gmail.com
 	Lance Putnam, 2010, putnam.lance@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
 #include <string>
@@ -52,20 +52,24 @@
 #include "allocore/types/al_Color.hpp"
 #include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
+#include "allocore/graphics/al_Light.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
 
 #ifdef AL_GRAPHICS_USE_PROG_PIPELINE
 	#include <stack> // matrix stack
 	#include "allocore/graphics/al_Shader.hpp"
-	#ifndef AL_GRAPHICS_MODELVIEW_STACK_SIZE
-		#define AL_GRAPHICS_MODELVIEW_STACK_SIZE 8
+	#ifndef AL_MODELVIEW_STACK_SIZE
+		#define AL_MODELVIEW_STACK_SIZE 8
 	#endif
-	#ifndef AL_GRAPHICS_PROJECTION_STACK_SIZE
-		#define AL_GRAPHICS_PROJECTION_STACK_SIZE 4
+	#ifndef AL_PROJECTION_STACK_SIZE
+		#define AL_PROJECTION_STACK_SIZE 4
 	#endif
 #endif
 
+#ifndef AL_MAX_LIGHTS
+	#define AL_MAX_LIGHTS 4
+#endif
 
 /*!
 	\def AL_GRAPHICS_ERROR(msg, ID)
@@ -166,13 +170,15 @@ public:
 		CULL_FACE				= GL_CULL_FACE,				/**< Cull faces */
 
 		#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
-		COLOR_MATERIAL			= GL_COLOR_MATERIAL,		/**< Use vertex colors with materials */
 		FOG						= GL_FOG,					/**< Apply fog effect */
+		COLOR_MATERIAL			= GL_COLOR_MATERIAL,		/**< Use vertex colors with materials */
 		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
 		NORMALIZE				= GL_NORMALIZE,				/**< Rescale normals to counteract non-isotropic modelview scaling */
 		RESCALE_NORMAL			= GL_RESCALE_NORMAL,		/**< Rescale normals to counteract an isotropic modelview scaling */
 		#else
 		FOG						= 0x6000,
+		COLOR_MATERIAL,
+		LIGHTING,
 		#endif
 	};
 
@@ -220,8 +226,8 @@ public:
 
 	enum MatrixMode {
 		#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
-		MODELVIEW				= GL_MODELVIEW,				/**< Modelview matrix */
-		PROJECTION				= GL_PROJECTION				/**< Projection matrix */
+		MODELVIEW				= GL_MODELVIEW,				/**< Modelview matrix (object to eye space) */
+		PROJECTION				= GL_PROJECTION				/**< Projection matrix (eye to clip space) */
 		#else
 		MODELVIEW				= 0,
 		PROJECTION				= 1
@@ -607,39 +613,96 @@ public:
 
 	void draw(int numVertices, const Mesh& v);
 
+	/// Set view matrix (inverse camera pose)
+
+	/// This must be set to obtain correct lighting with the fixed pipeline
+	/// emulation.
+	void view(const Mat4f& v){ mUpdateView=true; mView=v; }
+
+	/// Get light at specified index
+	Light& light(unsigned index);
+	const Light& light(unsigned index) const;
+
+	/// Get material
+	Material& material();
+	const Material& material() const;
+
+	Material& materialFront();
+	const Material& materialFront() const;
+
+	Material& materialBack();
+	const Material& materialBack() const;
+
 protected:
+	template <class T, class Loc=int>
+	class ShaderData{
+	public:
+		ShaderData(){}
+		ShaderData(const T& val): mData(val), mUpdate(true){}
+		ShaderData& operator= (const T& v){ if(mData!=v) update(); mData=v; return *this; }
+		bool operator== (const T& v) const { return mData==v; }
+		const T& get() const { return mData; }
+		T& var(){ update(); return mData; }
+		void update(){ mUpdate=true; }
+		bool handleUpdate() const { auto r=mUpdate; mUpdate=false; return r; }
+		Loc& loc(){ return mLoc; }
+		const Loc& loc() const { return mLoc; }
+	private:
+		T mData;
+		Loc mLoc;
+		mutable bool mUpdate = false;
+	};
+
 #ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-	std::stack<Mat4f> mMatrixStacks[2];
+	typedef ShaderData<std::stack<Mat4f>> MatrixStack;
+	MatrixStack mMatrixStacks[2];
 
 	static unsigned maxStackSize(MatrixMode mode){
 		static unsigned s[] = {
-			AL_GRAPHICS_MODELVIEW_STACK_SIZE, AL_GRAPHICS_PROJECTION_STACK_SIZE
+			AL_MODELVIEW_STACK_SIZE, AL_PROJECTION_STACK_SIZE
 		};
 		return s[mode];
 	};
 	MatrixMode mMatrixMode = MODELVIEW;
-	decltype(*mMatrixStacks)& currentMatrixStack(){ return mMatrixStacks[mMatrixMode]; }
-	const Mat4f& modelView() const { return mMatrixStacks[MODELVIEW].top(); }
-	const Mat4f& projection() const { return mMatrixStacks[PROJECTION].top(); }
-	Mat4f& currentMatrix(){ return currentMatrixStack().top(); }
+	MatrixStack& currentMatrixStack(){
+		return mMatrixStacks[mMatrixMode];
+	}
+	const MatrixStack& currentMatrixStack() const {
+		return mMatrixStacks[mMatrixMode];
+	}
+	const Mat4f& modelView() const { return mMatrixStacks[MODELVIEW].get().top(); }
+	const Mat4f& projection() const { return mMatrixStacks[PROJECTION].get().top(); }
+	Mat4f& currentMatrix(){ return currentMatrixStack().var().top(); }
+	const Mat4f& currentMatrix() const { return currentMatrixStack().get().top(); }
 	ShaderProgram mShader;
 	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
 	Color mCurrentColor;
+
+	bool mCompileShader = true;
+#endif
+
+	struct LightLocs{int pos,dir,halfDist,spread,strength,diffuse,specular,ambient;};
+	ShaderData<Light,LightLocs> mLights[AL_MAX_LIGHTS];
+	ShaderData<bool> mDoLighting{false};
+
+	struct MaterialLocs{int diffuse,emission,specular,shininess;};
+	ShaderData<Material,MaterialLocs> mMaterials[2];
+	ShaderData<bool> mMaterialOneSided{true};
 
 	struct Fog{
 		al::RGB color;
 		float start=0, end=1;
 		float scale = 1; // 1 / (end - start)
 	};
+	struct FogLocs{int color,start,end,scale;};
+	ShaderData<Fog, FogLocs> mFog;
+	bool mDoFog = false;
 
-	Fog mFog;
-
-	bool mDoFog = false, mUpdateFog = true;
-	bool mCompileShader = true;
-#endif
-
+	Mat4f mView;
+	bool mUpdateView = true;
 	std::vector<unsigned short> mIndices16;
 	Mesh mMesh;				// used for immediate mode style rendering
+	const Mesh * mLastDrawnMesh = 0;
 	int mRescaleNormal;
 	bool mInImmediateMode;	// flag for whether or not in immediate mode
 
@@ -668,33 +731,34 @@ const char * toString(Graphics::Format v);
 #ifdef AL_GRAPHICS_USE_PROG_PIPELINE
 inline void Graphics::enable(Capability v){
 	switch(v){
-	case FOG: mDoFog=true; mUpdateFog=true; break;
+	case FOG: mDoFog=true; mFog.update(); break;
+	case LIGHTING: mDoLighting=true; break;
 	default: glEnable(v);
 	}
 }
 inline void Graphics::disable(Capability v){
 	switch(v){
-	case FOG: mDoFog=false; mUpdateFog=true; break;
+	case FOG: mDoFog=false; mFog.update(); break;
+	case LIGHTING: mDoLighting=false; break;
 	default: glDisable(v);
 	}
 }
 inline void Graphics::currentColor(float r, float g, float b, float a){
 	mCurrentColor.set(r,g,b,a);
 }
-inline void Graphics::lighting(bool b){}
 inline void Graphics::pointSize(float v){}
 
 inline void Graphics::matrixMode(MatrixMode mode){ mMatrixMode=mode; }
 inline void Graphics::pushMatrix(){
-	if(currentMatrixStack().size() < maxStackSize(mMatrixMode)){
-		currentMatrixStack().emplace(currentMatrix());
+	if(currentMatrixStack().get().size() < maxStackSize(mMatrixMode)){
+		currentMatrixStack().var().emplace(currentMatrix());
 	} else {
 		AL_WARN_ONCE("%s matrix stack overflow", mMatrixMode==MODELVIEW?"MV":"Proj");
 	}
 }
 inline void Graphics::popMatrix(){
-	if(currentMatrixStack().size() > 1){
-		currentMatrixStack().pop();
+	if(currentMatrixStack().get().size() > 1){
+		currentMatrixStack().var().pop();
 	} else {
 		AL_WARN_ONCE("%s matrix stack underflow", mMatrixMode==MODELVIEW?"MV":"Proj");
 	}
@@ -720,7 +784,6 @@ inline void Graphics::pointAtten(float c2, float c1, float c0){}
 inline void Graphics::enable(Capability v){ glEnable(v); }
 inline void Graphics::disable(Capability v){ glDisable(v); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
-inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
 inline void Graphics::pointSize(float v){ glPointSize(v); }
 inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
 inline void Graphics::pushMatrix(){ glPushMatrix(); }
@@ -806,6 +869,7 @@ inline void Graphics::colorMask(bool r, bool g, bool b, bool a){
 inline void Graphics::colorMask(bool b){ colorMask(b,b,b,b); }
 inline void Graphics::depthMask(bool b){ glDepthMask(b?GL_TRUE:GL_FALSE); }
 inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
+inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
 inline void Graphics::scissorTest(bool b){ capability(SCISSOR_TEST, b); }
 inline void Graphics::cullFace(bool b){ capability(CULL_FACE, b); }
 inline void Graphics::cullFace(bool b, Direction d) {
