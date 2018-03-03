@@ -10,12 +10,10 @@
 // SDL API:
 // https://wiki.libsdl.org/APIByCategory
 #define SDL_MAIN_HANDLED
+#include <SDL2/SDL.h>
 
 #ifdef AL_EMSCRIPTEN
-#include <SDL/SDL.h>
-#include <emscripten.h>
-#else
-#include <SDL2/SDL.h>
+	#include <emscripten.h>
 #endif
 
 namespace al{
@@ -130,18 +128,17 @@ private:
 			//printf("a:%d c:%d s:%d\n", k.alt(), k.ctrl(), k.shift());
 		};
 
-		auto sdlToAlloKey = [](int sdlKey){
-			int alloKey;
+		auto sdlToAlloKey = [](int sdlKey) -> int {
 			switch(sdlKey){
-			#define CS(v) case SDLK_##v: alloKey = Keyboard::v; break;
+			#define CS(v) case SDLK_##v: return Keyboard::v;
 			CS(INSERT) CS(LEFT) CS(UP) CS(RIGHT) CS(DOWN) CS(END) CS(HOME)
 			CS(F1) CS(F2) CS(F3) CS(F4) CS(F5) CS(F6) CS(F7) CS(F8) CS(F9) CS(F10) CS(F11) CS(F12)
 			#undef CS
-			case SDLK_PAGEDOWN: alloKey = Keyboard::PAGE_DOWN; break;
-			case SDLK_PAGEUP: alloKey = Keyboard::PAGE_UP; break;
-			default:; alloKey = sdlKey;
+			#define CS(KEY,allo) case SDLK_##KEY: return Keyboard::allo;
+			CS(PAGEDOWN, PAGE_DOWN) CS(PAGEUP, PAGE_UP)
+			#undef CS
+			default: return sdlKey;
 			}
-			return alloKey;
 		};
 
 		// FIXME: this should be called only once per app as it applies to all windows
@@ -196,7 +193,7 @@ private:
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
 			{	bool keyDown = (ev.type == SDL_KEYDOWN);
-				//printf("Key %s: %c\n", keyDown?"down":"up", ev.key.keysym.sym);
+				//printf("Key %s: %s (sym=%#x)\n", keyDown?"down":"up", SDL_GetKeyName(ev.key.keysym.sym), ev.key.keysym.sym);
 				win->mKeyboard.setKey(sdlToAlloKey(ev.key.keysym.sym), keyDown);
 				setModifiers(ev);
 				keyDown ? win->callHandlersOnKeyDown() : win->callHandlersOnKeyUp();
@@ -358,6 +355,8 @@ bool Window::implCreate(){
 		printf("SDL ERROR: Failed to init SDL video subsystem.\n");
 		return false;
 	}
+
+	//SDL_EnableUNICODE(1);
 
 	// SDL setup code: https://wiki.libsdl.org/SDL_GL_SetAttribute
 
