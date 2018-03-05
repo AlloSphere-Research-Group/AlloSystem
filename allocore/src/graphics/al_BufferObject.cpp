@@ -82,7 +82,7 @@ void BufferObject::onDestroy(){
 }
 
 void BufferObject::print() const {
-	printf("%s: %s %s (%d comps %d elems [%d bytes])\n", toString(mType), toString(mUsage), toString(mDataType), mNumComps, mNumElems, size());
+	printf("%s: %s %s (%d comps %d elems [%.1f kB])\n", toString(mType), toString(mUsage), toString(mDataType), mNumComps, mNumElems, size()/1000.);
 }
 
 #ifdef AL_GRAPHICS_SUPPORTS_MAP_BUFFER
