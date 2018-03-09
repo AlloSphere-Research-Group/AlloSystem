@@ -127,7 +127,7 @@ Listener * AudioScene::createListener(Spatializer* spatializer){
 
 void AudioScene::render(AudioIOData& io) {
 	const int numFrames = io.framesPerBuffer();
-	double sampleRate = io.framesPerSecond();
+	// double sampleRate = io.framesPerSecond();
 	io.zeroOut();
 
 	// iterate through all listeners adding contribution from all sources
@@ -145,13 +145,13 @@ void AudioScene::render(AudioIOData& io) {
 			SoundSource& src = *(*it);
 			if(mPerSampleProcessing) { //audioscene per sample processing
 				src.frame(0);
-				for(int i=0; i < numFrames; ++i){
-					Vec3d relpos = src.pose().pos() - l.pose().pos();
+                for(int i=0; i < numFrames; ++i){
+                    Pose relpos(src.pose().pos() - l.pose().pos(), src.pose().quat() /l.pose().quat());
 					spatializer->renderSample(io, relpos, src.getNextSample(l), i);
 				}
 			} else { //more efficient, per buffer processing for audioscene (does not work well with doppler)
-				src.getBuffer(l, mBuffer.data(), numFrames);
-				Vec3d relpos = src.pose().pos() - l.pose().pos();
+                src.getBuffer(l, mBuffer.data(), numFrames);
+                Pose relpos(src.pose().pos() - l.pose().pos(), src.pose().quat() /l.pose().quat());
 //				std::cout << l.pose().x() << "," << l.pose().z() << " ---- ";
 //				std::cout << src.pos().x << "," << src.pos().z << " ----- ";
 //				std::cout << relpos.x << "," << relpos.z << std::endl;

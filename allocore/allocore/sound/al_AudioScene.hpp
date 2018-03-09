@@ -406,7 +406,7 @@ protected:
 		if (mBuffer.size() != io.framesPerBuffer()) {
 			mBuffer.reserve(io.framesPerBuffer());
 		}
-		for(int i = 0; i < io.framesPerBuffer(); i++)
+        for(unsigned int i = 0; i < io.framesPerBuffer(); i++)
 		{
 			double readIndex = (io.framesPerBuffer() - i - 1);
 			mBuffer[i] = src.readSample(readIndex);

@@ -53,7 +53,7 @@ public:
 	}
 
 	/// Per Buffer Processing
-	void renderBuffer(AudioIOData& io, const Pose& listeningPose, const float *samples, const int& numFrames) override
+    virtual void renderBuffer(AudioIOData& io, const Pose& listeningPose, const float *samples, const int& numFrames) override
 	{
 		Vec3d vec = listeningPose.vec();
 		Quatd srcRot = listeningPose.quat();
