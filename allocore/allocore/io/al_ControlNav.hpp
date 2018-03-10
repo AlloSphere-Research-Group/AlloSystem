@@ -55,7 +55,7 @@ class NavInputControl : public InputEventHandler {
 public:
 	NavInputControl(const NavInputControl& v);
 
-	NavInputControl(Nav& nav, float vscale = 0.125, float tscale = 2., float mouseSens=0.2);
+	NavInputControl(Nav& nav, float vscale = 0.125, float tscale = 2., float mouseSens=0.3);
 
 	virtual ~NavInputControl(){}
 
