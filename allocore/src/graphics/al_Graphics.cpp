@@ -250,11 +250,10 @@ public:
 					intens *= hh / (hh + dot(lightVec,lightVec));
 
 					// Spotlight
-					float coneAmt = -dot(light.dir, L); // cos of angle: [1,-1] -> [coincident, opposing]
-					//coneAmt = coneAmt*-0.5+0.5; // [1,-1] -> [0,1]
-					float cosMax = cos(light.spread * pi/180.);
-					//if(coneAmt < cosMax) intens = 0.; // hard cut
-					if(cosMax >-0.9999){ // to allow disabling spotlight
+					if(light.spread < 180.){
+						float coneAmt = -dot(light.dir, L); // cos of angle: [1,-1] -> [coincident, opposing]
+						//coneAmt = coneAmt*-0.5+0.5; // [1,-1] -> [0,1]
+						float cosMax = cos(light.spread * pi/180.);
 						float coneDist = (1.-coneAmt)/(1.-cosMax); // apx dist from cone center [0,1]
 						//float coneAmp = 1.-min(coneDist,1.); // linear falloff
 						float coneAmp = min(coneDist,1.)-1.; coneAmp*=coneAmp; // parabolic falloff
@@ -267,7 +266,17 @@ public:
 					//diffAmt = abs(diffAmt); // front-and-back lighting
 					diffAmt = diffAmt*(1.-light.ambient) + light.ambient; // mix in ambient
 					vec3 H = normalize(L + V); // half-vector
-					float specAmt = pow(max(dot(N,H), 0.), shininess) * intens;
+					float specAmt = pow(max(dot(N,H), 0.), shininess) * intens; // Blinn-Phong
+					//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), shininess*0.25) * intens; // Phong
+
+					/* Specular approx [Lyon, 1993. "Phong Shading Reformulation"]
+					vec3 R = reflect(-L,N), D = R-V;
+					//vec3 H = L+V, D = dot(H,N)*N - H; // bug: flaring effect
+					//float c = 1.-min(1.,shininess*0.25*0.5*dot(D,D)); // 1st order apx
+					float c = 1.-min(1.,shininess*0.25*0.25*dot(D,D)); c*=c; // 2nd order apx
+					//float c = 1.-min(1.,shininess*0.25*0.125*dot(D,D)); c*=c; c*=c; // 3rd order apx
+					float specAmt = c * intens;
+					//*/
 
 					LightFall fall;
 					fall.diffuse  = light.diffuse  * diffAmt;
@@ -303,8 +312,6 @@ public:
 						if(gl_FrontFacing || materialOneSided) m = materials[0];
 						else m = materials[1];
 						if(colorMaterial) m.diffuse *= col;
-						// Custom material mapping...
-						// Custom normal mapping...
 						col = lightColor(pos, N, V, m);
 					}
 					col = mix(col, fog.color, fogMix);
@@ -399,7 +406,6 @@ public:
 			}
 
 			if(mMatrixStacks[PROJECTION].handleUpdate()){
-	//printf("P\n");
 				mShader.uniform(mMatrixStacks[PROJECTION].loc(), projection());
 			}
 
@@ -419,7 +425,6 @@ public:
 			*/
 
 			if(mDoLighting.handleUpdate()){
-	//printf("doLighting\n");
 				mShader.uniform(mDoLighting.loc(), mDoLighting.get());
 			}
 
@@ -435,12 +440,12 @@ public:
 					bool updateLight = l.handleUpdate();
 					bool lightActive = l.get().strength() != 0;
 					if(lightActive && (updateLight || mUpdateView)){
-	//printf("light %p pos\n", &l.get());
+						//printf("light %p pos\n", &l.get());
 						mShader.uniform(l.loc().pos, xfm(mView, l.get().pos()));
 						mShader.uniform(l.loc().dir, viewRot * l.get().dir());
 					}
 					if(updateLight){
-	//printf("light %p rest\n", &l.get());
+						//printf("light %p rest\n", &l.get());
 						if(lightActive){
 							mShader.uniform(l.loc().halfDist, l.get().halfDist());
 							mShader.uniform(l.loc().spread, l.get().spread());
@@ -470,7 +475,7 @@ public:
 			}
 
 			if(mFog.handleUpdate()){
-	//printf("fog update\n");
+				//printf("fog update\n");
 				if(mDoFog == true){
 					mShader.uniform(mFog.loc().color, mFog.get().color);
 					mShader.uniform(mFog.loc().start, mFog.get().start);
