@@ -56,17 +56,6 @@
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
 
-#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-	#include <stack> // matrix stack
-	#include "allocore/graphics/al_Shader.hpp"
-	#ifndef AL_MODELVIEW_STACK_SIZE
-		#define AL_MODELVIEW_STACK_SIZE 8
-	#endif
-	#ifndef AL_PROJECTION_STACK_SIZE
-		#define AL_PROJECTION_STACK_SIZE 4
-	#endif
-#endif
-
 #ifndef AL_MAX_LIGHTS
 	#define AL_MAX_LIGHTS 4
 #endif
@@ -126,6 +115,11 @@ struct Viewport {
 class Graphics : public GPUObject {
 public:
 
+	enum Pipeline {
+		FIXED=0,
+		PROG
+	};
+
 	enum AntiAliasMode {
 		DONT_CARE				= GL_DONT_CARE,				/**< No preference */
 		FASTEST					= GL_FASTEST,				/**< Fastest render, possibly lower quality */
@@ -168,17 +162,12 @@ public:
 		DEPTH_TEST				= GL_DEPTH_TEST,			/**< Test depth of incoming fragments */
 		SCISSOR_TEST			= GL_SCISSOR_TEST,			/**< Crop fragments according to scissor region */
 		CULL_FACE				= GL_CULL_FACE,				/**< Cull faces */
-
-		#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
-		FOG						= GL_FOG,					/**< Apply fog effect */
-		COLOR_MATERIAL			= GL_COLOR_MATERIAL,		/**< Use vertex colors with materials */
-		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
+		FOG						= 0x6000,					/**< Apply fog effect */
+		COLOR_MATERIAL,										/**< Use vertex colors with materials */
+		LIGHTING,											/**< Use lighting */
+		#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 		NORMALIZE				= GL_NORMALIZE,				/**< Rescale normals to counteract non-isotropic modelview scaling */
 		RESCALE_NORMAL			= GL_RESCALE_NORMAL,		/**< Rescale normals to counteract an isotropic modelview scaling */
-		#else
-		FOG						= 0x6000,
-		COLOR_MATERIAL,
-		LIGHTING,
 		#endif
 	};
 
@@ -225,13 +214,8 @@ public:
 	};
 
 	enum MatrixMode {
-		#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
-		MODELVIEW				= GL_MODELVIEW,				/**< Modelview matrix (object to eye space) */
-		PROJECTION				= GL_PROJECTION				/**< Projection matrix (eye to clip space) */
-		#else
-		MODELVIEW				= 0,
-		PROJECTION				= 1
-		#endif
+		MODELVIEW				= 0,						/**< Modelview matrix (object to eye space) */
+		PROJECTION				= 1							/**< Projection matrix (eye to clip space) */
 	};
 
 	enum PolygonMode {
@@ -610,9 +594,6 @@ public:
 	/// Returns DataType for a given AlloTy
 	static DataType toDataType(AlloTy type);
 
-
-	void draw(int numVertices, const Mesh& v);
-
 	/// Set view matrix (inverse camera pose)
 
 	/// This must be set to obtain correct lighting with the fixed pipeline
@@ -633,7 +614,47 @@ public:
 	Material& materialBack();
 	const Material& materialBack() const;
 
+	/// Set pipeline used for rendering meshes
+	void pipeline(Pipeline p);
+
 protected:
+
+	class Backend{
+	public:
+		Backend(Graphics& g): mGraphics(g){}
+		virtual ~Backend(){}
+
+		virtual void enable(Capability v){}
+		virtual void disable(Capability v){}
+		virtual void currentColor(float r, float g, float b, float a){}
+
+		virtual void matrixMode(MatrixMode mode){}
+		virtual void pushMatrix(){}
+		virtual void popMatrix(){}
+		virtual void loadIdentity(){}
+		virtual void loadMatrix(const Mat4d& m){}
+		virtual void loadMatrix(const Mat4f& m){}
+		virtual void multMatrix(const Mat4d& m){}
+		virtual void multMatrix(const Mat4f& m){}
+		virtual void translate(float x, float y, float z){}
+		virtual void rotate(float angle, float x, float y, float z){}
+		virtual void scale(float s){ scale(s,s,s); }
+		virtual void scale(float x, float y, float z){}
+
+		virtual void pointSize(float v){}
+		virtual void pointAtten(float c2, float c1, float c0){}
+
+		virtual void draw(const Mesh& m, int count=-1, int begin=0){}
+
+	protected:
+		Graphics& mGraphics;
+	};
+
+	class BackendProg;
+	class BackendFixed;
+	Backend * mBackends[2] = {0};
+	Backend * mBackend = 0;
+
 	template <class T, class Loc=int>
 	class ShaderData{
 	public:
@@ -652,34 +673,6 @@ protected:
 		Loc mLoc;
 		mutable bool mUpdate = false;
 	};
-
-#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-	typedef ShaderData<std::stack<Mat4f>> MatrixStack;
-	MatrixStack mMatrixStacks[2];
-
-	static unsigned maxStackSize(MatrixMode mode){
-		static unsigned s[] = {
-			AL_MODELVIEW_STACK_SIZE, AL_PROJECTION_STACK_SIZE
-		};
-		return s[mode];
-	};
-	MatrixMode mMatrixMode = MODELVIEW;
-	MatrixStack& currentMatrixStack(){
-		return mMatrixStacks[mMatrixMode];
-	}
-	const MatrixStack& currentMatrixStack() const {
-		return mMatrixStacks[mMatrixMode];
-	}
-	const Mat4f& modelView() const { return mMatrixStacks[MODELVIEW].get().top(); }
-	const Mat4f& projection() const { return mMatrixStacks[PROJECTION].get().top(); }
-	Mat4f& currentMatrix(){ return currentMatrixStack().var().top(); }
-	const Mat4f& currentMatrix() const { return currentMatrixStack().get().top(); }
-	ShaderProgram mShader;
-	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
-	Color mCurrentColor;
-
-	bool mCompileShader = true;
-#endif
 
 	struct LightLocs{int pos,dir,halfDist,spread,strength,diffuse,specular,ambient;};
 	ShaderData<Light,LightLocs> mLights[AL_MAX_LIGHTS];
@@ -700,14 +693,15 @@ protected:
 
 	Mat4f mView;
 	bool mUpdateView = true;
-	std::vector<unsigned short> mIndices16;
 	Mesh mMesh;				// used for immediate mode style rendering
-	const Mesh * mLastDrawnMesh = 0;
-	int mRescaleNormal;
 	bool mInImmediateMode;	// flag for whether or not in immediate mode
 
 	virtual void onCreate(); // GPUObject
 	virtual void onDestroy(); // GPUObject
+
+public:
+	/// \deprecated
+	void draw(int numVertices, const Mesh& m);
 };
 
 
@@ -728,98 +722,24 @@ const char * toString(Graphics::Format v);
 
 
 // ============== INLINE ==============
-#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-inline void Graphics::enable(Capability v){
-	switch(v){
-	case FOG: mDoFog=true; mFog.update(); break;
-	case LIGHTING: mDoLighting=true; break;
-	default: glEnable(v);
-	}
-}
-inline void Graphics::disable(Capability v){
-	switch(v){
-	case FOG: mDoFog=false; mFog.update(); break;
-	case LIGHTING: mDoLighting=false; break;
-	default: glDisable(v);
-	}
-}
-inline void Graphics::currentColor(float r, float g, float b, float a){
-	mCurrentColor.set(r,g,b,a);
-}
-inline void Graphics::pointSize(float v){}
-
-inline void Graphics::matrixMode(MatrixMode mode){ mMatrixMode=mode; }
-inline void Graphics::pushMatrix(){
-	if(currentMatrixStack().get().size() < maxStackSize(mMatrixMode)){
-		currentMatrixStack().var().emplace(currentMatrix());
-	} else {
-		AL_WARN_ONCE("%s matrix stack overflow", mMatrixMode==MODELVIEW?"MV":"Proj");
-	}
-}
-inline void Graphics::popMatrix(){
-	if(currentMatrixStack().get().size() > 1){
-		currentMatrixStack().var().pop();
-	} else {
-		AL_WARN_ONCE("%s matrix stack underflow", mMatrixMode==MODELVIEW?"MV":"Proj");
-	}
-}
-inline void Graphics::loadIdentity(){ currentMatrix().setIdentity(); }
-inline void Graphics::loadMatrix(const Mat4d& m){ currentMatrix() = m; }
-inline void Graphics::loadMatrix(const Mat4f& m){ currentMatrix() = m; }
-inline void Graphics::multMatrix(const Mat4d& m){ currentMatrix() *= m; }
-inline void Graphics::multMatrix(const Mat4f& m){ currentMatrix() *= m; }
-inline void Graphics::translate(float x, float y, float z){
-	multMatrix(Mat4f::translation(x,y,z));
-}
-inline void Graphics::rotate(float angle, float x, float y, float z){
-	multMatrix(Mat4f::rotation(angle*0.01745329251994, Vec3f(x,y,z).normalize()));
-}
-inline void Graphics::scale(float s){ scale(s,s,s); }
-inline void Graphics::scale(float x, float y, float z){
-	multMatrix(Mat4f::scaling(x,y,z));
-}
-inline void Graphics::pointAtten(float c2, float c1, float c0){}
-
-#else
-inline void Graphics::enable(Capability v){ glEnable(v); }
-inline void Graphics::disable(Capability v){ glDisable(v); }
-inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
-inline void Graphics::pointSize(float v){ glPointSize(v); }
-inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
-inline void Graphics::pushMatrix(){ glPushMatrix(); }
-inline void Graphics::popMatrix(){ glPopMatrix(); }
-inline void Graphics::loadIdentity(){ glLoadIdentity(); }
-inline void Graphics::loadMatrix(const Mat4f& m){ glLoadMatrixf(m.elems()); }
-inline void Graphics::multMatrix(const Mat4f& m){ glMultMatrixf(m.elems()); }
-	#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
-	inline void Graphics::loadMatrix(const Mat4d& m){ glLoadMatrixd(m.elems()); }
-	inline void Graphics::multMatrix(const Mat4d& m){ glMultMatrixd(m.elems()); }
-	#else
-	inline void Graphics::loadMatrix(const Mat4d& m){ loadMatrix(Mat4f(m)); }
-	inline void Graphics::multMatrix(const Mat4d& m){ multMatrix(Mat4f(m)); }
-	#endif
-inline void Graphics::translate(float x, float y, float z){ glTranslatef(x,y,z); }
-inline void Graphics::rotate(float angle, float x, float y, float z){ glRotatef(angle,x,y,z); }
-inline void Graphics::scale(float s){
-	if(mRescaleNormal < 1){
-		mRescaleNormal = 1;
-		enable(RESCALE_NORMAL);
-	}
-	glScalef(s, s, s);
-}
-inline void Graphics::scale(float x, float y, float z){
-	if(mRescaleNormal < 3){
-		mRescaleNormal = 3;
-		disable(RESCALE_NORMAL);
-		enable(NORMALIZE);
-	}
-	glScalef(x, y, z);
-}
-inline void Graphics::pointAtten(float c2, float c1, float c0){
-	GLfloat att[3] = {c0, c1, c2};
-	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
-}
-#endif
+inline void Graphics::enable(Capability v){ mBackend->enable(v); }
+inline void Graphics::disable(Capability v){ mBackend->disable(v); }
+inline void Graphics::currentColor(float r, float g, float b, float a){ mBackend->currentColor(r,g,b,a); }
+inline void Graphics::matrixMode(MatrixMode mode){ mBackend->matrixMode(mode); }
+inline void Graphics::pushMatrix(){ mBackend->pushMatrix(); }
+inline void Graphics::popMatrix(){ mBackend->popMatrix(); }
+inline void Graphics::loadIdentity(){ mBackend->loadIdentity(); }
+inline void Graphics::loadMatrix(const Mat4f& m){ mBackend->loadMatrix(m); }
+inline void Graphics::multMatrix(const Mat4f& m){ mBackend->multMatrix(m); }
+inline void Graphics::loadMatrix(const Mat4d& m){ mBackend->loadMatrix(m); }
+inline void Graphics::multMatrix(const Mat4d& m){ mBackend->multMatrix(m); }
+inline void Graphics::translate(float x, float y, float z){ mBackend->translate(x,y,z); }
+inline void Graphics::rotate(float angle, float x, float y, float z){ mBackend->rotate(angle, x,y,z); }
+inline void Graphics::scale(float s){ mBackend->scale(s); }
+inline void Graphics::scale(float x, float y, float z){ mBackend->scale(x,y,z); }
+inline void Graphics::pointSize(float v){ mBackend->pointSize(v); }
+inline void Graphics::pointAtten(float c2, float c1, float c0){ mBackend->pointAtten(c2,c1,c0); }
+inline void Graphics::draw(const Mesh& m, int count, int begin){ mBackend->draw(m, count, begin); }
 
 #ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
 inline void Graphics::drawBuffer(Direction d){ glDrawBuffer(d); }
