@@ -2,15 +2,728 @@
 #include <stdio.h>
 #include "allocore/graphics/al_Graphics.hpp"
 
+#ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+	#include <stack> // matrix stack
+	#include "allocore/graphics/al_Shader.hpp"
+	#ifndef AL_MODELVIEW_STACK_SIZE
+		#define AL_MODELVIEW_STACK_SIZE 8
+	#endif
+	#ifndef AL_PROJECTION_STACK_SIZE
+		#define AL_PROJECTION_STACK_SIZE 4
+	#endif
+#endif
+
 namespace al{
 
-Graphics::Graphics()
-:	mRescaleNormal(0), mInImmediateMode(false)
-{
-	#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-	for(auto& stack : mMatrixStacks){
-		stack.var().emplace(1.f);
+#define DRAW_BEGIN\
+	const int Nv = m.vertices().size();\
+	if(0 == Nv) return; /* nothing to draw, so just return...*/\
+	const int Ni = m.indices().size();\
+	const int Nmax = Ni ? Ni : Nv;\
+	/* Adjust negative amounts*/\
+	if(count < 0) count += Nmax+1;\
+	if(begin < 0) begin += Nmax+1;\
+	if(begin >= Nmax) return;	/* Begin index past end?*/\
+	if(begin + count > Nmax){	/* If end index past end, then truncate it*/\
+		count = Nmax - begin;\
+	}\
+	const int Nc = m.colors().size();\
+	const int Nci= m.coloris().size();\
+	const int Nn = m.normals().size();\
+	const int Nt1= m.texCoord1s().size();\
+	const int Nt2= m.texCoord2s().size();\
+	const int Nt3= m.texCoord3s().size();\
+	auto prim = (Graphics::Primitive)m.primitive();\
+	if(m.stroke() > 0.f){\
+		switch(prim){\
+		case LINES: case LINE_STRIP: case LINE_LOOP:\
+			mGraphics.lineWidth(m.stroke());\
+			break;\
+		case POINTS:\
+			mGraphics.pointSize(m.stroke());\
+			break;\
+		default:;\
+		}\
+	}\
+	auto& mLights = mGraphics.mLights;\
+	auto& mMaterials = mGraphics.mMaterials;\
+	auto& mFog = mGraphics.mFog;\
+	auto& mUpdateView = mGraphics.mUpdateView;
+
+#define DRAW_END\
+	mUpdateView = false;
+
+#ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+class Graphics::BackendProg : public Graphics::Backend{
+public:
+	BackendProg(Graphics& g)
+	:	Graphics::Backend(g)
+	{
+		for(auto& stack : mMatrixStacks){
+			stack.var().emplace(1.f);
+		}
 	}
+
+	void enable(Capability v){
+		switch(v){
+		case FOG: mGraphics.mDoFog=true; mGraphics.mFog.update(); break;
+		case LIGHTING: mGraphics.mDoLighting=true; break;
+		default: glEnable(v);
+		}
+	}
+	void disable(Capability v){
+		switch(v){
+		case FOG: mGraphics.mDoFog=false; mGraphics.mFog.update(); break;
+		case LIGHTING: mGraphics.mDoLighting=false; break;
+		default: glDisable(v);
+		}
+	}
+	void currentColor(float r, float g, float b, float a){
+		mCurrentColor.set(r,g,b,a);
+	}
+
+	void matrixMode(MatrixMode mode){ mMatrixMode=mode; }
+	void pushMatrix(){
+		//printf("push %s (%d/%d)\n", mMatrixMode==MODELVIEW?"MV":"Proj", (int)currentMatrixStack().get().size(), (int)maxStackSize(mMatrixMode));
+		if(currentMatrixStack().get().size() < maxStackSize(mMatrixMode)){
+			currentMatrixStack().var().emplace(currentMatrix());
+		} else {
+			AL_WARN_ONCE("%s matrix stack overflow", mMatrixMode==MODELVIEW?"MV":"Proj");
+		}
+	}
+	void popMatrix(){
+		if(currentMatrixStack().get().size() > 1){
+			currentMatrixStack().var().pop();
+		} else {
+			AL_WARN_ONCE("%s matrix stack underflow", mMatrixMode==MODELVIEW?"MV":"Proj");
+		}
+	}
+	void loadIdentity(){ currentMatrix().setIdentity(); }
+	void loadMatrix(const Mat4d& m){ currentMatrix() = m; }
+	void loadMatrix(const Mat4f& m){ currentMatrix() = m; }
+	void multMatrix(const Mat4d& m){ currentMatrix() *= m; }
+	void multMatrix(const Mat4f& m){ currentMatrix() *= m; }
+	void translate(float x, float y, float z){
+		multMatrix(Mat4f::translation(x,y,z));
+	}
+	void rotate(float angle, float x, float y, float z){
+		multMatrix(Mat4f::rotation(angle*0.01745329251994, Vec3f(x,y,z).normalize()));
+	}
+	void scale(float s){ scale(s,s,s); }
+	void scale(float x, float y, float z){
+		multMatrix(Mat4f::scaling(x,y,z));
+	}
+
+	void draw(const Mesh& m, int count, int begin){
+		DRAW_BEGIN
+		auto& mDoLighting = mGraphics.mDoLighting;
+		auto& mMaterialOneSided = mGraphics.mMaterialOneSided;
+		auto& mDoFog = mGraphics.mDoFog;
+		auto& mView = mGraphics.mView;
+
+		if(mCompileShader){
+			mCompileShader = false; // will only make one attempt
+
+			mShader.preamble(
+			R"(
+				#ifdef GL_ES
+				precision mediump float; // req'd by ES2
+				#endif
+				const float pi = 3.141592653589793;
+				varying vec3 pos;		// position (eye space)
+				varying vec3 normal;	// normal (eye space)
+				varying vec3 posObj;	// position (object space)
+				varying vec4 color;
+				varying vec2 texCoord2;
+
+				struct Fog{
+					vec3 color;
+					float start, end;
+					float scale; // 1/(end-start)
+				};
+				uniform Fog fog;// = Fog(vec3(0.), 0., 1.);
+				varying float fogMix;
+			)"
+			);
+
+			mShader.compile(
+			R"(
+				uniform mat4 MV;
+				uniform mat4 P;
+				uniform mat3 normalMatrix;
+				uniform vec4 singleColor;
+				uniform bool hasNormals;
+				attribute vec3 posIn;
+				attribute vec3 normalIn;
+				attribute vec4 colorIn;
+				attribute vec2 texCoord2In;
+
+				void main(){
+					posObj = posIn;
+					pos = (MV * vec4(posIn,1.)).xyz; // to eye space
+					gl_Position = P * vec4(pos,1.); // to screen space
+					color = singleColor.a==8192. ? colorIn : singleColor;
+					if(hasNormals){
+						normal = normalMatrix * normalIn;
+					} else {
+						normal = vec3(1.,0.,0.);
+					}
+					texCoord2 = texCoord2In;
+					fogMix = (gl_Position.z - fog.start) * fog.scale;
+					fogMix = clamp(fogMix, 0., 1.);
+				}
+			)",
+
+				"#define MAX_LIGHTS " + std::to_string(AL_MAX_LIGHTS) + "\n" +
+			R"(
+				#ifndef MAX_LIGHTS
+				#define MAX_LIGHTS 4
+				#endif
+
+				// Light source
+				struct Light{
+					vec3 pos;			// Position of light
+					vec3 dir;			// Direction of cone
+					float halfDist;		// Distance at which intensity is 50%
+					float spread;		// Spread of cone, in degrees
+					float strength;		// Overall strength of light
+					vec3 diffuse;		// Component scattered off surface
+					vec3 specular;		// Component bounced/reflected off surface
+					float ambient;		// Amount of light bounced off walls (uses diffuse color)
+				};
+
+				struct LightFall{ // For storing intermediate results
+					vec3 diffuse;
+					vec3 specular;
+				};
+
+				void zero(out LightFall l){
+					l.diffuse = vec3(0.);
+					l.specular = vec3(0.);
+				}
+
+				// Surface material
+				struct Material{
+					vec3 diffuse;		// Component scattered off surface
+					vec3 specular;		// Component bounced/reflected off surface
+					vec3 emission;		// Component emitted from surface
+					float shininess;	// Concentration of specular (its lack of scattering)
+				};
+
+				uniform Light lights[MAX_LIGHTS];
+				uniform vec3 globalAmbient;
+				uniform Material materials[2];
+				uniform bool doLighting;
+				uniform bool colorMaterial;
+				uniform bool materialOneSided;
+
+				Material lerp(in Material m1, in Material m2, float frac){
+					Material m;
+					m.diffuse  = mix(m1.diffuse,  m2.diffuse,  frac);
+					m.specular = mix(m1.specular, m2.specular, frac);
+					m.emission = mix(m1.emission, m2.emission, frac);
+					m.shininess= mix(m1.shininess,m2.shininess,frac);
+					return m;
+				}
+
+				/* OpenGL fixed pipeline lighting (li = light i, m = material):
+					Em + Ag Am +
+					sum_i{ ali [Ali Am + max(L.N, 0) Dli Dm + max(H.N, 0)^s Sli Sm] }
+				*/
+
+				/// Blinn-Phong lighting
+				///
+				/// @param[in] pos		position on surface
+				/// @param[in] N		normal to surface
+				/// @param[in] V		direction from surface to eye
+				/// @param[in] light	Light structure
+				/// \returns light color
+				LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in float shininess){
+					// Note: light attenuation over distance is an exponential decay (Beer-Lambert)
+					vec3 lightVec = light.pos - pos;
+					vec3 L = normalize(lightVec); // dir from surface to light
+
+					float intens = light.strength;
+
+					// Distance attenuation: 1/(1+[d/h]^2) = h^2 / (h^2 + d^2)
+					float hh = light.halfDist*light.halfDist;
+					intens *= hh / (hh + dot(lightVec,lightVec));
+
+					// Spotlight
+					float coneAmt = -dot(light.dir, L); // cos of angle: [1,-1] -> [coincident, opposing]
+					//coneAmt = coneAmt*-0.5+0.5; // [1,-1] -> [0,1]
+					float cosMax = cos(light.spread * pi/180.);
+					//if(coneAmt < cosMax) intens = 0.; // hard cut
+					if(cosMax >-0.9999){ // to allow disabling spotlight
+						float coneDist = (1.-coneAmt)/(1.-cosMax); // apx dist from cone center [0,1]
+						//float coneAmp = 1.-min(coneDist,1.); // linear falloff
+						float coneAmp = min(coneDist,1.)-1.; coneAmp*=coneAmp; // parabolic falloff
+						intens *= coneAmp;
+					}
+
+					// Diffuse/specular
+					float diffAmt = dot(N,L) * intens;
+					diffAmt = max(diffAmt, 0.); // front lighting
+					//diffAmt = abs(diffAmt); // front-and-back lighting
+					diffAmt = diffAmt*(1.-light.ambient) + light.ambient; // mix in ambient
+					vec3 H = normalize(L + V); // half-vector
+					float specAmt = pow(max(dot(N,H), 0.), shininess) * intens;
+
+					LightFall fall;
+					fall.diffuse  = light.diffuse  * diffAmt;
+					fall.specular = light.specular * specAmt;
+					return fall;
+				}
+
+				vec3 lightColor(
+					in vec3 pos, in vec3 N, in vec3 V,
+					in Material material
+				){
+					LightFall lsum;
+					zero(lsum);
+					for(int i=0; i<MAX_LIGHTS; ++i){
+						if(lights[i].strength != 0.){
+							LightFall l = light(pos, N, V, lights[i], material.shininess);
+							lsum.diffuse += l.diffuse;
+							lsum.specular += l.specular;
+						}
+					}
+
+					return (lsum.diffuse + globalAmbient) * material.diffuse
+						+ lsum.specular * material.specular
+						+ material.emission;
+				}
+
+				void main(){
+					vec3 col = color.rgb;
+					if(doLighting){
+						vec3 N = normalize(normal);
+						vec3 V = normalize(-pos); // surface to eye
+						Material m;
+						if(gl_FrontFacing || materialOneSided) m = materials[0];
+						else m = materials[1];
+						if(colorMaterial) m.diffuse *= col;
+						// Custom material mapping...
+						// Custom normal mapping...
+						col = lightColor(pos, N, V, m);
+					}
+					col = mix(col, fog.color, fogMix);
+					gl_FragColor = vec4(col, color.a);
+					//gl_FragColor = vec4(1.,0.,0.,1.); //debug
+				}
+			)");
+
+			if(mShader.linked()){
+				mLocPos       = mShader.attribute("posIn");
+				mLocColor     = mShader.attribute("colorIn");
+				mLocNormal    = mShader.attribute("normalIn");
+				mLocTexCoord2 = mShader.attribute("texCoord2In");
+				mMatrixStacks[MODELVIEW].loc() = mShader.uniform("MV");
+				mMatrixStacks[PROJECTION].loc() = mShader.uniform("P");
+				mDoLighting.loc() = mShader.uniform("doLighting");
+				#define SET_LOC(name)\
+					o.loc().name = mShader.uniform((pre + #name).c_str());
+				for(int i=0; i<AL_MAX_LIGHTS; ++i){
+					auto& o = mLights[i];
+					std::string pre = "lights[" + std::to_string(i) + "].";
+					SET_LOC(pos) SET_LOC(dir) SET_LOC(halfDist) SET_LOC(spread)
+					SET_LOC(strength) SET_LOC(diffuse) SET_LOC(specular) SET_LOC(ambient)
+				}
+				for(int i=0; i<2; ++i){
+					auto& o = mMaterials[i];
+					std::string pre = "materials[" + std::to_string(i) + "].";
+					SET_LOC(diffuse) SET_LOC(emission) SET_LOC(specular) SET_LOC(shininess)
+				}
+				mMaterialOneSided.loc() = mShader.uniform("materialOneSided");
+				mFog.loc().color = mShader.uniform("fog.color");
+				mFog.loc().start = mShader.uniform("fog.start");
+				mFog.loc().end   = mShader.uniform("fog.end");
+				mFog.loc().scale = mShader.uniform("fog.scale");
+				// init uniforms
+				mShader.begin();
+					mShader.uniform("colorMaterial", true);
+				mShader.end();
+			} else {
+				printf("Critical error: al::Graphics failed to compile shader\n");
+			}
+		}
+
+		//printf("%d %d %d %d\n", mLocPos, mLocColor, mLocNormal, mLocTexCoord2);
+		// Return if shader didn't compile
+		if(mLocPos < 0) return;
+
+		bool setPointers = true;
+		if(mLastDrawnMesh){
+			//setPointers = (mLastDrawnMesh == &m);
+		}
+		mLastDrawnMesh = &m;
+
+		// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
+		glEnableVertexAttribArray(mLocPos);
+		if(setPointers) glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
+
+		if(Nn >= Nv){
+			glEnableVertexAttribArray(mLocNormal);
+			if(setPointers) glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
+		}
+
+		Color singleColor(0,0,0,8192); // if unchanged, triggers read from array
+
+		if(Nc >= Nv){
+			glEnableVertexAttribArray(mLocColor);
+			if(setPointers) glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, &m.colors()[0]);
+		}
+		else if(Nci >= Nv){
+			glEnableVertexAttribArray(mLocColor);
+			if(setPointers) glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &m.coloris()[0]);
+		}
+		else if(0 == Nc && 0 == Nci){
+			singleColor = mCurrentColor;
+		}
+		else{
+			singleColor = Nc ? m.colors()[0] : Color(m.coloris()[0]);
+		}
+
+		if(Nt2 >= Nv){
+			glEnableVertexAttribArray(mLocTexCoord2);
+			if(setPointers) glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, &m.texCoord2s()[0]);
+		}
+
+		mShader.begin();
+			if(mMatrixStacks[MODELVIEW].handleUpdate()){
+				if(Nn){
+					// Needed to correctly convert normals into eye space
+					mShader.uniform("normalMatrix", normalMatrix(modelView()));
+				}
+				mShader.uniform(mMatrixStacks[MODELVIEW].loc(), modelView());
+			}
+
+			if(mMatrixStacks[PROJECTION].handleUpdate()){
+	//printf("P\n");
+				mShader.uniform(mMatrixStacks[PROJECTION].loc(), projection());
+			}
+
+			mShader.uniform("singleColor", singleColor);
+
+			/* Lighting options:
+			Eye space:
+				- Vertices: multiply by ModelView
+				- Normals: multiply by (ModelView^-1)^T matrix
+				- Light positions: multiply by View
+			World space:
+				- Vertices: multiply by Model matrix
+				- Normals: multiply by (Model^-1)^T matrix
+				- Light positions: nothing
+			World space more intuitive, but more work to get model matrix (V^-1 MV)
+			and eye pos (V^T -V[3]).
+			*/
+
+			if(mDoLighting.handleUpdate()){
+	//printf("doLighting\n");
+				mShader.uniform(mDoLighting.loc(), mDoLighting.get());
+			}
+
+			if(mDoLighting == true){
+				mShader.uniform("hasNormals", bool(Nn));
+
+				auto xfm = [](const Mat4f& m, const Vec3f& v){
+					return (m * Vec4f(v,1.f)).xyz();
+				};
+				auto viewRot = mView.sub<3>();
+
+				for(const auto& l : mLights){
+					bool updateLight = l.handleUpdate();
+					bool lightActive = l.get().strength() != 0;
+					if(lightActive && (updateLight || mUpdateView)){
+	//printf("light %p pos\n", &l.get());
+						mShader.uniform(l.loc().pos, xfm(mView, l.get().pos()));
+						mShader.uniform(l.loc().dir, viewRot * l.get().dir());
+					}
+					if(updateLight){
+	//printf("light %p rest\n", &l.get());
+						if(lightActive){
+							mShader.uniform(l.loc().halfDist, l.get().halfDist());
+							mShader.uniform(l.loc().spread, l.get().spread());
+							mShader.uniform(l.loc().diffuse, l.get().diffuse().rgb());
+							mShader.uniform(l.loc().specular, l.get().specular().rgb());
+							mShader.uniform(l.loc().ambient, l.get().ambient().luminance());
+							if(Light::sGlobalAmbientUpdate){
+								Light::sGlobalAmbientUpdate = false;
+								mShader.uniform("globalAmbient", Light::globalAmbient().rgb());
+							}
+						}
+						mShader.uniform(l.loc().strength, l.get().strength());
+					}
+				}
+			}
+
+			for(const auto& m : mMaterials){
+				if(m.handleUpdate()){
+					if(mMaterialOneSided.handleUpdate()){
+						mShader.uniform(mMaterialOneSided.loc(), mMaterialOneSided.get());
+					}
+					mShader.uniform(m.loc().diffuse, m.get().diffuse().rgb());
+					mShader.uniform(m.loc().emission, m.get().emission().rgb());
+					mShader.uniform(m.loc().specular, m.get().specular().rgb());
+					mShader.uniform(m.loc().shininess, m.get().shininess());
+				}
+			}
+
+			if(mFog.handleUpdate()){
+	//printf("fog update\n");
+				if(mDoFog == true){
+					mShader.uniform(mFog.loc().color, mFog.get().color);
+					mShader.uniform(mFog.loc().start, mFog.get().start);
+					mShader.uniform(mFog.loc().end, mFog.get().end);
+					mShader.uniform(mFog.loc().scale, mFog.get().scale);
+				} else {
+					mShader.uniform(mFog.loc().scale, 0.f);
+				}
+			}
+
+			if(Ni){
+				// Here, 'count' is the number of indices to render
+				glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
+			}
+			else{
+				glDrawArrays(prim, begin, count);
+			}
+		mShader.end();
+
+		glDisableVertexAttribArray(mLocPos);
+		if(Nc || Nci) glDisableVertexAttribArray(mLocColor);
+		if(Nn) glDisableVertexAttribArray(mLocNormal);
+		if(Nt1 || Nt2 || Nt3) glDisableVertexAttribArray(mLocTexCoord2);
+
+		DRAW_END
+	}
+
+protected:
+	typedef ShaderData<std::stack<Mat4f>> MatrixStack;
+	MatrixStack mMatrixStacks[2];
+
+	static unsigned maxStackSize(MatrixMode mode){
+		static unsigned s[] = {
+			AL_MODELVIEW_STACK_SIZE, AL_PROJECTION_STACK_SIZE
+		};
+		return s[mode];
+	};
+	MatrixMode mMatrixMode = MODELVIEW;
+	MatrixStack& currentMatrixStack(){
+		return mMatrixStacks[mMatrixMode];
+	}
+	const MatrixStack& currentMatrixStack() const {
+		return mMatrixStacks[mMatrixMode];
+	}
+	const Mat4f& modelView() const { return mMatrixStacks[MODELVIEW].get().top(); }
+	const Mat4f& projection() const { return mMatrixStacks[PROJECTION].get().top(); }
+	Mat4f& currentMatrix(){ return currentMatrixStack().var().top(); }
+	const Mat4f& currentMatrix() const { return currentMatrixStack().get().top(); }
+	ShaderProgram mShader;
+	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
+	Color mCurrentColor;
+	const Mesh * mLastDrawnMesh = 0;
+	bool mCompileShader = true;
+};
+#endif
+
+#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
+class Graphics::BackendFixed : public Graphics::Backend{
+public:
+	BackendFixed(Graphics& g)
+	:	Graphics::Backend(g)
+	{}
+
+	void enable(Capability v){
+		switch(v){
+		case FOG:				glEnable(GL_FOG); break;
+		case LIGHTING:			glEnable(GL_LIGHTING); break;
+		case COLOR_MATERIAL:	glEnable(GL_COLOR_MATERIAL); break;
+		default:				glEnable(v);
+		}
+	}
+	void disable(Capability v){
+		switch(v){
+		case FOG:				glDisable(GL_FOG); break;
+		case LIGHTING:			glDisable(GL_LIGHTING); break;
+		case COLOR_MATERIAL:	glDisable(GL_COLOR_MATERIAL); break;
+		default:				glDisable(v);
+		}
+	}
+	void currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
+	void pointSize(float v){ glPointSize(v); }
+	void matrixMode(MatrixMode mode){
+		switch(mode){
+		case MODELVIEW:		glMatrixMode(GL_MODELVIEW); break;
+		case PROJECTION:	glMatrixMode(GL_PROJECTION); break;
+		default:			glMatrixMode(mode); break;
+		}
+	}
+	void pushMatrix(){ glPushMatrix(); }
+	void popMatrix(){ glPopMatrix(); }
+	void loadIdentity(){ glLoadIdentity(); }
+	void loadMatrix(const Mat4f& m){ glLoadMatrixf(m.elems()); }
+	void multMatrix(const Mat4f& m){ glMultMatrixf(m.elems()); }
+		#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
+		void loadMatrix(const Mat4d& m){ glLoadMatrixd(m.elems()); }
+		void multMatrix(const Mat4d& m){ glMultMatrixd(m.elems()); }
+		#else
+		void loadMatrix(const Mat4d& m){ loadMatrix(Mat4f(m)); }
+		void multMatrix(const Mat4d& m){ multMatrix(Mat4f(m)); }
+		#endif
+	void translate(float x, float y, float z){ glTranslatef(x,y,z); }
+	void rotate(float angle, float x, float y, float z){ glRotatef(angle,x,y,z); }
+	void scale(float s){
+		if(mRescaleNormal < 1){
+			mRescaleNormal = 1;
+			enable(RESCALE_NORMAL);
+		}
+		glScalef(s, s, s);
+	}
+	void scale(float x, float y, float z){
+		if(mRescaleNormal < 3){
+			mRescaleNormal = 3;
+			disable(RESCALE_NORMAL);
+			enable(NORMALIZE);
+		}
+		glScalef(x, y, z);
+	}
+	void pointAtten(float c2, float c1, float c0){
+		GLfloat att[3] = {c0, c1, c2};
+		glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
+	}
+
+	void draw(const Mesh& m, int count, int begin){
+		DRAW_BEGIN
+
+		// Note: Nothing submitted to GPU if light strength zero
+		for(int i=0; i<AL_MAX_LIGHTS; ++i){
+			const auto& l = mLights[i].get();
+			auto glID = l.backendID();
+			bool lightActive = l.strength() != 0.f;
+			if(lightActive){
+				l.submitPos(glID);	// Must do this for light to track modelview
+			}
+			if(mLights[i].handleUpdate()){
+				if(lightActive){
+					l.submitCol(glID); // will enable GL lighting
+				} else {
+					glDisable(glID);
+				}
+			}
+		}
+
+		for(const auto& m : mMaterials){
+			if(m.handleUpdate()){
+				m.get()();
+			}
+		}
+
+		if(mFog.handleUpdate()){
+			enable(FOG);
+			glFogf(GL_FOG_MODE, GL_LINEAR);
+			glFogf(GL_FOG_START, mFog.get().start);
+			glFogf(GL_FOG_END, mFog.get().end);
+			const auto& col = mFog.get().color;
+			float fogColor[4] = {col.r, col.g, col.b, 1.f};
+			glFogfv(GL_FOG_COLOR, fogColor);
+		}
+
+		// Enable arrays and set pointers...
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, &m.vertices()[0]);
+
+		if(Nn >= Nv){
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glNormalPointer(GL_FLOAT, 0, &m.normals()[0]);
+		}
+
+		if(Nc >= Nv){
+			glEnableClientState(GL_COLOR_ARRAY);
+			glColorPointer(4, GL_FLOAT, 0, &m.colors()[0]);
+		}
+		else if(Nci >= Nv){
+			glEnableClientState(GL_COLOR_ARRAY);
+			glColorPointer(4, GL_UNSIGNED_BYTE, 0, &m.coloris()[0]);
+			//printf("using integer colors\n");
+		}
+		else if(0 == Nc && 0 == Nci){
+			// just use whatever the last glColor() call used!
+		}
+		else{
+			if(Nc)
+				glColor4f(m.colors()[0].r, m.colors()[0].g, m.colors()[0].b, m.colors()[0].a);
+			else
+				glColor4ub(m.coloris()[0].r, m.coloris()[0].g, m.coloris()[0].b, m.coloris()[0].a);
+		}
+
+		if(Nt1 >= Nv){
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glTexCoordPointer(1, GL_FLOAT, 0, &m.texCoord1s()[0]);
+		}
+		else if(Nt2 >= Nv){
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glTexCoordPointer(2, GL_FLOAT, 0, &m.texCoord2s()[0]);
+		}
+		else if(Nt3 >= Nv){
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glTexCoordPointer(3, GL_FLOAT, 0, &m.texCoord3s()[0]);
+		}
+
+		// Draw
+		if(Ni){
+			#ifdef AL_GRAPHICS_SUPPORTS_INT32
+				// Here, 'count' is the number of indices to render
+				glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
+			#else
+				mIndices16.clear();
+				for(int i=begin; i<begin+count; ++i){
+					auto idx = m.indices()[i];
+					if(idx > 65535) AL_WARN_ONCE("Mesh index value out of range (> 65535)");
+					mIndices16.push_back(idx);
+				}
+				glDrawElements(prim, count, GL_UNSIGNED_SHORT, &mIndices16[0]);
+			#endif
+		}
+		else{
+			glDrawArrays(prim, begin, count);
+		}
+
+		// Disable arrays
+		glDisableClientState(GL_VERTEX_ARRAY);
+		if(Nn)					glDisableClientState(GL_NORMAL_ARRAY);
+		if(Nc || Nci)			glDisableClientState(GL_COLOR_ARRAY);
+		if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		DRAW_END
+	}
+
+private:
+	int mRescaleNormal = 0;
+	std::vector<unsigned short> mIndices16;
+};
+#endif
+
+
+Graphics::Graphics()
+:	mInImmediateMode(false)
+{
+	#ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+		mBackends[PROG] = new BackendProg(*this);
+	#endif
+
+	#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
+		mBackends[FIXED] = new BackendFixed(*this);
+	#endif
+
+	#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
+		pipeline(PROG);
+		for(auto& m : mMaterials){
+			m.var()
+			;
+		}
+	#else
+		pipeline(FIXED);
 	#endif
 
 	for(int i=0; i<AL_MAX_LIGHTS; ++i){
@@ -22,16 +735,32 @@ Graphics::Graphics()
 	}
 	mDoLighting = false; // since accessing lights sets true
 	Light::globalAmbient(al::RGB(0.2));
-
-	#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-	for(auto& m : mMaterials){
-		m.var()
-		;
-	}
-	#endif
 }
 
-Graphics::~Graphics(){}
+Graphics::~Graphics(){
+	for(auto * b : mBackends){
+		if(b) delete b;
+	}
+}
+
+void Graphics::pipeline(Pipeline p){
+	switch(p){
+	case FIXED:
+		#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
+		mBackend = mBackends[FIXED];
+		#else
+		AL_WARN("Fixed pipeline not supported");
+		#endif
+		break;
+	case PROG:
+		#ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+		mBackend = mBackends[PROG];
+		#else
+		AL_WARN("Programmable pipeline not supported");
+		#endif
+		break;
+	}
+}
 
 #define CS(t) case Graphics::t: return #t;
 const char * toString(Graphics::DataType v){
@@ -234,15 +963,6 @@ void Graphics::antialiasing(AntiAliasMode v){
 	#endif
 }
 
-/*#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
-void Graphics::fog(float end, float start, const Color& c){
-	enable(FOG);
-	glFogf(GL_FOG_MODE, GL_LINEAR);
-	glFogf(GL_FOG_START, start); glFogf(GL_FOG_END, end);
-	float fogColor[4] = {c.r, c.g, c.b, c.a};
-	glFogfv(GL_FOG_COLOR, fogColor);
-}
-#else*/
 void Graphics::fog(float end, float start, const Color& c){
 	//enable(FOG);
 	mDoFog = true;
@@ -252,7 +972,6 @@ void Graphics::fog(float end, float start, const Color& c){
 	f.scale = 1./(end-start);
 	f.color = c;
 }
-//#endif
 
 Light& Graphics::light(unsigned index){
 	if(index >= AL_MAX_LIGHTS) index = AL_MAX_LIGHTS-1;
@@ -356,535 +1075,6 @@ void Graphics::color(double r, double g, double b, double a) {
 	}
 }
 
-// Buffer drawing
-void Graphics::draw(int num_vertices, const Mesh& m){
-	draw(m, num_vertices);
-}
-
-void Graphics::draw(const Mesh& m, int count, int begin){
-
-	const int Nv = m.vertices().size();
-	if(0 == Nv) return; // nothing to draw, so just return...
-
-	const int Ni = m.indices().size();
-
-	const int Nmax = Ni ? Ni : Nv;
-
-	// Adjust negative amounts
-	if(count < 0) count += Nmax+1;
-	if(begin < 0) begin += Nmax+1;
-
-	// Safety checks...
-	//if(count > Nmax) count = Nmax;
-	//if(begin+count >= iend) return;
-
-	if(begin >= Nmax) return;	// Begin index past end?
-	if(begin + count > Nmax){	// If end index past end, then truncate it
-		count = Nmax - begin;
-	}
-
-	const int Nc = m.colors().size();
-	const int Nci= m.coloris().size();
-	const int Nn = m.normals().size();
-	const int Nt1= m.texCoord1s().size();
-	const int Nt2= m.texCoord2s().size();
-	const int Nt3= m.texCoord3s().size();
-
-	//printf("client %d, GPU %d\n", clientSide, gpuSide);
-	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
-
-	auto prim = (Graphics::Primitive)m.primitive();
-
-	if(m.stroke() > 0.f){
-		switch(prim){
-		case LINES: case LINE_STRIP: case LINE_LOOP:
-			lineWidth(m.stroke());
-			break;
-		case POINTS:
-			pointSize(m.stroke());
-			break;
-		default:;
-		}
-	}
-
-	#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-
-	if(mCompileShader){
-		mCompileShader = false; // will only make one attempt
-
-		mShader.preamble(
-		R"(
-			precision mediump float; // req'd by ES2
-			const float pi = 3.141592653589793;
-			varying vec3 pos;		// position (eye space)
-			varying vec3 normal;	// normal (eye space)
-			varying vec4 color;
-			varying vec2 texCoord2;
-
-			struct Fog{
-				vec3 color;
-				float start, end;
-				float scale; // 1/(end-start)
-			};
-			uniform Fog fog;// = Fog(vec3(0.), 0., 1.);
-			varying float fogMix;
-		)"
-		);
-
-		mShader.compile(
-		R"(
-			uniform mat4 MV;
-			uniform mat4 P;
-			uniform mat3 normalMatrix;
-			uniform vec4 singleColor;
-			uniform bool hasNormals;
-			attribute vec3 posIn;
-			attribute vec3 normalIn;
-			attribute vec4 colorIn;
-			attribute vec2 texCoord2In;
-
-			void main(){
-				pos = (MV * vec4(posIn,1.)).xyz; // to eye space
-				gl_Position = P * vec4(pos,1.); // to screen space
-				color = singleColor.a==8192. ? colorIn : singleColor;
-				if(hasNormals){
-					normal = normalMatrix * normalIn;
-				} else {
-					normal = vec3(1.,0.,0.);
-				}
-				texCoord2 = texCoord2In;
-				fogMix = (gl_Position.z - fog.start) * fog.scale;
-				fogMix = clamp(fogMix, 0., 1.);
-			}
-		)",
-
-			"#define MAX_LIGHTS " + std::to_string(AL_MAX_LIGHTS) + "\n" +
-		R"(
-			#ifndef MAX_LIGHTS
-			#define MAX_LIGHTS 4
-			#endif
-
-			// Light source
-			struct Light{
-				vec3 pos;			// Position of light
-				vec3 dir;			// Direction of cone
-				float halfDist;		// Distance at which intensity is 50%
-				float spread;		// Spread of cone, in degrees
-				float strength;		// Overall strength of light
-				vec3 diffuse;		// Component scattered off surface
-				vec3 specular;		// Component bounced/reflected off surface
-				float ambient;		// Amount of light bounced off walls (uses diffuse color)
-			};
-
-			struct LightFall{ // For storing intermediate results
-				vec3 diffuse;
-				vec3 specular;
-			};
-
-			void zero(out LightFall l){
-				l.diffuse = vec3(0.);
-				l.specular = vec3(0.);
-			}
-
-			// Surface material
-			struct Material{
-				vec3 diffuse;		// Component scattered off surface
-				vec3 specular;		// Component bounced/reflected off surface
-				vec3 emission;		// Component emitted from surface
-				float shininess;	// Concentration of specular (its lack of scattering)
-			};
-
-			uniform Light lights[MAX_LIGHTS];
-			uniform vec3 globalAmbient;
-			uniform Material materials[2];
-			uniform bool doLighting;
-			uniform bool colorMaterial;
-			uniform bool materialOneSided;
-
-			Material lerp(in Material m1, in Material m2, float frac){
-				Material m;
-				m.diffuse  = mix(m1.diffuse,  m2.diffuse,  frac);
-				m.specular = mix(m1.specular, m2.specular, frac);
-				m.emission = mix(m1.emission, m2.emission, frac);
-				m.shininess= mix(m1.shininess,m2.shininess,frac);
-				return m;
-			}
-
-			/* OpenGL fixed pipeline lighting (li = light i, m = material):
-				Em + Ag Am +
-				sum_i{ ali [Ali Am + max(L.N, 0) Dli Dm + max(H.N, 0)^s Sli Sm] }
-			*/
-
-			/// Blinn-Phong lighting
-			///
-			/// @param[in] pos		position on surface
-			/// @param[in] N		normal to surface
-			/// @param[in] V		direction from surface to eye
-			/// @param[in] light	Light structure
-			/// \returns light color
-			LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in float shininess){
-				// Note: light attenuation over distance is an exponential decay (Beer-Lambert)
-				vec3 lightVec = light.pos - pos;
-				vec3 L = normalize(lightVec); // dir from surface to light
-
-				float intens = light.strength;
-
-				// Distance attenuation: 1/(1+[d/h]^2) = h^2 / (h^2 + d^2)
-				float hh = light.halfDist*light.halfDist;
-				intens *= hh / (hh + dot(lightVec,lightVec));
-
-				// Spotlight
-				float coneAmt = -dot(light.dir, L); // cos of angle: [1,-1] -> [coincident, opposing]
-				//coneAmt = coneAmt*-0.5+0.5; // [1,-1] -> [0,1]
-				float cosMax = cos(light.spread * pi/180.);
-				//if(coneAmt < cosMax) intens = 0.; // hard cut
-				if(cosMax >-0.9999){ // to allow disabling spotlight
-					float coneDist = (1.-coneAmt)/(1.-cosMax); // apx dist from cone center [0,1]
-					//float coneAmp = 1.-min(coneDist,1.); // linear falloff
-					float coneAmp = min(coneDist,1.)-1.; coneAmp*=coneAmp; // parabolic falloff
-					intens *= coneAmp;
-				}
-
-				// Diffuse/specular
-				float diffAmt = dot(N,L) * intens;
-				diffAmt = max(diffAmt, 0.); // front lighting
-				//diffAmt = abs(diffAmt); // front-and-back lighting
-				diffAmt = diffAmt*(1.-light.ambient) + light.ambient; // mix in ambient
-				vec3 H = normalize(L + V); // half-vector
-				float specAmt = pow(max(dot(N,H), 0.), shininess) * intens;
-
-				LightFall fall;
-				fall.diffuse  = light.diffuse  * diffAmt;
-				fall.specular = light.specular * specAmt;
-				return fall;
-			}
-
-			vec3 lightColor(
-				in vec3 pos, in vec3 N, in vec3 V,
-				in Material material
-			){
-				LightFall lsum;
-				zero(lsum);
-				for(int i=0; i<MAX_LIGHTS; ++i){
-					if(lights[i].strength != 0.){
-						LightFall l = light(pos, N, V, lights[i], material.shininess);
-						lsum.diffuse += l.diffuse;
-						lsum.specular += l.specular;
-					}
-				}
-
-				return (lsum.diffuse + globalAmbient) * material.diffuse
-					+ lsum.specular * material.specular
-					+ material.emission;
-			}
-
-			void main(){
-				vec3 col = color.rgb;
-				if(doLighting){
-					vec3 N = normalize(normal);
-					vec3 V = normalize(-pos); // surface to eye
-					Material m;
-					if(gl_FrontFacing || materialOneSided) m = materials[0];
-					else m = materials[1];
-					if(colorMaterial) m.diffuse *= col;
-					col = lightColor(pos, N, V, m);
-				}
-				col = mix(col, fog.color, fogMix);
-				gl_FragColor = vec4(col, color.a);
-				//gl_FragColor = vec4(1.,0.,0.,1.); //debug
-			}
-		)");
-
-		if(mShader.linked()){
-			mLocPos       = mShader.attribute("posIn");
-			mLocColor     = mShader.attribute("colorIn");
-			mLocNormal    = mShader.attribute("normalIn");
-			mLocTexCoord2 = mShader.attribute("texCoord2In");
-			mMatrixStacks[MODELVIEW].loc() = mShader.uniform("MV");
-			mMatrixStacks[PROJECTION].loc() = mShader.uniform("P");
-			mDoLighting.loc() = mShader.uniform("doLighting");
-			#define SET_LOC(name)\
-				o.loc().name = mShader.uniform((pre + #name).c_str());
-			for(int i=0; i<AL_MAX_LIGHTS; ++i){
-				auto& o = mLights[i];
-				std::string pre = "lights[" + std::to_string(i) + "].";
-				SET_LOC(pos) SET_LOC(dir) SET_LOC(halfDist) SET_LOC(spread)
-				SET_LOC(strength) SET_LOC(diffuse) SET_LOC(specular) SET_LOC(ambient)
-			}
-			for(int i=0; i<2; ++i){
-				auto& o = mMaterials[i];
-				std::string pre = "materials[" + std::to_string(i) + "].";
-				SET_LOC(diffuse) SET_LOC(emission) SET_LOC(specular) SET_LOC(shininess)
-			}
-			mMaterialOneSided.loc() = mShader.uniform("materialOneSided");
-			mFog.loc().color = mShader.uniform("fog.color");
-			mFog.loc().start = mShader.uniform("fog.start");
-			mFog.loc().end   = mShader.uniform("fog.end");
-			mFog.loc().scale = mShader.uniform("fog.scale");
-			// init uniforms
-			mShader.begin();
-				mShader.uniform("colorMaterial", true);
-			mShader.end();
-		} else {
-			printf("Critical error: al::Graphics failed to compile shader\n");
-		}
-	}
-
-	//printf("%d %d %d %d\n", mLocPos, mLocColor, mLocNormal, mLocTexCoord2);
-	// Return if shader didn't compile
-	if(mLocPos < 0) return;
-
-	bool setPointers = true;
-	if(mLastDrawnMesh){
-		//setPointers = (mLastDrawnMesh == &m);
-	}
-	mLastDrawnMesh = &m;
-
-	// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
-	glEnableVertexAttribArray(mLocPos);
-	if(setPointers) glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
-
-	if(Nn >= Nv){
-		glEnableVertexAttribArray(mLocNormal);
-		if(setPointers) glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
-	}
-
-	Color singleColor(0,0,0,8192); // if unchanged, triggers read from array
-
-	if(Nc >= Nv){
-		glEnableVertexAttribArray(mLocColor);
-		if(setPointers) glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, &m.colors()[0]);
-	}
-	else if(Nci >= Nv){
-		glEnableVertexAttribArray(mLocColor);
-		if(setPointers) glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, 0, 0, &m.coloris()[0]);
-	}
-	else if(0 == Nc && 0 == Nci){
-		singleColor = mCurrentColor;
-	}
-	else{
-		singleColor = Nc ? m.colors()[0] : Color(m.coloris()[0]);
-	}
-
-	if(Nt2 >= Nv){
-		glEnableVertexAttribArray(mLocTexCoord2);
-		if(setPointers) glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, &m.texCoord2s()[0]);
-	}
-
-	mShader.begin();
-		if(mMatrixStacks[MODELVIEW].handleUpdate()){
-			if(Nn){
-				// Needed to correctly convert normals into eye space
-				mShader.uniform("normalMatrix", normalMatrix(modelView()));
-			}
-			mShader.uniform(mMatrixStacks[MODELVIEW].loc(), modelView());
-		}
-
-		if(mMatrixStacks[PROJECTION].handleUpdate()){
-//printf("P\n");
-			mShader.uniform(mMatrixStacks[PROJECTION].loc(), projection());
-		}
-
-		mShader.uniform("singleColor", singleColor);
-
-		/* Lighting options:
-		Eye space:
-			- Vertices: multiply by ModelView
-			- Normals: multiply by (ModelView^-1)^T matrix
-			- Light positions: multiply by View
-		World space:
-			- Vertices: multiply by Model matrix
-			- Normals: multiply by (Model^-1)^T matrix
-			- Light positions: nothing
-		World space more intuitive, but more work to get model matrix (V^-1 MV)
-		and eye pos (V^T -V[3]).
-		*/
-
-		if(mDoLighting.handleUpdate()){
-//printf("doLighting\n");
-			mShader.uniform(mDoLighting.loc(), mDoLighting.get());
-		}
-
-		if(mDoLighting == true){
-			mShader.uniform("hasNormals", bool(Nn));
-
-			auto xfm = [](const Mat4f& m, const Vec3f& v){
-				return (m * Vec4f(v,1.f)).xyz();
-			};
-			auto viewRot = mView.sub<3>();
-
-			for(const auto& l : mLights){
-				bool updateLight = l.handleUpdate();
-				bool lightActive = l.get().strength() != 0;
-				if(lightActive && (updateLight || mUpdateView)){
-//printf("light %p pos\n", l.get());
-					mShader.uniform(l.loc().pos, xfm(mView, l.get().pos()));
-					mShader.uniform(l.loc().dir, viewRot * l.get().dir());
-				}
-				if(updateLight){
-//printf("light %p rest\n", l.get());
-					if(lightActive){
-						mShader.uniform(l.loc().halfDist, l.get().halfDist());
-						mShader.uniform(l.loc().spread, l.get().spread());
-						mShader.uniform(l.loc().diffuse, l.get().diffuse().rgb());
-						mShader.uniform(l.loc().specular, l.get().specular().rgb());
-						mShader.uniform(l.loc().ambient, l.get().ambient().luminance());
-						if(Light::sGlobalAmbientUpdate){
-							Light::sGlobalAmbientUpdate = false;
-							mShader.uniform("globalAmbient", Light::globalAmbient().rgb());
-						}
-					}
-					mShader.uniform(l.loc().strength, l.get().strength());
-				}
-			}
-		}
-
-		for(const auto& m : mMaterials){
-			if(m.handleUpdate()){
-				if(mMaterialOneSided.handleUpdate()){
-					mShader.uniform(mMaterialOneSided.loc(), mMaterialOneSided.get());
-				}
-				mShader.uniform(m.loc().diffuse, m.get().diffuse().rgb());
-				mShader.uniform(m.loc().emission, m.get().emission().rgb());
-				mShader.uniform(m.loc().specular, m.get().specular().rgb());
-				mShader.uniform(m.loc().shininess, m.get().shininess());
-			}
-		}
-
-		if(mFog.handleUpdate()){
-//printf("fog update\n");
-			if(mDoFog == true){
-				mShader.uniform(mFog.loc().color, mFog.get().color);
-				mShader.uniform(mFog.loc().start, mFog.get().start);
-				mShader.uniform(mFog.loc().end, mFog.get().end);
-				mShader.uniform(mFog.loc().scale, mFog.get().scale);
-			} else {
-				mShader.uniform(mFog.loc().scale, 0.f);
-			}
-		}
-
-		mUpdateView = false;
-
-		if(Ni){
-			// Here, 'count' is the number of indices to render
-			glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
-		}
-		else{
-			glDrawArrays(prim, begin, count);
-		}
-	mShader.end();
-
-	glDisableVertexAttribArray(mLocPos);
-	if(Nc) glDisableVertexAttribArray(mLocColor);
-	if(Nn) glDisableVertexAttribArray(mLocNormal);
-	if(Nt2)glDisableVertexAttribArray(mLocTexCoord2);
-
-
-	//---- FIXED PIPELINE
-	#else
-
-	// Note: Nothing submitted to GPU if light strength zero
-	for(int i=0; i<AL_MAX_LIGHTS; ++i){
-		const auto& l = mLights[i].get();
-		auto glID = l.backendID();
-		bool lightActive = l.strength() != 0.f;
-		if(lightActive){
-			l.submitPos(glID);	// Must do this for light to track modelview
-		}
-		if(mLights[i].handleUpdate()){
-			if(lightActive){
-				l.submitCol(glID); // will enable GL lighting
-			} else {
-				glDisable(glID);
-			}
-		}
-	}
-
-	for(const auto& m : mMaterials){
-		if(m.handleUpdate()){
-			m.get()();
-		}
-	}
-
-	if(mFog.handleUpdate()){
-		enable(FOG);
-		glFogf(GL_FOG_MODE, GL_LINEAR);
-		glFogf(GL_FOG_START, mFog.get().start);
-		glFogf(GL_FOG_END, mFog.get().end);
-		const auto& col = mFog.get().color;
-		float fogColor[4] = {col.r, col.g, col.b, 1.f};
-		glFogfv(GL_FOG_COLOR, fogColor);
-	}
-
-	// Enable arrays and set pointers...
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, &m.vertices()[0]);
-
-	if(Nn >= Nv){
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, 0, &m.normals()[0]);
-	}
-
-	if(Nc >= Nv){
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_FLOAT, 0, &m.colors()[0]);
-	}
-	else if(Nci >= Nv){
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_UNSIGNED_BYTE, 0, &m.coloris()[0]);
-		//printf("using integer colors\n");
-	}
-	else if(0 == Nc && 0 == Nci){
-		// just use whatever the last glColor() call used!
-	}
-	else{
-		if(Nc)
-			glColor4f(m.colors()[0].r, m.colors()[0].g, m.colors()[0].b, m.colors()[0].a);
-		else
-			glColor4ub(m.coloris()[0].r, m.coloris()[0].g, m.coloris()[0].b, m.coloris()[0].a);
-	}
-
-	if(Nt1 >= Nv){
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(1, GL_FLOAT, 0, &m.texCoord1s()[0]);
-	}
-	else if(Nt2 >= Nv){
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, 0, &m.texCoord2s()[0]);
-	}
-	else if(Nt3 >= Nv){
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(3, GL_FLOAT, 0, &m.texCoord3s()[0]);
-	}
-
-	// Draw
-	if(Ni){
-		#ifdef AL_GRAPHICS_SUPPORTS_INT32
-			// Here, 'count' is the number of indices to render
-			glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
-		#else
-			mIndices16.clear();
-			for(int i=begin; i<begin+count; ++i){
-				auto idx = m.indices()[i];
-				if(idx > 65535) AL_WARN_ONCE("Mesh index value out of range (> 65535)");
-				mIndices16.push_back(idx);
-			}
-			glDrawElements(prim, count, GL_UNSIGNED_SHORT, &mIndices16[0]);
-		#endif
-	}
-	else{
-		glDrawArrays(prim, begin, count);
-	}
-
-	// Disable arrays
-	glDisableClientState(GL_VERTEX_ARRAY);
-	if(Nn)					glDisableClientState(GL_NORMAL_ARRAY);
-	if(Nc || Nci)			glDisableClientState(GL_COLOR_ARRAY);
-	if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	#endif
-}
-
 // draw a MeshVBO
 void Graphics::draw(MeshVBO& meshVBO) {
 	if (!meshVBO.isBound()) meshVBO.bind();
@@ -895,13 +1085,17 @@ void Graphics::draw(MeshVBO& meshVBO) {
 	meshVBO.unbind();
 }
 
-
 void Graphics::onCreate(){
 	GPUObject::mID = 1; // must be non-zero to flag creation
-	mRescaleNormal = 0;
+	//mRescaleNormal = 0;
 }
 
 void Graphics::onDestroy(){
+}
+
+// deprecated
+void Graphics::draw(int num_vertices, const Mesh& m){
+	draw(m, num_vertices);
 }
 
 } // al::

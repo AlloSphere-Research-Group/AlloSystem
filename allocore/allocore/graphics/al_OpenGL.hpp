@@ -155,6 +155,13 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_USE_FIXED_PIPELINE
 #endif
 
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES1)
+	#define AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
+#endif
 
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
 	#define AL_GRAPHICS_SUPPORTS_INT32

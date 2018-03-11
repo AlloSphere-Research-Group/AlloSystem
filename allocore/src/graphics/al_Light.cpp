@@ -37,7 +37,7 @@ struct LightPool{
 static LightPool lightPool;
 
 
-#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
+#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 void Material::operator()() const {
 
 	GLenum glface = face();
