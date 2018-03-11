@@ -105,7 +105,8 @@ struct SceneWindowHandler : public WindowEventHandler{
 	SceneWindowHandler(ViewpointWindow& w, App& a): win(w), app(a){}
 
 	bool onCreate(){
-/*
+
+		// FIXME: only do this if actually using fixed pipeline
 		#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 		// Enable color material to simplify cases where materials are not used 
 		// explicitly (e.g., only mesh colors are used).
@@ -114,7 +115,7 @@ struct SceneWindowHandler : public WindowEventHandler{
 			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 			#endif
 		#endif
-*/
+
 		app.onCreate(win);
 		return true;
 	}
