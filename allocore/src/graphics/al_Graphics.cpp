@@ -141,7 +141,7 @@ public:
 					float start, end;
 					float scale; // 1/(end-start)
 				};
-				uniform Fog fog;// = Fog(vec3(0.), 0., 1.);
+				uniform Fog fog;// = Fog(vec3(0.), 0., 1., 1.);
 				varying float fogMix;
 			)"
 			);
@@ -169,8 +169,8 @@ public:
 						normal = vec3(1.,0.,0.);
 					}
 					texCoord2 = texCoord2In;
-					fogMix = (gl_Position.z - fog.start) * fog.scale;
-					fogMix = clamp(fogMix, 0., 1.);
+					// fogMix: [0,1] -> [start, end]
+					fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
 				}
 			)",
 
