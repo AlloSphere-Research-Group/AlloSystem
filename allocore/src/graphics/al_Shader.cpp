@@ -319,14 +319,14 @@ bool ShaderProgram::linked() const {
 int ShaderProgram::uniform(const char * name) const {
 	GET_LOC(mUniformLocs, glGetUniformLocation);
 	if(-1 == loc)
-		AL_WARN_ONCE("No such uniform named \"%s\"", name);
+		AL_WARN_ONCE("ShaderProgram %d has no uniform \"%s\"", id(), name);
 	return loc;
 }
 
 int ShaderProgram::attribute(const char * name) const {
 	GET_LOC(mAttribLocs, glGetAttribLocation);
 	if(-1 == loc)
-        AL_WARN_ONCE("No such attribute named \"%s\"", name);
+        AL_WARN_ONCE("ShaderProgram %d has no attribute \"%s\"", id(), name);
 	return loc;
 }
 
