@@ -619,6 +619,9 @@ public:
 	/// Set pipeline used for rendering meshes
 	void pipeline(Pipeline p);
 
+	Graphics& shaderPreamble(const std::string& s);
+	Graphics& shaderOnMaterial(const std::string& s);
+
 protected:
 
 	class Backend{

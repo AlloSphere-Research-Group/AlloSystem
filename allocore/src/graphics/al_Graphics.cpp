@@ -129,6 +129,9 @@ public:
 				#ifdef GL_ES
 				precision mediump float; // req'd by ES2
 				#endif
+			)" +
+				mPreamble
+			+ R"(
 				const float pi = 3.141592653589793;
 				varying vec3 pos;		// position (eye space)
 				varying vec3 normal;	// normal (eye space)
@@ -312,11 +315,14 @@ public:
 						if(lightTwoSided){ // make normal always face eye
 							N = faceforward(N, -V, N);
 						}
-						Material m;
-						if(gl_FrontFacing || materialOneSided) m = materials[0];
-						else m = materials[1];
-						if(colorMaterial) m.diffuse *= col;
-						col = lightColor(pos, N, V, m);
+						Material material;
+						if(gl_FrontFacing || materialOneSided) material = materials[0];
+						else material = materials[1];
+						if(colorMaterial) material.diffuse *= col;
+			)" +
+						mOnMaterial
+			+ R"(
+						col = lightColor(pos, N, V, material);
 					}
 					col = mix(col, fog.color, fogMix);
 					gl_FragColor = vec4(col, color.a);
@@ -509,6 +515,7 @@ public:
 	}
 
 protected:
+	friend class Graphics;
 	typedef ShaderData<std::stack<Mat4f>> MatrixStack;
 	MatrixStack mMatrixStacks[2];
 
@@ -531,6 +538,7 @@ protected:
 	const Mat4f& currentMatrix() const { return currentMatrixStack().get().top(); }
 	ShaderProgram mShader;
 	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
+	std::string mPreamble, mOnMaterial;
 	Color mCurrentColor;
 	const Mesh * mLastDrawnMesh = 0;
 	bool mCompileShader = true;
@@ -770,6 +778,19 @@ void Graphics::pipeline(Pipeline p){
 		#endif
 		break;
 	}
+}
+
+Graphics& Graphics::shaderPreamble(const std::string& s){
+	if(mBackends[PROG]){
+		dynamic_cast<BackendProg *>(mBackends[PROG])->mPreamble = s;
+	}
+	return *this;
+}
+Graphics& Graphics::shaderOnMaterial(const std::string& s){
+	if(mBackends[PROG]){
+		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnMaterial = s;
+	}
+	return *this;
 }
 
 #define CS(t) case Graphics::t: return #t;
