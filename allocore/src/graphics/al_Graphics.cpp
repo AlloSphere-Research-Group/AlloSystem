@@ -212,6 +212,7 @@ public:
 
 				uniform Light lights[MAX_LIGHTS];
 				uniform vec3 globalAmbient;
+				uniform bool lightTwoSided;
 				uniform Material materials[2];
 				uniform bool doLighting;
 				uniform bool colorMaterial;
@@ -308,6 +309,9 @@ public:
 					if(doLighting){
 						vec3 N = normalize(normal);
 						vec3 V = normalize(-pos); // surface to eye
+						if(lightTwoSided){ // make normal always face eye
+							N = faceforward(N, -V, N);
+						}
 						Material m;
 						if(gl_FrontFacing || materialOneSided) m = materials[0];
 						else m = materials[1];
@@ -430,6 +434,7 @@ public:
 
 			if(mDoLighting == true){
 				mShader.uniform("hasNormals", bool(Nn));
+				mShader.uniform("lightTwoSided", Light::twoSided());
 
 				auto xfm = [](const Mat4f& m, const Vec3f& v){
 					return (m * Vec4f(v,1.f)).xyz();
