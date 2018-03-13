@@ -438,15 +438,19 @@ public:
 	void multMatrix(const Mat4d& m);
 	void multMatrix(const Mat4f& m);
 
-	/// Set modelview matrix
+	/// Set current modelview matrix
 	void modelView(const Mat4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 	void modelView(const Mat4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 
-	/// Set projection matrix
+	/// Set current view matrix (inverse camera pose)
+
+	/// This must be set to obtain correct lighting with the fixed pipeline
+	/// emulation.
+	void view(const Mat4f& v){ mUpdateView=true; mView=v; modelView(v); }
+
+	/// Set current projection matrix
 	void projection(const Mat4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
 	void projection(const Mat4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
-
-
 
 	/// Rotate current matrix
 
@@ -597,12 +601,6 @@ public:
 
 	/// Returns DataType for a given AlloTy
 	static DataType toDataType(AlloTy type);
-
-	/// Set view matrix (inverse camera pose)
-
-	/// This must be set to obtain correct lighting with the fixed pipeline
-	/// emulation.
-	void view(const Mat4f& v){ mUpdateView=true; mView=v; }
 
 	/// Get light at specified index
 	Light& light(unsigned index);
