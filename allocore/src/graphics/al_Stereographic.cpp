@@ -23,7 +23,6 @@ void Stereographic::pushDrawPop(Graphics& g, Drawable& draw){
 	g.pushMatrix(g.PROJECTION);
 	g.loadMatrix(projection());
 	g.pushMatrix(g.MODELVIEW);
-	g.loadMatrix(view());
 	g.view(view());
 		draw.onDraw(g);
 	g.popMatrix(g.PROJECTION);
