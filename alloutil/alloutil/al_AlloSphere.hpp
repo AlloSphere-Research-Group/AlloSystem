@@ -382,8 +382,8 @@ inline void AlloSphereModel::drawSolid()
 
 	for ( int i = 0; i < stacks - 1; i++ )
 	{
-		glDrawArrays( GL_QUAD_STRIP, countFan + i * (slices + 1) * 2, (slices + 1) * 2 );
-//		glDrawArrays( GL_TRIANGLE_STRIP, countFan + i * (slices + 1) * 2, (slices + 1) * 2 );
+		//glDrawArrays( GL_QUAD_STRIP, countFan + i * (slices + 1) * 2, (slices + 1) * 2 );
+		glDrawArrays( GL_TRIANGLE_STRIP, countFan + i * (slices + 1) * 2, (slices + 1) * 2 );
 	}
 
 	glDrawArrays(GL_TRIANGLE_FAN, countAll - countFan, countFan);

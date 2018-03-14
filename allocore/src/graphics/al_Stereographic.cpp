@@ -14,61 +14,59 @@ Stereographic::Stereographic()
  // each component of input vector should be normalized from -1. to 1.
 // template<class T>
 Vec3d Stereographic::unproject(Vec3d screenPos){
-  Matrix4d invprojview = Matrix4d::inverse(this->modelViewProjection());
-  Vec4d worldPos4 = invprojview.transform(screenPos);
-  return worldPos4.sub<3>(0) / worldPos4.w;
+	Matrix4d invprojview = Matrix4d::inverse(this->modelViewProjection());
+	Vec4d worldPos4 = invprojview.transform(screenPos);
+	return worldPos4.sub<3>(0) / worldPos4.w;
 }
 
-void Stereographic::pushDrawPop(Graphics& gl, Drawable& draw){
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(projection());
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(modelView());
-		draw.onDraw(gl);
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
+void Stereographic::pushDrawPop(Graphics& g, Drawable& draw){
+	g.pushMatrix(g.PROJECTION);
+	g.loadMatrix(projection());
+	g.pushMatrix(g.MODELVIEW);
+	g.view(view());
+		draw.onDraw(g);
+	g.popMatrix(g.PROJECTION);
+	g.popMatrix(g.MODELVIEW);
 }
 
-void Stereographic::sendViewport(Graphics& gl, const Viewport& vp){
+void Stereographic::sendViewport(Graphics& g, const Viewport& vp){
 	glScissor(vp.l, vp.b, vp.w, vp.h);
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
+	g.viewport(vp.l, vp.b, vp.w, vp.h);
 	mVP = vp;
 }
 
-void Stereographic::sendClear(Graphics& gl){
-	gl.depthMask(true); // ensure writing to depth buffer is enabled
-	gl.clearColor(mClearColor);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+void Stereographic::sendClear(Graphics& g){
+	g.depthMask(true); // ensure writing to depth buffer is enabled
+	g.clearColor(mClearColor);
+	g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
 }
 
-void Stereographic :: draw(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
+void Stereographic :: draw(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
 	//printf("%d, %d\n", mStereo, mMode);
 	if(mStereo){
 		switch(mMode){
-			case ANAGLYPH:	drawAnaglyph(gl, lens, pose, vp, draw, clear, pixelaspect); return;
-			case ACTIVE:	drawActive	(gl, lens, pose, vp, draw, clear, pixelaspect); return;
-			case DUAL:		drawDual	(gl, lens, pose, vp, draw, clear, pixelaspect); return;
-			case LEFT_EYE:	drawLeft	(gl, lens, pose, vp, draw, clear, pixelaspect); return;
-			case RIGHT_EYE:	drawRight	(gl, lens, pose, vp, draw, clear, pixelaspect); return;
+			case ANAGLYPH:	drawAnaglyph(g, lens, pose, vp, draw, clear, pixelaspect); return;
+			case ACTIVE:	drawActive	(g, lens, pose, vp, draw, clear, pixelaspect); return;
+			case DUAL:		drawDual	(g, lens, pose, vp, draw, clear, pixelaspect); return;
+			case LEFT_EYE:	drawLeft	(g, lens, pose, vp, draw, clear, pixelaspect); return;
+			case RIGHT_EYE:	drawRight	(g, lens, pose, vp, draw, clear, pixelaspect); return;
 			default:;
 		}
 	} else {
-		drawMono(gl, lens, pose, vp, draw, clear, pixelaspect);
+		drawMono(g, lens, pose, vp, draw, clear, pixelaspect);
 	}
 }
 
-void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereographic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	double near = lens.near();
-	double far = lens.far();
 	const Vec3d& pos = pose.pos();
 
 	// We must configure scissoring BEFORE clearing buffers
-	glEnable(GL_SCISSOR_TEST);
-	sendViewport(gl, vp);
+	g.scissorTest(true);
+	sendViewport(g, vp);
 
-	// glDrawBuffer(GL_BACK);	// << breaks usage under FBO
-	if(clear) sendClear(gl);
+	// g.drawBuffer(Graphics::BACK);	// << breaks usage under FBO
+	if(clear) sendClear(g);
 
 	mEye = pos;
 
@@ -83,19 +81,16 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
 			double aspect = vp1.aspect() * pixelaspect;
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
+			mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
 
-			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
-			Vec3d ux = q.toVectorX();
-			Vec3d uy = q.toVectorY();
-			Vec3d uz = q.toVectorZ();
+			// TODO: lerp quat instead of computing anew each iteration
+			mView = (pose * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0)).matrix();
+			invertRigid(mView);
 
-			mProjection = Matrix4d::perspective(fovy, aspect, near, far);
-			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+			sendViewport(g, vp1);
+			if(clear) sendClear(g);
 
-			sendViewport(gl, vp1);
-			if(clear) sendClear(gl);
-
-			pushDrawPop(gl,draw);
+			pushDrawPop(g,draw);
 
 			wx = wx1;
 		}
@@ -103,14 +98,15 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 	} else {
 		double fovy = lens.fovy();
 		double aspect = vp.aspect() * pixelaspect;
-		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
-		mProjection = Matrix4d::perspective(fovy, aspect, near, far);
-		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+		mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
+		
+		mView = pose.matrix();
+		invertRigid(mView);
 
-		pushDrawPop(gl,draw);
+		pushDrawPop(g,draw);
 	}
 
-	glDisable(GL_SCISSOR_TEST);
+	g.scissorTest(false);
 }
 
 
@@ -118,32 +114,38 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 Before calling this function, you must enable scissoring and set the
 appropriate draw buffer. Thus, to draw the right eye:
 
-	glEnable(GL_SCISSOR_TEST);
-	glDrawBuffer(GL_BACK_RIGHT);
+	g.scissorTest(true);
+	g.drawBuffer(Graphics::BACK_RIGHT);
 
-	drawOffAxis(RIGHT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
+	drawOffAxis(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
 
-	glDrawBuffer(GL_BACK);
-	glDisable(GL_SCISSOR_TEST);
+	g.drawBuffer(Graphics::BACK);
+	g.scissorTest(false);
 */
-void Stereographic::drawEye(StereoMode eye, Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect){
+void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect){
 
-	double near = lens.near();
-	double far = lens.far();
-	double focal = lens.focalLength();
-	double iod = lens.eyeSep();
-	const Vec3d& pos = pose.pos();
+	const auto near = lens.near();
+	const auto far = lens.far();
+	const auto focal = lens.focalLength();
+	auto eyeShift = lens.eyeSep()*0.5;
 
 	if(RIGHT_EYE == eye){
-		iod = -iod; // eyes only differ in sign in interocular distance
 		mEyeNumber = 0;
 	}
 	else{
+		eyeShift = -eyeShift; // eyes only differ in sign in interocular distance
 		mEyeNumber = 1;
 	}
 
-	sendViewport(gl, vp);		// set scissor/viewport regions
-	if(clear) sendClear(gl);	// clear color/depth buffers
+	sendViewport(g, vp);		// set scissor/viewport regions
+	if(clear) sendClear(g);	// clear color/depth buffers
+
+	auto setView = [this](const Pose& pose, double eyeShift){
+		mView = pose.matrix(); // head pose
+		mView.Mat4d::translate(pose.ux()*eyeShift); // translate head to eye
+		mEye = mView.col(3); // eye pos
+		invertRigid(mView); // convert eye pose to view
+	};
 
 	// FIXME: geometry is not continuous at slice boundaries
 	if (omni()) {
@@ -153,183 +155,148 @@ void Stereographic::drawEye(StereoMode eye, Graphics& gl, const Lens& lens, cons
 
 		// Render slices starting on left of viewport
 		for (unsigned i=0; i<mSlices; i++) {
-			// angle at center of slice:
-			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
-
 			// Position of right edge of slice (exclusive)
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
 			double aspect = vp1.aspect() * pixelaspect;
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
 
-			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
-			Vec3d ux = q.toVectorX();
-			Vec3d uy = q.toVectorY();
-			Vec3d uz = q.toVectorZ();
+			mProjection = Matrix4d::perspectiveOffAxis(fovy, aspect, near, far, -eyeShift, focal);
 
-			/* LEFT
-			mEye = pos + (ux * iod);
-			mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-			*/
-			/* RIGHT
-			mEye = pos + (ux * -iod);	// right
-			mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-			*/
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
+			Quatd qrot = Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
 
-			mEye = pos + (ux * iod);
-
-			// Compute projection and modelview matrices
-			mProjection = Matrix4d::perspectiveOffAxis(fovy, aspect, near, far, 0.5*iod, focal);
-			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+			setView(pose * qrot, eyeShift);
 
 			// Do the rendering
-			sendViewport(gl, vp1);		// set scissor/viewport regions
-			pushDrawPop(gl,draw);		// onDraw wrapped in push/pop calls
+			sendViewport(g, vp1);		// set scissor/viewport regions
+			pushDrawPop(g,draw);		// onDraw wrapped in push/pop calls
 
 			wx = wx1;
 		}
 
 	} else {
-		double fovy = lens.fovy();
 		double aspect = vp.aspect() * pixelaspect;
-
-		// Get orientation reference frame of viewer
-		Vec3d ux, uy, uz;
-		pose.unitVectors(ux, uy, uz);
-
-		/* LEFT
-		mEye = pos + (ux * iod);
-		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, mEye, iod);
-					(= lookAtOffAxis(ux,uy,uz, pos,-0.5*iod))
-		*/
-
-		/* RIGHT
-				mEye = pos + (ux * -iod);	// right
-		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAtRight(ux, uy, uz, mEye, iod);
-					(= lookAtOffAxis(ux,uy,uz, pos, 0.5*iod))
-		*/
-
-		mEye = pos + (ux * iod);
-
-		// Compute projection and modelview matrices
-		mProjection = Matrix4d::perspectiveOffAxis(fovy, aspect, near, far, 0.5*iod, focal);
-		mModelView = Matrix4d::lookAtOffAxis(ux, uy, uz, mEye, -0.5*iod);
+		mProjection = Matrix4d::perspectiveOffAxis(lens.fovy(), aspect, near, far, -eyeShift, focal);
+		setView(pose, eyeShift);
 
 		// Do the rendering
-		pushDrawPop(gl,draw);		// onDraw wrapped in push/pop
+		pushDrawPop(g,draw);		// onDraw wrapped in push/pop
 	}
 }
 
 
-void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereographic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
+	g.scissorTest(true);
 
 	// We must clear here since color masks affect glClear
 	if(clear){
-		sendViewport(gl, vp);
-		sendClear(gl);
+		sendViewport(g, vp);
+		sendClear(g);
 	}
 
+	// Note: color order is left-right by convention
 	switch(mAnaglyphMode){
-		case RED_BLUE:
-		case RED_GREEN:
-		case RED_CYAN:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
-		case BLUE_RED:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
-		case GREEN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
-		case CYAN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
-		default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
+		case RED_CYAN:	g.colorMask(0,1,1,1); break;
+		case RED_BLUE:	g.colorMask(0,0,1,1); break;
+		case RED_GREEN:	g.colorMask(0,1,0,1); break;
+		case CYAN_RED:
+		case BLUE_RED:
+		case GREEN_RED:	g.colorMask(1,0,0,1); break;
+		default:		g.colorMask(1);
 	}
 
-	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
+	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, /*clear*/false, pixelaspect);
 
 	// Clear only depth buffer for second eye pass
 	// Note: This must be cleared regardless of the 'clear' argument since we
 	// only have one depth buffer and eye must have its own depth buffer.
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.depthMask(true);
-	gl.clear(gl.DEPTH_BUFFER_BIT);
+	g.viewport(vp.l, vp.b, vp.w, vp.h);
+	g.depthMask(true);
+	g.clear(g.DEPTH_BUFFER_BIT);
 
 	switch(mAnaglyphMode){
-		case RED_BLUE:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
-		case RED_GREEN:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
-		case RED_CYAN:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
-		case BLUE_RED:
-		case GREEN_RED:
-		case CYAN_RED:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
-		default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
+		case RED_CYAN:
+		case RED_BLUE:
+		case RED_GREEN:	g.colorMask(1,0,0,1); break;
+		case CYAN_RED:	g.colorMask(0,1,1,1); break;
+		case BLUE_RED:	g.colorMask(0,0,1,1); break;
+		case GREEN_RED:	g.colorMask(0,1,0,1); break;
+		default:		g.colorMask(1);
 	}
 
-	drawEye(LEFT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
+	drawEye(LEFT_EYE, g, lens, pose, vp, draw, /*clear*/false, pixelaspect);
 
-	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-	glDisable(GL_SCISSOR_TEST);
+	g.colorMask(1);
+	g.scissorTest(false);
 }
 
 
 
-void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereographic :: drawActive(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
+	#ifdef AL_GRAPHICS_SUPPORTS_LR_BUFFERS
+		g.scissorTest(true);
 
-	glDrawBuffer(GL_BACK_RIGHT);
-	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
+		g.drawBuffer(Graphics::BACK_RIGHT);
+		drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
 
-	glDrawBuffer(GL_BACK_LEFT);
-	drawEye(LEFT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
+		g.drawBuffer(Graphics::BACK_LEFT);
+		drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
 
-	glDrawBuffer(GL_BACK); // set back (?) to default
-	glDisable(GL_SCISSOR_TEST);
+		g.drawBuffer(Graphics::BACK); // set back (?) to default
+		g.scissorTest(false);
+
+	#else
+		AL_WARN_ONCE("Active stereo rendering not supported");
+	#endif
 }
 
 
-void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereographic :: drawLeft(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
-
-	drawEye(LEFT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
-
-	glDisable(GL_SCISSOR_TEST);
+	g.scissorTest(true);
+	drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+	g.scissorTest(false);
 }
 
-void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereographic :: drawRight(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
-
-	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
-
-	glDisable(GL_SCISSOR_TEST);
+	g.scissorTest(true);
+	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+	g.scissorTest(false);
 }
 
 
-void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereographic :: drawDual(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
+	g.scissorTest(true);
 
 	// Clear the whole viewport in one go (not once for each half)
 	if(clear){
-		sendViewport(gl, vp);
-		sendClear(gl);
+		sendViewport(g, vp);
+		sendClear(g);
 	}
 
 	Viewport vpright(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
 	Viewport vpleft(vp.l, vp.b, vp.w*0.5, vp.h);
 
-	drawEye(RIGHT_EYE, gl, lens, pose, vpright, draw, /*clear*/false, pixelaspect);
+	drawEye(RIGHT_EYE, g, lens, pose, vpright, draw, /*clear*/false, pixelaspect);
 
-	drawEye(LEFT_EYE, gl, lens, pose, vpleft, draw, /*clear*/false, pixelaspect);
+	drawEye(LEFT_EYE, g, lens, pose, vpleft, draw, /*clear*/false, pixelaspect);
 
-	glDisable(GL_SCISSOR_TEST);
+	g.scissorTest(false);
 }
 
 
 
 /// blue line sync for active stereo
 /// @see http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/GLUTStereo/glutStereo.cpp
-void Stereographic :: drawBlueLine(double window_width, double window_height)
-{
+void Stereographic :: drawBlueLine(double window_width, double window_height){
+// FIXME: This will not compile with OpenGL ES
+#if defined(AL_GRAPHICS_USE_OPENGL)
 	GLint i;
 	unsigned long buffer;
 
@@ -401,6 +368,7 @@ void Stereographic :: drawBlueLine(double window_width, double window_height)
 	glPopAttrib();
 
 	glDrawBuffer(GL_BACK);
+#endif
 }
 
 } // al::

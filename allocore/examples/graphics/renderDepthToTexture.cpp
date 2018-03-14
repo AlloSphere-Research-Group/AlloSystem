@@ -34,8 +34,8 @@ public:
 		fbo.bind();
 
 		// These calls are sometimes needed if we do not have a color buffer attached
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
+		graphics().drawBuffer(Graphics::NONE);
+		graphics().readBuffer(Graphics::NONE);
 
 		// Attach the texture to the FBO
 		fbo.attachTexture2D(texDepth.id(), FBO::DEPTH_ATTACHMENT);

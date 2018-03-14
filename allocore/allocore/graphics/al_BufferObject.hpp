@@ -72,29 +72,32 @@ identifier.
 class BufferObject : public GPUObject {
 public:
 
-	/// Buffer access mode
-	enum AccessMode{
-		READ_ONLY				= GL_READ_ONLY,
-		WRITE_ONLY				= GL_WRITE_ONLY,
-		READ_WRITE				= GL_READ_WRITE
-	};
-
 	/// Array type
 	enum ArrayType{
+		#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
+		VERTEX_ARRAY			= 0,
+		NORMAL_ARRAY			= 1,
+		COLOR_ARRAY				= 2,
+		TEXTURE_COORD_ARRAY		= 3,
+		#else
 		VERTEX_ARRAY			= GL_VERTEX_ARRAY,
 		NORMAL_ARRAY			= GL_NORMAL_ARRAY,
 		COLOR_ARRAY				= GL_COLOR_ARRAY,
-		INDEX_ARRAY				= GL_INDEX_ARRAY,
 		TEXTURE_COORD_ARRAY		= GL_TEXTURE_COORD_ARRAY,
-		EDGE_FLAG_ARRAY			= GL_EDGE_FLAG_ARRAY
+		#endif
 	};
 
 	/// Buffer type
 	enum BufferType{
 		ARRAY_BUFFER			= GL_ARRAY_BUFFER,
 		ELEMENT_ARRAY_BUFFER	= GL_ELEMENT_ARRAY_BUFFER,
+		#ifdef AL_GRAPHICS_SUPPORTS_PBO
 		PIXEL_PACK_BUFFER		= GL_PIXEL_PACK_BUFFER,			/**< Transfer to PBO */
-		PIXEL_UNPACK_BUFFER		= GL_PIXEL_UNPACK_BUFFER		/**< Transfer from PBO */
+		PIXEL_UNPACK_BUFFER		= GL_PIXEL_UNPACK_BUFFER,		/**< Transfer from PBO */
+		#else
+		PIXEL_PACK_BUFFER,
+		PIXEL_UNPACK_BUFFER
+		#endif
 	};
 
 
@@ -106,15 +109,11 @@ public:
 	means the data will be copied internally on the GPU.
 	*/
 	enum BufferUsage{
-		STREAM_DRAW		= GL_STREAM_DRAW,
-		//STREAM_READ		= GL_STREAM_READ,
-		//STREAM_COPY		= GL_STREAM_COPY,
 		STATIC_DRAW		= GL_STATIC_DRAW,
-		//STATIC_READ		= GL_STATIC_READ,
-		//STATIC_COPY		= GL_STATIC_COPY,
 		DYNAMIC_DRAW	= GL_DYNAMIC_DRAW,
-		//DYNAMIC_READ	= GL_DYNAMIC_READ,
-		//DYNAMIC_COPY	= GL_DYNAMIC_COPY
+		#ifdef AL_GRAPHICS_SUPPORTS_STREAM_DRAW
+		STREAM_DRAW		= GL_STREAM_DRAW,
+		#endif
 	};
 
 	/// @param[in] bufType	buffer type (array, element, etc.)
@@ -173,12 +172,16 @@ public:
 	void operator()();
 	void send();
 
-
 	void print() const;
 
 
-	#ifdef AL_GRAPHICS_USE_OPENGL
-	/* Warning: these are not supported in OpenGL ES */
+	#ifdef AL_GRAPHICS_SUPPORTS_MAP_BUFFER
+	/// Buffer access mode
+	enum AccessMode{
+		READ_ONLY				= GL_READ_ONLY,
+		WRITE_ONLY				= GL_WRITE_ONLY,
+		READ_WRITE				= GL_READ_WRITE
+	};
 
 	/// Set map mode
 	void mapMode(AccessMode v);
@@ -207,16 +210,19 @@ public:
 	/// Unmaps data store from client address
 	/// After unmap(), the mapped pointer is invalid
 	bool unmap();
+
+protected:
+	AccessMode mMapMode = READ_WRITE;
+public:
 	#endif
 
 protected:
-	AccessMode mMapMode;
 	BufferType mType;
 	BufferUsage mUsage;
-	Graphics::DataType mDataType;
-	int mNumComps;
-	int mNumElems;
-	void * mData;
+	Graphics::DataType mDataType = Graphics::FLOAT;
+	int mNumComps = 0;
+	int mNumElems = 0;
+	void * mData = 0;
 	struct SubData{
 		SubData(const void * data_=NULL, unsigned size_=0, unsigned offset_=0)
 		:	data(data_), size(size_), offset(offset_){}
@@ -235,7 +241,7 @@ protected:
 /// Vertex buffer object
 class VBO : public BufferObject {
 public:
-	VBO(BufferUsage usage=STREAM_DRAW);
+	VBO(BufferUsage usage=DYNAMIC_DRAW);
 
 	static void enable();
 	static void disable();
@@ -248,7 +254,7 @@ protected:
 /// Color buffer object
 class CBO : public BufferObject {
 public:
-	CBO(BufferUsage usage=STREAM_DRAW);
+	CBO(BufferUsage usage=DYNAMIC_DRAW);
 
 	static void enable();
 	static void disable();
@@ -257,21 +263,21 @@ protected:
 	virtual void onPointerFunc();
 };
 
-
+#ifdef AL_GRAPHICS_SUPPORTS_PBO
 /// Pixel buffer object
 class PBO : public BufferObject {
 public:
-	PBO(bool packMode, BufferUsage usage=STREAM_DRAW);
+	PBO(bool packMode, BufferUsage usage=DYNAMIC_DRAW);
 
 protected:
 	virtual void onPointerFunc();
 };
-
+#endif
 
 /// Element object buffer
 class EBO : public BufferObject {
 public:
-	EBO(Graphics::Primitive prim=Graphics::POINTS, BufferUsage usage=STATIC_DRAW);
+	EBO(Graphics::Primitive prim=Graphics::POINTS, BufferUsage usage=DYNAMIC_DRAW);
 
 	EBO& primitive(Graphics::Primitive v);
 	EBO& range(int start, int end);

@@ -6,7 +6,7 @@ namespace al{
 
 Viewpoint::Viewpoint(const Pose& transform)
 :	mViewport(0,0,0,0),
-	mParentTransform(NULL),
+	mParentTransform(NULL), mTransform(transform),
 	mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
 	mLens(NULL), mClearColor(NULL)
 {}
@@ -35,7 +35,7 @@ void Viewpoint::onParentResize(int w, int h){
 //______________________________________________________________________________
 
 ViewpointWindow::ViewpointWindow(){
-	init();
+	append(mStandardKeyControls);
 }
 
 ViewpointWindow::ViewpointWindow(
@@ -43,19 +43,17 @@ ViewpointWindow::ViewpointWindow(
 	const std::string title,
 	double fps,
 	DisplayMode mode
-){
-	init();
+)
+:	ViewpointWindow()
+{
 	create(dims, title, fps, mode);
 }
 
 bool ViewpointWindow::onResize(int w, int h){
-	//printf("ViewpointWindow onResize: %d %d\n", dw, dh);
-	Viewpoints::iterator iv = mViewpoints.begin();
-
-	while(iv != mViewpoints.end()){
-		(*iv)->onParentResize(w, h);
-		++iv;
-		//printf("%g %g %g %g\n", vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
+	//printf("ViewpointWindow onResize: %d %d\n", w, h);
+	for(auto * vp : mViewpoints){
+		vp->onParentResize(w, h);
+		//printf("%g %g %g %g\n", vp->viewport().l, vp->viewport().b, vp->viewport().w, vp->viewport().h);
 	}
 
 	mResized = true;
@@ -72,10 +70,6 @@ ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
 		v.onParentResize(width(), height());
 	}
 	return *this;
-}
-
-void ViewpointWindow::init(){
-	append(mStandardKeyControls);
 }
 
 //______________________________________________________________________________
@@ -112,10 +106,15 @@ struct SceneWindowHandler : public WindowEventHandler{
 
 	bool onCreate(){
 
+		// FIXME: only do this if actually using fixed pipeline
+		#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 		// Enable color material to simplify cases where materials are not used 
 		// explicitly (e.g., only mesh colors are used).
 		glEnable(GL_COLOR_MATERIAL);
-		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+			#ifdef AL_GRAPHICS_SUPPORTS_COLOR_MATERIAL_SPEC
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+			#endif
+		#endif
 
 		app.onCreate(win);
 		return true;
@@ -151,7 +150,7 @@ bool SceneWindowHandler::onFrame(){
 
 	Graphics& g = app.graphics();
 	g.depthTesting(true);
-	g.lighting(false);
+	//g.lighting(false); // should be disabled by default
 
 	struct DrawFunc : public Drawable {
 		App& app;
@@ -169,11 +168,10 @@ bool SceneWindowHandler::onFrame(){
 		}
 	};
 
-	ViewpointWindow::Viewpoints::const_iterator iv = win.viewpoints().begin();
-
 	// Draw scene for each viewpoint (pose + viewport)
-	for(; iv != win.viewpoints().end(); ++iv){
-		Viewpoint& vp = *(*iv);
+	for(auto * vpPtr : win.viewpoints()){
+
+		Viewpoint& vp = *vpPtr;
 
 		// if no camera, set to default scene camera
 		if(!vp.hasLens()) vp.lens(app.lens());
@@ -247,12 +245,8 @@ App::App()
 
 App::~App(){
 	// delete factory objects
-	for(unsigned i=0; i<mFacWindows.size(); ++i){
-		delete mFacWindows[i];
-	}
-	for(unsigned i=0; i<mFacViewpoints.size(); ++i){
-		delete mFacViewpoints[i];
-	}
+	for(auto * win : mFacWindows) delete win;
+	for(auto * vp : mFacViewpoints) delete vp;
 
 	if(oscSend().opened() && !name().empty()) sendDisconnect();
 }
@@ -260,15 +254,11 @@ App::~App(){
 
 static void AppAudioCB(AudioIOData& io){
 	App& app = io.user<App>();
-	//int numFrames = io.framesPerBuffer();
 
-	//w.mNavMaster.velScale(4);
-	//w.mNavMaster.step(io.secondsPerBuffer());
 	if(app.clockNav() == &app.audioIO()){
 		app.nav().smooth(0.95);
 		app.nav().step(1./4);
 	}
-	//app.mListeners[0]->pose(app.nav());
 
 	if(app.clockAnimate() == &app.audioIO()){
 		app.onAnimate(io.secondsPerBuffer());
@@ -276,10 +266,6 @@ static void AppAudioCB(AudioIOData& io){
 
 	io.frame(0);
 	app.onSound(app.audioIO());
-
-	//app.mAudioScene.encode(numFrames, io.framesPerSecond());
-	//app.mAudioScene.render(&io.out(0,0), numFrames);
-	//printf("%f\n", io.out(0,0));
 }
 
 
@@ -293,10 +279,6 @@ void App::initAudio(
 	mAudioIO.framesPerBuffer(audioBlockSize);
 	mAudioIO.channelsOut(audioOutputs);
 	mAudioIO.channelsIn(audioInputs);
-//	mAudioScene(3,2, audioBlockSize);
-//	mListeners.push_back(mAudioScene.createListener(2));
-//	mListeners[0]->speakerPos(0,0, -45);
-//	mListeners[0]->speakerPos(1,1,  45);
 }
 
 
@@ -317,7 +299,7 @@ ViewpointWindow * App::initWindow(
 
 	win.fps(fps);
 	win.displayMode(mode);
-	
+
 	auto& newVP = *new Viewpoint;
 	mFacViewpoints.push_back(&newVP);
 	newVP.parentTransform(nav().transformed());
@@ -351,20 +333,22 @@ void App::start(){
 	if(usingAudio()) mAudioIO.start();
 	if(oscSend().opened() && !name().empty()) sendHandshake();
 
-//	// factories OKAY
-//	for(unsigned i=0; i<mFacViewpoints.size(); ++i)
-//		printf("%p\n", mFacViewpoints[i].parentTransform());
-//
-//	// window pointers OKAY
-//	for(unsigned j=0; j<windows().size(); ++j){
-//		ViewpointWindow& w = *windows()[j];
-//		for(unsigned i=0; i<w.viewpoints().size(); ++i){
-//			Viewpoint& vp = *w.viewpoints()[i];
-//			printf("%d,%d: %p\n", j,i, vp.parentTransform());
-//			printf("anchor : %g %g\n", vp.anchorX(), vp.anchorY());
-//			printf("stretch: %g %g\n", vp.stretchX(), vp.stretchY());
-//		}
-//	}
+	/*
+	// factories OKAY
+	for(unsigned i=0; i<mFacViewpoints.size(); ++i)
+		printf("%p\n", mFacViewpoints[i].parentTransform());
+
+	// window pointers OKAY
+	for(unsigned j=0; j<windows().size(); ++j){
+		ViewpointWindow& w = *windows()[j];
+		for(unsigned i=0; i<w.viewpoints().size(); ++i){
+			Viewpoint& vp = *w.viewpoints()[i];
+			printf("%d,%d: %p\n", j,i, vp.parentTransform());
+			printf("anchor : %g %g\n", vp.anchorX(), vp.anchorY());
+			printf("stretch: %g %g\n", vp.stretchX(), vp.stretchY());
+		}
+	}
+	//*/
 
 	/* Add a handler to close i/o when Main exits.
 	This is done to ensure members of derived classes are not accessed by i/o 
@@ -379,11 +363,9 @@ void App::start(){
 			//printf("App exiting\n");
 			app.audioIO().close();
 
-			// Ensures windows get destroyed in case the user does, for example,
+			// Ensures windows get destroyed in case, for example, the user does
 			// a hard exit with exit(0).
-			for(unsigned i=0; i<app.mFacWindows.size(); ++i){
-				app.mFacWindows[i]->destroy();
-			}
+			for(auto * win : app.mFacWindows) win->destroy();
 
 			// ctrl-q will destroy all windows before stopping the main loop
 			// so we call onExit last
@@ -425,20 +407,20 @@ bool App::usingAudio() const {
 /// Get a pick ray from screen space coordinates
  // i.e. use mouse xy
 Rayd App::getPickRay(const ViewpointWindow& w, int screenX, int screenY){
-  Rayd r;
-  Vec3d screenPos;
-  screenPos.x = (screenX*1. / w.width()) * 2. - 1.;
-  screenPos.y = ((w.height() - screenY)*1. / w.height()) * 2. - 1.;
-  screenPos.z = -1.;
-  Vec3d worldPos = stereo().unproject(screenPos);
-  r.origin().set(worldPos);
+	Rayd r;
+	Vec3d screenPos;
+	screenPos.x = (screenX*1. / w.width()) * 2. - 1.;
+	screenPos.y = ((w.height() - screenY)*1. / w.height()) * 2. - 1.;
+	screenPos.z = -1.;
+	Vec3d worldPos = stereo().unproject(screenPos);
+	r.origin().set(worldPos);
 
-  screenPos.z = 1.;
-  worldPos = stereo().unproject(screenPos);
-  r.direction().set( worldPos );
-  r.direction() -= r.origin();
-  r.direction().normalize();
-  return r;
+	screenPos.z = 1.;
+	worldPos = stereo().unproject(screenPos);
+	r.direction().set( worldPos );
+	r.direction() -= r.origin();
+	r.direction().normalize();
+	return r;
 }
 
 

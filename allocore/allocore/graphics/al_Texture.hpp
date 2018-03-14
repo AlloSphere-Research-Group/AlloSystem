@@ -52,7 +52,6 @@
 
 namespace al{
 
-
 /// A simple wrapper around an OpenGL Texture
 /// @ingroup allocore
 class Texture : public GPUObject {
@@ -62,18 +61,24 @@ public:
 	typedef Graphics::DataType	DataType;
 
 	enum Target {
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		TEXTURE_1D				= GL_TEXTURE_1D,
+		#endif
 		TEXTURE_2D				= GL_TEXTURE_2D,
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 		TEXTURE_3D				= GL_TEXTURE_3D,
+		#endif
 		NO_TARGET				= 0
 	};
 
 	enum Wrap {
+		REPEAT					= GL_REPEAT,
+		CLAMP_TO_EDGE			= GL_CLAMP_TO_EDGE,
+		#ifdef AL_GRAPHICS_SUPPORTS_WRAP_EXTRA
+		MIRRORED_REPEAT			= GL_MIRRORED_REPEAT,
 		CLAMP					= GL_CLAMP,
 		CLAMP_TO_BORDER			= GL_CLAMP_TO_BORDER,
-		CLAMP_TO_EDGE			= GL_CLAMP_TO_EDGE,
-		MIRRORED_REPEAT			= GL_MIRRORED_REPEAT,
-		REPEAT					= GL_REPEAT
+		#endif
 	};
 
 	enum Filter {
@@ -90,6 +95,7 @@ public:
 	/// Construct an unsized Texture
 	Texture();
 
+	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	/// Construct a 1D Texture object
 
 	/// @param[in] width		width, in pixels
@@ -102,6 +108,7 @@ public:
 		Graphics::DataType type=Graphics::UBYTE,
 		bool clientAlloc=true
 	);
+	#endif
 
 	/// Construct a 2D Texture object
 
@@ -117,6 +124,7 @@ public:
 		bool clientAlloc=true
 	);
 
+	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 	/// Construct a 3D Texture object
 
 	/// @param[in] width		width, in pixels
@@ -131,6 +139,7 @@ public:
 		Graphics::DataType type=Graphics::UBYTE,
 		bool clientAlloc=true
 	);
+	#endif
 
 	/// Construct a Texture object from an Array header
 	Texture(AlloArrayHeader& header);
@@ -318,12 +327,6 @@ public:
 		int fbx=0, int fby=0,
 		int texx=0, int texy=0, int texz=0
 	);
-
-	/// Generate mipmaps
-
-	/// NOTE: This is only valid when the graphics context is valid.
-	///
-	Texture& generateMipmap();
 
 	/// Allocate the internal Array for a client-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);

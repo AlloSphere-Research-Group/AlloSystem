@@ -157,21 +157,43 @@ public:
 
 	/// Get identity matrix
 	static Mat identity(){
-		return Mat(MAT_NO_INIT).setIdentity();
+		return Mat(T(1));
 	}
 
 	/// Get a rotation transform matrix
+
+	/// @param[in] angle	rotation angle in radians
+	/// @param[in] dim1		first basis vector of rotation plane
+	/// @param[in] dim2		second basis vector of rotation plane
 	static Mat rotation(double angle, int dim1, int dim2){
 		double cs = cos(angle);
 		double sn = sin(angle);
-
-		Mat m(MAT_NO_INIT);
-		m.setIdentity();
+		Mat m(T(1));
 		m(dim1,dim1) = cs;
 		m(dim1,dim2) =-sn;
 		m(dim2,dim1) = sn;
 		m(dim2,dim2) = cs;
 		return m;
+	}
+
+	/// Get a rotation transform matrix
+
+	/// @param[in] angle	rotation angle in radians
+	/// @param[in] axis		rotation axis; should be a unit vector
+	static Mat<4,T> rotation(double angle, const Vec<3,T>& axis){
+		T s = sin(angle);
+		T c = cos(angle);
+		T t = T(1)-c;
+		T x = axis[0], y = axis[1], z = axis[2];
+		T tx = t*x, ty = t*y, tz = t*z;
+		T sx = s*x, sy = s*y, sz = s*z;
+
+		return Mat<4,T>(
+			tx*x + c , tx*y - sz, tx*z + sy, T(0),
+			tx*y + sz, ty*y + c , ty*z - sx, T(0),
+			tx*z - sy, ty*z + sx, tz*z + c , T(0),
+			T(0),T(0),T(0),T(1)
+		);
 	}
 
 	/// Get a scaling transform matrix
@@ -198,8 +220,7 @@ public:
 	/// Get a translation transform matrix
 	template <class V>
 	static Mat translation(const Vec<N-1,V>& v){
-		Mat m(MAT_NO_INIT);
-		m.setIdentity();
+		Mat m(T(1));
 		for(int r=0; r<N-1; ++r) m(r,N-1) = v[r];
 		return m;
 	}
@@ -240,6 +261,7 @@ public:
 
 	/// Return column i as vector
 	Vec<N,T> col(int i) const { return Vec<N,T>(elems() + i*N); }
+	Vec<N,T>& col(int i){ return Vec<N,T>::pun(elems() + i*N); }
 
 	/// Return row i as vector
 	Vec<N,T> row(int i) const { return Vec<N,T>(elems()+i, N); }
@@ -248,12 +270,13 @@ public:
 	Vec<N,T> diagonal() const { return Vec<N,T>(elems(), N+1); }
 
 	/// Transpose elements
-	Mat& transpose(){
-		for(int j=0; j<N-1; ++j){	// row and column
-		for(int i=j+1; i<N; ++i){	// offset into row or column
-			T& a = (*this)(i,j);
-			T& b = (*this)(j,i);
-			T c = a; a = b;	b = c;	// swap elements
+
+	/// @param[in] size		Size of upper-left submatrix to transpose
+	///
+	Mat& transpose(int size=N){
+		for(int j=0; j<size-1; ++j){	// row and column
+		for(int i=j+1; i<size; ++i){	// offset into row or column
+			std::swap((*this)(i,j), (*this)(j,i));
 		}}
 		return *this;
 	}
@@ -564,7 +587,6 @@ public:
 };
 
 
-
 // -----------------------------------------------------------------------------
 // The following are functions that either cannot be defined as class methods
 // (due to syntax rules or specialization) or simply are not object oriented.
@@ -591,39 +613,11 @@ inline Vec<N,U> operator* (const Vec<N,U>& vRow, const Mat<N,T>& m){
 	Vec<N,U> r; return Mat<N,T>::multiply(r, vRow,m);
 }
 
-
-/// Get determinant
-///
-/// @ingroup allocore
-template <class T>
-T determinant(const Mat<1,T>& m){
-	return m(0,0);
-}
-
-/// Get determinant
-///
-/// @ingroup allocore
-template <class T>
-T determinant(const Mat<2,T>& m){
-	return m(0,0)*m(1,1) - m(0,1)*m(1,0);
-}
-
-/// Get determinant
-///
-/// @ingroup allocore
-template <class T>
-T determinant(const Mat<3,T>& m){
-	return
-		m(0,0)*(m(1,1)*m(2,2) - m(1,2)*m(2,1)) +
-		m(0,1)*(m(1,2)*m(2,0) - m(1,0)*m(2,2)) +
-		m(0,2)*(m(1,0)*m(2,1) - m(1,1)*m(2,0));
-}
-
 /// Get determinant
 
 /// This computes the determinant using cofactor (or Laplace) expansion.
 /// The algorithm operates by recursively computing determinants of submatrices.
-///
+/// For small matrices, optimized versions are used.
 /// @ingroup allocore
 template<int N, class T>
 T determinant(const Mat<N,T>& m){
@@ -637,37 +631,26 @@ T determinant(const Mat<N,T>& m){
 	return res;
 }
 
-/// Invert matrix, returns whether matrix was able to be inverted
-///
-/// @ingroup allocore
 template <class T>
-bool invert(Mat<1,T>& m){
-	T det = determinant(m);
-	if(det != 0){
-		m(0,0) /= det;
-		return true;
-	}
-	return false;
+T determinant(const Mat<1,T>& m){
+	return m(0,0);
+}
+
+template <class T>
+T determinant(const Mat<2,T>& m){
+	return m(0,0)*m(1,1) - m(0,1)*m(1,0);
+}
+
+template <class T>
+T determinant(const Mat<3,T>& m){
+	return
+		m(0,0)*(m(1,1)*m(2,2) - m(1,2)*m(2,1)) +
+		m(0,1)*(m(1,2)*m(2,0) - m(1,0)*m(2,2)) +
+		m(0,2)*(m(1,0)*m(2,1) - m(1,1)*m(2,0));
 }
 
 /// Invert matrix, returns whether matrix was able to be inverted
-///
-/// @ingroup allocore
-template <class T>
-bool invert(Mat<2,T>& m){
-	T det = determinant(m);
-	if(det != 0){
-		m = Mat<2,T>(
-			 m(1,1),-m(0,1),
-			-m(1,0), m(0,0)
-		) /= det;
-		return true;
-	}
-	return false;
-}
-
-/// Invert matrix, returns whether matrix was able to be inverted
-///
+/// For small matrices, optimized versions are used.
 /// @ingroup allocore
 template<int N, class T>
 bool invert(Mat<N,T>& m){
@@ -689,6 +672,46 @@ bool invert(Mat<N,T>& m){
 	return false;
 }
 
+template <class T>
+bool invert(Mat<1,T>& m){
+	T det = determinant(m);
+	if(det != 0){
+		m(0,0) /= det;
+		return true;
+	}
+	return false;
+}
+
+template <class T>
+bool invert(Mat<2,T>& m){
+	T det = determinant(m);
+	if(det != T(0)){
+		m = Mat<2,T>(
+			 m(1,1),-m(0,1),
+			-m(1,0), m(0,0)
+		) *= T(1)/det;
+		return true;
+	}
+	return false;
+}
+
+template <class T>
+bool invert(Mat<3,T>& m){
+	auto nx = cross(m.col(1), m.col(2));
+	auto ny = cross(m.col(2), m.col(0));
+	auto nz = cross(m.col(0), m.col(1));
+	auto det= m(0,0)*nx.x + m(1,0)*ny.x + m(2,0)*nz.x;
+	if(det != T(0)){
+		m.set(
+			nx.x, nx.y, nx.z,
+			ny.x, ny.y, ny.z,
+			nz.x, nz.y, nz.z
+		) *= T(1)/det;
+		return true;
+	}
+	return false;
+}
+
 /// Invert a proper rigid transformation matrix (rotation + translation)
 
 /// This can be used to convert between camera and view matrices.
@@ -706,12 +729,35 @@ void invertRigid(Mat<N,T>& m){
 		m(r,N-1) = it[r];
 
 	// Transpose rotation part to get R^-1
-	for(int c=0; c<N-1; ++c){
-		for(int r=c+1; r<N-1; ++r){
-			std::swap(m(r,c), m(c,r));
-		}
-	}
+	m.transpose(N-1);
 }
+
+/// Get "normal" matrix from modelview
+
+/// This matrix is used to convert normals from object to eye space.
+/// It assumes the input matrix is composed of rotation, scaling, and
+/// translation. It is normally obtained as the inverse transpose of the
+/// modelview, however, this computes it much faster under the given assumption.
+template <int N, class T> Mat<N-1,T> normalMatrix(const Mat<N,T>& mv){
+	// Given A = S * R,
+	//       N = (A^-1)^T
+	//         = (R^-1 * S^-1)^T
+	//         =  S^-1 * R
+
+	// Compute S^-2
+	T iss[N-1];
+	for(int i=0; i<N-1; ++i)
+		iss[i] = T(1)/sub<N-1>(mv.col(i)).magSqr();
+
+	Mat<N-1,T> res = mv;
+
+	// Apply S^-2
+	for(int i=0; i<N-1; ++i)
+		res.col(i) *= iss[i];
+
+	return res;
+}
+
 
 /// Get rotation matrix that rotates one unit vector onto another
 

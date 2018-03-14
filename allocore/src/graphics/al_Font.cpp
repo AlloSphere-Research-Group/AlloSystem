@@ -212,7 +212,7 @@ void Font::align(float xfrac, float yfrac){
 void Font::write(Mesh& mesh, const std::string& text) {
 
 	mesh.reset();
-	mesh.primitive(Graphics::QUADS);
+	mesh.primitive(Graphics::TRIANGLES);
 
 	int nchars = text.size();
 	float margin = 2.;
@@ -258,6 +258,9 @@ void Font::write(Mesh& mesh, const std::string& text) {
 
 		mesh.texCoord(	tc_x0,	tc_y1);
 		mesh.vertex(	v_x0,	v_y1,	0);
+
+		int j = i*4;
+		mesh.index(j,j+1,j+2, j+2,j+3,j);
 
 		pos[0] += (float)c.width;
 	}

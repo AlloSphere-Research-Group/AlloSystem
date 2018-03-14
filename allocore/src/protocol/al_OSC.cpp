@@ -5,7 +5,6 @@
 #include "allocore/protocol/al_OSC.hpp"
 
 #include "oscpack/osc/OscOutboundPacketStream.h"
-#include "oscpack/osc/OscPacketListener.h"
 #include "oscpack/osc/OscReceivedElements.h"
 #include "oscpack/osc/OscTypes.h"
 #include "oscpack/osc/OscException.h"

@@ -323,7 +323,7 @@ public:
 	static int bufferSize(double samplerate, double speedOfSound, double distance);
 
 	/// Set speed of sound for computation in m/s
-	int setSpeedOfSound(float speedOfSound) {mSpeedOfSound = speedOfSound; }
+	void setSpeedOfSound(float speedOfSound) {mSpeedOfSound = speedOfSound; }
 
 	void cachedIndex(unsigned int v){ mCachedIndex = v; } // FIXME: For VBAP. There should be a better place for this
 	unsigned int cachedIndex(){ return mCachedIndex; }
@@ -406,7 +406,7 @@ protected:
 		if (mBuffer.size() != io.framesPerBuffer()) {
 			mBuffer.reserve(io.framesPerBuffer());
 		}
-		for(int i = 0; i < io.framesPerBuffer(); i++)
+        for(unsigned int i = 0; i < io.framesPerBuffer(); i++)
 		{
 			double readIndex = (io.framesPerBuffer() - i - 1);
 			mBuffer[i] = src.readSample(readIndex);

@@ -174,7 +174,6 @@ private:
 	friend class SceneWindowHandler;
 	StandardWindowKeyControls mStandardKeyControls;
 	bool mResized;
-	void init();
 };
 
 

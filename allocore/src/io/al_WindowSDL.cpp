@@ -12,8 +12,8 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
-#ifdef EMSCRIPTEN
-#include <emscripten.h>
+#ifdef AL_EMSCRIPTEN
+	#include <emscripten.h>
 #endif
 
 namespace al{
@@ -99,8 +99,12 @@ private:
 			CS(GL_INVALID_FRAMEBUFFER_OPERATION, "The framebuffer object is not complete.")
 		#endif
 			CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
+		#ifdef GL_STACK_OVERFLOW
 			CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
+		#endif
+		#ifdef GL_STACK_UNDERFLOW
 			CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
+		#endif
 		#ifdef GL_TABLE_TOO_LARGE
 			CS(GL_TABLE_TOO_LARGE, "The specified table exceeds the implementation's maximum supported table size.")
 		#endif
@@ -124,18 +128,17 @@ private:
 			//printf("a:%d c:%d s:%d\n", k.alt(), k.ctrl(), k.shift());
 		};
 
-		auto sdlToAlloKey = [](int sdlKey){
-			int alloKey;
+		auto sdlToAlloKey = [](int sdlKey) -> int {
 			switch(sdlKey){
-			#define CS(v) case SDLK_##v: alloKey = Keyboard::v; break;
+			#define CS(v) case SDLK_##v: return Keyboard::v;
 			CS(INSERT) CS(LEFT) CS(UP) CS(RIGHT) CS(DOWN) CS(END) CS(HOME)
 			CS(F1) CS(F2) CS(F3) CS(F4) CS(F5) CS(F6) CS(F7) CS(F8) CS(F9) CS(F10) CS(F11) CS(F12)
 			#undef CS
-			case SDLK_PAGEDOWN: alloKey = Keyboard::PAGE_DOWN; break;
-			case SDLK_PAGEUP: alloKey = Keyboard::PAGE_UP; break;
-			default:; alloKey = sdlKey;
+			#define CS(KEY,allo) case SDLK_##KEY: return Keyboard::allo;
+			CS(PAGEDOWN, PAGE_DOWN) CS(PAGEUP, PAGE_UP)
+			#undef CS
+			default: return sdlKey;
 			}
-			return alloKey;
 		};
 
 		// FIXME: this should be called only once per app as it applies to all windows
@@ -153,32 +156,32 @@ private:
 				if(ev.window.windowID == ID()){
 					switch(ev.window.event){
 					case SDL_WINDOWEVENT_SHOWN:
-						//printf("Window %d shown\n", sdlWindowID);
+						//printf("Window %d shown\n", ID());
 						win->mVisible = true;
 						win->callHandlersOnVisibility(win->mVisible);
 						win->dimensions(win->dimensions());
 						break;
 					case SDL_WINDOWEVENT_HIDDEN:
-						//printf("Window %d hidden\n", sdlWindowID);
+						//printf("Window %d hidden\n", ID());
 						win->mVisible = false;
 						win->callHandlersOnVisibility(win->mVisible);
 						break;
 					case SDL_WINDOWEVENT_EXPOSED:
-						//printf("Window %d exposed\n", sdlWindowID);
+						//printf("Window %d exposed\n", ID());
 						break;
 					case SDL_WINDOWEVENT_MOVED:
-						//printf("Window %d moved to %d,%d\n", sdlWindowID, ev.window.data1, ev.window.data2);
+						//printf("Window %d moved to %d,%d\n", ID(), ev.window.data1, ev.window.data2);
 						win->mDim.l = ev.window.data1;
 						win->mDim.t = ev.window.data2;
 						break;
 					case SDL_WINDOWEVENT_RESIZED:
-						//printf("Window %d resized to %dx%d\n", sdlWindowID, ev.window.data1, ev.window.data2);
+						//printf("Window %d resized to %dx%d\n", ID(), ev.window.data1, ev.window.data2);
 						win->mDim.w = ev.window.data1;
 						win->mDim.h = ev.window.data2;
 						win->callHandlersOnResize(win->mDim.w, win->mDim.h);
 						break;
 					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						//printf("Window %d size changed to %dx%d\n",	sdlWindowID, ev.window.data1, ev.window.data2);
+						//printf("Window %d size changed to %dx%d\n", ID(), ev.window.data1, ev.window.data2);
 						win->mDim.w = ev.window.data1;
 						win->mDim.h = ev.window.data2;
 						win->callHandlersOnResize(win->mDim.w, win->mDim.h);
@@ -190,7 +193,7 @@ private:
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
 			{	bool keyDown = (ev.type == SDL_KEYDOWN);
-				//printf("Key %s: %c\n", keyDown?"down":"up", ev.key.keysym.sym);
+				//printf("Key %s: %s (sym=%#x)\n", keyDown?"down":"up", SDL_GetKeyName(ev.key.keysym.sym), ev.key.keysym.sym);
 				win->mKeyboard.setKey(sdlToAlloKey(ev.key.keysym.sym), keyDown);
 				setModifiers(ev);
 				keyDown ? win->callHandlersOnKeyDown() : win->callHandlersOnKeyUp();
@@ -353,19 +356,9 @@ bool Window::implCreate(){
 		return false;
 	}
 
-	auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.l,mDim.t, mDim.w,mDim.h, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
-	if(!sdlWin){
-		printf("SDL ERROR: Could not create window.\n");
-		return false;
-	}
-	mImpl->mSDLWindow = sdlWin;
-	WindowImpl::windows()[mImpl->ID()] = mImpl;
+	//SDL_EnableUNICODE(1);
 
-	auto glContext = SDL_GL_CreateContext(sdlWin);
-	if(!glContext){
-		printf("SDL ERROR: Could not create GL context.\n");
-	}
-	mImpl->mGLContext = glContext;
+	// SDL setup code: https://wiki.libsdl.org/SDL_GL_SetAttribute
 
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -382,19 +375,27 @@ bool Window::implCreate(){
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	}
 
+	auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.l,mDim.t, mDim.w,mDim.h, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+	if(!sdlWin){
+		printf("SDL ERROR: Could not create window.\n");
+		return false;
+	}
+	mImpl->mSDLWindow = sdlWin;
+	WindowImpl::windows()[mImpl->ID()] = mImpl;
+
+	auto glContext = SDL_GL_CreateContext(sdlWin);
+	if(!glContext){
+		printf("SDL ERROR: Could not create GL context.\n");
+	}
+	mImpl->mGLContext = glContext;
+
 	AL_GRAPHICS_INIT_CONTEXT;
 	vsync(mVSync);
 
 	callHandlersOnCreate();
 
-	/*{ // SDL doesn't trigger a resize on window creation, so do it here
-		SDL_Event ev;
-		ev.type = SDL_WINDOWEVENT_SIZE_CHANGED;
-		ev.window.windowID = SDL_GetWindowID(sdlWin);
-		ev.window.data1 = mDim.w;
-		ev.window.data2 = mDim.h;
-		SDL_PushEvent(&ev);
-	}*/
+	// SDL doesn't trigger a resize on window creation, so do it here
+	callHandlersOnResize(mDim.w, mDim.h);
 
 	// Set fullscreen according to mFullScreen member
 	{	bool fs = fullScreen();
@@ -402,7 +403,7 @@ bool Window::implCreate(){
 		fullScreen(fs);
 	}
 
-	#ifdef EMSCRIPTEN
+	#ifdef AL_EMSCRIPTEN
 	{
 		int infiniteLoop = 1;
 		int fps = asap() ? -1 : fps();
@@ -429,7 +430,7 @@ void Window::destroyAll(){ //printf("Window::destroyAll\n");
 			++it;
 		}
 	}
-	#ifdef EMSCRIPTEN
+	#ifdef AL_EMSCRIPTEN
 		emscripten_cancel_main_loop();
 	#endif
 	//SDL_Quit();
@@ -468,13 +469,17 @@ void Window::implSetFPS(){
 }
 
 void Window::implSetFullScreen(){
-	auto err = SDL_SetWindowFullscreen(
-		mImpl->mSDLWindow,
-		mFullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0
-	);
-	if(err<0){
-		//printf("Error %s fullscreen (err = %d)\n", mFullScreen ? "entering" : "exiting", err);
-	}
+	#ifdef AL_EMSCRIPTEN
+		mFullScreen = false; // SDL_WINDOW_FULLSCREEN_DESKTOP not supported
+	#else
+		auto err = SDL_SetWindowFullscreen(
+			mImpl->mSDLWindow,
+			mFullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0
+		);
+		if(err<0){
+			//printf("Error %s fullscreen (err = %d)\n", mFullScreen ? "entering" : "exiting", err);
+		}
+	#endif
 }
 
 void Window::implSetTitle(){

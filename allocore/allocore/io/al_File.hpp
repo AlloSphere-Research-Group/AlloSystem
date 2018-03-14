@@ -77,7 +77,6 @@ public:
 
 	/// File types
 	enum Type{
-		NOFILE,				/**< No file type determined */
 		REG,				/**< Regular file */
 		DIR,				/**< Directory */
 		CHR,				/**< Character device */
@@ -85,7 +84,7 @@ public:
 		PIPE,				/**< FIFO or pipe */
 		LINK,				/**< Symbolic link */
 		SOCKET,				/**< Socket */
-		UNKNOWN = 127		/**< File type exists, but doesn't match any known types */
+		UNKNOWN = 127		/**< Not a known type */
 	};
 
 	/// Set type
@@ -292,15 +291,12 @@ public:
 	static size_t storage (const std::string& path){ return File(path).storage(); }
 
 protected:
-	class Impl; Impl * mImpl;
-
 	std::string mPath;
 	std::string mMode;
 	char * mContent;
 	int mSizeBytes;
 	FILE * mFP;
 
-	void dtor();
 	void freeContent();
 	void allocContent(int n);
 	void getSize();
@@ -358,6 +354,9 @@ public:
 
 	/// Remove a directory recursively
 	static bool removeRecursively(const std::string& path);
+
+	/// Get the current working directory
+	static std::string cwd();
 
 private:
 	class Impl; Impl * mImpl;
@@ -435,7 +434,7 @@ public:
 	iterator begin() { return mFiles.begin(); }
 	iterator end() { return mFiles.end(); }
 
-	void add(FilePath& fp){ mFiles.push_back(fp); }
+	void add(const FilePath& fp){ mFiles.push_back(fp); }
 	void sort(bool (*f)(FilePath,FilePath)){ std::sort(begin(),end(),f); }
 
 protected:
@@ -450,9 +449,9 @@ protected:
 /// @ingroup allocore
 class SearchPaths {
 public:
-	typedef std::pair<std::string, bool> searchpath;
-	typedef std::list<searchpath> searchpathlist;
-	typedef std::list<searchpath>::iterator iterator;
+	typedef std::pair<std::string, bool> SearchPath;
+	typedef std::list<SearchPath> SearchPathList;
+	typedef std::list<SearchPath>::iterator iterator;
 
 	SearchPaths(){}
 	SearchPaths(const std::string& file);
@@ -460,8 +459,8 @@ public:
 	SearchPaths(const SearchPaths& cpy);
 
 	/// find a file in the searchpaths
-	FilePath find(const std::string& filename);
-	FileList glob(const std::string& regex);
+	FilePath find(const std::string& filename) const;
+	FileList glob(const std::string& regex) const;
 
 	/// add a path to search in; recursive searching is optional
 	void addSearchPath(const std::string& path, bool recursive = true);
@@ -484,7 +483,7 @@ public:
 	iterator end() { return mSearchPaths.end(); }
 
 protected:
-	std::list<searchpath> mSearchPaths;
+	std::list<SearchPath> mSearchPaths;
 	std::string mAppPath;
 };
 

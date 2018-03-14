@@ -25,32 +25,46 @@ You can actually use connect() on UDP socket as an option. In that case, you can
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Printing.hpp"
 
-#define PRINT_SOCKADDR(s)\
-	printf("%s %s\n", s->hostname, s->servname);
+using namespace al;
 
-namespace al{
+#if defined(AL_SOCKET_DUMMY)
 
-struct SocketImplBase{
-	
-	SocketImplBase(uint16_t port=0, const char * address="")
-	:	mPort(port), mAddress(address)
-	{}
+class Socket::Impl{
+public:
+	Impl(){}
+	Impl(uint16_t port, const char * address, al_sec timeout_, int type){}
 
-	int mType = 0;
-	al_sec mTimeout = -1;
-	std::string mAddress;
-	uint16_t mPort = 0;
+	const std::string& address() const { static std::string s; return s; }
+	uint16_t port() const { return 0; }
+	al_sec timeout() const { return 0; }
+
+	bool open(uint16_t port, std::string address, al_sec timeoutSec, int type){ return false; }
+	void close(){}
+	bool reopen(){ return false; }
+	bool bind(){ return false; }
+	bool connect(){ return false; }
+	void timeout(al_sec v){}
+	bool listen(){ return false; }
+	bool accept(Socket::Impl * newSock){ return false; }
+	bool opened() const { return false;	}
+	size_t recv(char * buffer, size_t maxlen, char *from){ return 0; }
+	size_t send(const char * buffer, size_t len){ return 0;	}
 };
 
-} // al::
+/*static*/ std::string Socket::hostIP(){ return "0.0.0.0"; }
+/*static*/ std::string Socket::hostName(){ return "dummy_invalid"; }
 
 
-#if defined AL_WINDOWS
+// Native socket code
+#else
 
-// Note that much of this closely matches POSIX
+// Windows and POSIX socket code match very closely, so we will just conform
+// the differences with some new types
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#if defined(AL_WINDOWS)
+#include <Winsock2.h>
+#include <Ws2tcpip.h>
+#include <string.h> // memset
 
 // Initialization singleton
 struct WsInit{
@@ -68,39 +82,72 @@ struct WsInit{
 	}
 };
 
-
-namespace al {
-
-static const wchar_t * errorString(){
-	static wchar_t s[4096];
-	FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
-					NULL, WSAGetLastError(),
-					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-					s, sizeof(s), NULL);
+const char * errorString(){
+	static char s[4096];
+	FormatMessage(
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, WSAGetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		s, sizeof(s), NULL
+	);
 	return s;
 }
 
-class Socket::Impl : public SocketImplBase{
+#define INIT_SOCKET WsInit::get()
+typedef SOCKET SocketHandle;
+#define SHUT_RDWR SD_BOTH
+DWORD secToTimeout(al_sec t){
+	return DWORD(t>0. ? t*1000. + 0.5 : -1); /*msec*/
+}
+
+
+#else // POSIX
+
+#include <netdb.h> // gethostbyname
+#include <unistd.h> // close, gethostname
+#include <arpa/inet.h> // inet_ntoa
+#include <sys/socket.h>
+#include <errno.h>
+#include <string.h> // memset, strerror
+#include <sstream>
+#include <sys/time.h> // timeval
+
+const char * errorString(){ return strerror(errno); }
+
+#define INIT_SOCKET
+typedef int SocketHandle;
+timeval secToTimeout(al_sec t){
+	if(t<0) t = 2147483647.;
+	timeval tv;
+	tv.tv_sec = int(t);
+	tv.tv_usec = (t - tv.tv_sec) * 1000000;
+	return tv;
+}
+
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define closesocket ::close
+
+#endif
+
+class Socket::Impl{
 public:
-
-	struct addrinfo * mAddrInfo = NULL;
-	SOCKET mSocket = INVALID_SOCKET;
-
 	Impl(){
-		WsInit::get();
+		INIT_SOCKET;
 	}
 
 	Impl(uint16_t port, const char * address, al_sec timeout_, int type)
-	:	SocketImplBase(port,address)
+	:	Impl()
 	{
-		WsInit::get();
-
 		// opens the socket also:
 		if(!open(port, address, timeout_, type)){
 			AL_WARN("Socket::Impl failed to open port %d / address \"%s\"\n", port, address);
 		}
 	}
-	
+
+	const std::string& address() const { return mAddress; }
+	uint16_t port() const { return mPort; }
+	al_sec timeout() const { return mTimeout; }
 
 	bool open(uint16_t port, std::string address, al_sec timeoutSec, int type){
 
@@ -114,7 +161,13 @@ public:
 		switch(sockProto){
 		case TCP:  sockProto = IPPROTO_TCP; break;
 		case UDP:  sockProto = IPPROTO_UDP; break;
-		case SCTP: sockProto = IPPROTO_SCTP; break;
+		case SCTP:
+			#ifdef IPPROTO_SCTP
+			sockProto = IPPROTO_SCTP; break;
+			#else
+			AL_WARN("Socket::SCTP not supported on this platform.");
+			return false;
+			#endif
 		default:;
 		}
 
@@ -137,17 +190,17 @@ public:
 		case 0:
 		case INET:  sockFamily = AF_INET; break;
 		case INET6:
-		#ifdef AF_INET6
+			#ifdef AF_INET6
 			sockFamily = AF_INET6; break;
-		#else
+			#else
 			AL_WARN("Socket::INET6 not supported on this platform.");
 			return false;
-		#endif
+			#endif
 		default:;
 		}
 
 		struct addrinfo hints;
-		ZeroMemory(&hints, sizeof(hints));
+		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = sockFamily;
 		hints.ai_socktype = sockType;
 		hints.ai_protocol = sockProto;
@@ -161,9 +214,13 @@ public:
 		}
 
 		// Resolve address and port
-		char portAsString[6];
-		if(0 !=	getaddrinfo(addr, _itoa(mPort, portAsString, 10), &hints, &mAddrInfo)){
-			AL_WARN("failed to resolve %s:%i: %S", address.c_str(), port, errorString());
+		char portAsString[5+1] = {0}; // max port number 65535
+		{	auto s = std::to_string(mPort);
+			s.copy(portAsString, s.size());
+		}
+
+		if(0 !=	getaddrinfo(addr, portAsString, &hints, &mAddrInfo)){
+			AL_WARN("failed to resolve %s:%i: %s", address.c_str(), port, errorString());
 			close();
 			return false;
 		}
@@ -172,7 +229,7 @@ public:
 		// Create socket
 		mSocket = socket(mAddrInfo->ai_family, mAddrInfo->ai_socktype, mAddrInfo->ai_protocol);
 		if(!opened()){
-			AL_WARN("failed to create socket at %s:%i: %S", address.c_str(), port, errorString());
+			AL_WARN("failed to create socket at %s:%i: %s", address.c_str(), port, errorString());
 			close();
 			return false;
 		}
@@ -189,7 +246,7 @@ public:
 			mAddrInfo = NULL;
 		}
 		if(INVALID_SOCKET != mSocket){
-			shutdown(mSocket, SD_BOTH); // SD_SEND, SD_RECEIVE
+			shutdown(mSocket, SHUT_RDWR);
 			closesocket(mSocket);
 			mSocket = INVALID_SOCKET;
 		}
@@ -201,8 +258,14 @@ public:
 
 	bool bind(){ // for server-side
 		if(opened()){
+			// SO_REUSEADDR: "The rules used in validating addresses supplied to bind should allow reuse of local addresses."
+			int r=1;
+			if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, (char *)&r, sizeof(r))){
+				AL_WARN("unable to set SO_REUSEADDR on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
+			}
+
 			if(SOCKET_ERROR == ::bind(mSocket, mAddrInfo->ai_addr, (int)mAddrInfo->ai_addrlen)){
-				AL_WARN("unable to bind socket at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+				AL_WARN("unable to bind socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 				close();
 				return false;
 			}
@@ -213,7 +276,7 @@ public:
 	bool connect(){ // for client-side
 		if(opened()){
 			if(SOCKET_ERROR == ::connect(mSocket, mAddrInfo->ai_addr, (int)mAddrInfo->ai_addrlen)){
-				AL_WARN("unable to connect socket at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+				AL_WARN("unable to connect socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 				close();
 				return false;
 			}
@@ -223,28 +286,18 @@ public:
 
 	void timeout(al_sec v){
 		mTimeout = v;
-
-		DWORD ms = DWORD(v*1000. + 0.5); // Note: DWORD is an unsigned integer
-		if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&ms, sizeof(ms))){
-			AL_WARN("unable to set snd timeout on socket at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+		auto to = secToTimeout(v);
+		if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&to, sizeof(to))){
+			AL_WARN("unable to set snd timeout on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 		}
-		if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&ms, sizeof(ms))){
-			AL_WARN("unable to set rcv timeout on socket at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+		if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&to, sizeof(to))){
+			AL_WARN("unable to set rcv timeout on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 		}
 	}
 
 	bool listen(){
-		/* APR_SO_REUSEADDR is useful for a socket listening process.
-		It specifies that the "The rules used in validating addresses supplied
-		to bind should allow reuse of local addresses." */
-		/*apr_socket_opt_set(mSock, APR_SO_REUSEADDR, 1);
-		apr_status_t res = apr_socket_listen(mSock, SOMAXCONN);
-		if(APR_SUCCESS != res){
-			//AL_WARN("Failed to listen on socket");
-			return false;
-		}*/
 		if(SOCKET_ERROR == ::listen(mSocket, SOMAXCONN)){
-			AL_WARN("unable to listen at %s:%i: %S", mAddress.c_str(), mPort, errorString());
+			AL_WARN("unable to listen at %s:%i: %s", mAddress.c_str(), mPort, errorString());
 			return false;
 		}
 		return true;
@@ -253,7 +306,7 @@ public:
 	bool accept(Socket::Impl * newSock){
 		// TODO
 		/*struct sockaddr newSockAddr;
-		SOCKET newSOCKET = ::accept(mSocket, &newSockAddr);
+		SocketHandle newSOCKET = ::accept(mSocket, &newSockAddr);
 		if(INVALID_SOCKET == newSOCKET){
 			AL_WARN("unable to accept using listener at %s:%i: %S", mAddress.c_str(), mPort, errorString());
 			return false;
@@ -276,19 +329,27 @@ public:
 		return INVALID_SOCKET != mSocket;
 	}
 
-	size_t recv(char * buffer, size_t maxlen){
+	size_t recv(char * buffer, size_t maxlen, char *from){
 		return ::recv(mSocket, buffer, maxlen, 0);
 	}
 
 	size_t send(const char * buffer, size_t len){
 		return ::send(mSocket, buffer, len, 0);
 	}
+
+private:
+	int mType = 0;
+	al_sec mTimeout = -1;
+	std::string mAddress;
+	uint16_t mPort = 0;
+	struct addrinfo * mAddrInfo = NULL;
+	SocketHandle mSocket = INVALID_SOCKET;
 };
 
-std::string Socket::hostIP(){
-	hostent * host = gethostbyname("");
+/*static*/ std::string Socket::hostIP(){
+	hostent * host = gethostbyname(hostName().c_str());
 	if(NULL == host){
-		AL_WARN("unable to obtain host IP: ", errorString());
+		AL_WARN("unable to obtain host IP: %s", errorString());
 		return "";
 	}
 
@@ -303,25 +364,19 @@ std::string Socket::hostIP(){
 	return "";
 }
 
-std::string Socket::hostName(){
-	WsInit::get();
+/*static*/ std::string Socket::hostName(){
+	INIT_SOCKET;
 	char buf[256] = {0};
 	if(SOCKET_ERROR == gethostname(buf, sizeof(buf))){
-		AL_WARN("unable to obtain host name: ", errorString());
+		AL_WARN("unable to obtain host name: %s", errorString());
 	}
 	return buf;
 }
 
-} // al::
-
-#else
-#error Socket implementation not defined for this platform.
-#endif
-
+#endif // native socket
 
 
 // Everything below is common across all platforms
-namespace al{
 
 Socket::Socket()
 :	mImpl(new Impl)
@@ -336,13 +391,13 @@ Socket::~Socket(){
 	delete mImpl;
 }
 
-const std::string& Socket::address() const { return mImpl->mAddress; }
+const std::string& Socket::address() const { return mImpl->address(); }
 
 bool Socket::opened() const { return mImpl->opened(); }
 
-uint16_t Socket::port() const { return mImpl->mPort; }
+uint16_t Socket::port() const { return mImpl->port(); }
 
-al_sec Socket::timeout() const { return mImpl->mTimeout; }
+al_sec Socket::timeout() const { return mImpl->timeout(); }
 
 bool Socket::bind(){ return mImpl->bind(); }
 
@@ -360,8 +415,8 @@ void Socket::timeout(al_sec v){
 	mImpl->timeout(v);
 }
 
-size_t Socket::recv(char * buffer, size_t maxlen){
-	return mImpl->recv(buffer, maxlen);
+size_t Socket::recv(char * buffer, size_t maxlen, char *from){
+	return mImpl->recv(buffer, maxlen, from);
 }
 
 size_t Socket::send(const char * buffer, size_t len) {
@@ -384,4 +439,3 @@ bool SocketServer::onOpen(){
 	return bind();
 }
 
-} // al::
