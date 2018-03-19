@@ -617,7 +617,7 @@ public:
 		// Note: Nothing submitted to GPU if light strength zero
 		for(int i=0; i<AL_MAX_LIGHTS; ++i){
 			const auto& l = mLights[i].get();
-			auto glID = l.backendID();
+			auto glID = l.id();
 			bool lightActive = l.strength() != 0.f;
 			if(lightActive){
 				l.submitPos(glID);	// Must do this for light to track modelview

@@ -220,6 +220,9 @@ public:
 	/// Get whether lighting is two-sided
 	static bool twoSided(){ return sTwoSided; }
 
+	/// Unique ID of light
+	int id() const;
+
 protected:
 	static Color sGlobalAmbient;
 	static bool sGlobalAmbientUpdate;
@@ -239,7 +242,6 @@ protected:
 	friend class Graphics;
 	void submitCol(int lightID) const;
 	void submitPos(int lightID) const;
-	int backendID() const;
 };
 
 } // ::al
