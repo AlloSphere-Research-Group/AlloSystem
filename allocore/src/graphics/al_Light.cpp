@@ -63,7 +63,7 @@ void Material::operator()() const {
 
 
 void Light::operator()() const {
-	auto glID = backendID();
+	auto glID = id();
 	if(mStrength != 0.){
 		submitPos(glID);
 		submitCol(glID);
@@ -169,7 +169,7 @@ Light::~Light(){
 	lightPool.freeID(mID);
 }
 
-int Light::backendID() const { return lightPool.glLightID(mID); }
+int Light::id() const { return lightPool.glLightID(mID); }
 
 /*static*/ Color Light::sGlobalAmbient{0.2};
 /*static*/ bool Light::sGlobalAmbientUpdate = false;
