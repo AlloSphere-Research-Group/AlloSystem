@@ -218,7 +218,7 @@ add_custom_target("doc"
 #--------------------------------------------------------------------------
 # Examples targets
 if(BUILD_EXAMPLES)
-  set(EXAMPLE_DIRS av graphics io math simulation spatial system)
+  set(EXAMPLE_DIRS av graphics io math simulation spatial system ui)
   foreach(dir ${EXAMPLE_DIRS})
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/${dir})
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
