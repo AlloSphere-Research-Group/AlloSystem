@@ -106,7 +106,7 @@ void AudioScene::numFrames(int v){
 			++it;
 		}
 		mNumFrames = v;
-		mBuffer.reserve(mNumFrames);
+		mBuffer.resize(mNumFrames);
 	}
 }
 
@@ -126,7 +126,8 @@ Listener * AudioScene::createListener(Spatializer* spatializer){
 */
 
 void AudioScene::render(AudioIOData& io) {
-	const int numFrames = io.framesPerBuffer();
+	assert(io.framesPerBuffer() == mNumFrames);
+
 	// double sampleRate = io.framesPerSecond();
 	io.zeroOut();
 
@@ -138,24 +139,24 @@ void AudioScene::render(AudioIOData& io) {
 		spatializer->prepare();
 
 		// update listener history data:
-		l.updateHistory(numFrames);
+		l.updateHistory(mNumFrames);
 
 		// iterate through all sound sources
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 			SoundSource& src = *(*it);
 			if(mPerSampleProcessing) { //audioscene per sample processing
 				src.frame(0);
-                for(int i=0; i < numFrames; ++i){
+                for(int i=0; i < mNumFrames; ++i){
                     Pose relpos(src.pose().pos() - l.pose().pos(), src.pose().quat() /l.pose().quat());
 					spatializer->renderSample(io, relpos, src.getNextSample(l), i);
 				}
 			} else { //more efficient, per buffer processing for audioscene (does not work well with doppler)
-                src.getBuffer(l, mBuffer.data(), numFrames);
-                Pose relpos(src.pose().pos() - l.pose().pos(), src.pose().quat() /l.pose().quat());
+				Pose relpos(src.pose().pos() - l.pose().pos(), src.pose().quat() /l.pose().quat());
+				src.getBuffer(relpos, mBuffer.data(), mNumFrames);
 //				std::cout << l.pose().x() << "," << l.pose().z() << " ---- ";
 //				std::cout << src.pos().x << "," << src.pos().z << " ----- ";
 //				std::cout << relpos.x << "," << relpos.z << std::endl;
-				spatializer->renderBuffer(io, relpos, mBuffer.data(), numFrames);
+				spatializer->renderBuffer(io, relpos, mBuffer.data(), mNumFrames);
 			}
 		} //end for each source
 
