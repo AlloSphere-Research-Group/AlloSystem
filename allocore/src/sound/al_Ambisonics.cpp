@@ -214,7 +214,10 @@ void AmbiDecode::decode(float * dec, const float * ambi, int numDecFrames) const
 			// iterate ambi channels
 			for(int c=0; c<channels(); ++c){
 				const float * in = ambi + c * numDecFrames;
-				float w = decodeWeight(s, c);
+				float w = decodeWeight(s, c) + mConfig.weightOffset;
+				if (mConfig.discardNegativeWeights && w < 0.0f) {
+					w = 0.0f;
+				}
  				for(int i=0; i<numDecFrames; ++i) {
 					out[i] += in[i] * w;
 				}
@@ -228,13 +231,16 @@ void AmbiDecode::decode(float *dec, const float * ambi, int numDecFrames, int ti
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
 		// skip zero-amp speakers:
-		if ((*mSpeakers)[s].gain != 0.) {
+		if ((*mSpeakers)[s].gain != 0.f) {
 			float * out = dec + (*mSpeakers)[s].deviceChannel * numDecFrames;
 
 			// iterate ambi channels
 			for(int c=0; c<channels(); ++c){
 				const float * in = ambi + c * numDecFrames;
-				float w = decodeWeight(s, c);
+				float w = decodeWeight(s, c) + mConfig.weightOffset;
+				if (mConfig.discardNegativeWeights && w < 0.0f) {
+					w = 0.0f;
+				}
 				out[timeIndex] += in[timeIndex] * w;
 			}
 		}
