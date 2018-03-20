@@ -223,12 +223,14 @@ public:
 	/// Unique ID of light
 	int id() const;
 
+	int index() const;
+
 protected:
 	static Color sGlobalAmbient;
 	static bool sGlobalAmbientUpdate;
 	static bool sTwoSided;
 	static bool sTwoSidedUpdate;
-	int mID;
+	int mIndex;
 	Vec3f mPos{0,0,1}, mDir{0,0,-1};
 	Color mAmbient{0};
 	Color mDiffuse{1};

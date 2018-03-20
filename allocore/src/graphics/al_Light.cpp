@@ -6,7 +6,7 @@ namespace al{
 // This is used to manage GL light IDs
 struct LightPool{
 	static const int Nlights = 8;
-	bool mIDs[Nlights] = {0};
+	bool mAllocated[Nlights] = {0};
 
 	static int glLightID(int i){
 		#ifdef AL_GRAPHICS_USE_FIXED_PIPELINE
@@ -18,11 +18,11 @@ struct LightPool{
 		#endif
 	}
 
-	int nextID(){
+	int nextIndex(){
 		for(int i=0; i<Nlights; ++i){
-			if(!mIDs[i]){
-				mIDs[i] = true;
-				//printf("LightPool::nextID returning %d\n", i);
+			if(!mAllocated[i]){
+				mAllocated[i] = true;
+				//printf("LightPool::nextIndex returning %d\n", i);
 				return i;
 			}
 		}
@@ -30,7 +30,7 @@ struct LightPool{
 	}
 
 	void freeID(int i){
-		mIDs[i] = false;
+		mAllocated[i] = false;
 	}
 };
 
@@ -159,17 +159,18 @@ Material& Material::face(int f){ mFace=f; return *this; }
 
 // NOTE: all defaults match the OpenGL defaults for LIGHT0
 Light::Light(float x, float y, float z)
-:	mID(lightPool.nextID())
+:	mIndex(lightPool.nextIndex())
 {
 	pos(x,y,z);
 	attenuation(1,0,0);
 }
 
 Light::~Light(){
-	lightPool.freeID(mID);
+	lightPool.freeID(mIndex);
 }
 
-int Light::id() const { return lightPool.glLightID(mID); }
+int Light::id() const { return lightPool.glLightID(mIndex); }
+int Light::index() const { return mIndex; }
 
 /*static*/ Color Light::sGlobalAmbient{0.2};
 /*static*/ bool Light::sGlobalAmbientUpdate = false;
