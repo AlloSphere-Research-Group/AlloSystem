@@ -19,7 +19,7 @@ using namespace al;
 struct Agent : public SoundSource, public Nav, public Drawable{
 
 	Agent()
-	: oscPhase(0), oscEnv(1)
+	: oscPhase(0)
 	{
 		Nav::pos(-4, 0, -4);
 	}
@@ -28,30 +28,19 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 
 	virtual void onProcess(AudioIOData& io){
 		while(io()){
-            
-			//float s = io.in(0);
-			//float s = rnd::uniform(); // make noise, just to hear something
 			float s = sin(oscPhase * M_2PI);
-			//float s = al::rnd::uniformS();
-			//s *= (oscEnv*=0.999);
 
-			if(oscEnv < 0.00001){ oscEnv=1; oscPhase=0; }
-
-			//float s = phase * 2 - 1;
 			oscPhase += 440./io.framesPerSecond();
-			if(oscPhase >= 1) oscPhase -= 1;
+			if(oscPhase >= 1.0) oscPhase -= 1.0;
 			writeSample(s*0.2);
 		}
 	}
 
 	virtual void onUpdateNav(){
 		smooth(0.9);
-
         spin(M_2PI/360, M_2PI/397, 0);
         moveF(0.04);
-
 		step();
-
 		SoundSource::pose(*this);
 	}
 
@@ -92,7 +81,7 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 		g.popMatrix();
 	}
 
-	double oscPhase, oscEnv;
+	double oscPhase;
 };
 
 #define AUDIO_BLOCK_SIZE 256
@@ -136,7 +125,6 @@ struct MyWindow : public Window, public Drawable{
 	}
 
 	bool onKeyDown(const Keyboard& k) {
-
 		if (k.key() == Keyboard::TAB) {
 			stereo.stereo(!stereo.stereo());
 		}
@@ -145,7 +133,6 @@ struct MyWindow : public Window, public Drawable{
 	}
 
 	virtual void onDraw(Graphics& g){
-
 		for(unsigned i=0; i<agents.size(); ++i){
 			agents[i].onDraw(g);
 		}
@@ -160,14 +147,7 @@ struct MyWindow : public Window, public Drawable{
 int main (int argc, char * argv[])
 {
     // Set speaker layout
-    const int numSpeakers = 2;
-    Speaker speakers[] = {
-        Speaker(0,  45,0),
-        Speaker(1, -45,0),
-    };
-    SpeakerLayout speakerLayout;
-    speakerLayout.addSpeaker(speakers[0]);
-    speakerLayout.addSpeaker(speakers[1]);
+    SpeakerLayout speakerLayout = StereoSpeakerLayout();
 
     // Create spatializer
     AmbisonicsSpatializer *spat = new AmbisonicsSpatializer(speakerLayout, 2, 1);
@@ -176,8 +156,11 @@ int main (int argc, char * argv[])
 	// Create listener to render audio
 	listener = scene.createListener(spat);
 	
-	// Now do some visuals
-	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
+	// Add agents to the audio scene
+	for(unsigned i=0; i<agents.size(); ++i) {
+		scene.addSource(agents[i]);
+		agents[i].dopplerType(DOPPLER_NONE); // Doppler mode can be set per source
+	}
     
 	MyWindow windows[6];
 
@@ -204,7 +187,7 @@ int main (int argc, char * argv[])
 		windows[i].cam.fovy(90);
 	}
 
-	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, NULL, numSpeakers, 2);
+	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, NULL, speakerLayout.numSpeakers(), 0);
 	audioIO.start();
 
 	MainLoop::start();

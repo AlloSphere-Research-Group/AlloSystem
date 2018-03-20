@@ -35,16 +35,22 @@ public:
 		speakerLayout = StereoSpeakerLayout();
 		panner = new StereoPanner(speakerLayout);
 		listener = scene.createListener(panner);
+        // Doppler mode can be set per source:
+        soundSource.dopplerType(DOPPLER_NONE);
 		scene.addSource(soundSource);
 	}
 
 	virtual void onSound(AudioIOData &io) override {
 
 		while(io()) {
-			mEnvelope *= 0.9995;
-			float noise = rnd::gaussian() * mEnvelope;
-			if (mEnvelope < 0.0001) { mEnvelope = 0.3; }
-			soundSource.writeSample(noise);
+			mEnvelope *= 0.9998;
+			float sound = sin(mPhase) * mEnvelope;
+            mPhase += M_PI * 2.0 * 440.0/io.framesPerSecond();
+            if (mPhase > 2.0 * M_PI) {
+                mPhase -= 2.0 * M_PI;
+            }
+			if (mEnvelope < 0.0001) { mEnvelope = 0.3; mPhase = 0.0;}
+			soundSource.writeSample(sound);
 //			io.out(0) = noise;
 		}
 		scene.render(io);
@@ -77,6 +83,7 @@ private:
 	Light mLight;
 	// Sound variables
 	float mEnvelope;
+    float mPhase {0.0};
 };
 
 int main(int argc, char *argv[])
