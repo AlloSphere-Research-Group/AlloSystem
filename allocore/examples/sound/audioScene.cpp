@@ -24,8 +24,8 @@ SpeakerLayout speakerLayout = HeadsetSpeakerLayout();
 // 2) Create a panner: DBAP, VBAP, Ambisonics, or Stereo
 //Dbap* panner = new Dbap(speakerLayout);
 //Vbap* panner = new Vbap(speakerLayout);
-AmbisonicsSpatializer* panner = new AmbisonicsSpatializer(speakerLayout, 2, 1);  // dimension and order
-//StereoPanner *panner = new StereoPanner(speakerLayout);
+//AmbisonicsSpatializer* panner = new AmbisonicsSpatializer(speakerLayout, 2, 1);  // dimension and order
+StereoPanner *panner = new StereoPanner(speakerLayout);
 
 // 3) Create an audio scene with single argument for frames per buffer
 AudioScene scene(BLOCK_SIZE);
@@ -48,8 +48,8 @@ void audioCB(AudioIOData& io){
 		double sec = (t / io.fps());
 
 		// Create an oscillating trajectory
-		float x = sin(sec*0.5*2*M_PI);
-		src.pos(x, 0, 0);
+		float x = 3.0 * sin(sec*0.3*2*M_PI);
+		src.pos(x, 0, -1);
 
 		// Generate a test signal
 		float smp = sin(sec*440*2*M_PI)*0.5;	// tone
@@ -78,8 +78,8 @@ int main (int argc, char * argv[]){
 	scene.addSource(src);
 
     // Optionally, disable per sample processing to save CPU. Recommended to disable Doppler in this case as well.
-	//scene.usePerSampleProcessing(false);
-    //src.dopplerType(DOPPLER_NONE);
+	scene.usePerSampleProcessing(false);
+    src.dopplerType(DOPPLER_NONE);
 
 	// 9) update the listener's speaker layout and panner
 	//    call this to dynamically change a listener's speaker layout and panner

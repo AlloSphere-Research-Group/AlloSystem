@@ -15,7 +15,7 @@ AmbiFilePlayer::AmbiFilePlayer(string fullPath, bool loop, int bufferFrames, Spe
 {
 	// Create spatializer
 	mDecoder = new AmbiDecode(getFileDimensions(), getFileOrder(), layout.numSpeakers());
-	mDecoder->setSpeakers(&(layout.speakers()));
+	mDecoder->setSpeakers(layout.speakers());
 	mReadBuffer = (float *) calloc(mBufferSize * channels(), sizeof(float));
 	mDeinterleavedBuffer = (float *) calloc(mBufferSize * channels(), sizeof(float));
 }
