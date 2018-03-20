@@ -158,6 +158,11 @@ protected:
 };
 
 
+class AmbiDecodeConfig {
+public:
+	bool discardNegativeWeights {false};
+	float weightOffset {0.0};
+};
 
 /// Higher Order Ambisonic Decoding class
 ///
@@ -184,6 +189,8 @@ public:
 	/// @param[in] numFrames		number of frames in time domain buffers
 	/// @param[in] timeIndex		index into enc buffer to decode
 	virtual void decode(float *dec, const float * enc, int numFrames, int timeIndex) const;
+
+	void setConfiguration(AmbiDecodeConfig &config) {mConfig = config;}
 
 	float decodeWeight(int speaker, int channel) const {
 		return /*mWeights[channel] **/ mDecodeMatrix[speaker * channels() + channel];
@@ -236,6 +243,8 @@ protected:
 	float decode(float * encFrame, int encNumChannels, int speakerNum);	// is this useful?
 
 	static float flavorWeights[4][5][5];
+
+	AmbiDecodeConfig mConfig;
 };
 
 
