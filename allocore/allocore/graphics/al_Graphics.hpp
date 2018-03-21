@@ -616,6 +616,7 @@ public:
 	void pipeline(Pipeline p);
 
 	Graphics& shaderPreamble(const std::string& s);
+	Graphics& shaderOnVertex(const std::string& s);
 	Graphics& shaderOnMaterial(const std::string& s);
 
 protected:

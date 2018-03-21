@@ -174,6 +174,9 @@ public:
 					texCoord2 = texCoord2In;
 					// fogMix: [0,1] -> [start, end]
 					fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
+			)" +
+					mOnVertex
+			+ R"(
 				}
 			)",
 
@@ -538,7 +541,7 @@ protected:
 	const Mat4f& currentMatrix() const { return currentMatrixStack().get().top(); }
 	ShaderProgram mShader;
 	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
-	std::string mPreamble, mOnMaterial;
+	std::string mPreamble, mOnVertex, mOnMaterial;
 	Color mCurrentColor;
 	const Mesh * mLastDrawnMesh = 0;
 	bool mCompileShader = true;
@@ -783,6 +786,12 @@ void Graphics::pipeline(Pipeline p){
 Graphics& Graphics::shaderPreamble(const std::string& s){
 	if(mBackends[PROG]){
 		dynamic_cast<BackendProg *>(mBackends[PROG])->mPreamble = s;
+	}
+	return *this;
+}
+Graphics& Graphics::shaderOnVertex(const std::string& s){
+	if(mBackends[PROG]){
+		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnVertex = s;
 	}
 	return *this;
 }
