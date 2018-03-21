@@ -59,50 +59,19 @@ typedef Matrix4<float>	Matrix4f;	///< Single-precision 4-by-4 matrix
 /// 4x4 Matrix (Homogenous Transform)
 
 /// All functions operate according to a right-handed coordinate system.
-///
+/// Elements are stored in column-major format.
+/// Mathematical reference: http://www.glprogramming.com/red/appendixf.html
 /// @ingroup allocore
 template<typename T=double>
 class Matrix4 : public Mat<4, T> {
 public:
 	typedef Mat<4, T> Base;
 
+	using Base::Base; // inherit constructors
+
 	/// Default constructor creates an identity matrix
-	Matrix4()
-	: Base(
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	)
-	{}
-
-	/*
-		The constructor will map into memory locations as follows:
-
-		Matrix4(arg1, arg2, arg3, ...)
-
-		arg1 ->m[0]	arg2 ->m[4]	arg3 ->m[8]		arg4 ->m[12]
-		arg5 ->m[1]	arg6 ->m[5]	arg7 ->m[9]		arg8 ->m[13]
-		arg9 ->m[2]	arg10->m[6]	arg11->m[10]	arg12->m[14]
-		arg13->m[3]	arg14->m[7]	arg15->m[11]	arg16->m[15]
-
-		Matrix4(r1c1, r1c2, r1c3, r1c4,
-				r2c1, r2c2, r2c3, r2c4,
-				r3c1, r3c2, r3c3, r3c4,
-				r4c1, r4c2, r4c3, r4c4)
-	*/
-	Matrix4(
-		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
-		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
-		const T& r3c1, const T& r3c2, const T& r3c3, const T& r3c4,
-		const T& r4c1, const T& r4c2, const T& r4c3, const T& r4c4
-	)
-	:	Base(
-			r1c1, r1c2, r1c3, r1c4,
-			r2c1, r2c2, r2c3, r2c4,
-			r3c1, r3c2, r3c3, r3c4,
-			r4c1, r4c2, r4c3, r4c4
-		)
+	Matrix4(const T& diag = T(1))
+	: Base(diag)
 	{}
 
 	Matrix4(
@@ -118,17 +87,6 @@ public:
 			0, 0, 0, 1
 		)
 	{}
-
-	/// @param[in] src		C-array to copy values from
-	Matrix4(const T * src)
-	:	Base(src)
-	{}
-
-	/// @param[in] src		matrix to copy values from
-	Matrix4(const Mat<4,T>& src)
-	:	Base(src)
-	{}
-
 
 	/// Get a quaternion representation
 	Quat<T> toQuat() const {
@@ -388,14 +346,7 @@ public:
 		return transform(Vec<4,T>(vCol, T(1)));
 	}
 
-
-	/// Get the inverse of a matrix
-	static Matrix4 inverse(const Mat<4,T>& m) {
-		Matrix4 res(m);
-		invert(res);
-		return res;
-	}
-
+	// Deprecated functions
 
 	/// \deprecated Use Mat::translation
 	static Matrix4 translate(T x, T y, T z){ return translation(Vec<3,T>(x,y,z)); }
@@ -431,6 +382,12 @@ public:
 	/// \deprecated
 	static Matrix4 lookAtOffAxis(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeShift){
 		return lookAt(ux, uy, uz, pos + (ux * eyeShift));
+	}
+	/// \deprecated Use al::invert
+	static Matrix4 inverse(const Mat<4,T>& m) {
+		Matrix4 res(m);
+		invert(res);
+		return res;
 	}
 };
 
