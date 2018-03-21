@@ -138,6 +138,7 @@ public:
 				varying vec3 posObj;	// position (object space)
 				varying vec4 color;
 				varying vec2 texCoord2;
+				uniform bool doTex2;
 
 				struct Fog{
 					vec3 color;
@@ -171,7 +172,9 @@ public:
 					} else {
 						normal = vec3(1.,0.,0.);
 					}
-					texCoord2 = texCoord2In;
+					if(doTex2){
+						texCoord2 = texCoord2In;
+					}
 					// fogMix: [0,1] -> [start, end]
 					fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
 			)" +
@@ -218,8 +221,9 @@ public:
 
 				uniform Light lights[MAX_LIGHTS];
 				uniform vec3 globalAmbient;
-				uniform bool lightTwoSided;
 				uniform Material materials[2];
+				uniform sampler2D tex2;
+				uniform bool lightTwoSided;
 				uniform bool doLighting;
 				uniform bool colorMaterial;
 				uniform bool materialOneSided;
@@ -312,6 +316,9 @@ public:
 
 				void main(){
 					vec3 col = color.rgb;
+					if(doTex2){
+						col *= texture2D(tex2, texCoord2).rgb;
+					}
 					if(doLighting){
 						vec3 N = normalize(normal);
 						vec3 V = normalize(-pos); // surface to eye
@@ -372,30 +379,24 @@ public:
 		// Return if shader didn't compile
 		if(mLocPos < 0) return;
 
-		bool setPointers = true;
-		if(mLastDrawnMesh){
-			//setPointers = (mLastDrawnMesh == &m);
-		}
-		mLastDrawnMesh = &m;
-
 		// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
 		glEnableVertexAttribArray(mLocPos);
-		if(setPointers) glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
+		glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
 
 		if(Nn >= Nv){
 			glEnableVertexAttribArray(mLocNormal);
-			if(setPointers) glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
+			glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
 		}
 
 		Color singleColor(0,0,0,8192); // if unchanged, triggers read from array
 
 		if(Nc >= Nv){
 			glEnableVertexAttribArray(mLocColor);
-			if(setPointers) glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, &m.colors()[0]);
+			glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, &m.colors()[0]);
 		}
 		else if(Nci >= Nv){
 			glEnableVertexAttribArray(mLocColor);
-			if(setPointers) glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &m.coloris()[0]);
+			glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &m.coloris()[0]);
 		}
 		else if(0 == Nc && 0 == Nci){
 			singleColor = mCurrentColor;
@@ -406,7 +407,7 @@ public:
 
 		if(Nt2 >= Nv){
 			glEnableVertexAttribArray(mLocTexCoord2);
-			if(setPointers) glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, &m.texCoord2s()[0]);
+			glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, &m.texCoord2s()[0]);
 		}
 
 		mShader.begin();
@@ -423,6 +424,8 @@ public:
 			}
 
 			mShader.uniform("singleColor", singleColor);
+
+			mShader.uniform("doTex2", Nt2 >= Nv);
 
 			/* Lighting options:
 			Eye space:
@@ -543,7 +546,6 @@ protected:
 	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
 	std::string mPreamble, mOnVertex, mOnMaterial;
 	Color mCurrentColor;
-	const Mesh * mLastDrawnMesh = 0;
 	bool mCompileShader = true;
 };
 #endif
