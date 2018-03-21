@@ -68,10 +68,16 @@ public:
 	typedef Mat<4, T> Base;
 
 	using Base::Base; // inherit constructors
+	using Base::operator=;
 
 	/// Default constructor creates an identity matrix
 	Matrix4(const T& diag = T(1))
-	: Base(diag)
+	:	Base(diag)
+	{}
+
+	template <int M, class U>
+	Matrix4(const Mat<M,U>& src)
+	:	Base(src)
 	{}
 
 	Matrix4(
