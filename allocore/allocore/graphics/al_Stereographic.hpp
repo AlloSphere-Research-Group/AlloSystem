@@ -179,10 +179,14 @@ public:
 	const Viewport& viewport() const { return mVP; }
 
 	/// Convert a normalized screen space position to world space
-	 // each component of input vector should be normalized from -1. to 1.
-	// template<class T>
-	Vec3d unproject(Vec3d screenPos);
 
+	/// This converts a coordinate from normalized device coordinate (NDC) space
+	/// to world space. The range of each coordinate in NDC space is [-1,1].
+	Vec3d unproject(const Vec3d& ndc);
+
+	/// Convert screen pixel coordinate to world position
+	template <class T>
+	Vec<3,T> pixelToWorld(const Vec<2,T>& p);
 
 	/// Transform a vector from world space to clip space
 	template <class T>
@@ -232,6 +236,15 @@ public:
 	Matrix4d modelViewProjection() const { return mProjection * mView; }
 };
 
+
+template <class T>
+Vec<3,T> Stereographic::pixelToWorld(const Vec<2,T>& p){
+	Vec<3,T> ndc;
+	ndc.x = (p.x / mVP.w) * 2. - 1.;
+	ndc.y = (p.y / mVP.h) *-2. + 1.;
+	ndc.z = toNDCSpace().z;
+	return unproject(ndc);
+}
 
 template <class T>
 inline Vec<4,T> Stereographic::toClipSpace(const Vec<4,T>& v) const {
