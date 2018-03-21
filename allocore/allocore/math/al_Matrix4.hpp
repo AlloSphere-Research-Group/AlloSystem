@@ -140,39 +140,6 @@ public:
 	Matrix4& fromQuatTransposed(Quat<T>& q) { q.toMatrixTransposed(Base::elems()); return *this; }
 
 
-	static Matrix4 rotate(float angle, float x, float y, float z) {
-		return Matrix4::rotate(angle, Vec3d(x, y, z));
-	}
-
-	static Matrix4 rotate(float angle, const Vec<3, T> &v) {
-		Vec<3, T> axis(v);
-		axis.normalize();
-
-		float c = cos(angle);
-		float s = sin(angle);
-
-		Matrix4 m(
-			axis[0]*axis[0]*(1-c)+c,
-			axis[1]*axis[0]*(1-c)+axis[2]*s,
-			axis[0]*axis[2]*(1-c)-axis[1]*s,
-			0,
-
-			axis[0]*axis[1]*(1-c)-axis[2]*s,
-			axis[1]*axis[1]*(1-c)+c,
-			axis[1]*axis[2]*(1-c)+axis[0]*s,
-			0,
-
-			axis[0]*axis[2]*(1-c)+axis[1]*s,
-			axis[1]*axis[2]*(1-c)-axis[0]*s,
-			axis[2]*axis[2]*(1-c)+c,
-			0,
-
-			0, 0, 0, 1
-		);
-
-		return m;
-	}
-
 	/// Get a shear transformation matrix on the xy plane
 	static Matrix4 shearXY(T x, T y) {
 		return Matrix4(	1,	0,	x,	0,
@@ -196,7 +163,6 @@ public:
 						0,	z,	1,	0,
 						0,	0,	0,	1	);
 	}
-
 
 	/// Get a perspective projection matrix
 
@@ -409,21 +375,6 @@ public:
 		return lookAt(ur, uu, ub, eyePos);
 	}
 
-	/// Get a left-eye viewing matrix
-	static Matrix4 lookAtLeft(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep) {
-		return lookAtOffAxis(ux,uy,uz, pos,-0.5*eyeSep);
-	}
-
-	/// Get a right-eye viewing matrix
-	static Matrix4 lookAtRight(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep) {
-		return lookAtOffAxis(ux,uy,uz, pos, 0.5*eyeSep);
-	}
-
-	/// Get an off-axis viewing matrix
-	static Matrix4 lookAtOffAxis(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeShift){
-		return lookAt(ux, uy, uz, pos + (ux * eyeShift));
-	}
-
 	/// Computes product of matrix multiplied by column vector, r = m * vCol
 
 	/// This is typically what is required to project a vertex through a transform.
@@ -446,23 +397,41 @@ public:
 	}
 
 
-	// \deprecated Use Mat::translation
-	static Matrix4 translate(T x, T y, T z) {return translation(Vec<3,T>(x,y,z));}
-	// \deprecated Use Mat::translation
+	/// \deprecated Use Mat::translation
+	static Matrix4 translate(T x, T y, T z){ return translation(Vec<3,T>(x,y,z)); }
+	/// \deprecated Use Mat::translation
 	template<typename V>
-	static Matrix4 translate(const Vec<3,V>& v){return translation(v);}
-	// \deprecated Use Mat::scaling
-	static Matrix4 scale(T x, T y, T z) { return scaling(x,y,z); }
-	// \deprecated Use Mat::scaling
+	static Matrix4 translate(const Vec<3,V>& v){ return translation(v); }
+	/// \deprecated Use Mat::scaling
+	static Matrix4 scale(T x, T y, T z){ return scaling(x,y,z); }
+	/// \deprecated Use Mat::scaling
 	template<typename V>
 	static Matrix4 scale(const Vec<3,V>& v){return scaling(v);}
-	// \deprecated Use Mat::scaling
+	/// \deprecated Use Mat::scaling
 	template<typename V>
-	static Matrix4 scale(const V& v) { return scaling(v); }
-	// \deprecated Use Mat::rotation
-	static Matrix4 rotateXY(T theta) { return rotation(theta,0,1); }
-	static Matrix4 rotateYZ(T theta) { return rotation(theta,1,2); }
-	static Matrix4 rotateZX(T theta) { return rotation(theta,2,0); }
+	static Matrix4 scale(const V& v){ return scaling(v); }
+	/// \deprecated Use Mat::rotation
+	static Matrix4 rotateXY(T theta){ return rotation(theta,0,1); }
+	static Matrix4 rotateYZ(T theta){ return rotation(theta,1,2); }
+	static Matrix4 rotateZX(T theta){ return rotation(theta,2,0); }
+	/// \deprecated Use Mat::rotation
+	static Matrix4 rotate(float angle, float x, float y, float z){
+		return Matrix4::rotate(angle, Vec3d(x, y, z)); }
+	/// \deprecated Use Mat::rotation
+	static Matrix4 rotate(float angle, const Vec<3,T>& normal){
+		return rotation(angle, normal.normalized()); }
+	/// \deprecated
+	static Matrix4 lookAtLeft(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep){
+		return lookAtOffAxis(ux,uy,uz, pos,-0.5*eyeSep);
+	}
+	/// \deprecated
+	static Matrix4 lookAtRight(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep){
+		return lookAtOffAxis(ux,uy,uz, pos, 0.5*eyeSep);
+	}
+	/// \deprecated
+	static Matrix4 lookAtOffAxis(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeShift){
+		return lookAt(ux, uy, uz, pos + (ux * eyeShift));
+	}
 };
 
 
