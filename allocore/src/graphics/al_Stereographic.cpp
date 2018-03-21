@@ -10,12 +10,9 @@ Stereographic::Stereographic()
 	mStereo(false), mOmni(false)
 {}
 
-/// Convert a normalized screen space position to world space
- // each component of input vector should be normalized from -1. to 1.
-// template<class T>
-Vec3d Stereographic::unproject(Vec3d screenPos){
-	Matrix4d invprojview = Matrix4d::inverse(this->modelViewProjection());
-	Vec4d worldPos4 = invprojview.transform(screenPos);
+Vec3d Stereographic::unproject(const Vec3d& screenPos){
+	auto invprojview = Matrix4d::inverse(modelViewProjection());
+	auto worldPos4 = invprojview.transform(screenPos);
 	return worldPos4.sub<3>(0) / worldPos4.w;
 }
 
