@@ -85,6 +85,7 @@ list(APPEND ALLOCORE_HEADERS
     allocore/ui/al_Pickable.hpp
     allocore/ui/al_TranslateHandle.hpp
     allocore/ui/al_RotateHandle.hpp
+    allocore/ui/al_SynthSequencer.hpp
 )
 
 set(ALLOCORE_DUMMY_HEADERS "")
