@@ -375,21 +375,26 @@ void App::start(){
 
 	Main::get().add(appMainHandler);
 
-
 	if(windows().size()){
 		// create the windows
 		for(auto& w : windows()) w->create();
+
+		mStartTime = timeNow();
 
 		// start the main loop
 		Main::get().start();
 	}
 	else{
+		mStartTime = timeNow();
 		printf("\nPress 'enter' to quit...\n"); getchar();
 		// ensure exit handler gets called
 		Main::get().exit();
 	}
 }
 
+double App::appTime() const {
+	return timeNow() - mStartTime;
+}
 
 void App::sendHandshake(){
 	oscSend().send("/handshake", name(), oscRecv().port());
