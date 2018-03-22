@@ -283,6 +283,9 @@ public:
 	/// Get application name
 	const std::string&	name() const { return mName; }
 
+	/// Get seconds since application start
+	double appTime() const;
+
 
 	/// Get navigation pose (position/orientation)
 	Nav& nav(){ return mNav; }
@@ -364,6 +367,7 @@ private:
 
 	Viewpoints mFacViewpoints;
 	Windows mFacWindows;
+	double mStartTime;
 
 	// graphics
 	Windows mWindows;
