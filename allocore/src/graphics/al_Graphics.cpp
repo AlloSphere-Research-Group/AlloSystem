@@ -114,6 +114,9 @@ public:
 		multMatrix(Mat4f::scaling(x,y,z));
 	}
 
+	void pointSize(float v){ mPointSize = v; }
+	//void pointAtten(float c2, float c1, float c0){}
+
 	void draw(const Mesh& m, int count, int begin){
 		DRAW_BEGIN
 		auto& mDoLighting = mGraphics.mDoLighting;
@@ -156,6 +159,7 @@ public:
 				uniform mat4 P;
 				uniform mat3 normalMatrix;
 				uniform vec4 singleColor;
+				uniform float pointSize;
 				uniform bool hasNormals;
 				attribute vec3 posIn;
 				attribute vec3 normalIn;
@@ -175,6 +179,7 @@ public:
 					if(doTex2){
 						texCoord2 = texCoord2In;
 					}
+					gl_PointSize = pointSize;
 					// fogMix: [0,1] -> [start, end]
 					fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
 			)" +
@@ -366,6 +371,7 @@ public:
 				mFog.loc().start = mShader.uniform("fog.start");
 				mFog.loc().end   = mShader.uniform("fog.end");
 				mFog.loc().scale = mShader.uniform("fog.scale");
+				mPointSize.loc() = mShader.uniform("pointSize");
 				// init uniforms
 				mShader.begin();
 					mShader.uniform("colorMaterial", true);
@@ -424,8 +430,10 @@ public:
 			}
 
 			mShader.uniform("singleColor", singleColor);
-
 			mShader.uniform("doTex2", Nt2 >= Nv);
+			if(mPointSize.handleUpdate()){
+				mShader.uniform(mPointSize.loc(), mPointSize.get());
+			}
 
 			/* Lighting options:
 			Eye space:
@@ -546,6 +554,7 @@ protected:
 	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
 	std::string mPreamble, mOnVertex, mOnMaterial;
 	Color mCurrentColor;
+	ShaderData<float> mPointSize{1};
 	bool mCompileShader = true;
 };
 #endif
