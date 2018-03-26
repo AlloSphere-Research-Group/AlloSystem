@@ -49,10 +49,12 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <typeinfo> // For class name instrospection
 
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/io/al_AudioIOData.hpp"
+#include "allocore/types/al_SingleRWRingBuffer.hpp"
 
 //#include "Gamma/Domain.h"
 
@@ -65,6 +67,7 @@ namespace al
  * When inheriting this class you must provide a default construct that takes no arguments
 */
 class SynthVoice {
+    friend class PolySynth; // PolySynth needs to access private members like "next".
 public:
 
     /// Returns true if voice is currently active
@@ -116,6 +119,9 @@ public:
         mOffOffsetFrames = offsetFrames; // TODO implement offset frames for trigger off. Currently ignoring and turning off at start of buffer
         onTriggerOff();
     }
+    void id(int idValue) {mId = idValue;}
+
+    int id() {return mId;}
 
     /**
      * @brief returns the offset frames and sets them to 0.
@@ -147,48 +153,82 @@ protected:
     void free() {mActive = false; } // Mark this voice as done.
 
 private:
+    int mId {-1};
     int mActive {false};
     int mOnOffsetFrames {0};
     int mOffOffsetFrames {0};
+    SynthVoice *next {nullptr}; // To support SynthVoices as linked lists
 };
 
 class PolySynth {
 public:
-    PolySynth(unsigned int numPolyphony=64)
+    typedef enum {
+        TIME_MASTER_AUDIO,
+        TIME_MASTER_GRAPHICS
+    } TimeMasterMode;
+
+    PolySynth(unsigned int numPolyphony=64, TimeMasterMode masterMode = TIME_MASTER_AUDIO)
+        : mMasterMode(masterMode)
     {
-        mVoices.reserve(numPolyphony);
     }
 
     /**
-     * @brief trigger OnTriggers the start of a note event if a free note is available.
-     * @param newVoice instance of the voice to trigger
-     *
-     * Currently no voice stealing is implemented. Note is only triggered if a voice
-     * is free.
+     * @brief trigger Puts voice in active voice lit and calls triggerOn() for it
+     * @param voice pointer to the voice to trigger
+     * @return a unique id for the voice
      *
      * You can use the id to identify the note for later triggerOff() calls
      */
-    void triggerOn(std::shared_ptr<SynthVoice> voice) {
-        auto allocedVoiceIter = mVoices.begin();
-        for (; allocedVoiceIter != mVoices.end();allocedVoiceIter++) {
-            std::shared_ptr<SynthVoice> allocedVoice = *allocedVoiceIter;
-            if (!allocedVoice->active()) {
-                *allocedVoiceIter = voice;
-                break;
-            }
+    int triggerOn(SynthVoice *voice, int offsetFrames = 0, int id = -1) {
+        assert(voice);
+        int thisId = id;
+        if (thisId == -1) {
+            thisId = mIdCounter++;
         }
-        if (allocedVoiceIter == mVoices.end()) {
-            if (mVoices.size() >= mVoices.capacity()) {
-                std::cout << "Allocating new voice. You might want to increase polyphony to " << mVoices.size() + 1 << std::endl;
-            }
-            mVoices.push_back(voice);
-        }
-        voice->triggerOn();
+        voice->id(thisId);
+        voice->triggerOn(offsetFrames);
+        std::unique_lock<std::mutex> lk(mVoiceToInsertLock);
+        voice->next = mVoicesToInsert;
+        mVoicesToInsert = voice;
+        return thisId;
     }
 
     /// trigger release of voice with id
     void triggerOff(int id) {
-        mVoices[id]->triggerOff();
+        mVoiceIdsToTurnOff.write((const char*) &id, sizeof (int));
+    }
+
+    /**
+     * @brief Get a reference to a voice.
+     * @return
+     *
+     * Returns a free voice from the internal dynamic allocated pool.
+     * You must call triggerVoice to put the voice back in the rendering
+     * chain after setting its properties, otherwise it will be lost.
+     */
+    template<class TSynthVoice>
+    TSynthVoice &getVoice() {
+        std::unique_lock<std::mutex> lk(mFreeVoiceLock); // Only one getVoice() call at a time
+        SynthVoice *freeVoice = mFreeVoices;
+        SynthVoice *previousVoice = nullptr;
+        while (freeVoice) {
+            if (typeid(freeVoice) == typeid (TSynthVoice)) {
+                if (previousVoice) {
+                    previousVoice->next = freeVoice->next;
+                } else {
+                    mFreeVoices = freeVoice->next;
+                }
+                break;
+            }
+            previousVoice = freeVoice;
+            freeVoice = freeVoice->next;
+        }
+        if (!freeVoice) { // No free voice in list, so we need to allocate it
+            // TODO report current polyphony for more informed allocation of polyphony
+            std::cout << "Allocating voice of type " << typeid (TSynthVoice).name() << "." << std::endl;
+            freeVoice = new TSynthVoice;
+        }
+        return *static_cast<TSynthVoice *>(freeVoice);
     }
 
     /**
@@ -196,17 +236,67 @@ public:
      * @param io AudioIOData containing buffers and audio I/O meta data
      */
     void render(AudioIOData &io) {
-        for (auto voice: mVoices) {
+        // TODO implement turn off
+        if (mMasterMode == TIME_MASTER_AUDIO) {
+            if (mVoiceToInsertLock.try_lock()) {
+                if (mVoicesToInsert) {
+                    // If lock acquired insert queued voices
+                    if (mActiveVoices) {
+                        auto voice = mVoicesToInsert;
+                        while (voice->next) { // Find last voice to insert
+                            voice = voice->next;
+                        }
+                        voice->next = mActiveVoices; // Connect last inserted to previously active
+                        mActiveVoices = mVoicesToInsert; // Put new voices in head
+                    } else {
+                        mActiveVoices = mVoicesToInsert;
+                    }
+                    mVoicesToInsert = nullptr;
+                }
+                mVoiceToInsertLock.unlock();
+            }
+        }
+        // Render active voices
+        auto voice = mActiveVoices;
+        while (voice) {
             if (voice->active()) {
                 io.frame(voice->getStartOffsetFrames());
-                int endOffsetFrames = voice->getEndOffsetFrames();
-                if (endOffsetFrames >= 0) {
-                    if (endOffsetFrames < io.framesPerBuffer()) {
-                        voice->triggerOff(endOffsetFrames);
-                    }
-                    endOffsetFrames -= io.framesPerBuffer();
-                }
+//                int endOffsetFrames = voice->getEndOffsetFrames();
+//                if (endOffsetFrames >= 0) {
+//                    if (endOffsetFrames < io.framesPerBuffer()) {
+//                        voice->triggerOff(endOffsetFrames);
+//                    }
+//                    endOffsetFrames -= io.framesPerBuffer();
+//                }
                 voice->onProcess(io);
+            }
+            voice = voice->next;
+        }
+        // Move inactive voices to free queue
+        if (mMasterMode == TIME_MASTER_AUDIO) {
+            if (mFreeVoiceLock.try_lock()) { // Attempt to remove inactive voices without waiting.
+                auto voice = mActiveVoices;
+                SynthVoice *previousVoice = nullptr;
+                while(voice) {
+                    if (!voice->active()) {
+                        if (previousVoice) {
+                            previousVoice->next = voice->next; // Remove from active list
+                            voice->next = mFreeVoices;
+                            mFreeVoices = voice; // Insert as head in free voices
+                            voice = previousVoice; // prepare next iteration
+                        } else { // Inactive is head of the list
+                            mActiveVoices = voice->next; // Remove voice from list
+                            voice->next = mFreeVoices;
+                            mFreeVoices = voice; // Insert as head in free voices
+                            voice = mActiveVoices; // prepare next iteration
+                        }
+                    }
+                    previousVoice = voice;
+                    if (voice) {
+                        voice = voice->next;
+                    }
+                }
+                mFreeVoiceLock.unlock();
             }
         }
     }
@@ -215,15 +305,90 @@ public:
      * @brief render graphics for all active voices
      */
     void render(Graphics &g) {
-        for (auto voice: mVoices) {
+        if (mMasterMode == TIME_MASTER_GRAPHICS) {
+            // FIXME add support for TIME_MASTER_GRAPHICS
+        }
+        std::unique_lock<std::mutex> lk(mGraphicsLock);
+        auto voice = mActiveVoices;
+        while (voice) {
             if (voice->active()) {
                 voice->onProcess(g);
+            }
+            voice = voice->next;
+        }
+    }
+
+    template<class TSynthVoice>
+    void allocatePolyphony(int number) {
+        std::unique_lock<std::mutex> lk(mFreeVoiceLock);
+        SynthVoice *lastVoice = mFreeVoices;
+        if (lastVoice) {
+            while (lastVoice->next) { lastVoice = lastVoice->next; }
+        } else {
+            lastVoice = mFreeVoices = new TSynthVoice;
+            number--;
+        }
+        for(int i = 0; i < number; i++) {
+            lastVoice->next = new TSynthVoice;
+            lastVoice = lastVoice->next;
+        }
+    }
+
+    /**
+     * @brief prints details of the allocated voices (free, active and queued)
+     *
+     * Warning: this function is not thread safe and might crash if the audio
+     * or graphics is running. Only use for temporary debugging.
+     */
+    void print() {
+        {
+            std::unique_lock<std::mutex> lk(mFreeVoiceLock);
+            auto voice = mFreeVoices;
+            int counter = 0;
+            std::cout << " ---- Free Voices ----" << std:: endl;
+            while(voice) {
+                std::cout << "Voice " << counter++ << " " << voice->id() << " : " <<  typeid(voice).name() << " " << voice << std::endl;
+                voice = voice->next;
+            }
+        }
+        //
+        {
+            auto voice = mActiveVoices;
+            int counter = 0;
+            std::cout << " ---- Active Voices ----" << std:: endl;
+            while(voice) {
+                std::cout << "Voice " << counter++ << " " << voice->id() << " : " <<  typeid(voice).name() << " " << voice  << std::endl;
+                voice = voice->next;
+            }
+        }
+        //
+        {
+            std::unique_lock<std::mutex> lk(mVoiceToInsertLock);
+            auto voice = mVoicesToInsert;
+            int counter = 0;
+            std::cout << " ---- Queued Voices ----" << std:: endl;
+            while(voice) {
+                std::cout << "Voice " << counter++ << " " << voice->id() << " : " <<  typeid(voice).name() << " " << voice  << std::endl;
+                voice = voice->next;
             }
         }
     }
 
 private:
-    std::vector<std::shared_ptr<SynthVoice>> mVoices;  // External voices are added programatically
+
+    // Internal voices are allocated in PolySynth and shared with the outside.
+    SynthVoice *mVoicesToInsert {nullptr}; //Voices to be inserted in the realtime context
+    SynthVoice *mFreeVoices {nullptr}; // Allocated voices available for reuse
+    SynthVoice *mActiveVoices {nullptr}; // Dynamic voices that are currently active. Only modified within the master domain (set by mMasterMode)
+    std::mutex mVoiceToInsertLock;
+    std::mutex mFreeVoiceLock;
+    std::mutex mGraphicsLock;
+
+    SingleRWRingBuffer mVoiceIdsToTurnOff {64 * sizeof(int)};
+
+    TimeMasterMode mMasterMode;
+
+    int mIdCounter {0};
 };
 
 class SynthSequencerEvent {
@@ -231,7 +396,7 @@ public:
     double startTime {0};
     double duration {-1};
     int offsetCounter {0}; // To offset event within audio buffer
-    std::shared_ptr<SynthVoice> voice;
+    SynthVoice *voice;
 };
 
 /**
@@ -258,63 +423,32 @@ public:
 
 class SynthSequencer {
 public:
-    typedef enum {
-        TIME_MASTER_AUDIO,
-        TIME_MASTER_GRAPHICS
-    } TimeMasterMode;
 
-    SynthSequencer(unsigned int numPolyphony=64, TimeMasterMode masterMode = TIME_MASTER_AUDIO)
-        : mPolySynth(numPolyphony), mMasterMode(masterMode)
+    SynthSequencer(unsigned int numPolyphony=64,
+                   PolySynth::TimeMasterMode masterMode =  PolySynth::TIME_MASTER_AUDIO)
+        : mPolySynth(numPolyphony, masterMode), mMasterMode(masterMode)
     {
     }
 
     /// Insert this function within the audio callback
     void render(AudioIOData &io) {
-        if (mMasterMode == TIME_MASTER_AUDIO) {
+        if (mMasterMode ==  PolySynth::TIME_MASTER_AUDIO) {
             double timeIncrement = io.framesPerBuffer()/(double) io.framesPerSecond();
+            double blockStartTime = mMasterTime;
             mMasterTime += timeIncrement;
-            if (mNextEvent < mEvents.size()) {
-                auto iter = mEvents.begin();
-                std::advance(iter, mNextEvent);
-                auto event = *iter;
-                while (event.startTime <= mMasterTime) {
-                    event.offsetCounter = 0.5f + (event.startTime - (mMasterTime - timeIncrement))*io.framesPerSecond();
-                    mPolySynth.triggerOn(event.voice);
-//                    std::cout << "Event " << mNextEvent << " " << event.startTime << " " << typeid(*event.voice.get()).name() << std::endl;
+            processEvents(blockStartTime, io.framesPerSecond());
 
-                    mNextEvent++;
-                    iter++;
-                    if (iter == mEvents.end()) {
-                        break;
-                    }
-                    event = *iter;
-                }
-            }
         }
         mPolySynth.render(io);
     }
 
     /// Insert this function within the graphics callback
     void render(Graphics &g) {
-        if (mMasterMode == TIME_MASTER_GRAPHICS) {
+        if (mMasterMode == PolySynth::TIME_MASTER_GRAPHICS) {
             double timeIncrement = 1.0/mFps;
+            double blockStartTime = mMasterTime;
             mMasterTime += timeIncrement;
-            if (mNextEvent < mEvents.size()) {
-                auto iter = mEvents.begin();
-                std::advance(iter, mNextEvent);
-                auto event = *iter;
-                while (event.startTime <= mMasterTime) {
-                    event.offsetCounter = 0;
-                    mPolySynth.triggerOn(event.voice);
-                    std::cout << "Event " << mNextEvent << " " << event.startTime << " " << typeid(*event.voice.get()).name() << std::endl;
-                    mNextEvent++;
-                    iter++;
-                    if (iter == mEvents.end()) {
-                        break;
-                    }
-                    event = *iter;
-                }
-            }
+            processEvents(blockStartTime, mFps);
         }
         mPolySynth.render(g);
     }
@@ -345,9 +479,9 @@ public:
         auto insertedEvent = mEvents.insert(position, SynthSequencerEvent());
         insertedEvent->startTime = startTime;
         insertedEvent->duration = duration;
-        auto newVoice = std::make_shared<TSynthVoice>();
-        insertedEvent->voice = newVoice;
-        return *newVoice;
+        auto &newVoice = mPolySynth.getVoice<TSynthVoice>();
+        insertedEvent->voice = &newVoice;
+        return newVoice;
     }
 
     /**
@@ -361,6 +495,14 @@ public:
         io.user<SynthSequencer>().render(io);
     }
 
+    /**
+     * @brief print debugging information. Is not be thread safe. Use with care.
+     */
+    void print() {
+        std::cout << "POLYSYNTH INFO ................." << std::endl;
+        mPolySynth.print();
+    }
+
 private:
     PolySynth mPolySynth;
 
@@ -369,8 +511,27 @@ private:
     unsigned int mNextEvent {0};
     std::list<SynthSequencerEvent> mEvents; // List of events sorted by start time.
 
-    TimeMasterMode mMasterMode {TIME_MASTER_AUDIO};
+    PolySynth::TimeMasterMode mMasterMode {PolySynth::TIME_MASTER_AUDIO};
     double mMasterTime {0};
+
+    void processEvents(double blockStartTime, double fps) {
+        if (mNextEvent < mEvents.size()) {
+            auto iter = mEvents.begin();
+            std::advance(iter, mNextEvent);
+            auto event = *iter;
+            while (event.startTime <= mMasterTime) {
+                event.offsetCounter = (event.startTime - blockStartTime)*fps;
+                mPolySynth.triggerOn(event.voice, event.offsetCounter);
+//                    std::cout << "Event " << mNextEvent << " " << event.startTime << " " << typeid(*event.voice.get()).name() << std::endl;
+                mNextEvent++;
+                iter++;
+                if (iter == mEvents.end()) {
+                    break;
+                }
+                event = *iter;
+            }
+        }
+    }
 };
 
 }
