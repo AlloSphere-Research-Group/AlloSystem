@@ -298,6 +298,10 @@ public:
 	/// Set all elements to zero
 	Vec& zero(){ return set(T(0)); }
 
+	/// Swap elements
+	Vec& swap(int i, int j){
+		std::swap((*this)[i], (*this)[j]); return *this; }
+
 
 	/// Clip to range:
 	/// NOTE argument order (max,min)
