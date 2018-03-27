@@ -531,6 +531,10 @@ template <int M, int N, class T>
 inline Vec<M,T> sub(const Vec<N,T>& v, int begin=0){
 	return v.template sub<M>(begin);
 }
+template <int M, int N, class T>
+inline Vec<M,T>& sub(Vec<N,T>& v, int begin=0){
+	return v.template sub<M>(begin);
+}
 
 /// Sets r to cross product, a x b
 template <class T>
