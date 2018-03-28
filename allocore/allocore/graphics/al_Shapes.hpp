@@ -163,6 +163,19 @@ int addCone(
 int addDisc(Mesh& m, float radius=1, unsigned slices=16);
 
 
+/// Add a rectangle as indexed triangles
+
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] width		Total width (along x)
+/// @param[in] height		Total height (along y)
+/// @param[in] x			Position of center along x
+/// @param[in] y			Position of center along y
+/// \returns number of vertices added
+///
+/// @ingroup allocore
+int addRect(Mesh& m, float width=2, float height=2, float x=0, float y=0);
+
+
 /// Add a prism as an indexed triangle strip
 
 /// A prism is formed from a triangle strip between two parallel regular
