@@ -809,12 +809,12 @@ bool AudioBackend::open(int framesPerSecond, int framesPerBuffer, void *userdata
 	};
 
 	auto& data = backendData<AudioBackendData>();
+	data.audioIO = static_cast<AudioIO *>(userdata);
 	SDL_AudioSpec want;
 	SDL_zero(want);
 	want.freq = framesPerSecond;
 	want.format = AUDIO_F32;
 	want.samples = std::max(512, framesPerBuffer); // values < 512 tend to create problems
-	data.audioIO = static_cast<AudioIO *>(userdata);
 	want.userdata = this;
 
 	if(outDeviceChans()){
@@ -834,10 +834,17 @@ bool AudioBackend::open(int framesPerSecond, int framesPerBuffer, void *userdata
 			AL_WARN("Failed to open audio stream on device %d \"%s\"", data.devIndexOut, devName);
 		}
 		else{
-			if(want.freq != spec.freq)
+			if(framesPerBuffer != spec.samples){
+				AL_WARN("Opened audio stream with %d frames/buffer instead of requested %d frames/buffer", spec.samples, framesPerBuffer);
+				data.audioIO->framesPerBuffer(spec.samples);
+			}
+			if(want.freq != spec.freq){
 				AL_WARN("Opened audio stream at %d Hz instead of requested %d Hz", spec.freq, want.freq);
-			if(want.channels != spec.channels)
+				data.audioIO->framesPerSecond(spec.freq);
+			}
+			if(want.channels != spec.channels){
 				AL_WARN("Opened audio stream with %d channels instead of requested %d channels", spec.channels, want.channels);
+			}
 			mOpen = true;
 		}
 	}
