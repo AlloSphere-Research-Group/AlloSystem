@@ -53,7 +53,7 @@
 namespace al {
 
 /// Audio callback type
-typedef void (*audioCallback)(AudioIOData &io);
+typedef std::function<void(AudioIOData& io)> audioCallback;
 
 class AudioDevice;
 
@@ -184,23 +184,21 @@ inline AudioDevice::StreamMode operator|(const AudioDevice::StreamMode &a,
 /// @ingroup allocore
 class AudioIO : public AudioIOData {
 public:
+
 	/// Creates AudioIO using default I/O devices.
-//	AudioIO();
-	AudioIO(int framesPerBuf = 512, double framesPerSec = 44100,
-	        void (*callback)(AudioIOData &) = 0, void *userData = nullptr,
-            int outChans = 2, int inChans = 0) :
-	    AudioIOData(nullptr),
-	    callback(nullptr),
-	    mZeroNANs(true),
-	    mClipOut(true),
-	    mAutoZeroOut(true)
+	AudioIO(
+		int framesPerBuf = 512, double framesPerSec = 44100,
+		audioCallback callback = nullptr, void *userData = nullptr,
+		int outChans = 2, int inChans = 0
+	):
+		AudioIOData(nullptr)
 	{
 		mBackend = std::make_shared<AudioBackend>();
 		init(framesPerBuf, framesPerSec, callback, userData, outChans, inChans);
-
 	}
 
 	virtual ~AudioIO();
+
 	/// @param[in] framesPerBuf	Number of sample frames to process per callback
 	/// @param[in] framesPerSec	Frame rate.  Unsupported values will use default
 	/// rate of device.
@@ -210,9 +208,11 @@ public:
 	/// @param[in] inChans		Number of input channels to open
 	/// If the number of input or output channels is greater than the device
 	/// supports, virtual buffers will be created.
-	void init(int framesPerBuf, double framesPerSec,
-	          void (*callback)(AudioIOData &), void *userData,
-              int outChans = 2, int inChans = 0);
+	void init(
+		int framesPerBuf, double framesPerSec,
+		audioCallback callback, void * userData,
+		int outChans = 2, int inChans = 0
+	);
 
 	/// @param[in] callback	Audio processing callback (optional)
 	/// @param[in] userData	Pointer to user data accessible within callback (optional)
@@ -221,8 +221,10 @@ public:
 	/// @param[in] devNum		ID of the device to open. -1 Uses default
 	/// device.
 	/// @param[in] framesPerBuf	Number of sample frames to process per callback
-	void initWithDefaults(void (*callback)(AudioIOData &), void *userData,
-	                      bool use_out, bool use_in, int framesPerBuffer = 256);
+	void initWithDefaults(
+		audioCallback callback, void * userData,
+		bool use_out, bool use_in, int framesPerBuffer = 256
+	);
 
 	bool open();			///< Opens audio device.
 	bool close();			///< Closes audio device. Will stop active IO.
@@ -265,10 +267,10 @@ public:
 	double time(int frame) const;  ///< Get current stream time in seconds of frame
 
 	/// Add an AudioCallback handler (internal callback is always called first)
-	AudioIO &append(AudioCallback &v);
-	AudioIO &prepend(AudioCallback &v);
-	AudioIO &insertBefore(AudioCallback &v);
-	AudioIO &insertAfter(AudioCallback &v);
+	AudioIO& append(AudioCallback& v);
+	AudioIO& prepend(AudioCallback& v);
+	AudioIO& insertBefore(AudioCallback& v);
+	AudioIO& insertAfter(AudioCallback& v);
 
 	/// Remove all input event handlers matching argument
 	AudioIO &remove(AudioCallback &v);
@@ -279,13 +281,13 @@ public:
 	using AudioIOData::framesPerSecond;
 	using AudioIOData::framesPerBuffer;
 
-	audioCallback callback;  ///< User specified callback function.
+	audioCallback callback = nullptr;  ///< User specified callback function.
 
 private:
 	AudioDevice mInDevice, mOutDevice;
-	bool mZeroNANs;     // whether to zero NANs
-	bool mClipOut;      // whether to clip output between -1 and 1
-	bool mAutoZeroOut;  // whether to automatically zero output buffers each block
+	bool mZeroNANs = true;     // whether to zero NANs
+	bool mClipOut = true;      // whether to clip output between -1 and 1
+	bool mAutoZeroOut = true;  // whether to automatically zero output buffers each block
 	std::vector<AudioCallback *> mAudioCallbacks;
 
 	//	void init(int outChannels, int inChannels);			//

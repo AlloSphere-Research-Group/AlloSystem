@@ -1021,20 +1021,15 @@ void AudioDevice::setImpl(int deviceNum) {
 
 //==============================================================================
 
-//AudioIO::AudioIO()
-//    : AudioIOData(nullptr),
-//      callback(nullptr),
-//      mZeroNANs(true),
-//      mClipOut(true),
-//      mAutoZeroOut(true) { mBackend = std::make_shared<AudioBackend>(); }
-
 AudioIO::~AudioIO(){
 	close();
 }
 
-void AudioIO::init(int framesPerBuf, double framesPerSec,
-                   void (*callbackA)(AudioIOData &), void *userData,
-                   int outChansA, int inChansA) {
+void AudioIO::init(
+	int framesPerBuf, double framesPerSec,
+	audioCallback callbackA, void * userData,
+	int outChansA, int inChansA
+){
 	callback = callbackA;
 	user(userData);
 	deviceIn(AudioDevice::defaultInput());
@@ -1047,7 +1042,7 @@ void AudioIO::init(int framesPerBuf, double framesPerSec,
 }
 
 void AudioIO::initWithDefaults(
-	void (*callback)(AudioIOData &), void *userData,
+	audioCallback callbackA, void * userData,
 	bool use_out, bool use_in,
 	int framesPerBuffer  // default 256
 ){
@@ -1085,7 +1080,7 @@ void AudioIO::initWithDefaults(
 	          << " channels \n"
 	          << "buffer size: " << framesPerBuffer
 	          << ", sampling rate: " << sampling_rate << std::endl;
-	init(framesPerBuffer, sampling_rate, callback, userData,
+	init(framesPerBuffer, sampling_rate, callbackA, userData,
 	     out_channels, in_channels);
 }
 
@@ -1294,7 +1289,7 @@ void AudioIO::processAudio() {
 
 	// Call user callbacks
 	frame(0);
-	if(callback) callback(*this);
+	if(callback != nullptr) callback(*this);
 
 	for(auto * cb : mAudioCallbacks){
 		frame(0);

@@ -251,30 +251,23 @@ App::~App(){
 	if(oscSend().opened() && !name().empty()) sendDisconnect();
 }
 
-
-static void AppAudioCB(AudioIOData& io){
-	App& app = io.user<App>();
-
-	if(app.clockNav() == &app.audioIO()){
-		app.nav().smooth(0.95);
-		app.nav().step(1./4);
-	}
-
-	if(app.clockAnimate() == &app.audioIO()){
-		app.onAnimate(io.secondsPerBuffer());
-	}
-
-	io.frame(0);
-	app.onSound(app.audioIO());
-}
-
-
 void App::initAudio(
 	double audioRate, int audioBlockSize,
 	int audioOutputs, int audioInputs
 ){
-	mAudioIO.callback = AppAudioCB;
-	mAudioIO.user(this);
+	mAudioIO.callback = [this](AudioIOData& io){
+		if(clockNav() == &audioIO()){
+			nav().smooth(0.95);
+			nav().step(1./4);
+		}
+
+		if(clockAnimate() == &audioIO()){
+			onAnimate(io.secondsPerBuffer());
+		}
+
+		io.frame(0);
+		onSound(audioIO());
+	};
 	mAudioIO.framesPerSecond(audioRate);
 	mAudioIO.framesPerBuffer(audioBlockSize);
 	mAudioIO.channelsOut(audioOutputs);
@@ -405,7 +398,7 @@ void App::sendDisconnect(){
 }
 
 bool App::usingAudio() const {
-	return audioIO().callback == AppAudioCB;
+	return audioIO().callback != nullptr;
 }
 
 
