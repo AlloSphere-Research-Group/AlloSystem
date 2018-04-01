@@ -379,7 +379,11 @@ void App::start(){
 	}
 	else{
 		mStartTime = timeNow();
+		#ifdef AL_EMSCRIPTEN
+		Main::get().start();
+		#else
 		printf("\nPress 'enter' to quit...\n"); getchar();
+		#endif
 		// ensure exit handler gets called
 		Main::get().exit();
 	}
