@@ -483,6 +483,15 @@ public:
 		return *this;
 	}
 
+	/// Rotate vector 90 degrees on a global plane
+
+	/// @param[in] dim1		dimension to rotate from
+	/// @param[in] dim2		dimension to rotate towards
+	/// To rotate -90 degrees, swap the two dimensions.
+	Vec& rotate90(int dim1=0, int dim2=1){
+		(*this)[dim2] = -(*this)[dim2];
+		return swap(dim1, dim2);
+	}
 
 	/// debug printing
 	void print(FILE * out=stdout) const;
