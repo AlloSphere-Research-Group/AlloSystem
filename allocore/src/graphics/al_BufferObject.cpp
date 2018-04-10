@@ -108,20 +108,23 @@ CBO::CBO(BufferUsage usage)
 {}
 
 EBO::EBO(Graphics::Primitive prim, BufferUsage usage)
-:	BufferObject(ELEMENT_ARRAY_BUFFER, usage), mPrim(prim), mStart(0), mEnd(0)
+:	BufferObject(ELEMENT_ARRAY_BUFFER, usage), mPrim(prim)
 {}
 
 EBO& EBO::primitive(Graphics::Primitive v){ mPrim=v; return *this; }
+EBO& EBO::count(int v){ mCount=v; return *this; }
 EBO& EBO::range(int start, int end){ mStart=start; mEnd=end; return *this; }
 
 #ifdef AL_GRAPHICS_SUPPORTS_DRAW_RANGE
 void EBO::onPointerFunc(){
-	if(mEnd)	glDrawRangeElements(mPrim, mStart, mEnd, mNumElems, mDataType, 0);
-	else		glDrawRangeElements(mPrim, 0, mNumElems, mNumElems, mDataType, 0);
+	int Ne = mCount<0 ? mNumElems+mCount+1 : mCount;
+	if(mEnd)	glDrawRangeElements(mPrim, mStart, mEnd, Ne, mDataType, 0);
+	else		glDrawRangeElements(mPrim, 0, mNumElems-1, Ne, mDataType, 0);
 }
 #else
 void EBO::onPointerFunc(){
-	glDrawElements(mPrim, mNumElems, mDataType, 0);
+	int Ne = mCount<0 ? mNumElems+mCount+1 : mCount;
+	glDrawElements(mPrim, Ne, mDataType, 0);
 }
 #endif
 

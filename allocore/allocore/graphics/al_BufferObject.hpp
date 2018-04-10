@@ -279,12 +279,21 @@ class EBO : public BufferObject {
 public:
 	EBO(Graphics::Primitive prim=Graphics::POINTS, BufferUsage usage=DYNAMIC_DRAW);
 
+	/// Set primitive to render
 	EBO& primitive(Graphics::Primitive v);
+
+	/// Set number of indices to render
+
+	/// This should not be greater than the number of elements in the buffer.
+	/// If negative, renders numElems + v + 1 elements.
+	EBO& count(int v);
+
+	/// Set hint on what range of vertex indices to render (inclusive)
 	EBO& range(int start, int end);
 
 protected:
 	Graphics::Primitive mPrim;
-	int mStart, mEnd;
+	int mStart=0, mEnd=0, mCount=-1;
 
 	virtual void onPointerFunc();
 };
