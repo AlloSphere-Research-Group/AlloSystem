@@ -11,7 +11,7 @@ namespace al {
 struct AlloSphereSpeakerLayout : public SpeakerLayout{
 	AlloSphereSpeakerLayout(){
 		const int numSpeakers = 54;
-		Speaker speakers[numSpeakers] = {
+		Speaker alloSpeakers[numSpeakers] = {
 		    Speaker(1-1, -77.660913, 41.000000, 4.992118),
 		    Speaker(2-1, -45.088015, 41.000000, 5.571107),
 		    Speaker(3-1, -14.797289, 41.000000, 5.900603),
