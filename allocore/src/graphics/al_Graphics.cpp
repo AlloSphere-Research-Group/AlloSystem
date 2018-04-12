@@ -168,8 +168,6 @@ public:
 
 				void main(){
 					posObj = posIn;
-					pos = (MV * vec4(posIn,1.)).xyz; // to eye space
-					gl_Position = P * vec4(pos,1.); // to screen space
 					color = singleColor.a==8192. ? colorIn : singleColor;
 					if(hasNormals){
 						normal = normalMatrix * normalIn;
@@ -179,12 +177,14 @@ public:
 					if(doTex2){
 						texCoord2 = texCoord2In;
 					}
-					gl_PointSize = pointSize;
-					// fogMix: [0,1] -> [start, end]
-					fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
 			)" +
 					mOnVertex
 			+ R"(
+					pos = (MV * vec4(posObj,1.)).xyz; // to eye space
+					gl_Position = P * vec4(pos,1.); // to screen space
+
+					// fogMix: [0,1] -> [start, end]
+					fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
 				}
 			)",
 
