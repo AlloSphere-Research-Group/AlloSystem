@@ -57,6 +57,9 @@
 
 namespace al {
 
+/// @addtogroup allocore
+/// @{
+
 /// Returns absolute value
 template<class T> T abs(const T& v);
 
@@ -68,25 +71,17 @@ template<class T> T abs(const T& v);
 ///
 /// Algorithm from Dawson, B. "Comparing floating point numbers",
 /// http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
-///
-/// @ingroup allocore
 bool aeq(float a, float b, int maxULP=10);
 bool aeq(double a, double b, int maxULP=10);
 
 /// Convert amplitude to decibels
-///
-/// @ingroup allocore
 template <class T>
 inline T ampTodB(const T& amp){ return 20*std::log(amp); }
 
 /// Returns value clipped ouside of range [-eps, eps]
-///
-/// @ingroup allocore
 template<class T> T atLeast(const T& v, const T& eps);
 
 /// Fast approximation to atan2().
-///
-/// @ingroup allocore
 
 // Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
 // |error| < 0.01 rad
@@ -96,13 +91,9 @@ template<class T> T atan2Fast(const T& y, const T& x);
 
 /// From "Bit Twiddling Hacks",
 /// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
-///
-/// @ingroup allocore
 uint32_t bitsSet(uint32_t v);
 
 /// Returns floating point value rounded to next highest integer.
-///
-/// @ingroup allocore
 template<class T> T ceil(const T& val);
 template<class T> T ceil(const T& val, const T& step);
 template<class T> T ceil(const T& val, const T& step, const T& recStep);
@@ -114,13 +105,9 @@ inline uint32_t ceilEven(uint32_t v){ return v += v & 1UL; }
 
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-///
-/// @ingroup allocore
 uint32_t ceilPow2(uint32_t value);
 
 /// Returns value clipped to [lo, hi]
-///
-/// @ingroup allocore
 template<class T> T clip(const T& value, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns value clipped to [lo, hi] and signifies clipping behavior
@@ -128,45 +115,29 @@ template<class T> T clip(const T& value, const T& hi=T(1), const T& lo=T(0));
 /// clipFlag signifies if and where clipping occured.  0 means no clipping
 /// occured, -1 means clipping occured at the lower bound, and 1 means
 /// clipping at the upper bound.
-///
-/// @ingroup allocore
 template<class T> T clip(const T& v, int& clipFlag, const T& hi, const T& lo);
 
 /// Returns value clipped to [-hi, hi].
-///
-/// @ingroup allocore
 template<class T> T clipS(const T& value, const T& hi=T(1));
 
 /// Convert decibels to amplitude
-///
-/// @ingroup allocore
 template <class T>
 inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 
 /// Returns whether or not an integer value is even.
-///
-/// @ingroup allocore
 template<class T> bool even(const T& v);
 
 /// The Gauss error function or probability integral
 /// @see http://en.wikipedia.org/wiki/Error_function
-///
-/// @ingroup allocore
 template<class T> T erf(const T& v);
 
 /// Returns factorial. Argument must be less than or equal to 12.
-///
-/// @ingroup allocore
 uint32_t factorial(uint32_t n0to12);
 
 /// Returns square root of factorial
-///
-/// @ingroup allocore
 double factorialSqrt(int v);
 
 /// Returns floor of floating point value.
-///
-/// @ingroup allocore
 template<class T> T floor(const T& val);
 template<class T> T floor(const T& val, const T& step);
 template<class T> T floor(const T& val, const T& step, const T& recStep);
@@ -175,8 +146,6 @@ template<class T> T floor(const T& val, const T& step, const T& recStep);
 
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-///
-/// @ingroup allocore
 uint32_t floorPow2(uint32_t value);
 
 /// Returns value folded into [lo, hi]
@@ -184,23 +153,15 @@ uint32_t floorPow2(uint32_t value);
 /// For out-of-range values, the boundaries act like mirrors reflecting
 /// the value into the range. For an even number of periods out of the range
 /// this is identical to a wrap().
-///
-/// @ingroup allocore
 template<class T> T fold(const T& value, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns value folded into [lo, hi] one time.
-///
-/// @ingroup allocore
 template<class T> T foldOnce(const T& value, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns e^(-v*v)
-///
-/// @ingroup allocore
 template<class T> T gaussian(const T& v);
 
 /// Return greatest common divisor of two arguments
-///
-/// @ingroup allocore
 template<class T> T gcd(const T& x, const T& y);
 
 template <typename T, typename... Ts>
@@ -210,10 +171,9 @@ template <typename... Ts>
 bool coprime(const Ts&... vals){ return gcd(vals...) == 1; }
 
 /// The Gudermannian function
-/// relates circular and hyperbolic functions without using complex numbers.
+
+/// Relates circular and hyperbolic functions without using complex numbers.
 /// @see http://en.wikipedia.org/wiki/Gudermannian_function
-///
-/// @ingroup allocore
 template<class T> T gudermannian(const T& x);
 
 /// Generalized Laguerre polynomial L{n,k}
@@ -222,8 +182,6 @@ template<class T> T gudermannian(const T& x);
 /// @param[in] k	order
 /// @param[in] x	position
 /// http://en.wikipedia.org/wiki/Laguerre_polynomials
-///
-/// @ingroup allocore
 template<class T> T laguerreL(int n, int k, T x);
 
 /// Returns least common multiple
@@ -238,14 +196,10 @@ template<class T> T lcm(const T& x, const T& y);
 /// @param[in]	t	angle in [0, pi]
 ///
 /// http://comp.cs.ehime-u.ac.jp/~ogata/nac/index.html
-///
-/// @ingroup allocore
 template<class T> T legendreP(int l, int m, T t);
 template<class T> T legendreP(int l, int m, T ct, T st);
 
 /// Returns whether the absolute value is less than an epsilon.
-///
-/// @ingroup allocore
 template<class T> bool lessAbs(const T& v, const T& eps=T(0.000001));
 
 /// Returns base 2 logarithm of value.
@@ -254,8 +208,6 @@ template<class T> bool lessAbs(const T& v, const T& eps=T(0.000001));
 /// highest power of two will taken.
 /// This uses an algorithm devised by Eric Cole, Jan. 2006.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-///
-/// @ingroup allocore
 uint32_t log2(uint32_t v);
 
 template <typename T> void divide(T divisor, T& x){ x/=divisor; }
@@ -278,63 +230,39 @@ auto makeCoprime(Args&... args) -> decltype(al::gcd(args...)){
 }
 
 /// Returns maximum of two values
-///
-/// @ingroup allocore
 template<class T> T max(const T& v1, const T& v2);
 
 /// Returns maximum of three values
-///
-/// @ingroup allocore
 template<class T> T max(const T& v1, const T& v2, const T& v3);
 
 /// Returns mean of two values
-///
-/// @ingroup allocore
 template<class T> T mean(const T& v1, const T& v2);
 
 /// Returns minimum of two values
-///
-/// @ingroup allocore
 template<class T> T min(const T& v1, const T& v2);
 
 /// Returns minimum of three values
-///
-/// @ingroup allocore
 template<class T> T min(const T& v1, const T& v2, const T& v3);
 
 /// Returns nearest integer division of one value to another
-///
-/// @ingroup allocore
 template<class T> inline T nearestDiv(T of, T to){ return to / round(to/of); }
 
 /// Returns the next representable floating-point or integer value following x in the direction of y
-///
-/// @ingroup allocore
 template<class T> T nextAfter(const T& x, const T& y);
 
 /// Returns next largest value of 'val' that is a multiple of 'multiple'.
-///
-/// @ingroup allocore
 template<class T> T nextMultiple(T val, T multiple);
 
 /// Returns the number of digits in the integer portion
-///
-/// @ingroup allocore
 template<class T> T numInt(const T& v);
 
 /// Returns whether or not an integer value is odd.
-///
-/// @ingroup allocore
 template<class T> bool odd(const T& v);
 
 /// Evaluates polynomial a0 + a1 x + a2 x^2
-///
-/// @ingroup allocore
 template<class T> T poly(const T& x, const T& a0, const T& a1, const T& a2);
 
 /// Evaluates polynomial a0 + a1 x + a2 x^2 + a3 x^3
-///
-/// @ingroup allocore
 template<class T> T poly(const T& x, const T& a0, const T& a1, const T& a2, const T& a3);
 
 template<class T> T pow2(const T& v);		///< Returns value to the 2nd power.
@@ -352,69 +280,43 @@ template<class T> T pow64(const T& v);		///< Returns value to the 64th power.
 
 /// @param[in] base		the base value to exponentiate
 /// @param[in] power	the power to exponentiate by
-///
-/// @ingroup allocore
 template<class T>
 T powN(T base, unsigned power);
 
 /// Returns (n+1)th prime number up to n=53.
-///
-/// @ingroup allocore
 unsigned char prime(uint32_t n);
 
 /// Returns the value r such that r = x - n*y.
-///
-/// @ingroup allocore
 template<class T> T remainder(const T& x, const T& y);
 
 /// Returns value rounded to nearest integer towards zero.
-///
-/// @ingroup allocore
 template<class T> T round(const T& v);
 
 /// Returns value rounded to nearest integer multiple of 'step' towards zero.
-///
-/// @ingroup allocore
 template<class T> T round(const T& v, const T& step);
 
 /// Returns value rounded to nearest integer multiple of 'step' towards zero. Faster version to avoid 1/step divide.
-///
-/// @ingroup allocore
 template<class T> T round(const T& v, const T& step, const T& recStep);
 
 /// Returns value rounded to nearest integer away from zero.
-///
-/// @ingroup allocore
 template<class T> T roundAway(const T& v);
 
 /// Returns value rounded to nearest to nearest integer multiple of 'step' away from zero.
-///
-/// @ingroup allocore
 template<class T> T roundAway(const T& v, const T& step);
 
 /// Signum function for real numbers
-///
-/// @ingroup allocore
 template<class T> T sgn(const T& v, const T& norm=T(1));
 
 /// Unnormalized sinc function
-///
-/// @ingroup allocore
 template<class T> T sinc(const T& radians, const T& eps=T(0.0001));
 
 /// Returns slope of line passing through two points.
-///
-/// @ingroup allocore
 template<class T> T slope(const T& x1, const T& y1, const T& x2, const T& y2);
 
 /// Sort values so that value1 <= value2.
-///
-/// @ingroup allocore
 template<class T> void sort(T& value1, T& value2);
 
 /// Sum of integers squared from 1 to n.
-///
-/// @ingroup allocore
 template<class T> T sumOfSquares(T n);
 
 /// Returns number of trailing zeros in 32-bit int
@@ -422,75 +324,51 @@ template<class T> T sumOfSquares(T n);
 /// This implements an algorithm from the paper
 /// "Using de Bruijn Sequences to Index 1 in a Computer Word"
 /// by Charles E. Leiserson, Harald Prokof, and Keith H. Randall.
-///
-/// @ingroup allocore
 uint32_t trailingZeroes(uint32_t v);
 
 /// Truncates floating point value at decimal.
-///
-/// @ingroup allocore
 template<class T> T trunc(const T& v);
 
 /// Truncates floating point value to step.
-///
-/// @ingroup allocore
 template<class T> T trunc(const T& v, const T& step);
 
 /// Truncates floating point value to step. Faster version to avoid 1/step divide.
-///
-/// @ingroup allocore
 template<class T> T trunc(const T& v, const T& step, const T& recStep);
 
 /// Returns whether value is in interval [lo, hi].
-///
-/// @ingroup allocore
 template<class T> bool within(const T& v, const T& lo, const T& hi);
 
 /// Returns whether 3 values are in interval [lo, hi].
-///
-/// @ingroup allocore
 template<class T> bool within3(const T& v1, const T& v2, const T& v3, const T& lo, const T& hi);
 
 /// Returns whether value is in interval [lo, hi).
-///
-/// @ingroup allocore
 template<class T> bool withinIE(const T& v, const T& lo, const T& hi);
 
 /// Returns value wrapped in [lo, hi).
-///
-/// @ingroup allocore
 template<class T> T wrap(const T& value, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns value wrapped in [lo, hi).
 
 /// 'numWraps' reports how many wrappings occured where the sign, + or -,
 /// signifies above 'hi' or below 'lo', respectively.
-///
-/// @ingroup allocore
 template<class T> T wrap(const T& value, long& numWraps, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns value incremented by 1 and wrapped into interval [0, max).
-///
-/// @ingroup allocore
 template<class T> T wrapAdd1(const T& v, const T& max){ ++v; return v == max ? 0 : v; }
 
 /// Like wrap(), but only adds or subtracts 'hi' once from value.
-///
-/// @ingroup allocore
 template<class T> T wrapOnce(const T& value, const T& hi=T(1));
 
 template<class T> T wrapOnce(const T& value, const T& hi, const T& lo);
 
 /// Returns value wrapped in [-pi, pi)
-///
-/// @ingroup allocore
 template<class T> T wrapPhase(const T& radians);
 
 /// Like wrapPhase(), but only wraps once
-///
-/// @ingroup allocore
 template<class T> T wrapPhaseOnce(const T& radians);
 
+
+/// @} // end allocore group
 
 
 
@@ -984,5 +862,5 @@ TEM inline T mapRange(T value, T inlow, T inhigh, T outlow, T outhigh){
 }
 
 #undef TEM
-} // ::al::
+} // al::
 #endif
