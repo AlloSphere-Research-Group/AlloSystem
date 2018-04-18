@@ -135,7 +135,7 @@ void VBO::onPointerFunc(){ glVertexAttribPointer(VERTEX_ARRAY, mNumComps, mDataT
 
 void CBO::enable(){ glEnableVertexAttribArray(COLOR_ARRAY); }
 void CBO::disable(){ glDisableVertexAttribArray(COLOR_ARRAY); }
-void CBO::onPointerFunc(){ glVertexAttribPointer(VERTEX_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0); }
+void CBO::onPointerFunc(){ glVertexAttribPointer(COLOR_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0); }
 #else
 void VBO::enable(){ glEnableClientState(VERTEX_ARRAY); }
 void VBO::disable(){ glDisableClientState(VERTEX_ARRAY); }
