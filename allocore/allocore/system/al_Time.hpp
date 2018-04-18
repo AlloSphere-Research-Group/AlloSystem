@@ -47,6 +47,7 @@
 
 */
 
+#include <cmath>
 #include <string>
 #include "allocore/system/al_Time.h"
 
@@ -93,6 +94,44 @@ public:
 private:
 	al_nsec mStart=0, mStop=0;	// start and stop times
 	static al_nsec getTime(){ return al_steady_time_nsec(); }
+};
+
+
+/// Interval timer
+
+/// This generates a trigger whenever a specified interval passes. It may be
+/// periodic or one-shot.
+class ITimer{
+public:
+	ITimer(float interval=1, bool oneShot=false)
+	:	mInterval(interval), mPeriodic(!oneShot)
+	{}
+
+	/// Get current accumulator time
+	float time() const { return mTime; }
+
+	/// Set trigger interval
+	ITimer& interval(float v){ mInterval=v; return *this; }
+
+	/// Set one-shot or periodic mode
+	ITimer& oneShot(bool v){ mPeriodic=!v; return *this; }
+
+	/// Reset timer (with optional starting value)
+	ITimer& reset(float start=0.){ mTime=start; return *this; }
+
+	/// Increment time by dt and return whether interval passed
+	bool operator()(float dt){
+		mTime += dt;
+		if(mTime >= mInterval){
+			if(mPeriodic) mTime = std::fmod(mTime, mInterval);
+			return true;
+		}
+		return false;
+	}
+private:
+	float mTime = 0;
+	float mInterval;
+	bool mPeriodic;
 };
 
 
