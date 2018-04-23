@@ -103,12 +103,29 @@ private:
 /// periodic or one-shot.
 class ITimer{
 public:
-	ITimer(float interval=1, bool oneShot=false)
-	:	mInterval(interval), mPeriodic(!oneShot)
+	ITimer(float interval=1, bool oneShot=false, bool active=true)
+	:	mInterval(interval), mActive(active), mPeriodic(!oneShot)
 	{}
+
+	
+	/// Get whether timer is active
+	bool active() const { return mActive; }
+
+	/// Get trigger interval
+	float interval() const { return mInterval; }
 
 	/// Get current accumulator time
 	float time() const { return mTime; }
+
+	/// Returns whether timer triggered on last update
+	bool triggered() const { return mTriggered; }
+
+
+	/// Set whether timer is active
+	ITimer& active(bool v){ mActive=v; return *this; }
+
+	/// Toggle whether timer is active
+	ITimer& toggle(){ mActive^=true; return *this; }
 
 	/// Set trigger interval
 	ITimer& interval(float v){ mInterval=v; return *this; }
@@ -119,18 +136,24 @@ public:
 	/// Reset timer (with optional starting value)
 	ITimer& reset(float start=0.){ mTime=start; return *this; }
 
-	/// Increment time by dt and return whether interval passed
+	/// Increment time by dt and return whether interval passed on this update
 	bool operator()(float dt){
-		mTime += dt;
-		if(mTime >= mInterval){
-			if(mPeriodic) mTime = std::fmod(mTime, mInterval);
-			return true;
+		mTriggered = false;
+		if(mActive){
+			mTime += dt;
+			if(mTime >= mInterval){
+				if(mPeriodic) mTime = std::fmod(mTime, mInterval);
+				mTriggered = true;
+			}
 		}
-		return false;
+		return mTriggered;
 	}
+
 private:
 	float mTime = 0;
 	float mInterval;
+	bool mTriggered = false;
+	bool mActive = true;
 	bool mPeriodic;
 };
 
