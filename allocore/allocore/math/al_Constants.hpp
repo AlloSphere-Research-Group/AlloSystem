@@ -85,10 +85,10 @@ namespace al {
 #define M_SQRT1_2	0.707106781186547524400844362104849039
 #endif
 #ifndef M_DEG2RAD
-#define M_DEG2RAD	0.017453292519943
+#define M_DEG2RAD	0.017453292519943							// pi/180
 #endif
 #ifndef M_RAD2DEG
-#define M_RAD2DEG	57.295779513082
+#define M_RAD2DEG	57.295779513082								// 180/pi
 #endif
 
 // Some other useful constants

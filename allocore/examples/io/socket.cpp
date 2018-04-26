@@ -79,25 +79,28 @@ int main(){
 	{
 		SocketClient client(80, "www.mat.ucsb.edu", -1, Socket::TCP);
 
-		// This requests just the header information
-		std::string req = "HEAD / HTTP/1.0\r\n\r\n";
-		// This requests the default page
-		//std::string req = "GET / HTTP/1.0\r\n\r\n";
+		// Always check first that the socket opened okay
+		if(client.opened()){
+			// This requests just the header information
+			std::string req = "HEAD / HTTP/1.0\r\n\r\n";
+			// This requests the default page
+			//std::string req = "GET / HTTP/1.0\r\n\r\n";
 
-		// Here we send the request out
-		int bytesSent = client.send(req.c_str(), req.size());
-		printf("TCP client sent %d bytes:\n%s", bytesSent, req.c_str());
+			// Here we send the request out
+			int bytesSent = client.send(req.c_str(), req.size());
+			printf("TCP client sent %d bytes:\n%s", bytesSent, req.c_str());
 
-		// Now, we go into a busy loop checking for a response from the server
-		while(1){
-			char buf[512] = {0};
-			int n = client.recv(buf, sizeof buf);
+			// Now, we go into a busy loop checking for a response from the server
+			while(1){
+				char buf[512] = {0};
+				int n = client.recv(buf, sizeof buf);
 
-			if(n == 0) break;
+				if(n == 0) break;
 
-			printf("TCP client received %d bytes:\n", n);
-			for(int i=0; i<n; ++i) printf("%c", buf[i]);
-			printf("\n\n");
+				printf("TCP client received %d bytes:\n", n);
+				for(int i=0; i<n; ++i) printf("%c", buf[i]);
+				printf("\n\n");
+			}
 		}
 
 	}

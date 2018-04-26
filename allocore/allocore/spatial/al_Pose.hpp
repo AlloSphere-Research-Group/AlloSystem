@@ -86,6 +86,14 @@ public:
 		return *this;
 	}
 
+	/// Get pose rotated by a quaternion
+	template <class T>
+	Pose operator* (const Quat<T>& v) const { return Pose(*this)*=v; }
+
+	/// Rotate pose by quaternion
+	template <class T>
+	Pose& operator*= (const Quat<T>& v){ mQuat*=v; return *this; }
+
 
 	/// Turn to face a given world-coordinate point
 	void faceToward(const Vec3d& p, double amt = 1.);

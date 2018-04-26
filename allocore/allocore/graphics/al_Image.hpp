@@ -70,10 +70,10 @@ public:
 		Image data formats.
 	*/
 	enum Format {
-		LUMINANCE = 0,	//!< luminance (1-plane)
-		LUMALPHA,		//!< lumalpha (2-plane)
-		RGB,			//!< rgb (3-plane)
-		RGBA,			//!< rgba (4-plane)
+		LUMINANCE = 0,	//!< Luminance (1-plane)
+		LUMALPHA,		//!< Luminance/alpha (2-plane)
+		RGB,			//!< RGB (3-plane)
+		RGBA,			//!< RGBA (4-plane)
 		UNKNOWN_FORMAT
 	};
 
@@ -112,7 +112,8 @@ public:
 	///							extension.
 	/// @param[in] src			source array containing pixel data
 	/// @param[in] compressFlags level of compression in [0,100] and other flags
-	static bool save(const std::string& filePath, const Array& src, int compressFlags=50);
+	/// @param[in] paletteSize	number of colors in palette, in [2,256]
+	static bool save(const std::string& filePath, const Array& src, int compressFlags=50, int paletteSize=-1);
 
 	/// Save pixel data to disk
 
@@ -123,8 +124,9 @@ public:
 	/// @param[in] ny			number of pixels along the y dimension
 	/// @param[in] fmt			pixel format
 	/// @param[in] compressFlags level of compression in [0,100] and other flags
+	/// @param[in] paletteSize	number of colors in palette, in [2,256]
 	template <class T>
-	static bool save(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compressFlags=50);
+	static bool save(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compressFlags=50, int paletteSize=-1);
 
 
 	/// File path to image
@@ -171,6 +173,14 @@ public:
 	/// and other flags which may be specific to the image format.
 	Image& compression(int flags){ mCompression=flags; return *this; }
 
+	/// Get color palette size
+	int paletteSize() const { return mPaletteSize; }
+
+	/// Set color palette size
+
+	/// @param[in] numColors	number of colors in palette, in [2,256]
+	///
+	Image& paletteSize(int numColors){ mPaletteSize=numColors; return *this; }
 
 	/// Get read-only reference to a pixel
 
@@ -230,15 +240,16 @@ public:
 	public:
 		virtual ~Impl() {};
 		virtual bool load(const std::string& filename, Array& lat) = 0;
-		virtual bool save(const std::string& filename, const Array& lat, int compressFlags) = 0;
+		virtual bool save(const std::string& filename, const Array& lat, int compressFlags, int paletteSize) = 0;
 	};
 
 protected:
 	Array mArray;			// pixel data
-	Impl * mImpl;			// library implementation
+	Impl * mImpl = NULL;	// library implementation
 	std::string mFilename;
-	int mCompression;
-	bool mLoaded;			// true after image data is loaded
+	int mCompression = 50;
+	int mPaletteSize = -1;	// number of colors in palette
+	bool mLoaded = false;	// true after image data is loaded
 };
 
 
@@ -258,7 +269,7 @@ inline int Image::components(Format v){
 
 template <class T>
 bool Image::save(
-	const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compress
+	const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compress, int paletteSize
 ){
 	Array a;
 	a.data.ptr			= (char *)const_cast<T *>(pixels);
@@ -267,7 +278,7 @@ bool Image::save(
 	allo_array_setdim2d(&a.header, nx, ny);
 	allo_array_setstride(&a.header, 1);
 
-	bool res = save(filePath, a, compress);
+	bool res = save(filePath, a, compress, paletteSize);
 	a.data.ptr = NULL; // prevent ~Array from deleting data
 	return res;
 }

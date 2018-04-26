@@ -73,12 +73,28 @@ void testStereoAudioScene(int bufferSize) {
 		assert(almostEqual(right, 0.5));
 	}
 
+	 // Render another buffer without changing position
+	for (int i = 0; i < bufferSize; i++) {
+		src.writeSample(0.6);
+	}
+
+	scene.render(audioIO);
+
+	for (int i = 0; i < bufferSize; i++) {
+		float left = audioIO.out(0, i);
+		float right = audioIO.out(1, i);
+		assert(almostEqual(left, 0.0));
+		assert(almostEqual(right, 0.6));
+	}
+
+	//
+
 	for (int i = 0; i < bufferSize; i++) {
 		src.writeSample(1.0);
 	}
 
 	// Pan center
-	src.pos(0, 0, 4);
+	src.pos(0, 0, -4);
 	scene.render(audioIO);
 
 	for (int i = 0; i < bufferSize; i++) {
@@ -394,11 +410,12 @@ void testVbapRing() {
 void testAmbisonicsFirstOrder2D(int bufferSize) {
 	// TODO Finish ambisonics scene tester
 	SpeakerLayout speakerLayout = OctalSpeakerLayout();
+	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
+
 	AmbisonicsSpatializer *panner = new AmbisonicsSpatializer(speakerLayout, 2, 1);
-	AudioScene scene(bufferSize);
+	AudioScene scene(audioIO.framesPerBuffer());
 	SoundSource src;
 	scene.createListener(panner);
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
 	src.dopplerType(DOPPLER_NONE);
 	src.useAttenuation(false);
 	scene.addSource(src);
@@ -408,14 +425,14 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 	}
 
 	// Front
-	src.pos(1, 0, 0);
+	src.pos(0, 0, -1);
 	scene.render(audioIO);
 
 	for (int i = 0; i < bufferSize; i++) {
 		float front = audioIO.out(0, i);
 		for (int chan = 1; chan < speakerLayout.numSpeakers(); chan++) {
 			float spkr = audioIO.out(chan, i);
-//			assert(front > spkr);
+			assert(front > spkr);
 //			std::cout << spkr << std::endl;
 		}
 	}
@@ -431,8 +448,8 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = audioIO.out(0, i);
 		float right = audioIO.out(1, i);
-//		assert(almostEqual(left, right));
-//		assert(almostEqual(right, sin(M_PI/4)));
+		assert(almostEqual(left, right));
+		assert(almostEqual(right, sin(M_PI/4)));
 	}
 
 	for (int i = 0; i < bufferSize; i++) {
@@ -446,8 +463,8 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = audioIO.out(0, i);
 		float right = audioIO.out(1, i);
-//		assert(almostEqual(left, 0.75));
-//		assert(almostEqual(right, 0.0));
+		assert(almostEqual(left, 0.75));
+		assert(almostEqual(right, 0.0));
 	}
 
 	delete panner;

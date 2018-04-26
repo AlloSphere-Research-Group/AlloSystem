@@ -468,9 +468,9 @@ protected:
 	Window& insert(InputEventHandler& v, int i);
 	Window& insert(WindowEventHandler& v, int i);
 
-	#define CALL(e){\
-		for(unsigned i=0; i<mInputEventHandlers.size(); ++i){\
-			if(false == mInputEventHandlers[i]->e) break;\
+	#define CALL(func){\
+		for(auto * handler : mInputEventHandlers){\
+			if(false == handler->func) break;\
 		}\
 	}
 
@@ -482,9 +482,9 @@ protected:
 	void callHandlersOnKeyUp(){ CALL(onKeyUp(mKeyboard)); }
 	#undef CALL
 
-	#define CALL(e){\
-		for(unsigned i=0; i<mWindowEventHandlers.size(); ++i){\
-			if(false == mWindowEventHandlers[i]->e) break;\
+	#define CALL(func){\
+		for(auto * handler : mWindowEventHandlers){\
+			if(false == handler->func) break;\
 		}\
 	}
 

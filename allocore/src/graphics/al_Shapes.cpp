@@ -507,6 +507,16 @@ int addDisc(Mesh& m, float radius, unsigned slices){
 	return addCone(m, radius, Vec3f(0,0,0), slices);
 }
 
+int addRect(Mesh& m, float width, float height, float x, float y){
+	float w_2 = width*0.5, h_2 = height*0.5;
+	m.primitive(Graphics::TRIANGLES);
+	m.vertex(x-w_2, y+h_2);
+	m.vertex(x-w_2, y-h_2);
+	m.vertex(x+w_2, y+h_2);
+	m.vertex(x+w_2, y-h_2);
+	m.index(0,1,2, 2,1,3);
+	return 4;
+}
 
 int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist){
 

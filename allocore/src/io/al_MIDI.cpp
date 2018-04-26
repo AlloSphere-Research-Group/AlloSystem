@@ -8,7 +8,7 @@
 	#define __MACOSX_CORE__
 #elif defined(AL_WINDOWS)
 	#define __WINDOWS_MM__
-#else
+#elif defined(AL_LINUX)
 	#define __LINUX_ALSASEQ__
 #endif
 

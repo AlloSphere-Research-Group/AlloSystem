@@ -407,19 +407,20 @@ int utMath(){
 			}}}
 		}
 
-		// Test roundtrip matrix/quat conversions
+		// Test Quat to matrix
 		{
-			double mat4[16];
-			Quatd b;
-			q.toMatrix(mat4);
-			b = q.fromMatrix(mat4);
-			assert(q == b || q == b.conj());
-
-			q.toMatrixTransposed(mat4);
-			b = q.fromMatrixTransposed(mat4);
-			assert(q == b || q == b.conj());
+			Quatd q;
+			q.set(1,0,0,0);
+			Mat4d m;
+			q.toMatrix(&m[0]);
+			assert(eq(m, Mat4d::identity()));
+			
+			
+			q.fromAxisAngle(M_2PI/4, 0,0,1);
+			q.toMatrix(&m[0]);
+			// For a right-handed coordinate system
+			assert(eq(m, Mat4d(0,-1,0,0, 1,0,0,0, 0,0,1,0, 0,0,0,1)));
 		}
-
 
 		// Test Quat to component coordinate frame
 		{
@@ -452,7 +453,19 @@ int utMath(){
 			assert(eq(vz, Vec3d(0,0,1)));
 		}
 
+		// Test roundtrip matrix/quat conversions
+		{
+			double mat4[16];
+			Quatd b;
+			q.fromEuler(1.,2.,3.); // a non-trival quat
+			q.toMatrix(mat4);
+			b = q.fromMatrix(mat4);
+			assert( eq(q,b) || eq(q,b.conj()) );
 
+			q.toMatrixTransposed(mat4);
+			b = q.fromMatrixTransposed(mat4);
+			assert( eq(q,b) || eq(q,b.conj()) );
+		}
 
 //		int smps = 100;
 //		Quatd q1 = Quatd::fromAxisAngle(10, .707, .707, 0);

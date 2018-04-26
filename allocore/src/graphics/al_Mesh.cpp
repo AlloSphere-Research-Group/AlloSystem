@@ -632,26 +632,46 @@ Mesh::Vertex Mesh::getCenter() const {
 	return min+(max-min)*0.5;
 }
 
-void Mesh::unitize(bool proportional) {
+Mesh& Mesh::fitToSphere(float radius){
+	double maxMag = 0.;
+	for(auto& v : mVertices){
+		auto mm = v.dot(v);
+		if(mm > maxMag) maxMag=mm;
+	}
+	if(maxMag > 0.){
+		auto nrm = radius/sqrt(maxMag);
+		for(auto& v : mVertices){
+			v *= nrm;
+		}
+	}
+	return *this;
+}
+
+Mesh& Mesh::fitToCube(float radius, bool proportional){
 	Vertex min(0), max(0);
 	getBounds(min, max);
 	// span of each axis:
-	Vertex span = max-min;	// positive only
+	auto span = max-min;	// positive only
 	// center of each axis:
-	Vertex mid = min + (span * 0.5);
+	auto mid = min + (span * 0.5);
 	// axis scalar:
-	Vertex scale(2./span.x, 2./span.y, 2./span.z);	// positive only
+	auto scale = (2.f*radius)/span; // positive only
 
 	// adjust to use scale of largest axis:
 	if (proportional) {
-		float s = al::min(scale.x, al::min(scale.y, scale.z));
-		scale.x = scale.y = scale.z = s;
+		scale = al::min(scale.x, scale.y, scale.z);
 	}
 
 	for (int v=0; v<mVertices.size(); v++) {
-		Vertex& vt = mVertices[v];
+		auto& vt = mVertices[v];
 		vt = (vt-mid)*scale;
 	}
+
+	return *this;
+}
+
+Mesh& Mesh::unitize(bool proportional){
+	return fitToCube(1.f, proportional);
 }
 
 Mesh& Mesh::translate(float x, float y, float z){

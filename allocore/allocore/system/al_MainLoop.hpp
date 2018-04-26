@@ -49,14 +49,16 @@
 
 namespace al {
 
-///
-/// \brief The Main class
+/// Encapsulates a program's main run loop
+
+/// A run loop is used for programs that need to persist and execute actions
+/// at a periodic interval.
 ///
 /// @ingroup allocore
 class Main {
 public:
 
-	// interface for handlers:
+	/// A custom function object that gets called by the main loop
 	class Handler {
 	public:
 		virtual ~Handler();
@@ -64,68 +66,76 @@ public:
 		virtual void onExit() {}
 	};
 
+
+	/// Main loop driver
 	enum Driver {
-		SLEEP = 0,
-		GLUT,
-		NATIVE,
+		DEFAULT = 0,///< Use an appropriate default driver (usually SLEEP)
+		SLEEP,		///< Uses platform-specific sleep function
+		GLUT,		///< GLUT (forced by Window using GLUT backend)
+		NATIVE,		///< Use platform specific run loop
 		NUM_DRIVERS
 	};
 
-	/// mainloop is a singleton; this is how to access it:
+
+	/// Main is a singleton; this is how to access it
 	static Main& get();
 
-	/// set the timer interval in seconds (minimum 1 millisecond)
-	/// actual behavior is driver dependent
-	Main& interval(al_sec v) {
-		mInterval = v > 0.001 ? v : 0.001;
-		return *this;
-	}
 
-	/// takes over control of the current thread
-	/// starts the clock-driven scheduler
+	/// Set the timer interval in seconds (minimum 1 millisecond)
+
+	/// The actual behavior of this function is driver dependent.
+	///
+	Main& interval(al_sec v);
+
+	/// Start the main loop
+
+	/// This takes over control of the current thread and starts the
+	/// clock-driven scheduler.
 	void start();
 
-	/// releases control of the current thread where it was start()ed
-	/// stops the clock-driven scheduler
-	/// in some implementations (e.g. GLUT), may exit the application
+	/// Stop the main loop
+
+	/// This releases control of the current thread where it was start()ed
+	/// and stops the clock-driven scheduler. In some implementations
+	/// (e.g. GLUT), it may exit the application.
 	void stop();
 
 	bool isRunning() const { return mActive; }
 
-	/// requested time between updates:
+	/// Get requested time between updates
 	al_sec interval() const { return mInterval; }
 
-	/// measured time between updates:
+	/// Get measured time between updates
 	al_sec intervalActual() const { return mIntervalActual; }
 
-	/// current scheduler (logical) time
-	/// (seconds since start())
+	/// Get current scheduler (logical) time (seconds since start())
 	al_sec now() const { return mQueue.now(); }
 
-	/// real time
-	/// (seconds since start())
-	al_sec realtime() { return timeInSec() - get().mT0; }
+	/// Get real time (seconds since start())
+	al_sec realtime();
 
-	/// time when main loop was created
+	/// Get time when main loop was created
 	al_sec T0() { return mT0; }
 
-	/// percentage of interval time used in processing
+	/// Get percentage of interval time used in processing
 	double cpu() const { return mCPU; }
 
-	/// use this to schedule timed functions in this mainloop
-	/// (the mainloop itself will take care of updating this queue)
+	/// Use this to schedule timed functions in this loop
+
+	/// The mainloop itself will take care of updating this queue.
+	///
 	MsgQueue& queue() { return mQueue; }
 
-	/// register callbacks for Mainloop events:
+	/// Register callback for loop events
 	Main& add(Main::Handler& v);
 	Main& remove(Main::Handler& v);
 
 	// INTERNAL USE:
 
-	/// trigger a mainloop step (typically for implementation use only)
+	// trigger a mainloop step (typically for implementation use only)
 	void tick();
 
-	/// calls any registerd Handlers' onExit() methods
+	// calls any registerd Handlers' onExit() methods
 	void exit();
 
 	// used to switch the driver
@@ -154,8 +164,6 @@ private:
 
 	bool mActive;
 	bool mInited[NUM_DRIVERS];
-
-	static al_sec timeInSec(){ return al_steady_time(); }
 };
 
 // deprecated; for backwards compatibility only

@@ -45,7 +45,7 @@
 
 #include <string>
 
-#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/math/al_Vec.hpp"
 #include "allocore/types/al_Color.hpp"
 
 namespace al{
@@ -57,14 +57,19 @@ namespace al{
 /// @ingroup allocore
 class Material {
 public:
+	Material();
 
-	Material(Graphics::Face f=Graphics::FRONT);
+	/// @param[in] faceDir	Face this material applies to (see Graphics::Direction)
+	Material(int faceDir);
 
 	/// Send current material settings to GPU
 	void operator()() const;
 
 	/// Set the polygon face that material will be applied to
-	Material& face(Graphics::Face f);
+
+	/// @param[in] faceDir	Face this material applies to (see Graphics::Direction)
+	///
+	Material& face(int faceDir);
 
 	/// Set specular exponent [0, 128]
 	Material& shininess(float v);
@@ -83,7 +88,7 @@ public:
 	Material& bumpMap(const std::string& map) { mMapBump = map; return *this; }
 	Material& useColorMaterial(bool v) { mUseColorMaterial = v; return *this; }
 
-	Graphics::Face face() const { return mFace; }
+	int face() const { return mFace; }
 
 	float shininess() const { return mShine; }
 	float opticalDensity() const { return mOpticalDensity; }
@@ -105,7 +110,7 @@ protected:
 	Color mEmission;
 	Color mSpecular;
 	float mShine, mOpticalDensity, mIllumination;
-	Graphics::Face mFace;
+	int mFace;
 	std::string mMapKa, mMapKs, mMapKd, mMapBump;
 	bool mUseColorMaterial;
 };
@@ -121,25 +126,37 @@ public:
 	/// Send current light settings to GPU
 	void operator()() const;
 
-	/// Attenuation factor = 1/(c0 + c1*d + c2*d*d)
-	Light& attenuation(float c0, float c1=0, float c2=0);
-	Light& ambient(const Color& v);
-	Light& diffuse(const Color& v);
-	Light& specular(const Color& v);
+	/// Set positional light position
+	Light& pos(float x, float y, float z);
+
+	/// Set positional light position
+	template <class Vec3>
+	Light& pos(const Vec3& v){ return pos(v[0],v[1],v[2]); }
 
 	/// Set directional light direction
 	Light& dir(float x, float y, float z);
 
 	/// Set directional light direction
-	template <class VEC3>
-	Light& dir(const VEC3& v){ return dir(v[0],v[1],v[2]); }
+	template <class Vec3>
+	Light& dir(const Vec3& v){ return dir(v[0],v[1],v[2]); }
 
-	/// Set positional light position
-	Light& pos(float x, float y, float z);
+	Light& ambient(const Color& v);
+	Light& diffuse(const Color& v);
+	Light& specular(const Color& v);
 
-	/// Set positional light position
-	template <class VEC3>
-	Light& pos(const VEC3& v){ return pos(v[0],v[1],v[2]); }
+	Light& strength(float v);
+
+	/// Attenuation factor = 1/(c0 + c1*d + c2*d*d)
+	Light& attenuation(float c0, float c1=0, float c2=0);
+
+	/// Set distance at which light is at half intensity
+	Light& halfDist(float v);
+
+	/// Set cone spread
+
+	/// This is the angle of conical spread, in degress.
+	/// The special value of 180 produces a uniform distribution.
+	Light& spread(float v);
 
 	/// Set spotlight parameters
 
@@ -151,16 +168,33 @@ public:
 	Light& spot(float xDir, float yDir, float zDir, float cutoff, float expo=15);
 
 	template <class VEC3>
-	Light& spot(const VEC3& v, float cutoff, float expo=15){ return spot(v[0],v[1],v[2],cutoff,expo); }
+	Light& spot(const VEC3& v, float cutoff, float expo=15){
+		return spot(v[0],v[1],v[2],cutoff,expo);
+	}
+
+	/// Set global ambient component (default is {0.2, 0.2, 0.2, 1})
+	static void globalAmbient(const Color& v);
+
+	/// Determines whether global lighting is two-sided (default is false)
+
+	/// Setting this to true effectively reverses normals of back-facing
+	/// polygons.
+	static void twoSided(bool v);
 
 
-	/// Get position array
-	const float * pos() const { return mPos; }
-	float * pos(){ return mPos; }
+	/// Get position
+	const Vec3f& pos() const { return mPos; }
+	Vec3f& pos(){ return mPos; }
+
+	/// Get direction
+	const Vec3f& dir() const { return mDir; }
+	Vec3f& dir(){ return mDir; }
 
 	/// Get attenuation array
 	const float * attenuation() const { return mAtten; }
 	float * attenuation(){ return mAtten; }
+
+	float strength() const { return mStrength; }
 
 	/// Get ambient color
 	const Color& ambient() const { return mAmbient; }
@@ -174,26 +208,42 @@ public:
 	const Color& specular() const { return mSpecular; }
 	Color& specular(){ return mSpecular; }
 
+	/// Get attenuation half distance
+	float halfDist() const { return mHalfDist; }
 
-	/// Set global ambient light intensity (default is {0.2, 0.2, 0.2, 1})
-	static void globalAmbient(const Color& v);
+	/// Get cone spread
+	float spread() const { return mSpread; }
 
-	/// Determines how global specular reflection angles are computed
-	static void localViewer(bool v);
+	/// Get global ambient component
+	static const Color& globalAmbient(){ return sGlobalAmbient; }
 
-	/// Determines whether global lighting is two-sided
+	/// Get whether lighting is two-sided
+	static bool twoSided(){ return sTwoSided; }
 
-	/// Setting this to true effectively reverses normals of back-facing
-	/// polygons.
-	static void twoSided(bool v);
+	/// Unique ID of light
+	int id() const;
+
+	int index() const;
 
 protected:
-	int mID;
-	Color mAmbient;
-	Color mDiffuse;
-	Color mSpecular;
-	float mPos[4];
-	float mAtten[3];
+	static Color sGlobalAmbient;
+	static bool sGlobalAmbientUpdate;
+	static bool sTwoSided;
+	static bool sTwoSidedUpdate;
+	int mIndex;
+	Vec3f mPos{0,0,1}, mDir{0,0,-1};
+	Color mAmbient{0};
+	Color mDiffuse{1};
+	Color mSpecular{1};
+	float mStrength{1};
+	float mSpread{180};
+	float mHalfDist{1e16};
+	float mAtten[3] = {1,0,0};
+	bool mIsDir = false;
+
+	friend class Graphics;
+	void submitCol(int lightID) const;
+	void submitPos(int lightID) const;
 };
 
 } // ::al

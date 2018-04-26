@@ -158,6 +158,11 @@ protected:
 };
 
 
+class AmbiDecodeConfig {
+public:
+	bool discardNegativeWeights {false};
+	float weightOffset {0.0};
+};
 
 /// Higher Order Ambisonic Decoding class
 ///
@@ -175,12 +180,20 @@ public:
 
 
 	/// @param[out] dec				output time domain buffers (non-interleaved)
-	/// @param[in ] enc				input Ambisonic domain buffers (non-interleaved)
-	/// @param[in ] numDecFrames	number of frames in time domain buffers
+	/// @param[in] enc				input Ambisonic domain buffers (non-interleaved)
+	/// @param[in] numDecFrames	number of frames in time domain buffers
 	virtual void decode(float * dec, const float * enc, int numDecFrames) const;
 
+	/// @param[out] dec				output time domain buffer (non-interleaved buffer)
+	/// @param[in] enc				input Ambisonic domain buffers (non-interleaved)
+	/// @param[in] numFrames		number of frames in time domain buffers
+	/// @param[in] timeIndex		index into enc buffer to decode
+	virtual void decode(float *dec, const float * enc, int numFrames, int timeIndex) const;
+
+	void setConfiguration(AmbiDecodeConfig &config) {mConfig = config;}
+
 	float decodeWeight(int speaker, int channel) const {
-		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
+		return /*mWeights[channel] **/ mDecodeMatrix[speaker * channels() + channel];
 	}
 
 	/// Returns decode flavor
@@ -203,7 +216,7 @@ public:
 	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0, float amp=1.f);
 	//void zero();					///< Zeroes out internal ambisonic frame.
 
-	void setSpeakers(Speakers *spkrs);
+	void setSpeakers(Speakers &spkrs);
 
 //	float * azimuths();				///< Returns pointer to speaker azimuths.
 //	float * elevations();			///< Returns pointer to speaker elevations.
@@ -230,6 +243,8 @@ protected:
 	float decode(float * encFrame, int encNumChannels, int speakerNum);	// is this useful?
 
 	static float flavorWeights[4][5][5];
+
+	AmbiDecodeConfig mConfig;
 };
 
 
@@ -291,19 +306,11 @@ public:
 
 	AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
 
-	void zeroAmbi();
-
-	float * ambiChans(unsigned channel=0);
-
 	virtual void compile(Listener& l) override;
 
 	virtual void numFrames(int v) override;
 
-	void numSpeakers(int num);
-
-	void setSpeakerLayout(const SpeakerLayout& sl);
-
-	virtual void prepare();
+	virtual void prepare() override;
 
 	virtual void renderBuffer(AudioIOData& io,
 	                  const Pose& listeningPose,
@@ -315,7 +322,16 @@ public:
 	                          const float& sample,
 	                          const int& frameIndex) override;
 
-	virtual void finalize(AudioIOData& io) override;
+	void numSpeakers(int num);
+
+	void setSpeakerLayout(SpeakerLayout& sl);
+
+	void zeroAmbi();
+
+	float * ambiChans(unsigned channel=0);
+
+
+//	virtual void finalize(AudioIOData& io) override;
 
 private:
 	AmbiDecode mDecoder;

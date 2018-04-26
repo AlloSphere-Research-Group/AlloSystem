@@ -120,15 +120,15 @@ struct MyWindow : public Window {
 		tex.bind();
 		for (float slice = 0; slice <= 1.; slice += 0.1) {
 			float s = 32.;
-			gl.begin(gl.QUADS);
-				gl.texCoord(0, 0, slice);
+			gl.begin(gl.TRIANGLE_STRIP);
+				gl.texCoord(0, 0, slice); // BL
 				gl.vertex(0, 0, slice*s);
-				gl.texCoord(0, 1, slice);
+				gl.texCoord(0, 1, slice); // BR
 				gl.vertex(0, s, slice*s);
-				gl.texCoord(1, 1, slice);
-				gl.vertex(s, s, slice*s);
-				gl.texCoord(1, 0, slice);
+				gl.texCoord(1, 0, slice); // TL
 				gl.vertex(s, 0, slice*s);
+				gl.texCoord(1, 1, slice); // TR
+				gl.vertex(s, s, slice*s);
 			gl.end();
 		}
 		tex.unbind();

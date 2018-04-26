@@ -114,11 +114,24 @@ public:
 		}
 	}
 
+	typedef enum {
+		PRESET,
+		EVENT
+	} StepType;
+
 	struct Step {
+		StepType type = PRESET;
 		std::string presetName;
 		float delta; // The time to get to the preset
 		float duration; // The time to stay in the preset before the next step
+		std::vector<float> params;
 	};
+
+	typedef struct {
+		std::string eventName;
+		std::function<void (void *data, std::vector<float> &params)> callback;
+		void * callbackData;
+	} EventCallback;
 
 	/**
 	 * @brief Start playing the sequence specified
@@ -191,6 +204,18 @@ public:
 
 	std::string currentSequence() { return mCurrentSequence; }
 
+
+	/**
+	 * @brief registerEventCommand registers a function associated with an event command
+	 *
+	 * Sequences can have events commands prefixed by @. Whenever an event is
+	 * found in a sequence, it triggers the callback registered here if the
+	 * event name matches
+	 */
+	void registerEventCommand(std::string eventName,
+	                          std::function<void (void *data, std::vector<float> &params)> callback,
+	                          void *data);
+
 	void setOSCSubPath(std::string subPath) { mOSCsubPath = subPath; }
 
 	/**
@@ -235,7 +260,7 @@ private:
 
 	std::queue<Step> mSteps;
 	std::string mDirectory;
-	PresetHandler *mPresetHandler;
+	PresetHandler *mPresetHandler {nullptr};
 	std::string mOSCsubPath;
 	std::string mCurrentSequence;
 
@@ -252,6 +277,8 @@ private:
 	bool mEndCallbackEnabled;
 	std::function<void(bool,PresetSequencer *, void *userData)> mEndCallback;
 	void *mEndCallbackData;
+
+	std::vector<EventCallback> mEventCallbacks;
 };
 
 

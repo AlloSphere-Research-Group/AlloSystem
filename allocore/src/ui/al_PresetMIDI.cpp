@@ -22,6 +22,25 @@ void PresetMIDI::connectNoteToPreset(int channel, float presetLow, int noteLow, 
 	}
 }
 
+void PresetMIDI::connectProgramToPreset(int channel, float presetLow, int programLow, float presetHigh, int programHigh)
+{
+	if (programHigh == -1) {
+		presetHigh = presetLow;
+		programHigh = programLow;
+	}
+	if (programHigh - programLow != presetHigh - presetLow) {
+		std::cout << "PresetMIDI warning different ranges for preset and program ranges." << std::endl;
+	}
+	for (int num = programLow; num <= programHigh; ++num) {
+		ProgramBinding newBinding;
+		newBinding.channel = channel - 1;
+		newBinding.programNumber = num;
+		newBinding.presetIndex = presetLow - programLow + num;
+		mProgramBindings.push_back(newBinding);
+		//			std::cout << channel << " " << num << " " << newBinding.presetIndex << std::endl;
+	}
+}
+
 
 void PresetMIDI::setMorphControl(int controlNumber, int channel, float min, float max)
 {
@@ -39,6 +58,17 @@ void PresetMIDI::onMIDIMessage(const MIDIMessage &m) {
 			//				std::cout << (int) m.channel() << std::endl;
 			if (m.channel() == binding.channel
 			        && m.noteNumber() == binding.noteNumber) {
+				//					m.print();
+				mPresetHandler->recallPreset(binding.presetIndex);
+			}
+		}
+	} else if (m.type() == MIDIByte::PROGRAM_CHANGE
+	           && m.velocity() > 0 ) {
+		for(ProgramBinding binding: mProgramBindings) {
+			//				std::cout << binding.channel << " " << binding.noteNumber << " " << binding.presetIndex << std::endl;
+			//				std::cout << (int) m.channel() << std::endl;
+			if (m.channel() == binding.channel
+			        && m.noteNumber() == binding.programNumber) {
 				//					m.print();
 				mPresetHandler->recallPreset(binding.presetIndex);
 			}

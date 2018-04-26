@@ -201,8 +201,10 @@ public:
 		Quatd srcRot = listeningPose.quat();
 		relDirection = srcRot.rotate(relDirection);
 		double distanceToSample = 0;
+		double samplesAgo = 1024; // TODO how can we set a better default
 		if(dopplerType() == DOPPLER_SYMMETRICAL) {
 			distanceToSample = mSampleRate / mSpeedOfSound;
+			samplesAgo = dist * distanceToSample;
 		} else if(dopplerType() == DOPPLER_PHYSICAL) {
 			// FIXME AC Can we use the current pose here for distance or should we calculate from listener history?
 			double prevDistance = (posHistory()[1] - listeningPose.vec()).mag();
@@ -212,30 +214,26 @@ public:
 			if (sumSpeed < 0.001) { sumSpeed = 0.001; }
 
 			distanceToSample = fabs(mSampleRate / sumSpeed);
+			samplesAgo = dist * distanceToSample;
 		}
 		updateHistory();
 
-		// Compute how many samples ago to read from buffer
-		// Start with time delay due to speed of sound
-		double samplesAgo = dist * distanceToSample;
-
 //		// Add on time delay (in samples) - only needed if the source is rendered per buffer
-//		if(!usePerSampleProcessing())
-		samplesAgo += mFrameCounter++;
+		if(!usePerSampleProcessing()) {
+			samplesAgo -= mFrameCounter++;
+		}
 
 		// Is our delay line big enough?
 		if(samplesAgo <= maxIndex()){
 			double gain = attenuation(dist);
-//			std::cout << dist << ":" << gain << std::endl;
-
-			//This seemed to get the same sample per block
-			//   float s = src.readSample(samplesAgo) * gain;
 
 			//reading samplesAgo-i causes a discontinuity
 			s = readSample(samplesAgo) * gain;
 
 			// s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
 
+		} else {
+			std::cout << "Delay line exceeded in SoundSource" << std::endl;
 		}
 		return s;
 	}
@@ -264,14 +262,14 @@ public:
 	/// The index specifies how many samples ago by which to read back from
 	/// the buffer. The index must be less than or equal to bufferSize()-2.
 	float readSample(double index) const {
-		int index0 = index;
+		int index0 = (int) index;
 		float a = mSound.read(index0);
-		float b = mSound.read(index0+1);
-		float frac = index - index0;
+		float b = mSound.read(index0-1);
+		float frac = -(index0 - index);
 		//return ipl::linear(frac, a, b);
 
-		float a0 = mSound.read(index0-1);
-		float b1 = mSound.read(index0+2);
+		float a0 = mSound.read(index0+1);
+		float b1 = mSound.read(index0-2);
 		return ipl::cubic(frac, a0, a, b, b1);
 	}
 
@@ -323,7 +321,7 @@ public:
 	static int bufferSize(double samplerate, double speedOfSound, double distance);
 
 	/// Set speed of sound for computation in m/s
-	int setSpeedOfSound(float speedOfSound) {mSpeedOfSound = speedOfSound; }
+	void setSpeedOfSound(float speedOfSound) {mSpeedOfSound = speedOfSound; }
 
 	void cachedIndex(unsigned int v){ mCachedIndex = v; } // FIXME: For VBAP. There should be a better place for this
 	unsigned int cachedIndex(){ return mCachedIndex; }
@@ -406,7 +404,7 @@ protected:
 		if (mBuffer.size() != io.framesPerBuffer()) {
 			mBuffer.reserve(io.framesPerBuffer());
 		}
-		for(int i = 0; i < io.framesPerBuffer(); i++)
+        for(unsigned int i = 0; i < io.framesPerBuffer(); i++)
 		{
 			double readIndex = (io.framesPerBuffer() - i - 1);
 			mBuffer[i] = src.readSample(readIndex);

@@ -206,11 +206,15 @@ public:
 		return *(Vec<M,T> *)(elems()+begin);
 	}
 
+	Vec<2,T> xy() const { return sub<2>(); }
+	Vec<2,T>& xy(){ return sub<2>(); }
+	Vec<3,T> xyz() const { return sub<3>(); }
+	Vec<3,T>& xyz(){ return sub<3>(); }
+
 
 	//--------------------------------------------------------------------------
 	// Basic Arithmetic Operations
 
-	Vec& operator  =(const Vec& v){ return set(v); }
 	Vec& operator  =(const   T& v){ return set(v); }
 	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
 	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
@@ -230,8 +234,8 @@ public:
 	Vec operator / (const Vec& v) const { return Vec(*this) /= v; }
 	Vec operator / (const   T& v) const { return Vec(*this) /= v; }
 	Vec operator - () const { return Vec(*this).negate(); }
-	bool operator > (const Vec& v) const { return Vec(*this).mag() > v.mag(); }
-	bool operator < (const Vec& v) const { return Vec(*this).mag() < v.mag(); }
+	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
+	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
 
 	/// Set elements from another vector
 	template <class T2>
@@ -293,6 +297,10 @@ public:
 
 	/// Set all elements to zero
 	Vec& zero(){ return set(T(0)); }
+
+	/// Swap elements
+	Vec& swap(int i, int j){
+		std::swap((*this)[i], (*this)[j]); return *this; }
 
 
 	/// Clip to range:
@@ -377,7 +385,7 @@ public:
 		return pow(r, T(1)/p);
 	}
 
-	/// Return 1-norm of elements
+	/// Return 1-norm of elements (sum of absolute values)
 	T norm1() const { return sumAbs(); }
 
 	/// Return 2-norm of elements
@@ -397,7 +405,7 @@ public:
 		return r;
 	}
 
-	/// Returns sum of absolute value of elements
+	/// Returns sum of absolute value of elements (1-norm)
 	T sumAbs() const {
 		T r = abs((*this)[0]);
 		for(int i=1; i<N; ++i){ r += abs((*this)[i]); }
@@ -412,22 +420,35 @@ public:
 	/// Set magnitude (preserving direction)
 	Vec& mag(T v);
 
+	/// Set 1-norm of vector (sum of absolute values)
+
+	/// This is useful for when you need to ensure the sum of absolute values 
+	/// is equal to some value without changing the direction of the vector.
+	Vec& norm1(T v){
+		auto n1 = sumAbs();
+		if(n1 > T(0)) (*this) *= (v/n1);
+		return *this;
+	}
+
 	/// Negates all elements
 	Vec& negate(){
-		IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
+		for(auto& v:*this){ v = -v; } return *this;
+	}
 
-	/// Set magnitude to one without changing direction
+	/// Normalize magnitude (preserving direction)
 
-	/// @param[in] scale	amount to scale magnitude
+	/// @param[in] magVal	magnitude (1 is a standard normalization)
 	///
-	Vec& normalize(T scale=T(1));
+	Vec& normalize(T magVal=T(1)){
+		return mag(magVal);
+	}
 
-	/// Return closest vector lying on unit sphere
+	/// Return closest vector lying on a sphere
 
-	/// @param[in] scale	amount to scale magnitude of result
+	/// @param[in] magVal	magnitude (1 is a standard normalization)
 	///
-	Vec normalized(T scale=T(1)) const {
-		return Vec(*this).normalize(scale); }
+	Vec normalized(T magVal=T(1)) const {
+		return Vec(*this).normalize(magVal); }
 
 	/// Get projection of vector onto a unit vector
 	Vec projection(const Vec& u) const {
@@ -462,6 +483,15 @@ public:
 		return *this;
 	}
 
+	/// Rotate vector 90 degrees on a global plane
+
+	/// @param[in] dim1		dimension to rotate from
+	/// @param[in] dim2		dimension to rotate towards
+	/// To rotate -90 degrees, swap the two dimensions.
+	Vec& rotate90(int dim1=0, int dim2=1){
+		(*this)[dim2] = -(*this)[dim2];
+		return swap(dim1, dim2);
+	}
 
 	/// debug printing
 	void print(FILE * out=stdout) const;
@@ -508,6 +538,10 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 /// Get a subvector
 template <int M, int N, class T>
 inline Vec<M,T> sub(const Vec<N,T>& v, int begin=0){
+	return v.template sub<M>(begin);
+}
+template <int M, int N, class T>
+inline Vec<M,T>& sub(Vec<N,T>& v, int begin=0){
 	return v.template sub<M>(begin);
 }
 
@@ -611,6 +645,34 @@ inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Ve
 	n.normalize();
 }
 
+/// Returns element with minimum value
+template <int N, class T>
+inline const T& min(const Vec<N,T>& v){
+	int j = 0;
+	for(int i=1; i<N; ++i){
+		if(v[i] < v[j]) j=i;
+	}
+	return v[j];
+}
+template <int N, class T>
+inline T& min(Vec<N,T>& v){
+	return const_cast<T&>(min(static_cast<const Vec<N,T>&>(v)));
+}
+
+/// Returns element with maximum value
+template <int N, class T>
+inline const T& max(const Vec<N,T>& v){
+	int j = 0;
+	for(int i=1; i<N; ++i){
+		if(v[i] > v[j]) j=i;
+	}
+	return v[j];
+}
+template <int N, class T>
+inline T& max(Vec<N,T>& v){
+	return const_cast<T&>(max(static_cast<const Vec<N,T>&>(v)));
+}
+
 /// Returns vector containing element-wise minimum between two vectors
 template <int N, class T>
 inline Vec<N,T> min(const Vec<N,T>& a, const Vec<N,T>& b){
@@ -643,12 +705,6 @@ Vec<N,T>& Vec<N,T>::mag(T v){
 	}
 	return *this;
 }
-
-template <int N, class T>
-Vec<N,T>& Vec<N,T>::normalize(T scale){
-	return mag(scale);
-}
-
 
 template <typename T> const char* typeString();
 #define TypeString(A) template <> inline const char* typeString<A>() { return #A; }

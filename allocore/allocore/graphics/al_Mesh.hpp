@@ -121,8 +121,14 @@ public:
 	/// Reset all buffers
 	Mesh& reset();
 
-	/// Scale all vertices to lie in [-1,1]
-	void unitize(bool proportional=true);
+	/// Scales vertices to lie in sphere
+	Mesh& fitToSphere(float radius=1);
+
+	/// Scales vertices to lie in cube
+	Mesh& fitToCube(float radius=1, bool proportional=true);
+
+	/// Scales vertices to lie in cube with extrema [-1,1]
+	Mesh& unitize(bool proportional=true);
 
 	/// Scale all vertices
 	Mesh& scale(float x, float y, float z);
@@ -207,6 +213,7 @@ public:
 
 
 	int primitive() const { return mPrimitive; }
+	float stroke() const { return mStroke; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
 	const Buffer<Normal>& normals() const { return mNormals; }
 	const Buffer<Color>& colors() const { return mColors; }
@@ -219,6 +226,13 @@ public:
 
 	/// Set geometric primitive
 	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
+
+	/// Set stroke size
+
+	/// For line primitives, this is the line width.
+	/// For point primitives, this is the point diameter.
+	/// A negative value uses the current value of the renderer.
+	Mesh& stroke(float v){ mStroke=v; return *this; }
 
 	/// Repeat last vertex element(s)
 	Mesh& repeatLast();
@@ -393,6 +407,7 @@ protected:
 	Indices mIndices;
 
 	int mPrimitive;
+	float mStroke = -1.f;
 
 public:
 	/// \deprecated

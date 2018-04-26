@@ -44,10 +44,18 @@
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
+
+#include "allocore/graphics/al_OpenGL.hpp"
+
+#ifdef AL_GRAPHICS_SUPPORTS_SHADER
+
 #include <string>
 #include <unordered_map>
 #include "allocore/graphics/al_GPUObject.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/math/al_Mat.hpp"
+#include "allocore/math/al_Quat.hpp"
+#include "allocore/math/al_Vec.hpp"
+#include "allocore/types/al_Color.hpp"
 
 #define AL_SHADER_MAX_LOG_SIZE	4096
 
@@ -83,8 +91,8 @@ public:
 
 	enum Type {
 		VERTEX,
-		GEOMETRY,
-		FRAGMENT
+		FRAGMENT,
+		GEOMETRY
 	};
 
 	Shader(const std::string& source="", Shader::Type type=FRAGMENT);
@@ -122,46 +130,6 @@ private:
 class ShaderProgram : public ShaderBase{
 public:
 
-	/*!
-		The basic parameter types
-	*/
-	enum Type {
-		NONE = 0,	//uninitialized type
-
-		FLOAT,		///< A single float value
-		VEC2,		///< Two float values
-		VEC3,		///< Three float values
-		VEC4,		///< Four float values
-
-		INT,		///< A single int value
-		INT2,		///< Two int values
-		INT3,		///< Three int values
-		INT4,		///< Four int values
-
-		BOOL,		///< A single bool value
-		BOOL2,		///< Two bool values
-		BOOL3,		///< Three bool values
-		BOOL4,		///< Four bool values
-
-		MAT22,		///< A 2x2 matrix
-		MAT33,		///< A 3x3 matrix
-		MAT44,		///< A 4x4 matrix
-
-		SAMPLER_1D,			///< A 1D texture
-		SAMPLER_2D,			///< A 2D texture
-		SAMPLER_RECT,		///< A rectangular texture
-		SAMPLER_3D,			///< A 3D texture
-		SAMPLER_CUBE,		///< A cubemap texture
-		SAMPLER_1D_SHADOW,	///< A 1D depth texture
-		SAMPLER_2D_SHADOW	///< A 2D depth texture
-
-		//textures? non square matrices? attributes?
-	};
-
-	struct Attribute {
-	};
-
-
 	ShaderProgram();
 
 	/// Any attached shaders will automatically be detached, but not deleted.
@@ -196,6 +164,11 @@ public:
 		const std::string& geomSource=""
 	);
 
+	/// Set preamble to be inserted before sources specified by compile
+
+	/// This is useful for inserting code that is used across all shader stages,
+	/// e.g. version, common uniforms, etc.
+	ShaderProgram& preamble(const std::string& s){ mPreamble=s; return *this; }
 
 	const ShaderProgram& use();
 
@@ -232,15 +205,17 @@ public:
 	/// This must be called before attaching the geometry shader.
 	/// For GLSL, the geometry shader must include the line:
 	///		#extension GL_EXT_geometry_shader4 : enable
-	ShaderProgram& setGeometry(Graphics::Primitive inPrim, Graphics::Primitive outPrim, unsigned outVert){
+	ShaderProgram& setGeometry(int inPrim, int outPrim, unsigned outVert){
 		mInPrim=inPrim; mOutPrim=outPrim; mOutVertices=outVert; return *this;
 	}
 
 	// These parameters must be set before attaching geometry shaders
-	ShaderProgram& setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; return *this; }
-	ShaderProgram& setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; return *this; }
+	ShaderProgram& setGeometryInputPrimitive(int prim){ mInPrim = prim; return *this; }
+	ShaderProgram& setGeometryOutputPrimitive(int prim){ mOutPrim = prim; return *this; }
 	ShaderProgram& setGeometryOutputVertices(unsigned i){ mOutVertices = i; return *this; }
 
+	std::vector<std::string>& transformFeedbackVaryings(){ return mTFVaryings; }
+	const std::vector<std::string>& transformFeedbackVaryings() const { return mTFVaryings; }
 
 	/// Print out all the input parameters to the shader
 	void listParams() const;
@@ -251,9 +226,6 @@ public:
 	/// Get location of attribute
 	int attribute(const char * name) const;
 
-	const ShaderProgram& uniform(const char * name, Color v) const {
-	  return uniform(name, v[0], v[1], v[2], v[3]);
-	}
 
 	const ShaderProgram& uniform(int loc, int v) const;
 	const ShaderProgram& uniform(int loc, float v) const;
@@ -261,6 +233,7 @@ public:
 	const ShaderProgram& uniform(int loc, float v0, float v1) const;
 	const ShaderProgram& uniform(int loc, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(int loc, float v0, float v1, float v2, float v3) const;
+
 	template <typename T>
 	const ShaderProgram& uniform(int loc, const Vec<2,T>& v) const {
 		return uniform(loc, v.x, v.y);
@@ -273,14 +246,29 @@ public:
 	const ShaderProgram& uniform(int loc, const Vec<4,T>& v) const {
 		return uniform(loc, v.x, v.y, v.z, v.w);
 	}
+
 	const ShaderProgram& uniformMatrix3(int loc, const float * v, bool transpose=false) const;
 	const ShaderProgram& uniformMatrix4(int loc, const float * v, bool transpose=false) const;
-	const ShaderProgram& uniform(int loc, const Mat<4,float>& m) const{
+	const ShaderProgram& uniform(int loc, const Mat3f& m) const{
+		return uniformMatrix3(loc, m.elems());
+	}
+	template<typename T>
+	const ShaderProgram& uniform(int loc, const Mat<3,T>& m) const{
+		return uniform(loc, Mat3f(m));
+	}
+	const ShaderProgram& uniform(int loc, const Mat4f& m) const{
 		return uniformMatrix4(loc, m.elems());
 	}
 	template<typename T>
 	const ShaderProgram& uniform(int loc, const Mat<4,T>& m) const{
 		return uniform(loc, Mat4f(m));
+	}
+
+	const ShaderProgram& uniform(int loc, const Color& c) const {
+		return uniform(loc, c.r, c.g, c.b, c.a);
+	}
+	const ShaderProgram& uniform(int loc, const RGB& c) const {
+		return uniform(loc, c.r, c.g, c.b);
 	}
 
 	const ShaderProgram& uniform(const char * name, int v) const;
@@ -294,32 +282,41 @@ public:
 	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) const {
 		return uniform(name, v.x, v.y);
 	}
-
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<3,T>& v) const {
 		return uniform(name, v.x, v.y, v.z);
 	}
-
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<4,T>& v) const {
 		return uniform(name, v.x, v.y, v.z, v.w);
 	}
 
-	const ShaderProgram& uniform(const char * name, const Mat<4,float>& m) const{
+	const ShaderProgram& uniform(const char * name, const Mat3f& m) const{
+		return uniformMatrix3(name, m.elems());
+	}
+	template<typename T>
+	const ShaderProgram& uniform(const char * name, const Mat<3,T>& m) const{
+		return uniform(name, Mat3f(m));
+	}
+	const ShaderProgram& uniform(const char * name, const Mat4f& m) const{
 		return uniformMatrix4(name, m.elems());
 	}
-
 	template<typename T>
 	const ShaderProgram& uniform(const char * name, const Mat<4,T>& m) const{
 		return uniform(name, Mat4f(m));
 	}
-
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Quat<T>& q) const {
 		// note wxyz => xyzw for GLSL vec4:
 		return uniform(name, q.x, q.y, q.z, q.w);
 	}
 
+	const ShaderProgram& uniform(const char * name, const Color& c) const {
+		return uniform(name, c.r, c.g, c.b, c.a);
+	}
+	const ShaderProgram& uniform(const char * name, const RGB& c) const {
+		return uniform(name, c.r, c.g, c.b);
+	}
 
 	const ShaderProgram& uniform1(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform2(const char * name, const float * v, int count=1) const;
@@ -372,10 +369,12 @@ public:
 	static void use(unsigned programID);
 
 protected:
-	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
+	int mInPrim, mOutPrim;	// IO primitives for geometry shaders
 	unsigned int mOutVertices;
 	std::string mVertSource, mFragSource, mGeomSource;
 	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
+	std::vector<std::string> mTFVaryings;
+	std::string mPreamble;
 	bool mActive;
 
 	virtual void get(int pname, void * params) const;
@@ -386,5 +385,7 @@ protected:
 };
 
 } // ::al
+
+#endif //AL_GRAPHICS_SUPPORTS_SHADER
 
 #endif

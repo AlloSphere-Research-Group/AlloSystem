@@ -55,7 +55,7 @@ class NavInputControl : public InputEventHandler {
 public:
 	NavInputControl(const NavInputControl& v);
 
-	NavInputControl(Nav& nav, double vscale = 0.125, double tscale = 2.);
+	NavInputControl(Nav& nav, float vscale = 0.125, float tscale = 2., float mouseSens=0.3);
 
 	virtual ~NavInputControl(){}
 
@@ -67,17 +67,22 @@ public:
 	const Nav& nav() const { return *mNav; }
 	NavInputControl& nav(Nav& v){ mNav=&v; return *this; }
 
-	double vscale() const { return mVScale; }
-	NavInputControl& vscale(double v) { mVScale=v; return *this; }
+	/// Mouse rotation sensitivity in degrees/pixel
+	NavInputControl& mouseSens(float v) { mMouseSens=v; return *this; }
+	float mouseSens() const { return mMouseSens; }
 
-	double tscale() const { return mTScale; }
-	NavInputControl& tscale(double v) { mTScale=v; return *this; }
-
+	/// Whether to use mouse control
 	void useMouse(bool use){ mUseMouse = use; }
+
+	NavInputControl& vscale(float v) { mVScale=v; return *this; }
+	float vscale() const { return mVScale; }
+
+	NavInputControl& tscale(float v) { mTScale=v; return *this; }
+	float tscale() const { return mTScale; }
 
 protected:
 	Nav * mNav;
-	double mVScale, mTScale;
+	float mVScale, mTScale, mMouseSens;
 	bool mUseMouse;
 };
 

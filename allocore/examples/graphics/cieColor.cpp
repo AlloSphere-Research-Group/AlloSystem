@@ -77,7 +77,7 @@ public:
 
   MyApp():
   numRows(4), numCols(4), updateScene(true) {
-    verts.primitive(Graphics::QUADS);
+    verts.primitive(Graphics::TRIANGLES);
     initWindow();
     printInstructions();
   }
@@ -181,14 +181,18 @@ public:
 	  }
 
 	  //draw rectangles
+	  int k = verts.vertices().size();
+	  verts.index(k,k+1,k+2, k+2,k+1,k+3);
+
 	  verts.vertex(i*width - widthOffset,          j*height - heightOffset);          //bottom left
 	  verts.color(swatch);
 	  verts.vertex(i*width + width - widthOffset,  j*height- heightOffset);           //bottom right
 	  verts.color(swatch);
-	  verts.vertex(i*width + width - widthOffset,  j*height + height - heightOffset); //top right
-	  verts.color(swatch);
 	  verts.vertex(i*width - widthOffset,          j*height + height - heightOffset); //top left
 	  verts.color(swatch);
+	  verts.vertex(i*width + width - widthOffset,  j*height + height - heightOffset); //top right
+	  verts.color(swatch);
+
 	  //print RGB values [0, 255] for each swatch
 	  cout << "{" << (int)(swatch.r * 255) << ", " << (int)(swatch.g * 255) << ", " << (int)(swatch.b * 255) << "}" << endl;
 	}

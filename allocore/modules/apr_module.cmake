@@ -2,22 +2,17 @@
 find_package(APR QUIET)
 
 set(APR_HEADERS
-    allocore/io/al_File.hpp
     allocore/io/al_Socket.hpp
     allocore/system/al_Memory.hpp
-    allocore/system/al_Time.h
-    allocore/system/al_Time.hpp
 )
 
 if(APR_LIBRARY AND APR_INCLUDE_DIR)
 message(STATUS "Building APR module.")
 
 list(APPEND ALLOCORE_SRC
-    src/io/al_File.cpp
-    src/io/al_FileAPR.cpp
     src/io/al_SocketAPR.cpp
     src/system/al_Memory.cpp
-    src/system/al_Time.cpp)
+)
 
 list(APPEND ALLOCORE_HEADERS ${APR_HEADERS})
 

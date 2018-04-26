@@ -67,12 +67,12 @@ public:
 
 	/// Anaglyph mode
 	enum AnaglyphMode {
-		RED_BLUE = 0,	/**< */
-		RED_GREEN,		/**< */
-		RED_CYAN,		/**< */
-		BLUE_RED,		/**< */
-		GREEN_RED,		/**< */
-		CYAN_RED		/**< */
+		RED_CYAN,		/**< Left eye red, right eye cyan (the norm) */
+		RED_BLUE,		/**< Left eye red, right eye blue */
+		RED_GREEN,		/**< Left eye red, right eye green */
+		CYAN_RED,		/**< Left eye cyan, right eye red */
+		BLUE_RED,		/**< Left eye blue, right eye red */
+		GREEN_RED		/**< Left eye green, right eye red */
 	};
 
 
@@ -81,32 +81,32 @@ public:
 
 	/// Draw the scene according to the stored stereographic mode
 
-	/// @param[in] gl		graphics interface
+	/// @param[in] g		graphics interface
 	/// @param[in] lens		local viewing frustum
 	/// @param[in] pose		viewer position and orientation
 	/// @param[in] vp		region of screen to render to
 	/// @param[in] draw		function object with drawing commands
 	/// @param[in] clear	whether to clear the color/depth buffers
 	/// @param[in] pixelaspect	additional aspect multipler (for non-square pixels)
-	void draw			(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void draw			(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw mono
-	void drawMono		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawMono		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw active stereo
-	void drawActive		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawActive		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw anaglyph stereo
-	void drawAnaglyph	(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawAnaglyph	(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw dual (side-by-side, left-right) stereo
-	void drawDual		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawDual		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw left eye only
-	void drawLeft		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawLeft		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw right eye only
-	void drawRight		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawRight		(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw blue line for active stereo sync (for those projectors that need it)
 
@@ -166,14 +166,11 @@ public:
 	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.modelViewProjection(), Vec4d objectspace);
 	// to convert in the opposite direction, use Matrix4::inverse().
 
-	/// Get current modelview matrix
-	const Matrix4d& modelView() const { return mModelView; }
-
 	/// Get current projection matrix
 	const Matrix4d& projection() const { return mProjection; }
 
-	/// Get product of current projection and modelview matrices
-	Matrix4d modelViewProjection() const { return mProjection * mModelView; }
+	/// Get current view matrix
+	const Matrix4d& view() const { return mView; }
 
 	/// Get current eye position
 	const Vec3d& eye() const { return mEye; }
@@ -182,10 +179,14 @@ public:
 	const Viewport& viewport() const { return mVP; }
 
 	/// Convert a normalized screen space position to world space
-	 // each component of input vector should be normalized from -1. to 1.
-	// template<class T>
-	Vec3d unproject(Vec3d screenPos);
 
+	/// This converts a coordinate from normalized device coordinate (NDC) space
+	/// to world space. The range of each coordinate in NDC space is [-1,1].
+	Vec3d unproject(const Vec3d& ndc);
+
+	/// Convert screen pixel coordinate to world position
+	template <class T>
+	Vec<3,T> pixelToWorld(const Vec<2,T>& p);
 
 	/// Transform a vector from world space to clip space
 	template <class T>
@@ -214,20 +215,36 @@ protected:
 	Color mClearColor;
 	unsigned mSlices;	// number of omni slices
 	double mOmniFov;	// field of view of omnigraphics
-	Matrix4d mProjection, mModelView;
+	Matrix4d mProjection, mView;
 	Vec3d mEye;
 	unsigned mEyeNumber;
 	Viewport mVP;
 	bool mStereo;
 	bool mOmni;
 
-	void pushDrawPop(Graphics& gl, Drawable& draw);
-	void sendViewport(Graphics& gl, const Viewport& vp);
-	void sendClear(Graphics& gl);
+	void pushDrawPop(Graphics& g, Drawable& draw);
+	void sendViewport(Graphics& g, const Viewport& vp);
+	void sendClear(Graphics& g);
 
-	void drawEye(StereoMode eye, Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
+	void drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
+
+public:
+	// \deprecated Use view()
+	const Matrix4d& modelView() const { return mView; }
+
+	// Get product of current projection and modelview matrices
+	Matrix4d modelViewProjection() const { return mProjection * mView; }
 };
 
+
+template <class T>
+Vec<3,T> Stereographic::pixelToWorld(const Vec<2,T>& p){
+	Vec<3,T> ndc;
+	ndc.x = (p.x / mVP.w) * 2. - 1.;
+	ndc.y = (p.y / mVP.h) *-2. + 1.;
+	ndc.z = toNDCSpace().z;
+	return unproject(ndc);
+}
 
 template <class T>
 inline Vec<4,T> Stereographic::toClipSpace(const Vec<4,T>& v) const {

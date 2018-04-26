@@ -176,15 +176,15 @@ public:
 		gl.pushMatrix();
 		gl.translate(x0, y0, 0);
 		gl.scale(w, h, 1);
-		gl.begin(gl.QUADS);
+		gl.begin(gl.TRIANGLE_STRIP);
 			gl.texCoord	( 0, 0);
 			gl.vertex	( 0, 0, 0);
+			gl.texCoord	( 1, 0);
+			gl.vertex	( 1, 0, 0);
 			gl.texCoord	( 0, 1);
 			gl.vertex	( 0, 1, 0);
 			gl.texCoord	( 1, 1);
 			gl.vertex	( 1, 1, 0);
-			gl.texCoord	( 1, 0);
-			gl.vertex	( 1, 0, 0);
 		gl.end();
 		gl.popMatrix();
 		unbind();
@@ -507,16 +507,20 @@ public:
 		mTarget(GL_TEXTURE_CUBE_MAP)
 	{
 		// create mesh for drawing map:
-		mMapMesh.primitive(Graphics::QUADS);
+		mMapMesh.primitive(Graphics::TRIANGLES);
 		mMapMesh.color(1,1,1,1);
 		int mapSteps =100;
 		double step = 1./mapSteps;
 		for (double x=0; x<=1.; x+=step) {
 			for (double y=0; y<=1.; y+=step) {
 				drawMapVertex(x,		y);
-				drawMapVertex(x,		y+step);
-				drawMapVertex(x+step,	y+step);
 				drawMapVertex(x+step,	y);
+				drawMapVertex(x,		y+step);
+
+				drawMapVertex(x,		y+step);
+				drawMapVertex(x+step,	y);
+				drawMapVertex(x+step,	y+step);
+
 			}
 		}
 	}
