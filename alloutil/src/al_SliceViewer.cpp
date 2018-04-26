@@ -126,8 +126,14 @@ bool SliceViewer::parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, std:
   return false;
 }
 
-//does this needs to be in voxels?  currently it isn't
 Array SliceViewer::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &finalPointList){
+  Array result = slice(planeCenter, planeNormal, finalPointList, false);
+  return result;
+}
+
+
+//does this needs to be in voxels?  currently it isn't
+Array SliceViewer::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &finalPointList, bool blank){
  //assume point and vector are given in cell*width, cell*height, cell*depth coordinate system
  //point and vector define a plane
  // nice page on cube plane intersection
@@ -229,16 +235,18 @@ Array SliceViewer::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f
       }
       // std::cout << "finalPointList Length:" << finalPointList.size() << "\n";
       //now lets fill the results
-      for (unsigned i = 0; i < list.size(); i++){
-        std::vector<Vec3f> space = linspace(list[i], list2[i], oDirection);  //XXX should this be oDirection or aDirection, please check!
-        for (unsigned j = 0; j < space.size(); j++){
-          Vec3f point = space[j];
-          float temp[1] = {0};
-          if (point.x >= 0 && point.y >= 0 && point.z >= 0 && point.x <=  m_array->width()* m_voxWidth[2] && point.y <=  m_array->height()* m_voxWidth[1] && point.z <=  m_array->depth()* m_voxWidth[2]){
-            Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
-            m_array->read_interp(temp, p);
+      if (!blank){
+        for (unsigned i = 0; i < list.size(); i++){
+          std::vector<Vec3f> space = linspace(list[i], list2[i], oDirection);  //XXX should this be oDirection or aDirection, please check!
+          for (unsigned j = 0; j < space.size(); j++){
+            Vec3f point = space[j];
+            float temp[1] = {0};
+            if (point.x >= 0 && point.y >= 0 && point.z >= 0 && point.x <=  m_array->width()* m_voxWidth[2] && point.y <=  m_array->height()* m_voxWidth[1] && point.z <=  m_array->depth()* m_voxWidth[2]){
+              Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
+              m_array->read_interp(temp, p);
+            }
+            result.write(temp,i,j);
           }
-          result.write(temp,i,j);
         }
       }
     }
