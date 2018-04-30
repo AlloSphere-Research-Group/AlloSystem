@@ -82,6 +82,7 @@ public:
   );
   
   Array slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &finalPointList);
+  Array slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &finalPointList, bool blank);
 
   ~SliceViewer() {
   }
