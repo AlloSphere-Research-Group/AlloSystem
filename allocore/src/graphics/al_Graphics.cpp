@@ -492,7 +492,7 @@ public:
 					if(mMaterialOneSided.handleUpdate()){
 						mShader.uniform(mMaterialOneSided.loc(), mMaterialOneSided.get());
 					}
-					mShader.uniform(m.loc().diffuse, m.get().diffuse().rgb());
+					mShader.uniform(m.loc().diffuse, m.get().diffuse().rgb() + m.get().ambient().rgb());
 					mShader.uniform(m.loc().emission, m.get().emission().rgb());
 					mShader.uniform(m.loc().specular, m.get().specular().rgb());
 					mShader.uniform(m.loc().shininess, m.get().shininess());
