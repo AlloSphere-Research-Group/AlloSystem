@@ -303,6 +303,40 @@ int addTorus(
 );
 
 
+/// Fill array with ellipse (using fast recursion method)
+template <class Vec2>
+void ellipse(Vec2 * dst, int len, float radx=1, float rady=1);
+
+/// Fill array with circle (using fast recursion method)
+template <class Vec2>
+void circle(Vec2 * dst, int len, float rad=1){ ellipse(dst,len, rad,rad); }
+
+
+// Implementation only below
+
+template <class Vec2>
+void ellipse(Vec2 * dst, int len, float radx, float rady){
+	struct RSin{
+		float mul,val,val2;
+		RSin(float f=1, float a=1, float p=0){
+			f *= M_2PI, p *= M_2PI;
+			mul  = 2. * cos(f);
+			val2 = sin(p - f * 2.)*a;
+			val  = sin(p - f     )*a;
+		}
+		float operator()(){
+			auto v0 = mul * val - val2;
+			val2 = val;
+			return val = v0;
+		}
+	};
+	RSin x(1./len, radx, 0.25), y(1./len, rady);
+	for(int i=0; i<len; ++i){
+		dst[i][0] = x();
+		dst[i][1] = y();
+	}
+}
+
 } // al::
 
 #endif
