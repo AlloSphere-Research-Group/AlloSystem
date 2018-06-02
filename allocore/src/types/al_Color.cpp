@@ -22,12 +22,12 @@ RGB& RGB::operator= (const HSV& hsv){
 	auto p = v - vs;
 
 	switch(i){
-		case 0: {auto w=p+vs*f; return set(v,w,p);}
+		default:{auto w=p+vs*f; return set(v,w,p);} // also catches hue=1
 		case 1:	{auto w=v-vs*f; return set(w,v,p);}
 		case 2:	{auto w=p+vs*f; return set(p,v,w);}
 		case 3:	{auto w=v-vs*f; return set(p,w,v);}
 		case 4: {auto w=p+vs*f; return set(w,p,v);}
-		default:{auto w=v-vs*f; return set(v,p,w);}
+		case 5: {auto w=v-vs*f; return set(v,p,w);}
 	}
 }
 
