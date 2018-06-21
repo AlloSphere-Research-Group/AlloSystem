@@ -90,9 +90,9 @@ void Light::submitCol(int glID) const {
 
 	// atten = 1 / (kc + kl d + kq d^2)
 	float invStrength = 1./mStrength;
-    glLightf (glID, GL_CONSTANT_ATTENUATION,	mAtten[0]*invStrength);
-    glLightf (glID, GL_LINEAR_ATTENUATION,		mAtten[1]*invStrength);
-    glLightf (glID, GL_QUADRATIC_ATTENUATION,	mAtten[2]*invStrength);
+    glLightf(glID, GL_CONSTANT_ATTENUATION,	mAtten[0]*invStrength);
+    glLightf(glID, GL_LINEAR_ATTENUATION,	mAtten[1]*invStrength);
+    glLightf(glID, GL_QUADRATIC_ATTENUATION,mAtten[2]*invStrength);
 
 	glEnable(glID); // MUST enable each light source after configuration
 	//glShadeModel(GL_SMOOTH); // enabled by default and don't want to force...
@@ -100,16 +100,18 @@ void Light::submitCol(int glID) const {
 
 // This must be called every frame if the light is to track a varying modelview
 void Light::submitPos(int glID) const {
-	float pos[4];
-	if(mIsDir){ for(int i=0;i<3;++i) pos[i]=mDir[i]; pos[3]=0.; }
-	else      { for(int i=0;i<3;++i) pos[i]=mPos[i]; pos[3]=1.; }
-
-	if(mSpread == 180.){
-		glLightfv(glID, GL_POSITION,	pos);
-	} else {
+	if(mSpread < 180.){
+		float pos[4];
+		for(int i=0;i<3;++i){ pos[i]=mPos[i]; } pos[3]=1.;
+		glLightfv(glID, GL_POSITION, pos);
 		glLightfv(glID, GL_SPOT_DIRECTION, &mDir[0]);
 		glLightf (glID, GL_SPOT_CUTOFF, mSpread);
 		//glLightf (glID, GL_SPOT_EXPONENT, expo);
+	} else {
+		float pos[4];
+		if(mIsDir){ for(int i=0;i<3;++i) pos[i]=mDir[i]; pos[3]=0.; }
+		else      { for(int i=0;i<3;++i) pos[i]=mPos[i]; pos[3]=1.; }
+		glLightfv(glID, GL_POSITION, pos);
 	}
 }
 
