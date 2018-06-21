@@ -44,14 +44,8 @@ namespace al{
 			break;\
 		default:;\
 		}\
-	}\
-	auto& mLights = mGraphics.mLights;\
-	auto& mMaterials = mGraphics.mMaterials;\
-	auto& mFog = mGraphics.mFog;\
-	auto& mUpdateView = mGraphics.mUpdateView;
+	}
 
-#define DRAW_END\
-	mUpdateView = false;
 
 #ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 class Graphics::BackendProg : public Graphics::Backend{
@@ -117,12 +111,15 @@ public:
 	void pointSize(float v){ mPointSize = v; }
 	//void pointAtten(float c2, float c1, float c0){}
 
-	void draw(const Mesh& m, int count, int begin){
-		DRAW_BEGIN
+	bool prepareDraw(){
+		auto& mLights = mGraphics.mLights;
+		auto& mMaterials = mGraphics.mMaterials;
+		auto& mFog = mGraphics.mFog;
 		auto& mDoLighting = mGraphics.mDoLighting;
 		auto& mMaterialOneSided = mGraphics.mMaterialOneSided;
 		auto& mDoFog = mGraphics.mDoFog;
 		auto& mView = mGraphics.mView;
+		auto& mUpdateView = mGraphics.mUpdateView;
 
 		if(mCompileShader){
 			mCompileShader = false; // will only make one attempt
@@ -383,45 +380,12 @@ public:
 
 		//printf("%d %d %d %d\n", mLocPos, mLocColor, mLocNormal, mLocTexCoord2);
 		// Return if shader didn't compile
-		if(mLocPos < 0) return;
-
-		// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
-		glEnableVertexAttribArray(mLocPos);
-		glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
-
-		if(Nn >= Nv){
-			glEnableVertexAttribArray(mLocNormal);
-			glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
-		}
-
-		Color singleColor(0,0,0,8192); // if unchanged, triggers read from array
-
-		if(Nc >= Nv){
-			glEnableVertexAttribArray(mLocColor);
-			glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, &m.colors()[0]);
-		}
-		else if(Nci >= Nv){
-			glEnableVertexAttribArray(mLocColor);
-			glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &m.coloris()[0]);
-		}
-		else if(0 == Nc && 0 == Nci){
-			singleColor = mCurrentColor;
-		}
-		else{
-			singleColor = Nc ? m.colors()[0] : Color(m.coloris()[0]);
-		}
-
-		if(Nt2 >= Nv){
-			glEnableVertexAttribArray(mLocTexCoord2);
-			glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, &m.texCoord2s()[0]);
-		}
+		if(mLocPos < 0) return false;
 
 		mShader.begin();
 			if(mMatrixStacks[MODELVIEW].handleUpdate()){
-				if(Nn){
-					// Needed to correctly convert normals into eye space
-					mShader.uniform("normalMatrix", normalMatrix(modelView()));
-				}
+				// Needed to correctly convert normals into eye space
+				mShader.uniform("normalMatrix", normalMatrix(modelView()));
 				mShader.uniform(mMatrixStacks[MODELVIEW].loc(), modelView());
 			}
 
@@ -429,8 +393,6 @@ public:
 				mShader.uniform(mMatrixStacks[PROJECTION].loc(), projection());
 			}
 
-			mShader.uniform("singleColor", singleColor);
-			mShader.uniform("doTex2", Nt2 >= Nv);
 			if(mPointSize.handleUpdate()){
 				mShader.uniform(mPointSize.loc(), mPointSize.get());
 			}
@@ -453,7 +415,6 @@ public:
 			}
 
 			if(mDoLighting == true){
-				mShader.uniform("hasNormals", bool(Nn));
 				mShader.uniform("lightTwoSided", Light::twoSided());
 
 				auto xfm = [](const Mat4f& m, const Vec3f& v){
@@ -511,6 +472,53 @@ public:
 				}
 			}
 
+		mShader.end();
+
+		mUpdateView = false;
+
+		return true;
+	}
+
+	void draw(const Mesh& m, int count, int begin){
+		if(!prepareDraw()) return;
+		DRAW_BEGIN
+
+		// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
+		glEnableVertexAttribArray(mLocPos);
+		glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
+
+		if(Nn >= Nv){
+			glEnableVertexAttribArray(mLocNormal);
+			glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
+		}
+
+		Color singleColor(0,0,0,8192); // if unchanged, triggers read from array
+
+		if(Nc >= Nv){
+			glEnableVertexAttribArray(mLocColor);
+			glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, &m.colors()[0]);
+		}
+		else if(Nci >= Nv){
+			glEnableVertexAttribArray(mLocColor);
+			glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &m.coloris()[0]);
+		}
+		else if(0 == Nc && 0 == Nci){
+			singleColor = mCurrentColor;
+		}
+		else{
+			singleColor = Nc ? m.colors()[0] : Color(m.coloris()[0]);
+		}
+
+		if(Nt2 >= Nv){
+			glEnableVertexAttribArray(mLocTexCoord2);
+			glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, &m.texCoord2s()[0]);
+		}
+
+		mShader.begin();
+			mShader.uniform("singleColor", singleColor);
+			mShader.uniform("hasNormals", bool(Nn));
+			mShader.uniform("doTex2", Nt2 >= Nv);
+
 			if(Ni){
 				// Here, 'count' is the number of indices to render
 				glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
@@ -524,8 +532,6 @@ public:
 		if(Nc || Nci) glDisableVertexAttribArray(mLocColor);
 		if(Nn) glDisableVertexAttribArray(mLocNormal);
 		if(Nt1 || Nt2 || Nt3) glDisableVertexAttribArray(mLocTexCoord2);
-
-		DRAW_END
 	}
 
 protected:
@@ -625,8 +631,10 @@ public:
 		glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
 	}
 
-	void draw(const Mesh& m, int count, int begin){
-		DRAW_BEGIN
+	bool prepareDraw(){
+		auto& mLights = mGraphics.mLights;
+		auto& mMaterials = mGraphics.mMaterials;
+		auto& mFog = mGraphics.mFog;
 
 		// Note: Nothing submitted to GPU if light strength zero
 		for(int i=0; i<AL_MAX_LIGHTS; ++i){
@@ -660,6 +668,13 @@ public:
 			float fogColor[4] = {col.r, col.g, col.b, 1.f};
 			glFogfv(GL_FOG_COLOR, fogColor);
 		}
+
+		return true;
+	}
+
+	void draw(const Mesh& m, int count, int begin){
+		if(!prepareDraw()) return;
+		DRAW_BEGIN
 
 		// Enable arrays and set pointers...
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -726,8 +741,6 @@ public:
 		if(Nn)					glDisableClientState(GL_NORMAL_ARRAY);
 		if(Nc || Nci)			glDisableClientState(GL_COLOR_ARRAY);
 		if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		DRAW_END
 	}
 
 private:

@@ -560,6 +560,13 @@ public:
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
 
+	/// Prepare global drawing state (matrices, fog, lighting, etc.)
+
+	/// This only needs to be called before any drawing code not using the
+	/// draw function defined in this class.
+	/// Returns whether preparation was successful and drawing can proceed.
+	bool prepareDraw();
+
 
 	// Utility functions: converting, reporting, etc.
 
@@ -647,6 +654,7 @@ protected:
 		virtual void pointAtten(float c2, float c1, float c0){}
 
 		virtual void draw(const Mesh& m, int count=-1, int begin=0){}
+		virtual bool prepareDraw(){ return true; }
 
 	protected:
 		Graphics& mGraphics;
@@ -742,6 +750,7 @@ inline void Graphics::scale(float x, float y, float z){ mBackend->scale(x,y,z); 
 inline void Graphics::pointSize(float v){ mBackend->pointSize(v); }
 inline void Graphics::pointAtten(float c2, float c1, float c0){ mBackend->pointAtten(c2,c1,c0); }
 inline void Graphics::draw(const Mesh& m, int count, int begin){ mBackend->draw(m, count, begin); }
+inline bool Graphics::prepareDraw(){ return mBackend->prepareDraw(); }
 
 #ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
 inline void Graphics::drawBuffer(Direction d){ glDrawBuffer(d); }
