@@ -637,11 +637,20 @@ public:
 		auto& mFog = mGraphics.mFog;
 
 		// Note: Nothing submitted to GPU if light strength zero
+		bool loadedViewMatrix = false;
 		for(int i=0; i<AL_MAX_LIGHTS; ++i){
 			const auto& l = mLights[i].get();
 			auto glID = l.id();
 			bool lightActive = l.strength() != 0.f;
 			if(lightActive){
+				// With fixed pipeline, setting light position multiplies
+				// the position by the current modelview. Typically, you just
+				// want to multiply by the view part, so we load it here.
+				if(!loadedViewMatrix){
+					loadedViewMatrix = true;
+					mGraphics.pushMatrix(Graphics::MODELVIEW);
+					mGraphics.loadMatrix(mGraphics.mView);
+				}
 				l.submitPos(glID);	// Must do this for light to track modelview
 			}
 			if(mLights[i].handleUpdate()){
@@ -652,6 +661,7 @@ public:
 				}
 			}
 		}
+		if(loadedViewMatrix) mGraphics.popMatrix();
 
 		for(const auto& m : mMaterials){
 			if(m.handleUpdate()){
