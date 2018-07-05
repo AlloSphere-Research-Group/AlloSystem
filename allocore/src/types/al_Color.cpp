@@ -1,9 +1,18 @@
 #include "allocore/types/al_Color.hpp"
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Mat.hpp"
+#include <algorithm> // min,max
 #include <cmath>
 
 namespace al{
+
+RGB& RGB::complement(){
+	auto mn = std::min({r, g, b});
+	auto mx = std::max({r, g, b});
+	auto df = mx-mn;
+	*this = (df+2.*mn)-*this; // (df-(*this-mn))+mn
+	return *this;
+}
 
 RGB& RGB::operator= (const HSV& hsv){
 

@@ -646,6 +646,12 @@ struct RGB{
 	/// Invert RGB components
 	RGB& invert(){ return set(1.f-r, 1.f-g, 1.f-b); }
 
+	/// Returns complementary color
+	RGB complementary() const { return RGB(*this).complement(); }
+
+	/// Rotate hue halfway around color wheel
+	RGB& complement();
+
 	/// Returns luminance value (following ITU-R BT.601)
 	float luminance() const { return r*0.299f + g*0.587f + b*0.114f; }
 
