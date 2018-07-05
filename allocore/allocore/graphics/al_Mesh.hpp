@@ -238,113 +238,120 @@ public:
 	Mesh& repeatLast();
 
 	/// Append index to index buffer
-	void index(unsigned int i){ indices().append(i); }
+	Mesh& index(unsigned int i){ indices().append(i); return *this; }
 
 	/// Append indices to index buffer
 	template <class Tindex>
-	void index(const Tindex * buf, int size, Tindex indexOffset=0){
-		for(int i=0; i<size; ++i) index((Index)(buf[i] + indexOffset)); }
+	Mesh& index(const Tindex * buf, int size, Tindex indexOffset=0){
+		for(int i=0; i<size; ++i) index((Index)(buf[i] + indexOffset));
+		return *this;
+	}
 
 	template <class...Indices>
-	void index(unsigned i, Indices... indices){
+	Mesh& index(unsigned i, Indices... indices){
 		index(i);
-		index(indices...);
+		return index(indices...);
 	}
 
 
 	/// Append color to color buffer
-	void color(const Color& v) { colors().append(v); }
+	Mesh& color(const Color& v) { colors().append(v); return *this; }
 
 	/// Append color to color buffer
-	void color(const Colori& v) { coloris().append(v); }
+	Mesh& color(const Colori& v) { coloris().append(v); return *this; }
 
 	/// Append color to color buffer
-	void color(const HSV& v) { colors().append(v); }
+	Mesh& color(const HSV& v) { colors().append(v); return *this; }
 
 	/// Append color to color buffer
-	void color(const RGB& v) { colors().append(v); }
+	Mesh& color(const RGB& v) { colors().append(v); return *this; }
 
 	/// Append color to color buffer
-	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
+	Mesh& color(float r, float g, float b, float a=1){ return color(Color(r,g,b,a)); }
 
 	/// Append color to color buffer
 	template <class T>
-	void color(const Vec<4,T>& v) { color(v[0], v[1], v[2], v[3]); }
+	Mesh& color(const Vec<4,T>& v) { return color(v[0], v[1], v[2], v[3]); }
 
 	/// Append colors from flat array
 	template <class T>
-	void color(const T * src, int numColors){
+	Mesh& color(const T * src, int numColors){
 		for(int i=0; i<numColors; ++i) color(src[4*i+0], src[4*i+1], src[4*i+2], src[4*i+3]);
+		return *this;
 	}
 
 
 	/// Append floating-point color to integer color buffer
-	void colori(const Color& v) { coloris().append(Colori(v)); }
+	Mesh& colori(const Color& v) { coloris().append(Colori(v)); return *this; }
 
 	/// Append integer colors from flat array
 	template <class T>
-	void colori(const T * src, int numColors){
+	Mesh& colori(const T * src, int numColors){
 		for(int i=0; i<numColors; ++i){
 			coloris().append(Colori(src[4*i+0], src[4*i+1], src[4*i+2], src[4*i+3]));
 		}
+		return *this;
 	}
 
 
 	/// Append normal to normal buffer
-	void normal(float x, float y, float z=0){ normal(Normal(x,y,z)); }
+	Mesh& normal(float x, float y, float z=0){ return normal(Normal(x,y,z)); }
 
 	/// Append normal to normal buffer
-	void normal(const Normal& v) { normals().append(v); }
+	Mesh& normal(const Normal& v) { normals().append(v); return *this; }
 
 	/// Append normal to normal buffer
 	template <class T>
-	void normal(const Vec<2,T>& v, float z=0){ normal(v[0], v[1], z); }
+	Mesh& normal(const Vec<2,T>& v, float z=0){ return normal(v[0], v[1], z); }
 
 	/// Append normals from flat array
 	template <class T>
-	void normal(const T * src, int numNormals){
+	Mesh& normal(const T * src, int numNormals){
 		for(int i=0; i<numNormals; ++i) normal(src[3*i+0], src[3*i+1], src[3*i+2]);
+		return *this;
 	}
 
 
 	/// Append texture coordinate to 1D texture coordinate buffer
-	void texCoord(float u){ texCoord1s().append(TexCoord1(u)); }
+	Mesh& texCoord(float u){ texCoord1s().append(TexCoord1(u)); return *this; }
 
 	/// Append texture coordinate to 2D texture coordinate buffer
-	void texCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); }
+	Mesh& texCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); return *this; }
 
 	/// Append texture coordinate to 2D texture coordinate buffer
 	template <class T>
-	void texCoord(const Vec<2,T>& v){ texCoord(v[0], v[1]); }
+	Mesh& texCoord(const Vec<2,T>& v){ return texCoord(v[0], v[1]); }
 
 	/// Append texture coordinate to 3D texture coordinate buffer
-	void texCoord(float u, float v, float w){ texCoord3s().append(TexCoord3(u,v,w)); }
+	Mesh& texCoord(float u, float v, float w){ texCoord3s().append(TexCoord3(u,v,w)); return *this; }
 
 	/// Append texture coordinate to 3D texture coordinate buffer
 	template <class T>
-	void texCoord(const Vec<3,T>& v){ texCoord(v[0], v[1], v[2]); }
+	Mesh& texCoord(const Vec<3,T>& v){ return texCoord(v[0], v[1], v[2]); }
 
 
 	/// Append vertex to vertex buffer
-	void vertex(float x, float y, float z=0){ vertex(Vertex(x,y,z)); }
+	Mesh& vertex(float x, float y, float z=0){ return vertex(Vertex(x,y,z)); }
 
 	/// Append vertex to vertex buffer
-	void vertex(const Vertex& v){ vertices().append(v); }
+	Mesh& vertex(const Vertex& v){ vertices().append(v); return *this; }
 
 	/// Append vertex to vertex buffer
 	template <class T>
-	void vertex(const Vec<2,T>& v, float z=0){ vertex(v[0], v[1], z); }
+	Mesh& vertex(const Vec<2,T>& v, float z=0){ return vertex(v[0], v[1], z); }
 
 	/// Append vertices from flat array
 	template <class T>
-	void vertex(const T * src, int numVerts){
+	Mesh& vertex(const T * src, int numVerts){
 		for(int i=0; i<numVerts; ++i) vertex(src[3*i+0], src[3*i+1], src[3*i+2]);
+		return *this;
 	}
 
 	/// Append vertices to vertex buffer
 	template <class T>
-	void vertex(const Vec<3,T> * src, int numVerts){
+	Mesh& vertex(const Vec<3,T> * src, int numVerts){
 		for(int i=0; i<numVerts; ++i) vertex(src[i][0], src[i][1], src[i][2]);
+		return *this;
 	}
 
 
