@@ -102,10 +102,10 @@ struct Frenet{
 
 	/// Compute Frenet frame one point back from input point
 
-	/// For best results, avoid runs of 3 or more colinear points and 2 or more
-	/// duplicate points. Colinear points result in ambiguous normal and
-	/// binormal vectors. Duplicated points make the first derivative undefined.
-	/// Both of these situations are guaranteed to wreak numerical havok.
+	/// The input points must be "curved" to generate a valid frame. This means 
+	/// no duplicate points or runs of 3 or more colinear points. Duplicated
+	/// points make the tangent undefined. Colinear points result in ambiguous 
+	/// normal and binormal vectors.
 	template<bool NormalizeT, bool NormalizeN, bool NormalizeB, bool ComputeN, bool ComputeB>
 	void next(const Vec3& p0){
 
