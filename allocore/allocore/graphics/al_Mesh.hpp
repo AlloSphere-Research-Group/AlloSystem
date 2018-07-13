@@ -293,6 +293,13 @@ public:
 		return *this;
 	}
 
+	/// Append copy of last appended color
+	Mesh& repeatColor(){
+		if(colors().size()) colors().repeatLast();
+		else if(coloris().size()) coloris().repeatLast();
+		return *this;
+	}
+
 
 	/// Append normal to normal buffer
 	Mesh& normal(float x, float y, float z=0){ return normal(Normal(x,y,z)); }
