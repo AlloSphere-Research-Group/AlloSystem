@@ -49,21 +49,20 @@ namespace al {
 /// Utilities for interpolation
 namespace ipl{
 
+/// @addtogroup allocore
+/// @{
+
 /// Bezier curve, 3-point quadratic
 
-/// 'frac' [0, 1) is the value on the curve btw x2 and x0
+/// @param[in] frac 	fraction between x2 and x0
 ///
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 Tv bezier(Tf frac, const Tv& x2, const Tv& x1, const Tv& x0);
 
 /// Bezier curve, 4-point cubic
 
-/// 'frac' [0, 1) is the value on the curve btw x3 and x0
+/// @param[in] frac 	fraction between x3 and x0
 ///
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 Tv bezier(Tf frac, const Tv& x3, const Tv& x2, const Tv& x1, const Tv& x0);
 
@@ -74,14 +73,10 @@ Tv bezier(Tf frac, const Tv& x3, const Tv& x2, const Tv& x1, const Tv& x0);
 ///	@param b		Second point
 ///	@param c		Third point
 ///	@param d		Fourth point
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 Tv casteljau(const Tf& frac, const Tv& a, const Tv& b, const Tv& c, const Tv& d);
 
 /// Hermite interpolation
-///
-/// @ingroup allocore
 template <class Tp, class Tv>
 Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension, Tp bias);
 
@@ -91,23 +86,15 @@ Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension,
 ///		'h' are the FIR coefficients and should be of size ('order' + 1). \n
 ///		'delay' is a fractional delay in samples. \n
 ///		As order increases, this converges to sinc interpolation.
-///
-/// @ingroup allocore
 template <class T> void lagrange(T * h, T delay, int order);
 
 /// Optimized lagrange() for first order.
-///
-/// @ingroup allocore
 template <class T> void lagrange1(T * h, T delay);
 
 /// Optimized lagrange() for second order
-///
-/// @ingroup allocore
 template <class T> void lagrange2(T * h, T delay);
 
 /// Optimized lagrange() for third order
-///
-/// @ingroup allocore
 template <class T> void lagrange3(T * h, T delay);
 
 
@@ -122,61 +109,38 @@ template <class T> void lagrange3(T * h, T delay);
 /// @param[ in] x	input domain values; spline in [x[1], x[2]]
 /// @param[ in] f	fraction in [0,1]
 /// @param[ in] b	smoothness parameter in [-1,1]; 1 = Catmull-Rom
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 void cardinalSpline(Tv * w, const Tv * x, const Tf& f, double b);
 
-/// Cubic interpolation
-
-///	This is a Cardinal spline with a tension of 0 (AKA a Catmull-Rom spline).
-///
-/// @ingroup allocore
+/// Cubic interpolation (cardinal spline with tension 0, Catmull-Rom spline)
 template <class Tf, class Tv>
 Tv cubic(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 
-/// Cubic interpolation
-
-///	This is a Cardinal spline with a tension of -1.
-///
-/// @ingroup allocore
+/// Cubic interpolation (cardinal spline with a tension -1)
 template <class Tf, class Tv>
 Tv cubic2(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 
 /// Linear interpolation.  Identical to first order Lagrange.
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y);
 
 /// Linear interpolation between three elements
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
 /// Cyclic linear interpolation between three elements
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
 /// Element-wise linear interpolation between two arrays of values
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 void linear(Tv * dst, const Tv * xs, const Tv * xp1s, int len, const Tf& frac);
 
 /// Nearest neighbor interpolation
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 Tv nearest(Tf frac, const Tv& x, const Tv& y);
 
-
 /// Bilinear interpolation between values on corners of quadrilateral
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 inline Tv bilinear(
 	const Tf& fracX, const Tf& fracY,
@@ -190,8 +154,6 @@ inline Tv bilinear(
 }
 
 /// Bilinear interpolation between values on corners of quadrilateral
-///
-/// @ingroup allocore
 template <class Tf2, class Tv>
 inline Tv bilinear(
 	const Tf2& f,
@@ -202,8 +164,6 @@ inline Tv bilinear(
 }
 
 /// Trilinear interpolation between values on corners of a hexahedron
-///
-/// @ingroup allocore
 template <class Tf, class Tv>
 inline Tv trilinear(
 	const Tf& fracX, const Tf& fracY, const Tf& fracZ,
@@ -222,7 +182,6 @@ inline Tv trilinear(
 
 /// @param[in] f		3 element array of fractions along x, y, and z
 ///
-/// @ingroup allocore
 template <class Tf3, class Tv>
 inline Tv trilinear(
 	const Tf3& f,
@@ -234,7 +193,7 @@ inline Tv trilinear(
 	return trilinear(f[0],f[1],f[2],xyz,Xyz,xYz,XYz,xyZ,XyZ,xYZ,XYZ);
 }
 
-
+/// @} // end allocore group
 
 
 
