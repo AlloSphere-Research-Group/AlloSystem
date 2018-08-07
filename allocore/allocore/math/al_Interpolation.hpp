@@ -42,7 +42,7 @@
 	Lance Putnam, 2006, putnam.lance@gmail.com
 */
 
-
+#include <initializer_list>
 
 namespace al {
 
@@ -139,6 +139,10 @@ void linear(Tv * dst, const Tv * xs, const Tv * xp1s, int len, const Tf& frac);
 /// Nearest neighbor interpolation
 template <class Tf, class Tv>
 Tv nearest(Tf frac, const Tv& x, const Tv& y);
+
+/// Truncating interpolation into a list
+template <class Tf, class Tv>
+const Tv& trunc(Tf frac, const std::initializer_list<Tv>& src);
 
 /// Bilinear interpolation between values on corners of quadrilateral
 template <class Tf, class Tv>
@@ -308,7 +312,6 @@ inline Tv cubic2(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 	return ((c3 * f + c2) * f + c1) * f + x;
 }
 
-
 // From http://astronomy.swin.edu.au/~pbourke/other/interpolation/ (Paul Bourke)
 /*
    Tension: 1 is high, 0 normal, -1 is low
@@ -421,8 +424,14 @@ inline Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 }
 
 template <class Tf, class Tv>
-inline Tv nearest(Tf f, const Tv& x, const Tv& y){
-	return (f < Tf(0.5)) ? x : y;
+inline Tv nearest(Tf frac, const Tv& x, const Tv& y){
+	return (frac < Tf(0.5)) ? x : y;
+}
+
+template <class Tf, class Tv>
+inline const Tv& trunc(Tf frac, const std::initializer_list<Tv>& src){
+	int i = src.size()*frac;
+	return *(src.begin()+i);
 }
 
 } // al::ipl
