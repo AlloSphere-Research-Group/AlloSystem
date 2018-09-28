@@ -176,6 +176,9 @@ bool coprime(const Ts&... vals){ return gcd(vals...) == 1; }
 /// @see http://en.wikipedia.org/wiki/Gudermannian_function
 template<class T> T gudermannian(const T& x);
 
+/// Returns true if integer is prime
+bool isPrime(unsigned n);
+
 /// Generalized Laguerre polynomial L{n,k}
 
 /// @param[in] n	degree, a non-negative integer
@@ -546,6 +549,18 @@ TEM T gcd(const T& x, const T& y){
 /// @see http://en.wikipedia.org/wiki/Gudermannian_function
 TEM T gudermannian(const T& x) {
 	return T(2) * std::atan(exp(x)) - T(M_PI_2);
+}
+
+inline bool isPrime(unsigned n){
+	if(n<=1) return false;
+	else if(n<=3) return true;
+	else if(n%2 == 0 || n%3 == 0) return false;
+	unsigned i = 5;
+	while(i*i <= n){
+		if(n%i == 0 || n%(i+2) == 0) return false;
+		i += 6;
+	}
+	return true;
 }
 
 TEM T laguerreL(int n, int k, T x){
