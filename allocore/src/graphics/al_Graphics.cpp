@@ -174,6 +174,7 @@ public:
 					if(doTex2){
 						texCoord2 = texCoord2In;
 					}
+					gl_PointSize = pointSize;
 			)" +
 					mOnVertex
 			+ R"(
@@ -393,10 +394,6 @@ public:
 				mShader.uniform(mMatrixStacks[PROJECTION].loc(), projection());
 			}
 
-			if(mPointSize.handleUpdate()){
-				mShader.uniform(mPointSize.loc(), mPointSize.get());
-			}
-
 			/* Lighting options:
 			Eye space:
 				- Vertices: multiply by ModelView
@@ -518,6 +515,14 @@ public:
 			mShader.uniform("singleColor", singleColor);
 			mShader.uniform("hasNormals", bool(Nn));
 			mShader.uniform("doTex2", Nt2 >= Nv);
+
+			// Should go in prepareDraw, but only seems to work here???
+			if(mPointSize.handleUpdate()){
+				mShader.uniform(mPointSize.loc(), mPointSize.get());
+				#ifdef AL_GRAPHICS_USE_OPENGL
+				glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+				#endif
+			}
 
 			if(Ni){
 				// Here, 'count' is the number of indices to render
