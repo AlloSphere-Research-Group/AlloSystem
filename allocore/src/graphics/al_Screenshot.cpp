@@ -7,13 +7,12 @@
 namespace al{
 
 bool Screenshot::save(unsigned w, unsigned h, const std::string& filePath){
-	std::ofstream fs;
 	auto derivedFilePath = filePath;
 	if(derivedFilePath.empty()){
 		derivedFilePath = mPath + "screenshot_" + timecodeNow("D_HMS") + "." + mExt;
 	}
 
-	fs.open(derivedFilePath);
+	std::ofstream fs(derivedFilePath, std::ofstream::out | std::ofstream::binary);
 
 	if(!fs.is_open()) return false;
 
@@ -34,7 +33,7 @@ bool Screenshot::save(unsigned w, unsigned h, const std::string& filePath){
 		0,0, 0,0,	// image origin
 		lsB(w), msB(w), lsB(h), msB(h), // width,height in pixels
 		24,			// bits/pixel
-		0			// image descriptor
+		0			// descriptor: 00vhaaaa - v/h vert/hor flip, a alpha bits
 	};
 	fs.write((char*)hdr, sizeof(hdr));
 	// Annoyingly, TGA is little endian, so we have to write BGR
