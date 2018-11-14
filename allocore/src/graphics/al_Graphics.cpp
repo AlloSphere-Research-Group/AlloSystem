@@ -278,7 +278,7 @@ public:
 					float diffAmt = dot(N,L) * intens;
 					diffAmt = max(diffAmt, 0.); // front lighting
 					//diffAmt = abs(diffAmt); // front-and-back lighting
-					diffAmt = diffAmt*(1.-light.ambient) + light.ambient; // mix in ambient
+					diffAmt = mix(diffAmt,1., light.ambient); // mix in ambient
 					vec3 H = normalize(L + V); // half-vector
 					float specAmt = pow(max(dot(N,H), 0.), shininess) * intens; // Blinn-Phong
 					//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), shininess*0.25) * intens; // Phong
