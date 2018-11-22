@@ -92,7 +92,9 @@ public:
 template <class T>
 class Complex{
 public:
+
 	typedef Complex<T> C;
+	typedef T value_type;
 
 	union{
 		struct{

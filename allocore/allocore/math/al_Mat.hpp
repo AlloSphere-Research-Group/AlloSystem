@@ -79,6 +79,8 @@ template <int N, class T>
 class Mat{
 public:
 
+	typedef T value_type;
+
 	/// Column-major array of elements
 	T mElems[N*N];
 
