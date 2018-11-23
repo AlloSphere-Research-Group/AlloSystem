@@ -19,8 +19,8 @@ void BufferObject::bufferType(BufferType v){ mType=v; }
 void BufferObject::usage(BufferUsage v){ mUsage=v; }
 
 void BufferObject::operator()(){
-	//data(); onPointerFunc(); unbind();
-	bind(); onPointerFunc();
+	//data(); onAction(); unbind();
+	bind(); onAction();
 }
 
 void BufferObject::send(){
@@ -103,6 +103,18 @@ VBO::VBO(BufferUsage usage)
 :	BufferObject(ARRAY_BUFFER, usage)
 {}
 
+void VBO::onAction(){
+	if(true){ // using shader attributes
+		#ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+		glVertexAttribPointer(VERTEX_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0);
+		#endif
+	} else { // not using shader attributes
+		#ifndef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
+		glVertexPointer(mNumComps, mDataType, 0, 0);
+		#endif
+	}
+}
+
 CBO::CBO(BufferUsage usage)
 :	BufferObject(ARRAY_BUFFER, usage)
 {}
@@ -116,13 +128,13 @@ EBO& EBO::count(int v){ mCount=v; return *this; }
 EBO& EBO::range(int start, int end){ mStart=start; mEnd=end; return *this; }
 
 #ifdef AL_GRAPHICS_SUPPORTS_DRAW_RANGE
-void EBO::onPointerFunc(){
+void EBO::onAction(){
 	int Ne = mCount<0 ? mNumElems+mCount+1 : mCount;
 	if(mEnd)	glDrawRangeElements(mPrim, mStart, mEnd, Ne, mDataType, 0);
 	else		glDrawRangeElements(mPrim, 0, mNumElems-1, Ne, mDataType, 0);
 }
 #else
-void EBO::onPointerFunc(){
+void EBO::onAction(){
 	int Ne = mCount<0 ? mNumElems+mCount+1 : mCount;
 	glDrawElements(mPrim, Ne, mDataType, 0);
 }
@@ -131,19 +143,19 @@ void EBO::onPointerFunc(){
 #ifdef AL_GRAPHICS_USE_PROG_PIPELINE
 void VBO::enable(){ glEnableVertexAttribArray(VERTEX_ARRAY); }
 void VBO::disable(){ glDisableVertexAttribArray(VERTEX_ARRAY); }
-void VBO::onPointerFunc(){ glVertexAttribPointer(VERTEX_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0); }
+//void VBO::onAction(){ glVertexAttribPointer(VERTEX_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0); }
 
 void CBO::enable(){ glEnableVertexAttribArray(COLOR_ARRAY); }
 void CBO::disable(){ glDisableVertexAttribArray(COLOR_ARRAY); }
-void CBO::onPointerFunc(){ glVertexAttribPointer(COLOR_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0); }
+void CBO::onAction(){ glVertexAttribPointer(COLOR_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0); }
 #else
 void VBO::enable(){ glEnableClientState(VERTEX_ARRAY); }
 void VBO::disable(){ glDisableClientState(VERTEX_ARRAY); }
-void VBO::onPointerFunc(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
+//void VBO::onAction(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
 
 void CBO::enable(){ glEnableClientState(COLOR_ARRAY); }
 void CBO::disable(){ glDisableClientState(COLOR_ARRAY); }
-void CBO::onPointerFunc(){ glColorPointer(mNumComps, mDataType, 0, 0); }
+void CBO::onAction(){ glColorPointer(mNumComps, mDataType, 0, 0); }
 #endif
 
 #ifdef AL_GRAPHICS_SUPPORTS_PBO
@@ -153,7 +165,7 @@ PBO::PBO(bool packMode, BufferUsage usage)
 
 //void PBO::enable(){ glEnableClientState(ArrayType::Vertex); }
 //void PBO::disable(){ glDisableClientState(ArrayType::Vertex); }
-void PBO::onPointerFunc(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
+void PBO::onAction(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
 #endif
 
 
