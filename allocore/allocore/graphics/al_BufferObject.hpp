@@ -234,7 +234,7 @@ protected:
 
 	virtual void onCreate();
 	virtual void onDestroy();
-	virtual void onPointerFunc(){};
+	virtual void onAction(){};
 };
 
 
@@ -247,7 +247,7 @@ public:
 	static void disable();
 
 protected:
-	virtual void onPointerFunc();
+	virtual void onAction();
 };
 
 
@@ -260,7 +260,7 @@ public:
 	static void disable();
 
 protected:
-	virtual void onPointerFunc();
+	virtual void onAction();
 };
 
 #ifdef AL_GRAPHICS_SUPPORTS_PBO
@@ -270,7 +270,7 @@ public:
 	PBO(bool packMode, BufferUsage usage=DYNAMIC_DRAW);
 
 protected:
-	virtual void onPointerFunc();
+	virtual void onAction();
 };
 #endif
 
@@ -295,7 +295,7 @@ protected:
 	Graphics::Primitive mPrim;
 	int mStart=0, mEnd=0, mCount=-1;
 
-	virtual void onPointerFunc();
+	virtual void onAction();
 };
 
 const char * toString(BufferObject::BufferType v);
