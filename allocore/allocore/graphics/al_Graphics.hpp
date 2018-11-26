@@ -610,8 +610,8 @@ public:
 	static DataType toDataType(AlloTy type);
 
 	/// Get light at specified index
-	Light& light(unsigned index);
-	const Light& light(unsigned index) const;
+	Light& light(unsigned index=0);
+	const Light& light(unsigned index=0) const;
 
 	/// Get material
 	Material& material();
