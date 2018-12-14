@@ -108,7 +108,7 @@ protected:
 	glv::ParamPanel mParamPanel;
 	glv::Table mTopBar;
 	glv::Label mAppLabel;
-	std::string mResourceDir;
+	std::string mResourceDir = ".";
 	bool mShowAxes = false;
 };
 
