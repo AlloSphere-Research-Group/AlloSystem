@@ -146,6 +146,7 @@ void ProtoApp::init(
 		toIdentifier(idName);
 
 		MM.name(idName + "Presets");
+		resourceDir(mResourceDir); // verify path
 		MM.fileDir(mResourceDir);
 
 		mGUI.refreshModels();
@@ -161,16 +162,21 @@ void ProtoApp::init(
 ProtoApp& ProtoApp::resourceDir(const std::string& dir, bool searchBack){
 
 	std::string modDir = dir;
+	bool pathExists = false;
 
 	if(searchBack){
-		if(!al::File::searchBack(modDir)){
-			AL_WARN("Could not find %s", modDir.c_str());
-			exit(0);
-		}
+		pathExists = al::File::searchBack(modDir);
+	} else {
+		pathExists = al::File::exists(modDir);
 	}
-	mResourceDir = modDir;
 
-	if(mResourceDir[mResourceDir.size()-1] != AL_FILE_DELIMITER){
+	if(!pathExists){
+		AL_WARN("Could not find resource directory %s", modDir.c_str());
+	} else {
+		mResourceDir = modDir;
+	}
+
+	if(mResourceDir.back() != AL_FILE_DELIMITER){
 		mResourceDir += AL_FILE_DELIMITER_STR;
 	}
 
