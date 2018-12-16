@@ -56,6 +56,8 @@ public:
 		for(auto& stack : mMatrixStacks){
 			stack.var().emplace(1.f);
 		}
+
+		g.material(); // touch so shader uniforms get inited
 	}
 
 	void enable(Capability v){
@@ -778,10 +780,6 @@ Graphics::Graphics()
 
 	#ifdef AL_GRAPHICS_USE_PROG_PIPELINE
 		pipeline(PROG);
-		for(auto& m : mMaterials){
-			m.var()
-			;
-		}
 	#else
 		pipeline(FIXED);
 	#endif
