@@ -28,7 +28,7 @@ namespace al{
 		count = Nmax - begin;\
 	}\
 	const int Nc = m.colors().size();\
-	const int Nci= m.coloris().size();\
+	int Nci= m.coloris().size();\
 	const int Nn = m.normals().size();\
 	const int Nt1= m.texCoord1s().size();\
 	const int Nt2= m.texCoord2s().size();\
@@ -491,7 +491,8 @@ public:
 			glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
 		}
 
-		Color singleColor(0,0,0,8192); // if unchanged, triggers read from array
+		const float colorArrayFlag = 8192.;
+		Color singleColor(0,0,0,colorArrayFlag); // if unchanged, triggers read from array
 
 		if(Nc >= Nv){
 			glEnableVertexAttribArray(mLocColor);
@@ -507,6 +508,23 @@ public:
 		else{
 			singleColor = Nc ? m.colors()[0] : Color(m.coloris()[0]);
 		}
+
+		// There is a strange bug on OSX where we cannot switch between single
+		// and array color reads in a shader.
+		#ifdef AL_OSX
+		if(singleColor.a != colorArrayFlag){
+			Colori col = singleColor;
+			singleColor.a = colorArrayFlag;
+			// Avoid copies if possible
+			if(mColorArray.empty() || mColorArray.size() < unsigned(Nv) || mColorArray[0] != col){
+				mColorArray.clear();
+				for(int i=0; i<Nv; ++i) mColorArray.push_back(col);
+			}
+			glEnableVertexAttribArray(mLocColor);
+			glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &mColorArray[0]);
+			Nci = Nv;
+		}
+		#endif
 
 		if(Nt2 >= Nv){
 			glEnableVertexAttribArray(mLocTexCoord2);
@@ -568,9 +586,10 @@ protected:
 	std::string mPreamble, mOnVertex, mOnMaterial;
 	Color mCurrentColor;
 	ShaderData<float> mPointSize{1};
+	std::vector<Colori> mColorArray;
 	bool mCompileShader = true;
 };
-#endif
+#endif // AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 
 #ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 class Graphics::BackendFixed : public Graphics::Backend{
@@ -764,7 +783,7 @@ private:
 	int mRescaleNormal = 0;
 	std::vector<unsigned short> mIndices16;
 };
-#endif
+#endif // AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 
 
 Graphics::Graphics()
