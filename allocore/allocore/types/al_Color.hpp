@@ -368,6 +368,12 @@ struct Colori {
 	/// Set RGB components from HCLuv
 	Colori& operator= (const HCLuv& v);
 
+	/// Return true if all components are equal, false otherwise
+	bool operator ==(const Colori& v) const { return v.rgba==rgba; }
+
+	/// Return true if components are not equal, false otherwise
+	bool operator !=(const Colori& v) const { return !(*this == v); }
+
 	/// Set RGB components
 	Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
 		r=re; g=gr; b=bl; return *this; }
