@@ -37,11 +37,8 @@ void BufferObject::unbind() const {
 }
 
 void BufferObject::resize(int numBytes){
-	mData = NULL;
-	mDataType = Graphics::BYTE;
-	mNumElems = numBytes;
-	mNumComps = 1;
-	data();
+	// does remote resize without data upload
+	data((const char *)NULL, numBytes, 1);
 }
 
 void BufferObject::data(const void * src, Graphics::DataType dataType, int numElems, int numComps){
