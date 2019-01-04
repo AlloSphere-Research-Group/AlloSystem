@@ -137,30 +137,30 @@ public:
 
 
 	/// Set buffer type
-	void bufferType(BufferType v);
+	BufferObject& bufferType(BufferType v);
 
 	/// Set buffer usage
-	void usage(BufferUsage v);
+	BufferObject& usage(BufferUsage v);
 
 	/// Set size, in bytes, of buffer without sending data
-	void resize(int numBytes);
+	BufferObject& resize(int numBytes);
 
 	/// Set buffer data store and copy over client data
-	void data(const void * src, Graphics::DataType dataType, int numElems, int numComps=1);
+	BufferObject& data(const void * src, Graphics::DataType dataType, int numElems, int numComps=1);
 
 	/// Set buffer data store and copy over client data
 	template <class T>
-	void data(const T * src, int numElems, int numComps=1);
+	BufferObject& data(const T * src, int numElems, int numComps=1);
 
 	/// Set buffer data store without copying client data
-	void data(Graphics::DataType dataType, int numElems, int numComps=1);
-
-	/// Set buffer data store using cached values
-	void data();
+	BufferObject& data(Graphics::DataType dataType, int numElems, int numComps=1);
 
 	/// Set subregion of buffer store
 	template <class T>
 	int subData(const T * src, int numElems, int byteOffset=0);
+
+	/// Trigger update of remote data buffer store
+	BufferObject& update();
 
 
 	/// Bind buffer
@@ -170,7 +170,6 @@ public:
 	void unbind() const;
 
 	void operator()();
-	void send();
 
 	void print() const;
 
@@ -231,6 +230,8 @@ protected:
 		unsigned offset;
 	};
 	std::vector<SubData> mSubData;
+	bool mDataChanged = false;
+	bool mSubDataChanged = false;
 
 	virtual void onCreate();
 	virtual void onDestroy();
@@ -304,17 +305,15 @@ const char * toString(BufferObject::BufferUsage v);
 // IMPLEMENTATION --------------------------------------------------------------
 
 template <class T>
-void BufferObject::data(const T * src, int numElems, int numComps){
-	data(src, Graphics::toDataType<T>(), numElems, numComps);
+BufferObject& BufferObject::data(const T * src, int numElems, int numComps){
+	return data(src, Graphics::toDataType<T>(), numElems, numComps);
 }
 
 template <class T>
 int BufferObject::subData(const T * src, int numElems, int byteOffset){
 	if(numElems){
-		bind();
-		glBufferSubData(mType, byteOffset, numElems*sizeof(T), src);
-		unbind();
 		mSubData.push_back(SubData(src, numElems*sizeof(T), byteOffset));
+		mSubDataChanged = true;
 	}
 	return numElems*sizeof(T) + byteOffset;
 }

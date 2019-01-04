@@ -14,64 +14,61 @@ int BufferObject::size() const {
 	return mNumElems*mNumComps*Graphics::numBytes(mDataType);
 }
 
-void BufferObject::bufferType(BufferType v){ mType=v; }
+BufferObject& BufferObject::bufferType(BufferType v){ mType=v; return update(); }
 
-void BufferObject::usage(BufferUsage v){ mUsage=v; }
+BufferObject& BufferObject::usage(BufferUsage v){ mUsage=v; return update(); }
 
 void BufferObject::operator()(){
 	//data(); onAction(); unbind();
 	bind(); onAction();
 }
 
-void BufferObject::send(){
-	(*this)();
+BufferObject& BufferObject::update(){
+	mDataChanged = true;
+	mSubDataChanged = true;
+	return *this;
 }
 
 void BufferObject::bind(){
 	validate();
 	glBindBuffer(mType, id());
+	if(mDataChanged){
+		mDataChanged = false;
+		glBufferData(mType, size(), mData, mUsage);
+	}
+	if(mSubDataChanged){
+		mSubDataChanged = false;
+		for(const auto& sd : mSubData){
+			glBufferSubData(mType, sd.offset, sd.size, sd.data);
+		}
+	}
 }
 
 void BufferObject::unbind() const {
 	glBindBuffer(mType, 0);
 }
 
-void BufferObject::resize(int numBytes){
+BufferObject& BufferObject::resize(int numBytes){
 	// does remote resize without data upload
-	data((const char *)NULL, numBytes, 1);
+	return data((const char *)NULL, numBytes, 1);
 }
 
-void BufferObject::data(const void * src, Graphics::DataType dataType, int numElems, int numComps){
+BufferObject& BufferObject::data(const void * src, Graphics::DataType dataType, int numElems, int numComps){
 	mData = (void *)src;
 	mDataType = dataType;
 	mNumElems = numElems;
 	mNumComps = numComps;
-	data();
+	mDataChanged = true;
+	return *this;
 }
 
-void BufferObject::data(Graphics::DataType dataType, int numElems, int numComps){
-	data(0, dataType, numElems, numComps);
-}
-
-void BufferObject::data(){
-	bind();
-	glBufferData(mType, size(), mData, mUsage);
-	unbind();
+BufferObject& BufferObject::data(Graphics::DataType dataType, int numElems, int numComps){
+	return data(0, dataType, numElems, numComps);
 }
 
 void BufferObject::onCreate(){
 	glGenBuffers(1, (GLuint*)&mID);
-	if(size() > 0){
-		data();
-		if(mSubData.size() > 0){
-			bind();
-			for(unsigned i=0; i<mSubData.size(); ++i){
-				const SubData& sd = mSubData[i];
-				glBufferSubData(mType, sd.offset, sd.size, sd.data);
-			}
-			unbind();
-		}
-	}
+	if(size() > 0) update(); // handle potential GL context change
 }
 
 void BufferObject::onDestroy(){
