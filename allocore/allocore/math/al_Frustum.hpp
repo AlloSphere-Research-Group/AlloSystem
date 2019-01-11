@@ -115,8 +115,8 @@ public:
 	int testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
 
 	/// Get axis-aligned bounding box
-	template <class V>
-	void boundingBox(Vec<3,V>& xyz, Vec<3,V>& dim) const;
+	template <class Vec3>
+	void boundingBox(Vec3& xyz, Vec3& dim) const;
 
 	/// Returns center of frustum
 	Vec<3,T> center() const { return (ntl+ntr+nbl+nbr+ftl+ftr+fbl+fbr)*0.125; }
@@ -138,13 +138,13 @@ private:
 
 
 template <class T>
-template <class V>
-void Frustum<T>::boundingBox(Vec<3,V>& xyz, Vec<3,V>& dim) const {
-	Vec<3,T> vmin = corner(0);
-	Vec<3,T> vmax = vmin;
+template <class Vec3>
+void Frustum<T>::boundingBox(Vec3& xyz, Vec3& dim) const {
+	auto vmin = corner(0);
+	auto vmax = vmin;
 
 	for(int i=1; i<8; ++i){
-		Vec<3,T> v = corner(i);
+		auto v = corner(i);
 		vmin = min(vmin, v);
 		vmax = max(vmax, v);
 	}
