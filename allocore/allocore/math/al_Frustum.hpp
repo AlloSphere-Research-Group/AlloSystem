@@ -80,8 +80,8 @@ public:
 	}
 
 	/// Get point in frustum corresponding to fraction along edges
-	template <class U>
-	Vec<3,T> getPoint(const Vec<3,U>& frac) const {
+	template <class Vec3>
+	Vec<3,T> getPoint(const Vec3& frac) const {
 		return
 		lerp(frac[2],
 			lerp(frac[1],
@@ -165,8 +165,8 @@ void Frustum<T>::computePlanes(){
 
 template <class T>
 int Frustum<T>::testPoint(const Vec<3,T>& p) const {
-	for(int i=0; i<6; ++i){
-		if(pl[i].inNegativeSpace(p)) return OUTSIDE;
+	for(const auto& plane : pl){
+		if(plane.inNegativeSpace(p)) return OUTSIDE;
 	}
 	return INSIDE;
 }
@@ -174,8 +174,8 @@ int Frustum<T>::testPoint(const Vec<3,T>& p) const {
 template <class T>
 int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
 	int result = INSIDE;
-	for(int i=0; i<6; ++i){
-		float distance = pl[i].distance(c);
+	for(const auto& plane : pl){
+		float distance = plane.distance(c);
 		if(distance < -r)		return OUTSIDE;
 		else if(distance < r)	result = INTERSECT;
 	}
@@ -185,9 +185,8 @@ int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
 template <class T>
 int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 	int result = INSIDE;
-	for(int i=0; i<6; ++i){
-		const Vec3d& plNrm = pl[i].normal();
-
+	for(const auto& plane : pl){
+		const auto plNrm = plane.normal();
 /*
 		The positive vertex is the vertex from the box that is further along
 		the normal's direction. The negative vertex is the opposite vertex.
@@ -199,18 +198,18 @@ int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 		the right side of the plane, or if the box intersects the plane.
 */
 		// Is positive vertex outside?
-		Vec<3,T> vp = xyz;
+		auto vp = xyz;
 		if(plNrm[0] > 0) vp[0] += dim[0];
 		if(plNrm[1] > 0) vp[1] += dim[1];
 		if(plNrm[2] > 0) vp[2] += dim[2];
-		if(pl[i].inNegativeSpace(vp)) return OUTSIDE;
+		if(plane.inNegativeSpace(vp)) return OUTSIDE;
 
 		// Is negative vertex outside?
-		Vec<3,T> vn = xyz;
+		auto vn = xyz;
 		if(plNrm[0] < 0) vn[0] += dim[0];
 		if(plNrm[1] < 0) vn[1] += dim[1];
 		if(plNrm[2] < 0) vn[2] += dim[2];
-		if(pl[i].inNegativeSpace(vn)) result = INTERSECT;
+		if(plane.inNegativeSpace(vn)) result = INTERSECT;
 	}
 	return result;
 }
