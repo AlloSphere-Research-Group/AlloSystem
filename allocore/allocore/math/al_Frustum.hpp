@@ -74,10 +74,21 @@ public:
 
 
 	const Vec<3,T>& corner(int i) const { return (&ntl)[i]; }
+	Vec<3,T>& corner(int i){ return (&ntl)[i]; }
 
 	const Vec<3,T>& corner(int i0, int i1, int i2) const {
 		return corner(i2<<2 | i1<<1 | i0);
 	}
+
+
+	/// Set from eight corners
+	template <class Vec>
+	Frustum& fromCorners(const Vec * corners);
+
+	/// Set from inverse model-view-projection matrix
+	template <class Mat4>
+	Frustum& fromInverseMVP(const Mat4& invMVP);
+
 
 	/// Get point in frustum corresponding to fraction along edges
 	template <class Vec3>
@@ -124,8 +135,8 @@ public:
 
 	/// Compute planes based on frustum corners (planes face to inside)
 
+	/// This must be called if any of the corners change value.
 	///	The plane normals are computed assuming a right-hand coordinate system.
-	///
 	void computePlanes();
 
 private:
@@ -136,6 +147,33 @@ private:
 };
 
 
+
+template <class T>
+template <class Vec>
+Frustum<T>& Frustum<T>::fromCorners(const Vec * corners){
+	for(unsigned i=0; i<8; ++i){
+		for(unsigned k=0; k<3; ++k){
+			corner(i)[k] = corners[i][k];
+		}
+	}
+	computePlanes();
+	return *this;
+}
+
+template <class T>
+template <class Mat4>
+Frustum<T>& Frustum<T>::fromInverseMVP(const Mat4& invMVP){
+	static const Vec4f bb[8] = {
+		{-1.f, 1.f,-1.f, 1.f}, { 1.f, 1.f,-1.f, 1.f}, {-1.f,-1.f,-1.f, 1.f}, { 1.f,-1.f,-1.f, 1.f},
+		{-1.f, 1.f, 1.f, 1.f}, { 1.f, 1.f, 1.f, 1.f}, {-1.f,-1.f, 1.f, 1.f}, { 1.f,-1.f, 1.f, 1.f}
+	};
+	Vec<3,T> corners[8];
+	for(unsigned i=0; i<8; ++i){
+		auto c = invMVP * bb[i];
+		corners[i] = sub<3>(c) / c.w;
+	}
+	return fromCorners(corners);
+}
 
 template <class T>
 template <class Vec3>
