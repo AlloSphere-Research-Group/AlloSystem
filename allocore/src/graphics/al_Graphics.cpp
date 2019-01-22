@@ -1,6 +1,7 @@
 #include <map>
 #include <stdio.h>
 #include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_BufferObject.hpp"
 
 #ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 	#include <stack> // matrix stack
@@ -16,35 +17,147 @@
 namespace al{
 
 #define DRAW_BEGIN\
-	const int Nv = m.vertices().size();\
-	if(0 == Nv) return; /* nothing to draw, so just return...*/\
-	const int Ni = m.indices().size();\
-	const int Nmax = Ni ? Ni : Nv;\
-	/* Adjust negative amounts*/\
-	if(count < 0) count += Nmax+1;\
-	if(begin < 0) begin += Nmax+1;\
-	if(begin >= Nmax) return;	/* Begin index past end?*/\
-	if(begin + count > Nmax){	/* If end index past end, then truncate it*/\
-		count = Nmax - begin;\
-	}\
-	const int Nc = m.colors().size();\
-	int Nci= m.coloris().size();\
-	const int Nn = m.normals().size();\
-	const int Nt1= m.texCoord1s().size();\
-	const int Nt2= m.texCoord2s().size();\
-	const int Nt3= m.texCoord3s().size();\
-	auto prim = (Graphics::Primitive)m.primitive();\
-	if(m.stroke() > 0.f){\
-		switch(prim){\
+	if(0==m.count || !prepareDraw()) return;\
+	\
+	if(m.stroke > 0.f){\
+		switch((Graphics::Primitive)m.primitive){\
 		case LINES: case LINE_STRIP: case LINE_LOOP:\
-			mGraphics.lineWidth(m.stroke());\
+			mGraphics.lineWidth(m.stroke);\
 			break;\
 		case POINTS:\
-			mGraphics.pointSize(m.stroke());\
+			mGraphics.pointSize(m.stroke);\
 			break;\
 		default:;\
 		}\
 	}
+
+
+struct Graphics::RawMeshData{
+	int primitive = 0;
+	float stroke = 1;
+	int count=0, begin=0;
+	int Nv=0, Nn=0, Nc=0, Nci=0, Nt1=0, Nt2=0, Nt3=0, Ni=0;
+	const char	* vertices = NULL, * normals = NULL,
+				* colors = NULL, * coloris = NULL,
+				* texCoord1s = NULL, * texCoord2s = NULL, * texCoord3s = NULL,
+				* indices = NULL;
+
+	RawMeshData(){}
+
+	RawMeshData(const Mesh& m)
+	:	primitive(m.primitive()), stroke(m.stroke()),
+		Nv(m.vertices().size()), Nn(m.normals().size()), Nc(m.colors().size()),	Nci(m.coloris().size()), Nt1(m.texCoord1s().size()), Nt2(m.texCoord2s().size()), Nt3(m.texCoord3s().size()), Ni(m.indices().size())
+	{
+		count = Ni ? Ni : Nv;
+		if(Nv ) vertices = decltype(vertices)(&m.vertices()[0][0]);
+		if(Nn ) normals = decltype(normals)(&m.normals()[0][0]);
+		if(Nc ) colors = decltype(colors)(&m.colors()[0][0]);
+		if(Nci) coloris = decltype(coloris)(&m.coloris()[0][0]);
+		if(Nt1) texCoord1s = decltype(texCoord1s)(&m.texCoord1s()[0]);
+		if(Nt2) texCoord2s = decltype(texCoord2s)(&m.texCoord2s()[0][0]);
+		if(Nt3) texCoord3s = decltype(texCoord3s)(&m.texCoord3s()[0][0]);
+		if(Ni ) indices = decltype(indices)(&m.indices()[0]);
+	}
+
+	RawMeshData(const Mesh& m, int countIn, int beginIn=0)
+	:	RawMeshData(m)
+	{
+		int Nmax = count; // max # elements (vertices or indices)
+		count = countIn;
+		begin = beginIn;
+		// Adjust any negative amounts
+		if(count < 0) count += Nmax+1;
+		if(begin < 0) begin += Nmax+1;
+		if(begin >= Nmax){			// Begin index past end?
+			begin = Nmax;
+			count = 0;
+		}
+		if(begin + count > Nmax){	// If end index past end, then truncate it
+			count = Nmax - begin;
+		}
+	}
+};
+
+
+class GPUMesh : public Graphics::RawMeshData{
+public:
+
+	void bind(){
+		mVBO.bind();
+		if(Ni) mEBO.bind();
+		mBound = true;
+	}
+
+	void unbind(){
+		mVBO.unbind();
+		if(Ni) mEBO.unbind();
+		mBound = false;
+	}
+
+	bool bound() const { return mBound; }
+
+	void update(const Mesh& m){
+		Nv = m.vertices().size();
+		if(0 == Nv) return;
+		Nn = m.normals().size();
+		Nc = m.colors().size();
+		Nci= m.coloris().size();
+		Nt1= m.texCoord1s().size();
+		Nt2= m.texCoord2s().size();
+		Nt3= m.texCoord3s().size();
+		Ni = m.indices().size();
+
+		primitive = m.primitive();
+		stroke = m.stroke();
+		count = Ni ? Ni : Nv;
+
+		mVBO.usage(BufferObject::STATIC_DRAW);
+		int b = 0; // current byte offset into VBO
+		b = mVBO.subData(&m.vertices()[0], Nv);
+
+		if(Nn){
+			normals = vertices + b;
+			b = mVBO.subData(&m.normals()[0], Nn, b);
+		}
+
+		if(Nc){
+			colors = vertices + b;
+			b = mVBO.subData(&m.colors()[0], Nc, b);
+		} else if(Nci){
+			coloris = vertices + b;
+			b = mVBO.subData(&m.coloris()[0], Nci, b);
+		}
+
+		if(Nt2){
+			texCoord2s = vertices + b;
+			b = mVBO.subData(&m.texCoord2s()[0], Nt2, b);
+		} else if(Nt1){
+			texCoord1s = vertices + b;
+			b = mVBO.subData(&m.texCoord1s()[0], Nt1, b);
+		} else if(Nt3){
+			texCoord3s = vertices + b;
+			b = mVBO.subData(&m.texCoord3s()[0], Nt3, b);
+		}
+
+		// Here, b should be the total number of bytes in the buffer
+		mVBO.resize(b);
+
+		if(Ni){
+			mEBO.usage(BufferObject::STATIC_DRAW);
+			mEBO.data(&m.indices()[0], m.indices().size());
+		}
+	}
+
+private:
+	VBO mVBO;
+	EBO mEBO;
+	bool mBound = false;
+};
+
+
+std::map<const Mesh *, std::unique_ptr<GPUMesh>> gpuMeshes;
+//std::map<const MeshNew *, GPUMesh *> gpuMeshes;
+GPUMesh * currentGPUMesh = NULL;
 
 
 #ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
@@ -478,63 +591,69 @@ public:
 		return true;
 	}
 
-	void draw(const Mesh& m, int count, int begin){
-		if(!prepareDraw()) return;
-		DRAW_BEGIN
+	void draw(const RawMeshData& m){
+
+		DRAW_BEGIN;
+
+		int Nci = m.Nci; // needed for strange OSX bug below
 
 		// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
 		glEnableVertexAttribArray(mLocPos);
-		glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, &m.vertices()[0]);
+		glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, m.vertices);
 
-		if(Nn >= Nv){
+		if(m.Nn >= m.Nv){
 			glEnableVertexAttribArray(mLocNormal);
-			glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, &m.normals()[0]);
+			glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, m.normals);
 		}
 
 		const float colorArrayFlag = 8192.;
 		Color singleColor(0,0,0,colorArrayFlag); // if unchanged, triggers read from array
 
-		if(Nc >= Nv){
+		if(m.Nc >= m.Nv){
 			glEnableVertexAttribArray(mLocColor);
-			glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, &m.colors()[0]);
+			glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, m.colors);
 		}
-		else if(Nci >= Nv){
+		else if(m.Nci >= m.Nv){
 			glEnableVertexAttribArray(mLocColor);
-			glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &m.coloris()[0]);
+			glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, m.coloris);
 		}
-		else if(0 == Nc && 0 == Nci){
+		else if(0 == m.Nc && 0 == m.Nci){
 			singleColor = mCurrentColor;
 		}
 		else{
-			singleColor = Nc ? m.colors()[0] : Color(m.coloris()[0]);
+			singleColor = m.Nc ? *(Color*)m.colors : Color(*(Colori*)m.coloris);
 		}
 
 		// There is a strange bug on OSX where we cannot switch between single
 		// and array color reads in a shader.
+		// TODO: if VBO bound, must bind a separate color VBO
 		#ifdef AL_OSX
-		if(singleColor.a != colorArrayFlag){
+		if(singleColor.a != colorArrayFlag){ // using single color
 			Colori col = singleColor;
 			singleColor.a = colorArrayFlag;
 			// Avoid copies if possible
-			if(mColorArray.empty() || mColorArray.size() < unsigned(Nv) || mColorArray[0] != col){
+			if(mColorArray.empty() || mColorArray.size() < unsigned(m.Nv) || mColorArray[0] != col){
 				mColorArray.clear();
-				for(int i=0; i<Nv; ++i) mColorArray.push_back(col);
+				for(int i=0; i<m.Nv; ++i) mColorArray.push_back(col);
 			}
-			glEnableVertexAttribArray(mLocColor);
-			glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &mColorArray[0]);
-			Nci = Nv;
+			if(currentGPUMesh && currentGPUMesh->bound()){
+			} else {
+				glEnableVertexAttribArray(mLocColor);
+				glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &mColorArray[0]);
+			}
+			Nci = m.Nv;
 		}
 		#endif
 
-		if(Nt2 >= Nv){
+		if(m.Nt2 >= m.Nv){
 			glEnableVertexAttribArray(mLocTexCoord2);
-			glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, &m.texCoord2s()[0]);
+			glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, m.texCoord2s);
 		}
 
 		mShader.begin();
 			mShader.uniform("singleColor", singleColor);
-			mShader.uniform("hasNormals", bool(Nn));
-			mShader.uniform("doTex2", Nt2 >= Nv);
+			mShader.uniform("hasNormals", bool(m.Nn));
+			mShader.uniform("doTex2", m.Nt2 >= m.Nv);
 
 			// Should go in prepareDraw, but only seems to work here???
 			if(mPointSize.handleUpdate()){
@@ -544,19 +663,23 @@ public:
 				#endif
 			}
 
-			if(Ni){
+			if(m.Ni){
 				// Here, 'count' is the number of indices to render
-				glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
+				glDrawElements(m.primitive, m.count, GL_UNSIGNED_INT, m.indices + m.begin*sizeof(Mesh::Index));
 			}
 			else{
-				glDrawArrays(prim, begin, count);
+				glDrawArrays(m.primitive, m.begin, m.count);
 			}
 		mShader.end();
 
 		glDisableVertexAttribArray(mLocPos);
-		if(Nc || Nci) glDisableVertexAttribArray(mLocColor);
-		if(Nn) glDisableVertexAttribArray(mLocNormal);
-		if(Nt1 || Nt2 || Nt3) glDisableVertexAttribArray(mLocTexCoord2);
+		if(m.Nc || Nci) glDisableVertexAttribArray(mLocColor);
+		if(m.Nn) glDisableVertexAttribArray(mLocNormal);
+		if(m.Nt2) glDisableVertexAttribArray(mLocTexCoord2);
+	}
+
+	void draw(const Mesh& m, int count, int begin){
+		draw(RawMeshData(m,count,begin));
 	}
 
 protected:
@@ -590,6 +713,7 @@ protected:
 	bool mCompileShader = true;
 };
 #endif // AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+
 
 #ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 class Graphics::BackendFixed : public Graphics::Backend{
@@ -708,75 +832,82 @@ public:
 		return true;
 	}
 
-	void draw(const Mesh& m, int count, int begin){
-		if(!prepareDraw()) return;
-		DRAW_BEGIN
+	void draw(const RawMeshData& m){
+
+		DRAW_BEGIN;
 
 		// Enable arrays and set pointers...
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, 0, &m.vertices()[0]);
+		glVertexPointer(3, GL_FLOAT, 0, m.vertices);
 
-		if(Nn >= Nv){
+		if(m.Nn >= m.Nv){
 			glEnableClientState(GL_NORMAL_ARRAY);
-			glNormalPointer(GL_FLOAT, 0, &m.normals()[0]);
+			glNormalPointer(GL_FLOAT, 0, m.normals);
 		}
 
-		if(Nc >= Nv){
+		if(m.Nc >= m.Nv){
 			glEnableClientState(GL_COLOR_ARRAY);
-			glColorPointer(4, GL_FLOAT, 0, &m.colors()[0]);
+			glColorPointer(4, GL_FLOAT, 0, m.colors);
 		}
-		else if(Nci >= Nv){
+		else if(m.Nci >= m.Nv){
 			glEnableClientState(GL_COLOR_ARRAY);
-			glColorPointer(4, GL_UNSIGNED_BYTE, 0, &m.coloris()[0]);
+			glColorPointer(4, GL_UNSIGNED_BYTE, 0, m.coloris);
 			//printf("using integer colors\n");
 		}
-		else if(0 == Nc && 0 == Nci){
+		else if(0 == m.Nc && 0 == m.Nci){
 			// just use whatever the last glColor() call used!
 		}
 		else{
-			if(Nc)
-				glColor4f(m.colors()[0].r, m.colors()[0].g, m.colors()[0].b, m.colors()[0].a);
-			else
-				glColor4ub(m.coloris()[0].r, m.coloris()[0].g, m.coloris()[0].b, m.coloris()[0].a);
+			if(m.Nc){
+				auto col = *(Color *)m.colors;
+				glColor4f(col.r, col.g, col.b, col.a);
+			} else {
+				auto col = *(Colori *)m.coloris;
+				glColor4ub(col.r, col.g, col.b, col.a);
+			}
 		}
 
-		if(Nt1 >= Nv){
+		if(m.Nt1 >= m.Nv){
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glTexCoordPointer(1, GL_FLOAT, 0, &m.texCoord1s()[0]);
+			glTexCoordPointer(1, GL_FLOAT, 0, m.texCoord1s);
 		}
-		else if(Nt2 >= Nv){
+		else if(m.Nt2 >= m.Nv){
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glTexCoordPointer(2, GL_FLOAT, 0, &m.texCoord2s()[0]);
+			glTexCoordPointer(2, GL_FLOAT, 0, m.texCoord2s);
 		}
-		else if(Nt3 >= Nv){
+		else if(m.Nt3 >= m.Nv){
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glTexCoordPointer(3, GL_FLOAT, 0, &m.texCoord3s()[0]);
+			glTexCoordPointer(3, GL_FLOAT, 0, m.texCoord3s);
 		}
 
 		// Draw
-		if(Ni){
+		if(m.Ni){
 			#ifdef AL_GRAPHICS_SUPPORTS_INT32
 				// Here, 'count' is the number of indices to render
-				glDrawElements(prim, count, GL_UNSIGNED_INT, &m.indices()[begin]);
+				glDrawElements(m.primitive, m.count, GL_UNSIGNED_INT, m.indices + m.begin*sizeof(Mesh::Index));
 			#else
 				mIndices16.clear();
-				for(int i=begin; i<begin+count; ++i){
+				for(int i=m.begin; i<m.begin+m.count; ++i){
 					auto idx = m.indices()[i];
 					if(idx > 65535) AL_WARN_ONCE("Mesh index value out of range (> 65535)");
 					mIndices16.push_back(idx);
 				}
-				glDrawElements(prim, count, GL_UNSIGNED_SHORT, &mIndices16[0]);
+				glDrawElements(m.primitive, m.count, GL_UNSIGNED_SHORT, &mIndices16[0]);
 			#endif
 		}
 		else{
-			glDrawArrays(prim, begin, count);
+			glDrawArrays(m.primitive, m.begin, m.count);
 		}
 
 		// Disable arrays
 		glDisableClientState(GL_VERTEX_ARRAY);
-		if(Nn)					glDisableClientState(GL_NORMAL_ARRAY);
-		if(Nc || Nci)			glDisableClientState(GL_COLOR_ARRAY);
-		if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		if(m.Nn)					glDisableClientState(GL_NORMAL_ARRAY);
+		if(m.Nc || m.Nci)			glDisableClientState(GL_COLOR_ARRAY);
+		if(m.Nt1 || m.Nt2 || m.Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
+
+	void draw(const Mesh& m, int count, int begin){
+		draw(RawMeshData(m, count, begin));
 	}
 
 private:
@@ -856,6 +987,25 @@ Graphics& Graphics::shaderOnMaterial(const std::string& s){
 		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnMaterial = s;
 	}
 	return *this;
+}
+
+void Graphics::setVertexBuffer(const Mesh& m, bool updateBuffer){
+	auto it = gpuMeshes.find(&m);
+	if(it != gpuMeshes.end()){ // found existing VBO for passed in mesh
+		currentGPUMesh = it->second.get();
+	} else { // create new buffer and update
+		currentGPUMesh = new GPUMesh;
+		gpuMeshes[&m] = std::unique_ptr<GPUMesh>(currentGPUMesh);
+		updateBuffer = true;
+	}
+	
+	if(updateBuffer) currentGPUMesh->update(m);
+}
+
+void Graphics::drawVertexBuffer(){
+	currentGPUMesh->bind();
+	mBackend->draw(*currentGPUMesh);
+	currentGPUMesh->unbind();
 }
 
 #define CS(t) case Graphics::t: return #t;

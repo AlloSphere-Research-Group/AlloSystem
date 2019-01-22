@@ -630,6 +630,15 @@ public:
 	Graphics& shaderOnVertex(const std::string& s);
 	Graphics& shaderOnMaterial(const std::string& s);
 
+	/// Set current vertex buffer and optionally update
+	void setVertexBuffer(const Mesh& m, bool updateBuffer=false);
+
+	/// Draw currently set vertex buffer
+	void drawVertexBuffer();
+
+public: 
+	class RawMeshData;
+
 protected:
 
 	class Backend{
@@ -657,8 +666,11 @@ protected:
 		virtual void pointSize(float v){}
 		virtual void pointAtten(float c2, float c1, float c0){}
 
-		virtual void draw(const Mesh& m, int count=-1, int begin=0){}
 		virtual bool prepareDraw(){ return true; }
+		virtual void draw(const RawMeshData& m){}
+		virtual void draw(const Mesh& m, int count=-1, int begin=0){}
+
+		virtual void drawVertexBuffer(){}
 
 	protected:
 		Graphics& mGraphics;
