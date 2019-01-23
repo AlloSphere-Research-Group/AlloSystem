@@ -1,4 +1,5 @@
 #include <map>
+#include <memory> // unique_ptr
 #include <stdio.h>
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_BufferObject.hpp"
