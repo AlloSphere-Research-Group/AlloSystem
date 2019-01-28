@@ -120,6 +120,8 @@ int addSphereWithTexcoords(Mesh& m, double radius=1, int bands=16 );
 
 /// Add wireframe box as indexed lines
 
+/// The min/max coordinates of the box are (0,0,0) and (width, height, depth).
+///
 /// @param[in,out]	m		Mesh to add vertices and indices to
 /// @param[in]		width	Total width (along x)
 /// @param[in]		height	Total height (along y)
@@ -174,6 +176,23 @@ int addDisc(Mesh& m, float radius=1, unsigned slices=16);
 ///
 /// @ingroup allocore
 int addRect(Mesh& m, float width=2, float height=2, float x=0, float y=0);
+
+
+/// Add a quadrilateral as indexed triangles
+
+/// Input points should be co-planar and in counter-clockwise winding order.
+///
+/// \returns number of vertices added
+template <class Vec>
+int addQuad(Mesh& m, const Vec& a, const Vec& b, const Vec& c, const Vec& d);
+
+int addQuad(
+	Mesh& m,
+	float x1, float y1, float z1,
+	float x2, float y2, float z2,
+	float x3, float y3, float z3,
+	float x4, float y4, float z4
+);
 
 
 /// Add a prism as an indexed triangle strip
@@ -307,12 +326,17 @@ int addTorus(
 template <class Vec2>
 void ellipse(Vec2 * dst, int len, float radx=1, float rady=1);
 
+
 /// Fill array with circle (using fast recursion method)
 template <class Vec2>
 void circle(Vec2 * dst, int len, float rad=1){ ellipse(dst,len, rad,rad); }
 
 
 // Implementation only below
+template <class Vec>
+int addQuad(Mesh& m, const Vec& a, const Vec& b, const Vec& c, const Vec& d){
+	return addQuad(m, a[0],a[1],a[2], b[0],b[1],b[2], c[0],c[1],c[2], d[0],d[1],d[2]);
+}
 
 template <class Vec2>
 void ellipse(Vec2 * dst, int len, float radx, float rady){
