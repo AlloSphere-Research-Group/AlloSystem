@@ -251,9 +251,7 @@ std::string timecodeNow(const std::string& format){
 }
 
 void Timer::print() const {
-	auto t = getTime();
-	auto dt = t-mStart;
-	double dtSec = al_time_ns2s * dt;
+	auto dtSec = elapsedSec();
 	printf("%g sec (%g ms) elapsed\n", dtSec, dtSec*1000.);
 }
 

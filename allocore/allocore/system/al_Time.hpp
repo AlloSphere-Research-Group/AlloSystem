@@ -76,10 +76,10 @@ public:
 		if(setStartTime) start();
 	}
 
-	/// Returns nsec between start() and stop() calls
-	al_nsec elapsed() const { return mStop - mStart; }					
+	/// Returns nsec elapsed from start() call
+	al_nsec elapsed() const { return (mStop<mStart ? getTime() : mStop) - mStart; }					
 
-	/// Returns seconds between start() and stop() calls
+	/// Returns seconds elapsed from start() call
 	al_sec elapsedSec() const { return al_time_ns2s * elapsed(); }
 
 	/// Set start time to current time
