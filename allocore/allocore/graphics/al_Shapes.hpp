@@ -120,7 +120,7 @@ int addSphereWithTexcoords(Mesh& m, double radius=1, int bands=16 );
 
 /// Add wireframe box as indexed lines
 
-/// The min/max coordinates of the box are (0,0,0) and (width, height, depth).
+/// The box is centered at (0,0,0).
 ///
 /// @param[in,out]	m		Mesh to add vertices and indices to
 /// @param[in]		width	Total width (along x)

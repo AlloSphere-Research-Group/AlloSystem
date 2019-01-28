@@ -454,6 +454,8 @@ int addWireBox(Mesh& m, float w, float h, float d){
 
 	int Nv = m.vertices().size();
 
+	float w_2=w*0.5, h_2=h*0.5, d_2=d*0.5;
+
 	/*		6 7
 			4 5
 		2 3
@@ -462,7 +464,7 @@ int addWireBox(Mesh& m, float w, float h, float d){
 	for(int k=-1; k<=1; k+=2){
 	for(int j=-1; j<=1; j+=2){
 	for(int i=-1; i<=1; i+=2){
-		m.vertex(i*w, j*h, k*d);
+		m.vertex(i*w_2, j*h_2, k*d_2);
 	}}}
 
 	static const int I[] = {
