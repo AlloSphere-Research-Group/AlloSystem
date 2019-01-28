@@ -518,6 +518,20 @@ int addRect(Mesh& m, float width, float height, float x, float y){
 	return 4;
 }
 
+int addQuad(Mesh& m,
+	float x1, float y1, float z1,
+	float x2, float y2, float z2,
+	float x3, float y3, float z3,
+	float x4, float y4, float z4
+){
+	m.primitive(Graphics::TRIANGLES);
+	auto i = m.vertices().size();
+	m.vertex(x1,y1,z1).vertex(x2,y2,z2).vertex(x3,y3,z3).vertex(x4,y4,z4);
+	m.index(i,i+1,i+2, i,i+2,i+3);
+	return 4;
+}
+
+
 int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist){
 
 	m.primitive(Graphics::TRIANGLE_STRIP);
