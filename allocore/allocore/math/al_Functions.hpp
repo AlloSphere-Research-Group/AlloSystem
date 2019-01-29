@@ -54,6 +54,11 @@
 #undef sinc
 #endif
 
+#ifdef __MINGW32__
+	#ifndef AL_USE_STD_ROUND
+		#define AL_USE_STD_ROUND
+	#endif
+#endif
 
 namespace al {
 
@@ -248,7 +253,7 @@ template<class T> T min(const T& v1, const T& v2);
 template<class T> T min(const T& v1, const T& v2, const T& v3);
 
 /// Returns nearest integer division of one value to another
-template<class T> inline T nearestDiv(T of, T to){ return to / round(to/of); }
+template<class T> inline T nearestDiv(T of, T to);
 
 /// Returns the next representable floating-point or integer value following x in the direction of y
 template<class T> T nextAfter(const T& x, const T& y);
@@ -465,9 +470,9 @@ inline uint32_t bitsSet(uint32_t v){
 	return ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
 }
 
-TEM inline T ceil(const T& v){ return round(v + roundEps<T>()); }
-TEM inline T ceil(const T& v, const T& s){ return ceil(v/s)*s; }
-TEM inline T ceil(const T& v, const T& s, const T& r){ return ceil(v*r)*s; }
+TEM inline T ceil(const T& v){ return al::round(v + roundEps<T>()); }
+TEM inline T ceil(const T& v, const T& s){ return al::ceil(v/s)*s; }
+TEM inline T ceil(const T& v, const T& s, const T& r){ return al::ceil(v*r)*s; }
 
 inline uint32_t ceilPow2(uint32_t v){
 	--v;
@@ -690,6 +695,8 @@ TEM inline T mean(const T& v1, const T& v2){ return (v1 + v2) * T(0.5); }
 TEM inline T min(const T& v1, const T& v2){ return v1<v2?v1:v2; }
 TEM inline T min(const T& v1, const T& v2, const T& v3){ return al::min(al::min(v1,v2),v3); }
 
+TEM inline T nearestDiv(T of, T to){ return to / al::round(to/of); }
+
 #ifdef __MSYS__
 // MSYS2 does not support C++11 std::nextafter like it should
 template<class T>
@@ -750,12 +757,16 @@ inline uint8_t prime(uint32_t n){ return mPrimes54[n]; }
 TEM inline T remainder(const T& x, const T& y){ return x - long(x/y) * y; }
 
 TEM inline T round(const T& v){
+#ifdef AL_USE_STD_ROUND
+	return std::round(v);
+#else
 	static const double roundMagic = 6755399441055744.; // 2^52 * 1.5
 	double r=v;
 	return (r + roundMagic) - roundMagic;
+#endif
 }
-TEM inline T round(const T& v, const T& s){ return round<double>(v/s) * s; }
-TEM inline T round(const T& v, const T& s, const T& r){ return round<T>(v * r) * s; }
+TEM inline T round(const T& v, const T& s){ return al::round<double>(v/s) * s; }
+TEM inline T round(const T& v, const T& s, const T& r){ return al::round<T>(v * r) * s; }
 TEM inline T roundAway(const T& v){ return v<T(0) ? al::floor(v) : al::ceil(v); }
 TEM inline T roundAway(const T& v, const T& s){ return v<T(0) ? al::floor(v,s) : al::ceil(v,s); }
 
