@@ -405,6 +405,7 @@ public:
 	Nav& pullBack(double v){ mPullBack0 = v>0. ? v : 0.; return *this; }
 
 	/// Get transformed pose
+	const Pose& transformed() const { return mTransformed; }
 	Pose& transformed(){ return mTransformed; }
 
 protected:
