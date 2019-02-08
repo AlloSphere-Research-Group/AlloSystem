@@ -62,6 +62,12 @@ RenderToDisk& RenderToDisk::imageFormat(const std::string& ext, int compress, in
 	return *this;
 }
 
+RenderToDisk& RenderToDisk::audioGain(float v){
+	mAudioRing.mGain = v;
+	return *this;
+}
+
+
 bool RenderToDisk::toggle(al::AudioIO& aio, al::Window& win, double fps){
 	return toggle(&aio, &win, fps);
 }
@@ -507,7 +513,7 @@ int RenderToDisk::AudioRing::read(){
 	// Copy samples into read buffer as fast as possible
 	for(unsigned c=0; c<mChannels; ++c){
 		for(unsigned i=0; i<mBlockSize; ++i){
-			dst[i*mChannels + c] = *src++;
+			dst[i*mChannels + c] = (*src++) * mGain;
 		}
 	}
 
