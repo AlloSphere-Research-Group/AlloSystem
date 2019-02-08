@@ -109,6 +109,9 @@ public:
 	/// Set format of image files
 	RenderToDisk& imageFormat(const std::string& ext, int compression=50);
 
+	/// Set post-gain of captured audio
+	RenderToDisk& audioGain(float v);
+
 	/// Start rendering
 
 	/// The soundfile sample rate and number of channels will be taken directly
@@ -156,6 +159,7 @@ private:
 		std::vector<float> mBuffer;
 		unsigned mChannels, mBlockSize, mNumBlocks;
 		unsigned mWriteBlock, mReadBlock;
+		float mGain = 1.f;
 
 		AudioRing();
 
