@@ -325,7 +325,7 @@ public:
 					vec3 specular;
 				};
 
-				void zero(out LightFall l){
+				void zero(inout LightFall l){
 					l.diffuse = vec3(0.);
 					l.specular = vec3(0.);
 				}
