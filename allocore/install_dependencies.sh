@@ -117,6 +117,7 @@ elif uname -o | grep "Msys"; then
 		fi
 		DESTDIR=/usr/local/
 		#DESTDIR=local/
+		DOWNLOAD="wget --no-check-certificate"
 		install -d $DESTDIR/bin/ $DESTDIR/include/ $DESTDIR/lib/
 
 		if files_exist $DESTDIR/lib/libsndfile*; then
@@ -125,7 +126,7 @@ elif uname -o | grep "Msys"; then
 			PKG=libsndfile-1.0.25
 			DIR=$PWD
 			cd /tmp
-				wget http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
+				$DOWNLOAD http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
 				tar -xzf $PKG.tar.gz
 
 				cd $PKG
@@ -148,16 +149,17 @@ elif uname -o | grep "Msys"; then
 			PKG=pa_stable_v19_20140130
 			DIR=$PWD
 			cd /tmp
-				wget http://www.portaudio.com/archives/$PKG.tgz
+				$DOWNLOAD http://www.portaudio.com/archives/$PKG.tgz
 				tar -xzf $PKG.tgz
 				mv portaudio $PKG
 				
 				DXDIR=/usr/local/dx7sdk/include
-				DXURL=https://github.com/msys2/mingw-w64/raw/master/mingw-w64-headers
+				DXURL=https://raw.githubusercontent.com/msys2-contrib/mingw-w64/master/mingw-w64-headers
+
 				install -d $DXDIR
-				wget --no-check-certificate $DXURL/direct-x/include/dsound.h -O $DXDIR/dsound.h
-				wget --no-check-certificate $DXURL/direct-x/include/dsconf.h -O $DXDIR/dsconf.h
-				wget --no-check-certificate $DXURL/crt/_mingw_unicode.h -O $DXDIR/_mingw_unicode.h
+				$DOWNLOAD $DXURL/direct-x/include/dsound.h -O $DXDIR/dsound.h
+				$DOWNLOAD $DXURL/direct-x/include/dsconf.h -O $DXDIR/dsconf.h
+				$DOWNLOAD $DXURL/crt/_mingw_unicode.h -O $DXDIR/_mingw_unicode.h
 				
 				cd $PKG
 					# MME may artificially cap channels at 2! WDMKS or DirectX is needed for multi-channel.
@@ -191,7 +193,7 @@ elif uname -o | grep "Msys"; then
 			PKG=freetype-2.3.5-1-bin
 			DIR=$PWD
 			cd /tmp
-				wget http://downloads.sourceforge.net/project/gnuwin32/freetype/2.3.5-1/$PKG.zip
+				$DOWNLOAD http://downloads.sourceforge.net/project/gnuwin32/freetype/2.3.5-1/$PKG.zip
 				unzip -q $PKG -d $PKG
 				cp $PKG/bin/freetype*.dll $DESTDIR/bin/
 				cp $PKG/lib/libfreetype.dll.a $DESTDIR/lib/
@@ -211,7 +213,7 @@ elif uname -o | grep "Msys"; then
 			PKG=FreeImage3160Win32
 			DIR=$PWD
 			cd /tmp
-				wget http://downloads.sourceforge.net/project/freeimage/Binary%20Distribution/3.16.0/$PKG.zip
+				$DOWNLOAD http://downloads.sourceforge.net/project/freeimage/Binary%20Distribution/3.16.0/$PKG.zip
 				unzip -q $PKG
 				mv FreeImage $PKG
 				cp $PKG/Dist/FreeImage.dll $DESTDIR/bin/
@@ -239,8 +241,8 @@ elif uname -o | grep "Msys"; then
 			#PKG=assimp-3.1.1-win-binaries
 			DIR=$PWD
 			cd /tmp
-				wget -nc http://downloads.sourceforge.net/project/assimp/assimp-3.0/$PKG.zip
-				#wget -nc http://downloads.sourceforge.net/project/assimp/assimp-3.1/$PKG.zip
+				$DOWNLOAD -nc http://downloads.sourceforge.net/project/assimp/assimp-3.0/$PKG.zip
+				#$DOWNLOAD -nc http://downloads.sourceforge.net/project/assimp/assimp-3.1/$PKG.zip
 				unzip -q $PKG
 
 				# 3.0.1270
@@ -265,7 +267,7 @@ elif uname -o | grep "Msys"; then
 		else
 			# These MSVC binaries don't work with MinGW/Msys :(
 			#PKG=glew-1.9.0-win32
-			#wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+			#$DOWNLOAD http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
 			#unzip $PKG.zip
 			#mv glew-1.9.0 $PKG
 			#cp $PKG/bin/*.dll $DESTDIR/bin/
@@ -275,7 +277,7 @@ elif uname -o | grep "Msys"; then
 			PKG=glew-$GLEW_VERSION
 			DIR=$PWD
 			cd /tmp
-				wget http://downloads.sourceforge.net/project/glew/glew/$GLEW_VERSION/$PKG.zip
+				$DOWNLOAD http://downloads.sourceforge.net/project/glew/glew/$GLEW_VERSION/$PKG.zip
 				unzip -q $PKG
 				cd $PKG
 					make install GLEW_DEST=$DESTDIR
@@ -293,7 +295,7 @@ elif uname -o | grep "Msys"; then
 			PKG=glutdlls37beta
 			DIR=$PWD
 			cd /tmp
-				wget --no-check-certificate https://www.opengl.org/resources/libraries/glut/$PKG.zip
+				$DOWNLOAD https://www.opengl.org/resources/libraries/glut/$PKG.zip
 				unzip -q $PKG -d $PKG
 				install -d $DESTDIR/include/GL/
 				cp $PKG/glut.h $DESTDIR/include/GL/
