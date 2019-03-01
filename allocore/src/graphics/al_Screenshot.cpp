@@ -65,4 +65,10 @@ bool Screenshot::save(unsigned w, unsigned h, const std::string& filePath){
 	return true;
 }
 
+bool Screenshot::save(const std::string& filePath){
+	GLint vp[4];
+	glGetIntegerv(GL_VIEWPORT, vp);
+	return save(vp[2], vp[3], filePath);
+}
+
 } // al::
