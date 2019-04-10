@@ -152,22 +152,6 @@ bool SceneWindowHandler::onFrame(){
 	g.depthTesting(true);
 	//g.lighting(false); // should be disabled by default
 
-	struct DrawFunc : public Drawable {
-		App& app;
-		Viewpoint& vp;
-		ViewpointWindow& win;
-
-		DrawFunc(App& a, Viewpoint& v, ViewpointWindow& w)
-		:	app(a), vp(v), win(w){}
-
-		void onDraw(Graphics& g){
-			g.pushMatrix(g.MODELVIEW);
-			for(auto& drawCall : win.drawCalls()) drawCall();
-			app.onDraw(g,vp);
-			g.popMatrix(g.MODELVIEW);
-		}
-	};
-
 	// Draw scene for each viewpoint (pose + viewport)
 	for(auto * vpPtr : win.viewpoints()){
 
@@ -223,7 +207,21 @@ bool SceneWindowHandler::onFrame(){
 			}
 		}
 
-		DrawFunc drawFunc(app, vp, win);
+		struct DrawFunc : public Drawable {
+			App& app;
+			Viewpoint& vp;
+			ViewpointWindow& win;
+
+			DrawFunc(App& a, Viewpoint& v, ViewpointWindow& w)
+			:	app(a), vp(v), win(w){}
+
+			void onDraw(Graphics& g){
+				for(auto& drawCall : win.drawCalls()) drawCall();
+				app.onDraw(g,vp);
+			}
+		} drawFunc(app, vp, win);
+
+		// Note that stereo pushes/pops both proj and modelview around Drawable::onDraw
 		stereo.draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc, doClear);
 		stereo.clearColor(defaultClearColor);
 	}
