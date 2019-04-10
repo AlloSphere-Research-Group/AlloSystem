@@ -227,16 +227,8 @@ public:
 	void pointSize(float v){ mPointSize = v; }
 	//void pointAtten(float c2, float c1, float c0){}
 
-	bool prepareDraw(){
-		auto& mLights = mGraphics.mLights;
-		auto& mMaterials = mGraphics.mMaterials;
-		auto& mFog = mGraphics.mFog;
-		auto& mDoLighting = mGraphics.mDoLighting;
-		auto& mMaterialOneSided = mGraphics.mMaterialOneSided;
-		auto& mDoFog = mGraphics.mDoFog;
-		auto& mView = mGraphics.mView;
-		auto& mUpdateView = mGraphics.mUpdateView;
-
+	// Compile/link shader once and return whether successful
+	bool validateShader(){
 		if(mCompileShader){
 			mCompileShader = false; // will only make one attempt
 
@@ -466,25 +458,25 @@ public:
 				mLocTexCoord2 = mShader.attribute("texCoord2In");
 				mMatrixStacks[MODELVIEW].loc() = mShader.uniform("MV");
 				mMatrixStacks[PROJECTION].loc() = mShader.uniform("P");
-				mDoLighting.loc() = mShader.uniform("doLighting");
+				mGraphics.mDoLighting.loc() = mShader.uniform("doLighting");
 				#define SET_LOC(name)\
 					o.loc().name = mShader.uniform((pre + #name).c_str());
 				for(int i=0; i<AL_MAX_LIGHTS; ++i){
-					auto& o = mLights[i];
+					auto& o = mGraphics.mLights[i];
 					std::string pre = "lights[" + std::to_string(i) + "].";
 					SET_LOC(pos) SET_LOC(dir) SET_LOC(halfDist) SET_LOC(spread)
 					SET_LOC(strength) SET_LOC(diffuse) SET_LOC(specular) SET_LOC(ambient)
 				}
 				for(int i=0; i<2; ++i){
-					auto& o = mMaterials[i];
+					auto& o = mGraphics.mMaterials[i];
 					std::string pre = "materials[" + std::to_string(i) + "].";
 					SET_LOC(diffuse) SET_LOC(emission) SET_LOC(specular) SET_LOC(shininess)
 				}
-				mMaterialOneSided.loc() = mShader.uniform("materialOneSided");
-				mFog.loc().color = mShader.uniform("fog.color");
-				mFog.loc().start = mShader.uniform("fog.start");
-				mFog.loc().end   = mShader.uniform("fog.end");
-				mFog.loc().scale = mShader.uniform("fog.scale");
+				mGraphics.mMaterialOneSided.loc() = mShader.uniform("materialOneSided");
+				mGraphics.mFog.loc().color = mShader.uniform("fog.color");
+				mGraphics.mFog.loc().start = mShader.uniform("fog.start");
+				mGraphics.mFog.loc().end   = mShader.uniform("fog.end");
+				mGraphics.mFog.loc().scale = mShader.uniform("fog.scale");
 				mPointSize.loc() = mShader.uniform("pointSize");
 				// init uniforms
 				mShader.begin();
@@ -496,8 +488,22 @@ public:
 		}
 
 		//printf("%d %d %d %d\n", mLocPos, mLocColor, mLocNormal, mLocTexCoord2);
-		// Return if shader didn't compile
-		if(mLocPos < 0) return false;
+		// If negative, shader didn't compile
+		return mLocPos >= 0;
+	}
+
+	bool prepareDraw(){
+
+		if(!validateShader()) return false;
+
+		auto& mLights = mGraphics.mLights;
+		auto& mMaterials = mGraphics.mMaterials;
+		auto& mFog = mGraphics.mFog;
+		auto& mDoLighting = mGraphics.mDoLighting;
+		auto& mMaterialOneSided = mGraphics.mMaterialOneSided;
+		auto& mDoFog = mGraphics.mDoFog;
+		auto& mView = mGraphics.mView;
+		auto& mUpdateView = mGraphics.mUpdateView;
 
 		mShader.begin();
 			if(mMatrixStacks[MODELVIEW].handleUpdate()){
@@ -968,6 +974,17 @@ void Graphics::pipeline(Pipeline p){
 		AL_WARN("Programmable pipeline not supported");
 		#endif
 		break;
+	}
+}
+
+ShaderProgram& Graphics::shader(){
+	if(mBackends[PROG]){
+		auto * backend =  dynamic_cast<BackendProg *>(mBackends[PROG]);
+		backend->validateShader();
+		return backend->mShader;
+	} else {
+		static ShaderProgram dummyShader;
+		return dummyShader;
 	}
 }
 

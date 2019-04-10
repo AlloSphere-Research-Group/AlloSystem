@@ -386,6 +386,11 @@ protected:
 
 } // ::al
 
-#endif //AL_GRAPHICS_SUPPORTS_SHADER
+#else // AL_GRAPHICS_SUPPORTS_SHADER not def'd
+
+// Dummy class
+class ShaderProgram{};
+
+#endif
 
 #endif
