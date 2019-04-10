@@ -80,6 +80,8 @@
 
 namespace al {
 
+class ShaderProgram;
+
 
 /// A framed area on a display screen
 /// @ingroup allocore
@@ -622,6 +624,7 @@ public:
 	/// Set pipeline used for rendering meshes
 	void pipeline(Pipeline p);
 
+	ShaderProgram& shader();
 	Graphics& shaderPreamble(const std::string& s);
 	Graphics& shaderOnVertex(const std::string& s);
 	Graphics& shaderOnMaterial(const std::string& s);
