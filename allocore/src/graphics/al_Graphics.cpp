@@ -246,6 +246,8 @@ public:
 				varying vec3 posObj;	// position (object space)
 				varying vec4 color;
 				varying vec2 texCoord2;
+
+				uniform mat4 view;		// view matrix (convert from world to eye space)
 				uniform bool doTex2;
 
 				struct Fog{
@@ -514,6 +516,10 @@ public:
 
 			if(mMatrixStacks[PROJECTION].handleUpdate()){
 				mShader.uniform(mMatrixStacks[PROJECTION].loc(), projection());
+			}
+
+			if(mUpdateView){
+				mShader.uniform("view", mView);
 			}
 
 			/* Lighting options:
