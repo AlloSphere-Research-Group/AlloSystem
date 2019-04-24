@@ -435,9 +435,8 @@ public:
 					if(doLighting){
 						vec3 N = normalize(normal);
 						vec3 V = normalize(-pos); // surface to eye
-						if(lightTwoSided){ // make normal always face eye
-							N = faceforward(N, -V, N);
-						}
+						// Two-sided lighting: make normal always face eye
+						if(lightTwoSided && !gl_FrontFacing) N=-N;
 						Material material;
 						if(gl_FrontFacing || materialOneSided) material = materials[0];
 						else material = materials[1];
