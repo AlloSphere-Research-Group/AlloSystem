@@ -1,3 +1,4 @@
+#include <algorithm> // max
 #include <map>
 #include <memory> // unique_ptr
 #include <stdio.h>
@@ -385,10 +386,7 @@ public:
 					}
 
 					// Diffuse/specular
-					float diffAmt = dot(N,L) * intens;
-					diffAmt = max(diffAmt, 0.); // front lighting
-					//diffAmt = abs(diffAmt); // front-and-back lighting
-					diffAmt = mix(diffAmt,1., light.ambient); // mix in ambient
+					float diffAmt = (max(dot(N,L), 0.) + light.ambient) * intens;
 					vec3 H = normalize(L + V); // half-vector
 					float specAmt = pow(max(dot(N,H), 0.), shininess) * intens; // Blinn-Phong
 					//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), shininess*0.25) * intens; // Phong
@@ -557,11 +555,12 @@ public:
 					if(updateLight){
 						//printf("light %p rest\n", &l.get());
 						if(lightActive){
+							auto max = [](const al::RGB& c){ return std::max(std::max(c.r, c.g), c.b); };
 							mShader.uniform(l.loc().halfDist, l.get().halfDist());
 							mShader.uniform(l.loc().spread, l.get().spread());
 							mShader.uniform(l.loc().diffuse, l.get().diffuse().rgb());
 							mShader.uniform(l.loc().specular, l.get().specular().rgb());
-							mShader.uniform(l.loc().ambient, l.get().ambient().luminance());
+							mShader.uniform(l.loc().ambient, max(l.get().ambient().rgb()));
 							if(Light::sGlobalAmbientUpdate){
 								Light::sGlobalAmbientUpdate = false;
 								mShader.uniform("globalAmbient", Light::globalAmbient().rgb());
