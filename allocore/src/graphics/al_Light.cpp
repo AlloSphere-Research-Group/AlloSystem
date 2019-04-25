@@ -215,7 +215,7 @@ Light& Light::attenuation(float c0, float c1, float c2){
 
 Light& Light::halfDist(float v){
 	mHalfDist=v;
-	return attenuation(1,0,1./v*v);
+	return attenuation(1., 0., 1./(v*v));
 }
 
 Light& Light::spread(float v){
