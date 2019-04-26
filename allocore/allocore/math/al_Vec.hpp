@@ -636,7 +636,7 @@ inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
 
 /// Return magnitude of vector (for GLSL compatibility)
 template <int N, class T>
-inline length(const Vec<N,T>& v){ return v.mag(); }
+inline T length(const Vec<N,T>& v){ return v.mag(); }
 
 template <int N, class T>
 inline Vec<N,T> lerp(const Vec<N,T>& input, const Vec<N,T>& target, T amt){
