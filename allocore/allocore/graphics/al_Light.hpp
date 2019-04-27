@@ -105,14 +105,14 @@ public:
 	bool useColorMaterial() const { return mUseColorMaterial; }
 
 protected:
-	Color mAmbient;
-	Color mDiffuse;
-	Color mEmission;
-	Color mSpecular;
-	float mShine, mOpticalDensity, mIllumination;
+	Color mAmbient{0.2};
+	Color mDiffuse{0.8};
+	Color mEmission{0.};
+	Color mSpecular{0.};
+	float mShine=5., mOpticalDensity=0., mIllumination=0.;
 	int mFace;
 	std::string mMapKa, mMapKs, mMapKd, mMapBump;
-	bool mUseColorMaterial;
+	bool mUseColorMaterial=true;
 };
 
 

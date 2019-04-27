@@ -128,15 +128,7 @@ Material::Material()
 {}
 
 Material::Material(int faceDir)
-:	mAmbient(0.2),		// These are the default OpenGL values. Do not change!
-	mDiffuse(0.8),		// See http://www.khronos.org/opengles/sdk/1.1/docs/man/glMaterial.xml
-	mEmission(0),
-	mSpecular(0),		// Specular is 0 to ensure linear lighting (no popping).
-	mShine(5.),
-	mOpticalDensity(0.),
-	mIllumination(0.),
-	mFace(faceDir),
-	mUseColorMaterial(true)
+:	mFace(faceDir)
 {}
 
 Material& Material::ambientAndDiffuse(const Color& v){
