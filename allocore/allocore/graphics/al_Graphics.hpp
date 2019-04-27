@@ -631,6 +631,7 @@ public:
 	ShaderProgram& shader();
 	Graphics& shaderPreamble(const std::string& s);
 	Graphics& shaderOnVertex(const std::string& s);
+	Graphics& shaderOnLight(const std::string& s);
 	Graphics& shaderOnMaterial(const std::string& s);
 
 	/// Set current vertex buffer and optionally update
