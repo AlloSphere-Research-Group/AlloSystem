@@ -403,6 +403,9 @@ public:
 					LightFall fall;
 					fall.diffuse  = light.diffuse  * diffAmt;
 					fall.specular = light.specular * specAmt;
+			)" +
+					mOnLight
+			+ R"(
 					return fall;
 				}
 
@@ -717,7 +720,7 @@ protected:
 	const Mat4f& currentMatrix() const { return currentMatrixStack().get().top(); }
 	ShaderProgram mShader;
 	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
-	std::string mPreamble, mOnVertex, mOnMaterial;
+	std::string mPreamble, mOnVertex, mOnLight, mOnMaterial;
 	Color mCurrentColor;
 	ShaderData<float> mPointSize{1};
 	std::vector<Colori> mColorArray;
@@ -1001,6 +1004,12 @@ Graphics& Graphics::shaderPreamble(const std::string& s){
 Graphics& Graphics::shaderOnVertex(const std::string& s){
 	if(mBackends[PROG]){
 		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnVertex = s;
+	}
+	return *this;
+}
+Graphics& Graphics::shaderOnLight(const std::string& s){
+	if(mBackends[PROG]){
+		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnLight = s;
 	}
 	return *this;
 }
