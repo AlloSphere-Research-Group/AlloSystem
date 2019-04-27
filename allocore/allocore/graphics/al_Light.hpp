@@ -109,7 +109,7 @@ protected:
 	Color mDiffuse{0.8};
 	Color mEmission{0.};
 	Color mSpecular{0.};
-	float mShine=5., mOpticalDensity=0., mIllumination=0.;
+	float mShine=40., mOpticalDensity=0., mIllumination=0.;
 	int mFace;
 	std::string mMapKa, mMapKs, mMapKd, mMapBump;
 	bool mUseColorMaterial=true;
