@@ -103,7 +103,7 @@ void VBO::onAction(){
 		glVertexAttribPointer(VERTEX_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0);
 		#endif
 	} else { // not using shader attributes
-		#ifndef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
+		#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 		glVertexPointer(mNumComps, mDataType, 0, 0);
 		#endif
 	}
