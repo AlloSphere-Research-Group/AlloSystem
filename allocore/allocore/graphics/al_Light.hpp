@@ -73,6 +73,10 @@ public:
 
 	/// Set specular exponent [0, 128]
 	Material& shininess(float v);
+
+	/// Set reflectance at non-grazing viewing angles; in [0,1]
+	Material& reflectance(float v){ mReflectance=v; return *this; }
+
 	Material& opticalDensity(float v) { mOpticalDensity=v; return *this; }
 	Material& illumination(float v) { mIllumination=v; return *this; }
 
@@ -91,6 +95,7 @@ public:
 	int face() const { return mFace; }
 
 	float shininess() const { return mShine; }
+	float reflectance() const { return mReflectance; }
 	float opticalDensity() const { return mOpticalDensity; }
 	float illumination() const { return mIllumination; }
 	const Color& ambient() const { return mAmbient; }
@@ -109,7 +114,8 @@ protected:
 	Color mDiffuse{0.8};
 	Color mEmission{0.};
 	Color mSpecular{0.};
-	float mShine=40., mOpticalDensity=0., mIllumination=0.;
+	float mShine=40., mReflectance=1.;
+	float mOpticalDensity=0., mIllumination=0.;
 	int mFace;
 	std::string mMapKa, mMapKs, mMapKd, mMapBump;
 	bool mUseColorMaterial=true;
