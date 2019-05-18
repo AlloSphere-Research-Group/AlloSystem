@@ -331,6 +331,7 @@ public:
 					vec3 specular;		// Component bounced/reflected off surface
 					vec3 emission;		// Component emitted from surface
 					float shininess;	// Concentration of specular (its lack of scattering)
+					float reflectance;	// Reflectance coef for Fresnel specular factor
 				};
 
 				uniform Light lights[MAX_LIGHTS];
@@ -344,12 +345,15 @@ public:
 
 				Material lerp(in Material m1, in Material m2, float frac){
 					Material m;
-					m.diffuse  = mix(m1.diffuse,  m2.diffuse,  frac);
-					m.specular = mix(m1.specular, m2.specular, frac);
-					m.emission = mix(m1.emission, m2.emission, frac);
-					m.shininess= mix(m1.shininess,m2.shininess,frac);
+					m.diffuse    = mix(m1.diffuse,    m2.diffuse,    frac);
+					m.specular   = mix(m1.specular,   m2.specular,   frac);
+					m.emission   = mix(m1.emission,   m2.emission,   frac);
+					m.shininess  = mix(m1.shininess,  m2.shininess,  frac);
+					m.reflectance= mix(m1.reflectance,m2.reflectance,frac);
 					return m;
 				}
+
+				float _pow5(float x){ float xx=x*x; return xx*xx*x; }
 
 				/* OpenGL fixed pipeline lighting (li = light i, m = material):
 					Em + Ag Am +
@@ -363,7 +367,7 @@ public:
 				/// @param[in] V		direction from surface to eye
 				/// @param[in] light	Light structure
 				/// \returns light color
-				LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in float shininess){
+				LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in Material mat){
 					// Note: light attenuation over distance is an exponential decay (Beer-Lambert)
 					vec3 lightVec = light.pos - pos;
 					vec3 L = normalize(lightVec); // dir from surface to light
@@ -371,8 +375,9 @@ public:
 					float intens = light.strength;
 
 					// Distance attenuation: 1/(1+[d/h]^2) = h^2 / (h^2 + d^2)
-					float hh = light.halfDist*light.halfDist;
-					intens *= hh / (hh + dot(lightVec,lightVec));
+					{	float hh = light.halfDist*light.halfDist;
+						intens *= hh / (hh + dot(lightVec,lightVec));
+					}
 
 					// Spotlight
 					if(light.spread < 180.){
@@ -388,17 +393,20 @@ public:
 					// Diffuse/specular
 					float diffAmt = (max(dot(N,L), 0.) + light.ambient) * intens;
 					vec3 H = normalize(L + V); // half-vector
-					float specAmt = pow(max(dot(N,H), 0.), shininess) * intens; // Blinn-Phong
-					//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), shininess*0.25) * intens; // Phong
+					float specAmt = pow(max(dot(N,H), 0.), mat.shininess) * intens; // Blinn-Phong
+					//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), mat.shininess*0.25) * intens; // Phong
 
 					/* Specular approx [Lyon, 1993. "Phong Shading Reformulation"]
 					vec3 R = reflect(-L,N), D = R-V;
 					//vec3 H = L+V, D = dot(H,N)*N - H; // bug: flaring effect
-					//float c = 1.-min(1.,shininess*0.25*0.5*dot(D,D)); // 1st order apx
-					float c = 1.-min(1.,shininess*0.25*0.25*dot(D,D)); c*=c; // 2nd order apx
-					//float c = 1.-min(1.,shininess*0.25*0.125*dot(D,D)); c*=c; c*=c; // 3rd order apx
+					//float c = 1.-min(1.,mat.shininess*0.25*0.5*dot(D,D)); // 1st order apx
+					float c = 1.-min(1.,mat.shininess*0.25*0.25*dot(D,D)); c*=c; // 2nd order apx
+					//float c = 1.-min(1.,mat.shininess*0.25*0.125*dot(D,D)); c*=c; c*=c; // 3rd order apx
 					float specAmt = c * intens;
 					//*/
+
+					// Fresnel "specular grazing" using Schlick apx
+					specAmt *= mix(mat.reflectance, 1., _pow5(1. - dot(H,V)));
 
 					LightFall fall;
 					fall.diffuse  = light.diffuse  * diffAmt;
@@ -417,7 +425,7 @@ public:
 					zero(lsum);
 					for(int i=0; i<MAX_LIGHTS; ++i){
 						if(lights[i].strength != 0.){
-							LightFall l = light(pos, N, V, lights[i], material.shininess);
+							LightFall l = light(pos, N, V, lights[i], material);
 							lsum.diffuse += l.diffuse;
 							lsum.specular += l.specular;
 						}
@@ -472,7 +480,7 @@ public:
 				for(int i=0; i<2; ++i){
 					auto& o = mGraphics.mMaterials[i];
 					std::string pre = "materials[" + std::to_string(i) + "].";
-					SET_LOC(diffuse) SET_LOC(emission) SET_LOC(specular) SET_LOC(shininess)
+					SET_LOC(diffuse) SET_LOC(emission) SET_LOC(specular) SET_LOC(shininess) SET_LOC(reflectance)
 				}
 				mGraphics.mMaterialOneSided.loc() = mShader.uniform("materialOneSided");
 				mGraphics.mFog.loc().color = mShader.uniform("fog.color");
@@ -583,6 +591,7 @@ public:
 					mShader.uniform(m.loc().emission, m.get().emission().rgb());
 					mShader.uniform(m.loc().specular, m.get().specular().rgb());
 					mShader.uniform(m.loc().shininess, m.get().shininess());
+					mShader.uniform(m.loc().reflectance, m.get().reflectance());
 				}
 			}
 
