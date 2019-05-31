@@ -448,6 +448,8 @@ void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
 	if(mWroteAudio){
 		args += " -i " + path() + "/output.au -c:a aac -b:a 192k";
 	}
+
+	//args += " -pix_fmt yuv420p" // for compatibility with outdated media players
 	//args += " -crf 20 -preset slower";
 	args += " -crf " + al::toString(videoCompress);
 	static const std::string speedStrings[] = {"placebo","veryslow","slower","slow","medium","fast","faster","veryfast","superfast","ultrafast"};
