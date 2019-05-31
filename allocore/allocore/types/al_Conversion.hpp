@@ -43,11 +43,11 @@
 */
 
 
-#include <stdio.h>
-#include <string.h>
-#include <iostream>
-#include <limits.h>
-#include <sstream>		/* string conversion */
+#include <cctype>		// tolower, toupper
+#include <climits>		// ULONG_MAX
+#include <cstring>		// strlen
+#include <string>
+#include <sstream>		// string conversion
 #include "allocore/system/al_Config.h"
 
 namespace al{
@@ -173,6 +173,20 @@ void swapBytes(T& word);
 template <typename T>
 void swapBytes(T * data, unsigned count);
 
+/// Returns string with all characters converted to lowercase
+inline std::string toLower(const std::string& s){
+	auto r = s;
+	for(auto& c : r) c = ::tolower(c);
+	return r;
+}
+
+/// Returns string with all characters converted to uppercase
+inline std::string toUpper(const std::string& s){
+	auto r = s;
+	for(auto& c : r) c = ::toupper(c);
+	return r;
+}
+
 /// Convert argument to a string using snprintf
 template <class T> std::string toString(const char * fmt, const T& v);
 
@@ -232,7 +246,7 @@ inline int base36To10(char v){
 }
 
 inline uint32_t bitsToUInt(const char * string){
-	uint32_t v=0; int n = strlen(string);
+	uint32_t v=0; int n = ::strlen(string);
 	for(int i=0; i<n; ++i) if(string[i] == '1') v |= 1<<(n-1-i);
 	return v;
 }
