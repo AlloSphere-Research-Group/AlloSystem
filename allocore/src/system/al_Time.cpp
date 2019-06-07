@@ -77,10 +77,29 @@ al_nsec steady_time_us(){
 	LARGE_INTEGER time; // tick count
 	QueryPerformanceFrequency(&freq);
 	QueryPerformanceCounter(&time);
+
+	// max 32-bit int:                2,147,483,648  = 2.1e09
+	// max 64-bit int:    9,223,372,036,854,775,808  = 9.2e18
+	// max double as int:     9,007,199,254,740,992  = 9.0e15
+
+	// freq.QuadPart: 3,328,129
+	//printf("freq.QuadPart: %I64d ticks/sec\n", freq.QuadPart);
+
+	// As long as time.QuadPart < 9.0e15, this will work:
+	return al_nsec(time.QuadPart / double(freq.QuadPart) * 1.0e6);
+
+	/* Note this approach can overflow as time.QuadPart may be > 1e13
 	// convert ticks to microseconds
-	time.QuadPart *= 1000000;
+	time.QuadPart *= 1000000; // 1e6
 	time.QuadPart /= freq.QuadPart;
 	return al_nsec(time.QuadPart);
+	*/
+
+	/* Correct integer-only approach
+	LONG64 hi;
+	LONG64 lo = Multiply128(time.QuadPart, 1000000, &hi);
+	//*/
+
 }
 
 al_sec  al_system_time(){		return system_time_100ns() * 1e-7; }
