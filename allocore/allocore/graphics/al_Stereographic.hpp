@@ -188,6 +188,9 @@ public:
 	template <class T>
 	Vec<3,T> pixelToWorld(const Vec<2,T>& p);
 
+	template <class T>
+	Vec<3,T> pixelToWorld(T x, T y){ return pixelToWorld(Vec<2,T>(x,y)); }
+
 	/// Transform a vector from world space to clip space
 	template <class T>
 	Vec<4,T> toClipSpace(const Vec<4,T>& v) const;
