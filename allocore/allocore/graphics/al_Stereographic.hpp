@@ -186,14 +186,14 @@ public:
 
 	/// Convert screen pixel coordinate to world position
 	template <class T>
-	Vec<3,T> pixelToWorld(const Vec<2,T>& p);
+	Vec3d pixelToWorld(const Vec<2,T>& p);
 
 	template <class T>
-	Vec<3,T> pixelToWorld(T x, T y){ return pixelToWorld(Vec<2,T>(x,y)); }
+	Vec3d pixelToWorld(T x, T y){ return pixelToWorld(Vec<2,T>(x,y)); }
 
 	/// Transform a vector from world space to clip space
 	template <class T>
-	Vec<4,T> toClipSpace(const Vec<4,T>& v) const;
+	Vec4d toClipSpace(const Vec<4,T>& v) const;
 
 	/// Returns origin of world space converted to clip space
 	Vec4d toClipSpace() const;
@@ -205,9 +205,9 @@ public:
 	/// corresponds to [left,right], the y-coordinate to [bottom,top], and the
 	/// z-coordinate to [near,far].
 	template <class T>
-	Vec<3,T> toNDCSpace(const Vec<4,T>& v) const;
+	Vec3d toNDCSpace(const Vec<4,T>& v) const;
 	template <class T>
-	Vec<3,T> toNDCSpace(const Vec<3,T>& v) const;
+	Vec3d toNDCSpace(const Vec<3,T>& v) const;
 
 	/// Returns origin of world space converted to normalized device coordinate space
 	Vec3d toNDCSpace() const;
@@ -241,8 +241,8 @@ public:
 
 
 template <class T>
-Vec<3,T> Stereographic::pixelToWorld(const Vec<2,T>& p){
-	Vec<3,T> ndc;
+Vec3d Stereographic::pixelToWorld(const Vec<2,T>& p){
+	Vec3d ndc;
 	ndc.x = (p.x / mVP.w) * 2. - 1.;
 	ndc.y = (p.y / mVP.h) *-2. + 1.;
 	ndc.z = toNDCSpace().z;
@@ -250,7 +250,7 @@ Vec<3,T> Stereographic::pixelToWorld(const Vec<2,T>& p){
 }
 
 template <class T>
-inline Vec<4,T> Stereographic::toClipSpace(const Vec<4,T>& v) const {
+inline Vec4d Stereographic::toClipSpace(const Vec<4,T>& v) const {
 	return modelViewProjection() * v;
 }
 
@@ -259,13 +259,13 @@ inline Vec4d Stereographic::toClipSpace() const {
 }
 
 template <class T>
-inline Vec<3,T> Stereographic::toNDCSpace(const Vec<4,T>& v) const {
-	Vec<4,T> clipSpace = toClipSpace(v);
+inline Vec3d Stereographic::toNDCSpace(const Vec<4,T>& v) const {
+	auto clipSpace = toClipSpace(v);
 	return clipSpace.get(0,1,2) / clipSpace[3];
 }
 template <class T>
-inline Vec<3,T> Stereographic::toNDCSpace(const Vec<3,T>& v) const {
-	return toNDCSpace(Vec<4,T>(v,1));
+inline Vec3d Stereographic::toNDCSpace(const Vec<3,T>& v) const {
+	return toNDCSpace(Vec<4,T>(v, T(1)));
 }
 
 inline Vec3d Stereographic::toNDCSpace() const {
