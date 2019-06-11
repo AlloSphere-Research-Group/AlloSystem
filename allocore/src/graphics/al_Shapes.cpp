@@ -447,25 +447,24 @@ int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
 	return m.vertices().size();
 }
 
-
-int addWireBox(Mesh& m, float w, float h, float d){
-
+int addWireBox(Mesh& m, const Vec3f& l, const Vec3f& h){
 	m.primitive(Graphics::LINES);
 
 	int Nv = m.vertices().size();
-
-	float w_2=w*0.5, h_2=h*0.5, d_2=d*0.5;
 
 	/*		6 7
 			4 5
 		2 3
 		0 1			*/
 
-	for(int k=-1; k<=1; k+=2){
-	for(int j=-1; j<=1; j+=2){
-	for(int i=-1; i<=1; i+=2){
-		m.vertex(i*w_2, j*h_2, k*d_2);
-	}}}
+	m.vertex(l[0], l[1], l[2]);
+	m.vertex(h[0], l[1], l[2]);
+	m.vertex(l[0], h[1], l[2]);
+	m.vertex(h[0], h[1], l[2]);
+	m.vertex(l[0], l[1], h[2]);
+	m.vertex(h[0], l[1], h[2]);
+	m.vertex(l[0], h[1], h[2]);
+	m.vertex(h[0], h[1], h[2]);
 
 	static const int I[] = {
 		0,1, 2,3, 4,5, 6,7,
@@ -476,6 +475,13 @@ int addWireBox(Mesh& m, float w, float h, float d){
 	m.index(I, sizeof(I)/sizeof(*I), Nv);
 
 	return m.vertices().size() - Nv;
+}
+
+
+int addWireBox(Mesh& m, float w, float h, float d){
+	Vec3f p(w, h, d);
+	p *= 0.5f;
+	return addWireBox(m, -p,p);
 }
 
 
