@@ -361,6 +361,14 @@ public:
 		return *this;
 	}
 
+	/// Append 2D vertex
+	template <class T1, class T2>
+	Mesh& vertex2(T1 x1, T2 y1){ return vertex(x1, y1); }
+
+	/// Append 2D vertices
+	template <class T1, class T2, class... Ts>
+	Mesh& vertex2(T1 x1, T2 y1, Ts... xnyn){ return vertex2(x1, y1).vertex2(xnyn...); }
+
 
 	Vertices& vertices(){ return mVertices; }
 	Normals& normals(){ return mNormals; }
