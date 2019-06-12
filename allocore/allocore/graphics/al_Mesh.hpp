@@ -131,14 +131,14 @@ public:
 	Mesh& unitize(bool proportional=true);
 
 	/// Scale all vertices
-	Mesh& scale(float x, float y, float z);
+	Mesh& scale(float x, float y, float z=1.f);
 	Mesh& scale(float s){ return scale(s,s,s); }
 
 	template <class T>
 	Mesh& scale(const Vec<3,T>& v){ return scale(v[0],v[1],v[2]); }
 
 	/// Translate all vertices
-	Mesh& translate(float x, float y, float z);
+	Mesh& translate(float x, float y, float z=0.f);
 
 	template <class T>
 	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
