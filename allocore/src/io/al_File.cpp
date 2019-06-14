@@ -618,30 +618,45 @@ Dir::~Dir(){
 }
 
 bool Dir::open(const std::string& dirPath){ return mImpl->open(dirPath); }
+
 bool Dir::close(){ return mImpl->close(); }
+
 bool Dir::rewind(){ return mImpl->rewind(); }
-bool Dir::read(){ return mImpl->read(mEntry); }
+
+bool Dir::read(){
+	if(mImpl->read(mEntry)){
+		const auto& name = mEntry.name();
+		switch(mHiddenPolicy){
+		default: // exclude hidden
+			if(name[0]=='.') return read();
+		case 1: // include hidden, except . and ..
+			if(name=="." || name=="..") return read();
+		case 2: // include hidden or fall-through
+			return true;
+		}
+	}
+	return false;
+}
 
 /*static*/ bool Dir::removeRecursively(const std::string& path){
 	Dir dir(path);
+	dir.almostAll(true); // all entries, except . and ..
 	bool ok = true;
 	while(dir.read()) {
-		FileInfo entryInfo = dir.entry();
-		if (entryInfo.type() == FileInfo::DIR &&
-				entryInfo.name() != ".." &&
-				entryInfo.name() != "." ) {
-			if (!Dir::remove(path + "/" + entryInfo.name())) {
+		const auto& entry = dir.entry();
+		if(entry.isDir()){
+			if(!Dir::remove(path + "/" + entry.name())){
 				ok = false;
 				break;
 			}
-		} else if (entryInfo.type() == FileInfo::REG) {
-			if (!File::remove(path + "/" + entryInfo.name())) {
+		} else if(entry.isReg()){
+			if(!File::remove(path + "/" + entry.name())) {
 				ok = false;
 				break;
 			}
 		}
 	}
-	if (!Dir::remove(path)) {
+	if(!Dir::remove(path)){
 		ok = false;
 	}
 	return ok;
@@ -733,6 +748,7 @@ bool findFile(
 ){
 	bool found = false;
 	Dir d;
+	d.all(true);
 	if(d.open(dir)){
 		while(d.read()){
 			const auto& entry = d.entry();
