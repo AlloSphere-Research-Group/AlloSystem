@@ -91,13 +91,19 @@ public:
 	FileInfo& type(Type v){ mType=v; return *this; }
 
 	/// Get type
-	const Type type() const { return mType; }
+	Type type() const { return mType; }
 
 	/// Set name
 	FileInfo& name(const std::string& v){ mName=v; return *this; }
 
 	/// Get name
 	const std::string& name() const { return mName; }
+
+	/// Returns whether entry is a regular file
+	bool isReg() const { return mType==REG; }
+
+	/// Returns whether entry is a directory
+	bool isDir() const { return mType==DIR; }
 
 private:
 	Type mType;
