@@ -349,8 +349,16 @@ public:
 	/// Get current directory entry (file) information
 	const FileInfo& entry() const { return mEntry; }
 
+	/// Whether to include all hidden entries in read
+	Dir& all(bool v){ mHiddenPolicy=v?2:0; return *this; }
+
+	/// Whether to include all hidden entries, except . and .. in read
+	Dir& almostAll(bool v){ mHiddenPolicy=v?1:0; return *this; }
+
+
 	/// Go back to first entry in directory
 	bool rewind();
+
 
 	/// Make a directory
 	static bool make(const std::string& path, bool recursive=true);
@@ -367,6 +375,7 @@ public:
 private:
 	class Impl; Impl * mImpl;
 	FileInfo mEntry;
+	int mHiddenPolicy = 0;
 };
 
 
