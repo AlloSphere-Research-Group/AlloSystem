@@ -619,11 +619,13 @@ Vec<N,T> closestPointOnLineSegment(const Vec<N,T>& a, const Vec<N,T>& b, const V
 	auto ab = b - a;
 	auto dot = (p - a).dot(ab);	// projection of ap onto ab
 	auto magAB = ab.magSqr();
-	auto frac = dot / magAB;	// normalized distance along ab from a to the closest point  
+
+	// normalized distance along ab from a to the closest point  
+	auto frac = magAB > T(0) ? dot / magAB : T(0);
 
 	// check if p projection is beyond endpoints of ab   
-	if(frac < 0.) return a;
-	if(frac > 1.) return b;
+	if(frac <= T(0)) return a;
+	if(frac >= T(1)) return b;
 
 	return a + ab * frac;
 }
