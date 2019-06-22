@@ -824,6 +824,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	Mesh m(*this);
 	m.toTriangles();
 
+	const unsigned Nn = m.normals().size();
 	const unsigned Nc = m.colors().size();
 	const unsigned Nci= m.coloris().size();
 	const unsigned Ni = m.indices().size();
@@ -849,7 +850,15 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	"property float z\n"
 	;
 
-	// TODO: normals (nx,ny,nz), texcoords (s,t)
+	bool hasNormals = Nn >= Nv;
+	if(hasNormals){
+		const char * type = binary ? "short" : "float";
+		s <<
+		"property " << type << " nx\n"
+		"property " << type << " ny\n"
+		"property " << type << " nz\n"
+		;
+	}
 
 	bool hasColors = Nc >= Nv || Nci >= Nv;
 	if(hasColors){
@@ -861,6 +870,8 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		;
 	}
 
+	// TODO: texcoords (s,t)
+
 	if(Ni){
 		s << "element face " << Ni/3 << "\n";
 		s << "property list uchar " << (Bi==4?"uint":"ushort") << " vertex_indices\n";
@@ -870,8 +881,14 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 
 	if(binary){
 		// Vertex data
-		for(unsigned i = 0; i < Nv; ++i){
+		for(unsigned i=0; i<Nv; ++i){
 			s.write(reinterpret_cast<const char*>(&m.vertices()[i][0]), sizeof(Mesh::Vertex));
+			if(hasNormals){
+				for(int k=0; k<3; ++k){
+					short v=m.normals()[i][k]*32767.;
+					s.write(reinterpret_cast<const char*>(&v), 2);
+				}
+			}
 			if(hasColors){
 				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
 				s << col.r << col.g << col.b << col.a;
@@ -879,7 +896,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		}
 		// Face data
 		if(Ni){
-			for(unsigned i = 0; i < Ni; i+=3){
+			for(unsigned i=0; i<Ni; i+=3){
 				s << char(3); // 3 indices/face
 				if(sizeof(Mesh::Index) == Bi){
 					s.write(reinterpret_cast<const char*>(&m.indices()[i]), Bi*3);
@@ -903,6 +920,10 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		for(unsigned i = 0; i < Nv; ++i){
 			auto vrt = m.vertices()[i];
 			s << vrt.x << " " << vrt.y << " " << vrt.z;
+			if(hasNormals){
+				auto nrm = m.normals()[i];
+				s << nrm.x << " " << nrm.y << " " << nrm.z;
+			}
 			if(hasColors){
 				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
 				s << " " << int(col.r) << " " << int(col.g) << " " << int(col.b) << " " << int(col.a);
