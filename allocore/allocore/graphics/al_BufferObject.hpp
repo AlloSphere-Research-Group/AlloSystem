@@ -118,7 +118,7 @@ public:
 
 	/// @param[in] bufType	buffer type (array, element, etc.)
 	/// @param[in] bufUsage	buffer usage (stream, static, etc.)
-	BufferObject(BufferType bufType, BufferUsage bufUsage);
+	BufferObject(BufferType bufType = ARRAY_BUFFER, BufferUsage bufUsage = DYNAMIC_DRAW);
 
 	virtual ~BufferObject();
 

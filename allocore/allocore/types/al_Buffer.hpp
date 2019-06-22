@@ -197,12 +197,12 @@ class RingBuffer : protected Alloc {
 public:
 
 	/// Default constructor; does not allocate memory
-	RingBuffer(): mPos(-1), mFill(0){}
+	RingBuffer(): mPos(-1){}
 
 	/// @param[in] size		number of elements
 	/// @param[in] v		value to initialize elements to
 	explicit RingBuffer(unsigned size, const T& v=T())
-	:	mPos(size), mFill(0)
+	:	mPos(size)
 	{
 		resize(size,v);
 	}
@@ -235,7 +235,7 @@ public:
 	T& next(){
 		if(mFill < size()) ++mFill;
 		++mPos; if(pos() == size()){ mPos=0; }
-		return mElems[pos()];
+		return newest();
 	}
 
 	/// Write new element
@@ -244,25 +244,27 @@ public:
 	}
 
 	/// Get reference to element relative to newest element
-	T& read(int i){ return mElems[wrapOnce(pos()-i, size())]; }
-
-	/// Get reference to element relative to newest element (read-only)
 	const T& read(int i) const { return readFrom(pos(), i); }
+	T& read(int i){ return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->read(i)); }
 
-	/// Get reference to older element relative to some newer element (read-only)
+	/// Get reference to older element relative to some newer element 
 
 	/// @param[in] from		absolute index the read is relative to
 	/// @param[in] dist		distance into past relative to 'from' of the returned element
 	const T& readFrom(int from, int dist) const {
 		return mElems[wrapOnce(from-dist, size())];
 	}
+	T& readFrom(int from, int dist){
+		return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->readFrom(from,dist));
+	}
 
-	/// \returns reference to newest element
-	T& newest(){ return mElems[pos()]; }
-
-	/// \returns reference to newest element (read-only)
+	/// \returns reference to newest (last in) element
 	const T& newest() const { return mElems[pos()]; }
+	T& newest(){ return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->newest()); }
 
+	/// \returns reference to oldest (first in) element
+	const T& oldest() const { return read(fill()-1); }
+	T& oldest(){ return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->oldest()); }
 
 	/// Set write position to start of array and zero fill amount
 	void reset(){
@@ -282,7 +284,7 @@ public:
 protected:
 	std::vector<T, Alloc> mElems;
 	int mPos;
-	int mFill;
+	int mFill = 0;
 
 	// Moves value one period closer to interval [0, max)
 	static int wrapOnce(int v, int max){
