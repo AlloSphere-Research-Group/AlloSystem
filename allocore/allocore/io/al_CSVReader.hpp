@@ -54,6 +54,12 @@
 /**
  * @brief The CSVReader class reads simple CSV files
  *
+ * CSV is a delimited data format that has fields/columns separated by the comma
+ * character and records/rows terminated by newlines. "CSV" formats vary greatly
+ * in choice of separator character. In particular, in locales where the comma
+ * is used as a decimal separator, semicolon, TAB, or other characters are used 
+ * instead. [Reference: https://en.wikipedia.org/wiki/Comma-separated_values].
+ *
  * To use, first create a CSVReader object and call addType() to add the type of a
  * column. Then call readFile().
  *
@@ -162,7 +168,6 @@ public:
 	 * @return vector with the data
 	 */
 	std::vector<double> getColumn(int index);
-
 
 private:
 
