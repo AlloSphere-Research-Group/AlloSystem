@@ -90,19 +90,19 @@ bool CSVReader::readFile(std::string fileName) {
 				case STRING:{
 					auto stringLen = std::min(maxStringSize, field.size());
 					std::memcpy(data + byteCount, field.data(), stringLen * sizeof(char));
-					break;}
+					} break;
 				case INTEGER:{
 					int32_t val = std::atoi(field.data());
 					std::memcpy(data + byteCount, &val, typeSize(type));
-					break;}
+					} break;
 				case REAL:{
 					double val = std::atof(field.data());
 					std::memcpy(data + byteCount, &val, typeSize(type));
-					break;}
+					} break;
 				case BOOLEAN:{
 					bool val = field == "True" || field == "true";
 					std::memcpy(data + byteCount, &val, typeSize(type));
-					break;}
+					} break;
 				case NONE:
 					break;
 				}
@@ -125,17 +125,6 @@ size_t CSVReader::columnByteOffset(int col) const {
 		offset += typeSize(mDataTypes[i]);
 	}
 	return offset;
-}
-
-std::vector<double> CSVReader::getColumn(int index) const {
-	std::vector<double> out;
-	auto offset = columnByteOffset(index);
-	//std::cout << offset << std::endl;
-	for (auto row: mData) {
-		double *val = (double *)(row + offset);
-		out.push_back(*val);
-	}
-	return out;
 }
 
 size_t CSVReader::calculateRowLength() const {

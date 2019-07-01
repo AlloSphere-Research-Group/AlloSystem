@@ -164,8 +164,35 @@ public:
 	 * @brief Returns a column from the csv file
 	 * @param index column index
 	 * @return vector with the data
+	 *
+	 * Values will be implicitly casted from their stored DataType to T.
 	 */
-	std::vector<double> getColumn(int index) const;
+	template <class T>
+	std::vector<T> getColumn(int index) const {
+		std::vector<T> out;
+		auto offset = columnByteOffset(index);
+		auto type = mDataTypes[index];
+		for (auto row: mData) {
+			switch(type){
+			case REAL:
+				out.push_back(*(const double *)(row + offset));
+				break;
+			case INTEGER:
+				out.push_back(*(const int32_t *)(row + offset));
+				break;
+			case BOOLEAN:
+				out.push_back(*(const bool *)(row + offset));
+				break;
+			// TODO: STRING -> std::string
+			default:;
+			}
+		}
+		return out;
+	}
+
+	std::vector<double> getColumn(int index) const {
+		return getColumn<double>(index);
+	}
 
 
 	/// Get column names
