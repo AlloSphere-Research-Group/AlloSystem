@@ -44,12 +44,7 @@
 
 #include <vector>
 #include <string>
-#include <memory>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
-#include <cstring>
+#include <cstring> // memcpy
 
 /**
  * @brief The CSVReader class reads simple CSV files
