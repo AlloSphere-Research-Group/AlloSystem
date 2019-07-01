@@ -13,7 +13,7 @@ CSVReader::~CSVReader() {
 	mData.clear();
 }
 
-size_t CSVReader::typeSize(CSVReader::DataType type){
+size_t CSVReader::typeSize(CSVReader::DataType type) const{
 	switch(type){
 		case STRING:  return sizeof(char)*maxStringSize;
 		case INTEGER: return sizeof(int32_t);
@@ -82,7 +82,7 @@ bool CSVReader::readFile(std::string fileName) {
 	return true;
 }
 
-std::vector<double> CSVReader::getColumn(int index) {
+std::vector<double> CSVReader::getColumn(int index) const {
 	std::vector<double> out;
 	int offset = 0;
 	for (int i = 0; i < index; i++) {
@@ -96,7 +96,7 @@ std::vector<double> CSVReader::getColumn(int index) {
 	return out;
 }
 
-size_t CSVReader::calculateRowLength() {
+size_t CSVReader::calculateRowLength() const {
 	size_t len = 0;;
 	for(auto type:mDataTypes) {
 		len += typeSize(type);

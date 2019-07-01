@@ -143,7 +143,7 @@ public:
 	 * @return vector with the data
 	 */
 	template<class DataStruct>
-	std::vector<DataStruct> copyToStruct() {
+	std::vector<DataStruct> copyToStruct() const {
 		std::vector<DataStruct> output;
 		if (sizeof(DataStruct) < calculateRowLength()) {
 			return output;
@@ -162,12 +162,12 @@ public:
 	 * @param index column index
 	 * @return vector with the data
 	 */
-	std::vector<double> getColumn(int index);
+	std::vector<double> getColumn(int index) const;
 
 private:
 
-	size_t calculateRowLength();
-	size_t typeSize(CSVReader::DataType type);
+	size_t calculateRowLength() const;
+	size_t typeSize(CSVReader::DataType type) const;
 
 	const size_t maxStringSize = 32;
 
