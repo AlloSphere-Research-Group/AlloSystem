@@ -124,6 +124,11 @@ public:
 	bool readFile(std::string fileName);
 
 	/**
+	 * @brief Set the delimiter used by readFile for parsing values
+	 */
+	CSVReader& delim(char v){ mDelim=v; return *this; }
+
+	/**
 	 * @brief addType
 	 * @param type
 	 */
@@ -132,7 +137,7 @@ public:
 	}
 
 	/**
-	 * @brief getColumn returns a column from the csv file
+	 * @brief Returns all columns from the csv file
 	 * @param index column index
 	 * @return vector with the data
 	 */
@@ -152,7 +157,7 @@ public:
 	}
 
 	/**
-	 * @brief getColumn returns a column from the csv file
+	 * @brief Returns a column from the csv file
 	 * @param index column index
 	 * @return vector with the data
 	 */
@@ -168,6 +173,7 @@ private:
 	std::vector<std::string> mColumnNames;
 	std::vector<DataType> mDataTypes;
 	std::vector<char *> mData;
+	char mDelim = ',';
 };
 
 #endif // INCLUDE_AL_CSVREADER_HPP
