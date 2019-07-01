@@ -24,7 +24,7 @@ bool CSVReader::readFile(std::string fileName) {
 		if (line.size() == 0) {
 			continue;
 		}
-		if (std::count(line.begin(), line.end(), ',') == int(mDataTypes.size() - 1)) { // Check that we have enough commas
+		if (std::count(line.begin(), line.end(), mDelim) == int(mDataTypes.size() - 1)) { // Check that we have enough commas
 			std::stringstream ss(line);
 			char *row = new char[rowLength];
 			mData.push_back(row);
