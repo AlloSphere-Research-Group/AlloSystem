@@ -6,6 +6,30 @@
 #include <cstdint> // int32_t
 #include "allocore/io/al_CSVReader.hpp"
 
+
+class Tokenizer{
+public:
+	Tokenizer(const std::string& src, char delim=',')
+	:	mStream(src), mDelim(delim)
+	{}
+
+	bool operator()(){
+		if(mStream.good()){
+			getline(mStream, mToken, mDelim);
+			return true;
+		}
+		return false;
+	}
+
+	const std::string& token() const { return mToken; }
+
+private:
+	std::stringstream mStream;
+	std::string mToken;
+	char mDelim;
+};
+
+
 CSVReader::~CSVReader() {
 	for (auto row: mData) {
 		delete[] row;
@@ -33,21 +57,28 @@ bool CSVReader::readFile(std::string fileName) {
 	std::string line;
 	size_t rowLength = calculateRowLength();
 
-	getline(f, line); // TODO Process column names
-//	std::cout << line << std::endl;
+	{	// Get column names (assuming they are the first row)
+		getline(f, line);
+		Tokenizer tk(line, mDelim);
+		mColumnNames.clear();
+		while(tk()){
+			mColumnNames.push_back(tk.token());
+		}
+	}
+
 	while (getline(f, line)) {
 		if (line.size() == 0) {
 			continue;
 		}
 		if (std::count(line.begin(), line.end(), mDelim) == int(mDataTypes.size() - 1)) { // Check that we have enough commas
-			std::stringstream ss(line);
+			Tokenizer tk(line, mDelim);
 			char *row = new char[rowLength];
 			mData.push_back(row);
 			char *data = mData.back();
 			int byteCount = 0;
 			for(auto type:mDataTypes) {
-				std::string field;
-				std::getline(ss, field, mDelim);
+				if(!tk()) break; // Failed to get next token (CSV field)
+				const auto& field = tk.token();
 
 				switch (type){
 				case STRING:{
