@@ -167,6 +167,7 @@ public:
 private:
 
 	size_t calculateRowLength();
+	size_t typeSize(CSVReader::DataType type);
 
 	const size_t maxStringSize = 32;
 
