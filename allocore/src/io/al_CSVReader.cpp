@@ -55,7 +55,6 @@ bool CSVReader::readFile(std::string fileName) {
 	}
 
 	std::string line;
-	size_t rowLength = calculateRowLength();
 
 	{	// Get column names (assuming they are the first row)
 		getline(f, line);
@@ -65,6 +64,13 @@ bool CSVReader::readFile(std::string fileName) {
 			mColumnNames.push_back(tk.token());
 		}
 	}
+
+	// No data types defined, so use a default
+	if(mDataTypes.empty()){
+		for(unsigned i=0; i<mColumnNames.size(); ++i) addType(REAL);
+	}
+
+	const auto rowLength = calculateRowLength();
 
 	while (getline(f, line)) {
 		if (line.size() == 0) {
@@ -113,13 +119,18 @@ bool CSVReader::readFile(std::string fileName) {
 	return true;
 }
 
-std::vector<double> CSVReader::getColumn(int index) const {
-	std::vector<double> out;
+size_t CSVReader::columnByteOffset(int col) const {
 	int offset = 0;
-	for (int i = 0; i < index; i++) {
+	for(int i = 0; i < col; i++){
 		offset += typeSize(mDataTypes[i]);
 	}
-//	std::cout << offset << std::endl;
+	return offset;
+}
+
+std::vector<double> CSVReader::getColumn(int index) const {
+	std::vector<double> out;
+	auto offset = columnByteOffset(index);
+	//std::cout << offset << std::endl;
 	for (auto row: mData) {
 		double *val = (double *)(row + offset);
 		out.push_back(*val);
@@ -128,10 +139,5 @@ std::vector<double> CSVReader::getColumn(int index) const {
 }
 
 size_t CSVReader::calculateRowLength() const {
-	size_t len = 0;;
-	for(auto type:mDataTypes) {
-		len += typeSize(type);
-	}
-//	std::cout << len << std::endl;
-	return len;
+	return columnByteOffset(mColumnNames.size());
 }
