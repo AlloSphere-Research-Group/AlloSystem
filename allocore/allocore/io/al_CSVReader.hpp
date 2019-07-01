@@ -119,8 +119,9 @@ public:
 	/**
 	 * @brief readFile reads the CSV file into internal memory
 	 * @param fileName the csv file name
+	 * \returns whether the file was successfully read.
 	 */
-	void readFile(std::string fileName);
+	bool readFile(std::string fileName);
 
 	/**
 	 * @brief addType
