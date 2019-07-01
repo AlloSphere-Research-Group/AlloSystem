@@ -13,6 +13,16 @@ CSVReader::~CSVReader() {
 	mData.clear();
 }
 
+size_t CSVReader::typeSize(CSVReader::DataType type){
+	switch(type){
+		case STRING:  return sizeof(char)*maxStringSize;
+		case INTEGER: return sizeof(int32_t);
+		case REAL:    return sizeof(double);
+		case BOOLEAN: return sizeof(bool);
+		default:      return 0;
+	}
+}
+
 bool CSVReader::readFile(std::string fileName) {
 	std::ifstream f(fileName);
 	if (!f.is_open()) {
@@ -37,34 +47,30 @@ bool CSVReader::readFile(std::string fileName) {
 			int byteCount = 0;
 			for(auto type:mDataTypes) {
 				std::string field;
-				std::getline(ss, field, ',');
-				size_t stringLen = std::min(maxStringSize, field.size());
-				int32_t intValue;
-				double doubleValue;
-				bool booleanValue;
+				std::getline(ss, field, mDelim);
+
 				switch (type){
-				case STRING:
-					std::memcpy(data + byteCount, field.data(), stringLen * sizeof (char));
-					byteCount += maxStringSize * sizeof (char);
-					break;
-				case INTEGER:
-					intValue = std::atoi(field.data());
-					std::memcpy(data + byteCount, &intValue, sizeof (int32_t));
-					byteCount += sizeof (int32_t);
-					break;
-				case REAL:
-					doubleValue = std::atof(field.data());
-					std::memcpy(data + byteCount, &doubleValue, sizeof (double));
-					byteCount += sizeof (double);
-					break;
-				case BOOLEAN:
-					booleanValue = field == "True" || field == "true";
-					std::memcpy(data + byteCount, &booleanValue, sizeof (bool));
-					byteCount += sizeof (bool);
-					break;
+				case STRING:{
+					auto stringLen = std::min(maxStringSize, field.size());
+					std::memcpy(data + byteCount, field.data(), stringLen * sizeof(char));
+					break;}
+				case INTEGER:{
+					int32_t val = std::atoi(field.data());
+					std::memcpy(data + byteCount, &val, typeSize(type));
+					break;}
+				case REAL:{
+					double val = std::atof(field.data());
+					std::memcpy(data + byteCount, &val, typeSize(type));
+					break;}
+				case BOOLEAN:{
+					bool val = field == "True" || field == "true";
+					std::memcpy(data + byteCount, &val, typeSize(type));
+					break;}
 				case NONE:
 					break;
 				}
+
+				byteCount += typeSize(type);
 			}
 		}
 	}
@@ -80,22 +86,7 @@ std::vector<double> CSVReader::getColumn(int index) {
 	std::vector<double> out;
 	int offset = 0;
 	for (int i = 0; i < index; i++) {
-		switch (mDataTypes[i]){
-		case STRING:
-			offset += maxStringSize * sizeof (char);
-			break;
-		case INTEGER:
-			offset += sizeof (int32_t);
-			break;
-		case REAL:
-			offset += sizeof (double);
-			break;
-		case BOOLEAN:
-			offset += sizeof (bool);
-			break;
-		case NONE:
-			break;
-		}
+		offset += typeSize(mDataTypes[i]);
 	}
 //	std::cout << offset << std::endl;
 	for (auto row: mData) {
@@ -108,22 +99,7 @@ std::vector<double> CSVReader::getColumn(int index) {
 size_t CSVReader::calculateRowLength() {
 	size_t len = 0;;
 	for(auto type:mDataTypes) {
-		switch(type) {
-		case STRING:
-			len += maxStringSize * sizeof (char);
-			break;
-		case INTEGER:
-			len += sizeof (int32_t);
-			break;
-		case REAL:
-			len += sizeof (double);
-			break;
-		case BOOLEAN:
-			len += sizeof (bool);
-			break;
-		case NONE:
-			break;
-		}
+		len += typeSize(type);
 	}
 //	std::cout << len << std::endl;
 	return len;
