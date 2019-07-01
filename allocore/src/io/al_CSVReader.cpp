@@ -1,4 +1,9 @@
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <algorithm> // count, min
+#include <cstdlib> // atoi, atof
+#include <cstdint> // int32_t
 #include "allocore/io/al_CSVReader.hpp"
 
 CSVReader::~CSVReader() {
