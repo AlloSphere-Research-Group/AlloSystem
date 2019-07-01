@@ -8,11 +8,11 @@ CSVReader::~CSVReader() {
 	mData.clear();
 }
 
-void CSVReader::readFile(std::string fileName) {
+bool CSVReader::readFile(std::string fileName) {
 	std::ifstream f(fileName);
 	if (!f.is_open()) {
-		std::cout << "Could not open:" << fileName << std::endl;
-		return;
+		std::cerr << "Could not open: " << fileName << std::endl;
+		return false;
 	}
 
 	std::string line;
@@ -64,8 +64,11 @@ void CSVReader::readFile(std::string fileName) {
 		}
 	}
 	if (f.bad()) {
-		std::cout << "Error reading:" << fileName << std::endl;
+		std::cerr << "Error reading: " << fileName << std::endl;
+		return false;
 	}
+
+	return true;
 }
 
 std::vector<double> CSVReader::getColumn(int index) {
