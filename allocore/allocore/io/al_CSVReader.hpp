@@ -121,6 +121,9 @@ public:
 	 * @brief readFile reads the CSV file into internal memory
 	 * @param fileName the csv file name
 	 * \returns whether the file was successfully read.
+	 *
+	 * If the column data types have not been defined before calling this
+	 * function using addType, then the reader will assume they are REAL.
 	 */
 	bool readFile(std::string fileName);
 
@@ -170,6 +173,7 @@ public:
 
 private:
 
+	size_t columnByteOffset(int col) const;
 	size_t calculateRowLength() const;
 	size_t typeSize(CSVReader::DataType type) const;
 
