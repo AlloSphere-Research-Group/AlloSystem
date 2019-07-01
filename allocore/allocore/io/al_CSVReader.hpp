@@ -164,6 +164,10 @@ public:
 	 */
 	std::vector<double> getColumn(int index) const;
 
+
+	/// Get column names
+	const std::vector<std::string>& columnNames() const { return mColumnNames; }
+
 private:
 
 	size_t calculateRowLength() const;
