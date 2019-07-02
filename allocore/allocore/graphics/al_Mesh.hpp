@@ -100,22 +100,22 @@ public:
 	// destructive edits to internal vertices:
 
 	/// Generates indices for a set of vertices
-	void compress();
+	Mesh& compress();
 
 	/// Convert indices (if any) to flat vertex buffers
-	void decompress();
+	Mesh& decompress();
 
 	/// Extend buffers to match number of vertices
 
 	/// This will resize all populated buffers to match the size of the vertex
 	/// buffer. Buffers are extended by copying their last element.
-	void equalizeBuffers();
+	Mesh& equalizeBuffers();
 
 	/// Append buffers from another mesh:
-	void merge(const Mesh& src);
+	Mesh& merge(const Mesh& src);
 
 	/// Convert triangle strip to triangles
-	void toTriangles();
+	Mesh& toTriangles();
 
 
 	/// Reset all buffers
@@ -168,10 +168,10 @@ public:
 	/// @param[in] equalWeightPerFace	whether to use an equal weighting of
 	///									face normals rather than a weighting
 	///									based on face areas
-	void generateNormals(bool normalize=true, bool equalWeightPerFace=false);
+	Mesh& generateNormals(bool normalize=true, bool equalWeightPerFace=false);
 
 	/// Invert direction of normals
-	void invertNormals();
+	Mesh& invertNormals();
 
 	/// Creates a mesh filled with lines for each normal of the source
 
@@ -188,8 +188,8 @@ public:
 	/// @param[in] width			Width of ribbon
 	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
 	///								If false, surface faces normal vector of curve.
-	void ribbonize(float width=0.04, bool faceBinormal=false){
-		ribbonize(&width, 0, faceBinormal);
+	Mesh& ribbonize(float width=0.04, bool faceBinormal=false){
+		return ribbonize(&width, 0, faceBinormal);
 	}
 
 	/// Ribbonize curve
@@ -200,7 +200,7 @@ public:
 	/// @param[in] widthsStride		Stride factor of width array
 	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
 	///								If false, surface faces normal vector of curve.
-	void ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
+	Mesh& ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
 
 	/// Smooths a triangle mesh
 
@@ -209,7 +209,7 @@ public:
 	/// The number of vertices is not changed.
 	/// @param[in] amount		interpolation fraction between original and smoothed result
 	/// @param[in] weighting	0 = equal weight, 1 = inverse distance weight
-	void smooth(float amount=1, int weighting=0);
+	Mesh& smooth(float amount=1, int weighting=0);
 
 
 	int primitive() const { return mPrimitive; }
