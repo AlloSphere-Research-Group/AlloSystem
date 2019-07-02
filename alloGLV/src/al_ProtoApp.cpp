@@ -33,11 +33,11 @@ ProtoApp::ProtoApp()
 	cnScale.setValue(1);
 	cnGain.setValue(0.5);
 
-	mParamPanel
+	/*mParamPanel
 		.addParamGroup(cnNear, "near", cnFar, "far", cnFOV, "FOV", "lens")
 		.addParam(cnScale, "scale")
 		.addParam(cnGain, "gain")
-	;
+	;*/
 
 	mGUI.addHandler(glv::Event::KeyDown, mGUIKeyDownHandler);
 
@@ -124,18 +124,15 @@ void ProtoApp::init(
 
 	// Add notifications to controls;
 	// must do it here to preserve user-specified app state, lens().far() etc.
-	struct F{
-		static void ntGUIUpdate(const glv::Notification& n){
-			ProtoApp& app = *n.receiver<ProtoApp>();
-			app.lens()
-				.near(app.cnNear.getValue())
-				.far(app.cnFar.getValue())
-				.fovy(app.cnFOV.getValue());
-		}
+	auto ntGUIUpdate = [this](const glv::Notification& n){
+		lens()
+			.near(cnNear.getValue())
+			.far(cnFar.getValue())
+			.fovy(cnFOV.getValue());
 	};
-	cnNear.attach(F::ntGUIUpdate, glv::Update::Value, this);
-	cnFar.attach(F::ntGUIUpdate, glv::Update::Value, this);
-	cnFOV.attach(F::ntGUIUpdate, glv::Update::Value, this);
+	cnNear.attach(ntGUIUpdate, glv::Update::Value);
+	cnFar.attach(ntGUIUpdate, glv::Update::Value);
+	cnFOV.attach(ntGUIUpdate, glv::Update::Value);
 
 	// setup model manager
 	if(!App::name().empty()){
