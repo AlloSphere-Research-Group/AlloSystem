@@ -828,6 +828,8 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	Mesh m(*this);
 	m.toTriangles();
 
+	Nv = m.vertices().size();
+
 	const unsigned Nn = m.normals().size();
 	const unsigned Nc = m.colors().size();
 	const unsigned Nci= m.coloris().size();
