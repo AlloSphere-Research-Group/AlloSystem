@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm> // count, min
-#include <cstdlib> // atoi, atof
+#include <cstdlib> // atoi, atof, strtod
 #include <cstdint> // int32_t
 #include "allocore/io/al_CSVReader.hpp"
 
@@ -65,12 +65,16 @@ bool CSVReader::readFile(std::string fileName) {
 		}
 	}
 
+	auto derivingTypeIndex = mDataTypes.size();
+
 	// No data types defined, so use a default
 	if(mDataTypes.empty()){
 		for(unsigned i=0; i<mColumnNames.size(); ++i) addType(REAL);
 	}
 
-	const auto rowLength = calculateRowLength();
+	auto derivingTypes = [&](){ return derivingTypeIndex < mDataTypes.size(); };
+
+	auto rowLength = calculateRowLength();
 
 	while (getline(f, line)) {
 		if (line.size() == 0) {
@@ -78,13 +82,25 @@ bool CSVReader::readFile(std::string fileName) {
 		}
 		if (std::count(line.begin(), line.end(), mDelim) == int(mDataTypes.size() - 1)) { // Check that we have enough commas
 			Tokenizer tk(line, mDelim);
-			char *row = new char[rowLength];
+			char *row = new char[!derivingTypes() ? rowLength : mDataTypes.size()*maxStringSize];
 			mData.push_back(row);
 			char *data = mData.back();
 			int byteCount = 0;
-			for(auto type:mDataTypes) {
+			for(auto& type : mDataTypes) {
 				if(!tk()) break; // Failed to get next token (CSV field)
 				const auto& field = tk.token();
+
+				if(derivingTypes()){
+					char * pEnd;
+					std::strtod(field.c_str(), &pEnd);
+					// pEnd == '\0' if number parse successful
+					if(*pEnd != '\0') type = STRING;
+					//printf("Column %u derived as %s\n", derivingTypeIndex, type==STRING?"string":"real");
+					++derivingTypeIndex;
+					if(!derivingTypes()){ // hit last column
+						rowLength = calculateRowLength();
+					}
+				}
 
 				switch (type){
 				case STRING:{

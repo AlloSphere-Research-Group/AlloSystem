@@ -111,9 +111,7 @@ public:
 		NONE
 	} DataType;
 
-	CSVReader() {
-		// TODO We could automatically add types by trying to parse the file
-	}
+	CSVReader(){}
 
 	~CSVReader();
 
@@ -123,7 +121,8 @@ public:
 	 * \returns whether the file was successfully read.
 	 *
 	 * If the column data types have not been defined before calling this
-	 * function using addType, then the reader will assume they are REAL.
+	 * function using addType, then the reader will do its best job to derive
+	 * the types.
 	 */
 	bool readFile(std::string fileName);
 
