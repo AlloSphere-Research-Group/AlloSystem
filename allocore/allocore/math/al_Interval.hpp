@@ -77,8 +77,11 @@ public:
 	bool proper() const { return min()!=max(); }	///< Returns true if diameter is non-zero
 	T radius() const { return diameter()/T(2); }	///< Returns one-half the diameter
 
-	/// Linearly map point in interval to point in the unit interval
+	/// Linearly map point in interval to point in the unit interval [0,1]
 	T toUnit(const T& v) const { return (v-min())/diameter(); }
+
+	/// Linearly map point in the unit interval [0,1] to point in interval
+	T fromUnit(const T& u) const { return u*diameter() + min(); }
 
 	template <class U>
 	bool operator == (const Interval<U>& v){ return min()==v.min() && max()==v.max(); }
