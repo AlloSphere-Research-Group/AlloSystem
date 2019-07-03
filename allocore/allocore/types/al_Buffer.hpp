@@ -56,8 +56,9 @@ namespace al{
 /// @ingroup allocore
 template <class T, class Alloc=std::allocator<T> >
 class Buffer : protected Alloc{
-	typedef Alloc super;
 public:
+
+	typedef T value_type;
 
 	/// @param[in] size			Initial size
 	explicit Buffer(int size=0)
@@ -132,10 +133,10 @@ public:
 			// which may become invalid after the resize.
 			const T vsafecopy = v;
 			mElems.resize((size() ? size() : 4)*growFactor);
-			super::construct(elems()+size(), vsafecopy);
+			Alloc::construct(elems()+size(), vsafecopy);
 		}
 		else{
-			super::construct(elems()+size(), v);
+			Alloc::construct(elems()+size(), v);
 		}
 		++mSize;
 	}
@@ -195,6 +196,8 @@ private:
 template <class T, class Alloc=std::allocator<T> >
 class RingBuffer : protected Alloc {
 public:
+
+	typedef T value_type;
 
 	/// Default constructor; does not allocate memory
 	RingBuffer(): mPos(-1){}
@@ -307,6 +310,8 @@ protected:
 template <int N, class T>
 class ShiftBuffer{
 public:
+
+	typedef T value_type;
 
 	/// @param[in] v	Value to initialize all elements to
 	ShiftBuffer(const T& v=T()){ assign(v); }
