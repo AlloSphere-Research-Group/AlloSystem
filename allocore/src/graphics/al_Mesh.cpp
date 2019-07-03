@@ -815,9 +815,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		return false;
 	}
 
-	const unsigned Nv = vertices().size();
-
-	if(!Nv) return false;
+	if(!vertices().size()) return false;
 
 	std::ofstream s;
 	s.open(filePath, binary ? (std::ios::out | std::ios::binary) : std::ios::out);
@@ -828,8 +826,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	Mesh m(*this);
 	m.toTriangles();
 
-	Nv = m.vertices().size();
-
+	const unsigned Nv = m.vertices().size();
 	const unsigned Nn = m.normals().size();
 	const unsigned Nc = m.colors().size();
 	const unsigned Nci= m.coloris().size();
