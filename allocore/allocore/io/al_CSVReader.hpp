@@ -167,27 +167,7 @@ public:
 	 * Values will be implicitly casted from their stored DataType to T.
 	 */
 	template <class T>
-	std::vector<T> getColumn(int index) const {
-		std::vector<T> out;
-		auto offset = columnByteOffset(index);
-		auto type = mDataTypes[index];
-		for (auto row: mData) {
-			switch(type){
-			case REAL:
-				out.push_back(*(const double *)(row + offset));
-				break;
-			case INTEGER:
-				out.push_back(*(const int32_t *)(row + offset));
-				break;
-			case BOOLEAN:
-				out.push_back(*(const bool *)(row + offset));
-				break;
-			// TODO: STRING -> std::string
-			default:;
-			}
-		}
-		return out;
-	}
+	std::vector<T> getColumn(int index) const;
 
 	std::vector<double> getColumn(int index) const {
 		return getColumn<double>(index);
@@ -210,5 +190,44 @@ private:
 	std::vector<char *> mData;
 	char mDelim = ',';
 };
+
+
+template <class T>
+std::vector<T> CSVReader::getColumn(int index) const {
+	std::vector<T> out;
+	auto offset = columnByteOffset(index);
+	auto type = mDataTypes[index];
+	for (auto row: mData) {
+		switch(type){
+		case REAL:
+			out.push_back(*(const double *)(row + offset));
+			break;
+		case INTEGER:
+			out.push_back(*(const int32_t *)(row + offset));
+			break;
+		case BOOLEAN:
+			out.push_back(*(const bool *)(row + offset));
+			break;
+		default:;
+		}
+	}
+	return out;
+}
+
+template <>
+inline std::vector<std::string> CSVReader::getColumn<std::string>(int index) const {
+	std::vector<std::string> out;
+	auto offset = columnByteOffset(index);
+	auto type = mDataTypes[index];
+	for (auto row: mData) {
+		switch(type){
+		case STRING:
+			out.emplace_back((const char *)(row + offset));
+			break;
+		default:;
+		}
+	}
+	return out;
+}
 
 #endif // INCLUDE_AL_CSVREADER_HPP
