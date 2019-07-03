@@ -104,8 +104,9 @@ bool CSVReader::readFile(std::string fileName) {
 
 				switch (type){
 				case STRING:{
-					auto stringLen = std::min(maxStringSize, field.size());
+					auto stringLen = std::min(maxStringSize-1, field.size());
 					std::memcpy(data + byteCount, field.data(), stringLen * sizeof(char));
+					data[byteCount + stringLen] = '\0';
 					} break;
 				case INTEGER:{
 					int32_t val = std::atoi(field.data());
