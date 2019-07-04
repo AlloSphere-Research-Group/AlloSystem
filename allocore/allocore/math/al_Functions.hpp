@@ -44,6 +44,7 @@
 */
 
 #include <cmath>
+#include <utility> // forward
 #include "allocore/system/al_Config.h"
 #include "allocore/math/al_Constants.hpp"
 
@@ -180,6 +181,19 @@ bool coprime(const Ts&... vals){ return gcd(vals...) == 1; }
 /// Relates circular and hyperbolic functions without using complex numbers.
 /// @see http://en.wikipedia.org/wiki/Gudermannian_function
 template<class T> T gudermannian(const T& x);
+
+template <class T>
+bool inSet(const T& val, const T& x){ return val==x; }
+
+/// Returns whether val is equal to any of the successive arguments
+
+/// Example: inSet(1, 4,3,1,47) returns true
+/// Example: inSet(4.2, 3.1,5.7,10.9) returns false
+/// Suitable for any type with == operator defined (including std::string).
+template <class T, class... Ts>
+bool inSet(const T& val, const T& x, Ts&&... xs){
+	return inSet(val, x) || inSet(val, std::forward<Ts>(xs)...);
+}
 
 /// Returns true if integer is prime
 bool isPrime(unsigned n);
