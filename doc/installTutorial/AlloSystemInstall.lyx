@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -42,6 +42,8 @@ framexleftmargin=1em,
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -81,6 +83,7 @@ framexleftmargin=1em,
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -93,7 +96,10 @@ framexleftmargin=1em,
 \tocdepth 2
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -203,6 +209,7 @@ For Windows users, Linux Ubuntu can be installed easily and safely using
 LatexCommand href
 name "Wubi"
 target "http://www.ubuntu.com/download/desktop/windows-installer"
+literal "false"
 
 \end_inset
 
@@ -803,20 +810,20 @@ reference "fig:MinGW-Installation-Manager"
 
 \end_inset
 
-), select 'Basic Setup' in the left pane and then set the following packages
- to 'Mark for Installation':
+), select `Basic Setup' in the left pane and then set the following packages
+ to `Mark for Installation':
 \end_layout
 
 \begin_layout Itemize
-mingw32-base
+mingw32-base-bin
 \end_layout
 
 \begin_layout Itemize
-mingw32-gcc-g++
+mingw32-gcc-g++-bin
 \end_layout
 
 \begin_layout Itemize
-msys-base
+msys-base-bin
 \end_layout
 
 \begin_layout Standard
@@ -828,7 +835,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename fig/mingw-getGUI.png
+	filename fig/mingw-getGUI2.png
 	lyxscale 50
 	width 100col%
 
@@ -862,21 +869,21 @@ name "fig:MinGW-Installation-Manager"
 
 \end_inset
 
-Next, click on 'All Packages' in the left pane and then set the following
- packages to 'Mark for Installation':
+Next, click on `All Packages' in the left pane and then set the following
+ packages to `Mark for Installation':
 \end_layout
 
 \begin_layout Itemize
-msys-unzip (bin)
+msys-unzip-bin
 \end_layout
 
 \begin_layout Itemize
-msys-wget (bin)
+msys-wget-bin
 \end_layout
 
 \begin_layout Standard
 Then run the menu item Installation -> Apply Changes.
- Click 'Apply' in the `Schedule of Pending Actions' window that pops up.
+ Click `Apply' in the `Schedule of Pending Actions' window that pops up.
  After all the packages download and install, you can close the MinGW Installati
 on Manager window.
 \end_layout
