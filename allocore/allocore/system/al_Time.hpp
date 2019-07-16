@@ -130,11 +130,14 @@ public:
 	/// Set trigger interval
 	ITimer& interval(float v){ mInterval=v; return *this; }
 
+	/// Set current accumulator time
+	ITimer& time(float v){ mTime=v; return *this; }
+
 	/// Set one-shot or periodic mode
 	ITimer& oneShot(bool v){ mPeriodic=!v; return *this; }
 
 	/// Reset timer (with optional starting value)
-	ITimer& reset(float start=0.){ mTime=start; return *this; }
+	ITimer& reset(float start=0.){ return time(start); }
 
 	/// Increment time by dt and return whether interval passed on this update
 	bool operator()(float dt){
