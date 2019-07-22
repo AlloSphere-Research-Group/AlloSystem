@@ -147,6 +147,8 @@ int utMath(){
 		Vec<2, double> t;
 		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
 		t = a.sub<2>(2);		assert(t[0] == 2 && t[1] == 3);
+		// Verify in-place operations
+		a.sub<2>() += 10;		assert(a[0] == 10 && a[1] == 11);
 		}
 
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(1, 0, 0)), 0.));
@@ -636,8 +638,8 @@ int utMath(){
 	#undef T
 
 	#define T(x,y) assert(al::round(x) == y);
-	T(0.f, 0.f) T(0.2f, 0.f) T(0.8f, 1.f) T(-0.2f, 0.f) T(-0.8f,-1.f) T(0.5f, 0.f) T(-0.5f, 0.f)
-	T(0.0, 0.0) T(0.20, 0.0) T(0.80, 1.0) T(-0.20, 0.0) T(-0.80,-1.0) T(0.50, 0.0) T(-0.50, 0.0)
+	T(0.f, 0.f) T(0.2f, 0.f) T(0.8f, 1.f) T(-0.2f, 0.f) T(-0.8f,-1.f) T(0.5f, 1.f) T(-0.5f, -1.f)
+	T(0.0, 0.0) T(0.20, 0.0) T(0.80, 1.0) T(-0.20, 0.0) T(-0.80,-1.0) T(0.50, 1.0) T(-0.50, -1.0)
 	#undef T
 
 	#define T(x,y,r) assert(al::round(x,y) == r);
