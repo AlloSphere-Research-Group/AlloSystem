@@ -44,10 +44,12 @@
 	Ryan McGee, 2012, ryanmichaelmcgee@gmail.com
 */
 
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 #include <vector>
 #include <list>
+#include <iostream>
+
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/math/al_Interpolation.hpp"
 #include "allocore/math/al_Vec.hpp"
@@ -84,65 +86,8 @@ namespace al{
 */
 
 class Listener;
+class Spatializer;
 class SoundSource;
-
-
-/// Abstract class for all spatializers: Ambisonics, DBAP, VBAP, etc.
-///
-/// @ingroup allocore
-class Spatializer {
-public:
-
-	/// @param[in] sl	A speaker layout to use
-	Spatializer(const SpeakerLayout& sl);
-
-	virtual ~Spatializer(){};
-
-	//
-	virtual void numFrames(int v){};
-
-	/// Perform any necessary updates when the listener or speaker layout changes, ex. new speaker triplets for VBAP
-	virtual void compile(Listener& l){};
-
-	/// Called once per listener, before sources are rendered. ex. zero ambisonics coefficients
-	virtual void prepare(){};
-
-	/// Render each source per sample
-	virtual void perform(
-			AudioIOData& io,
-			SoundSource& src,
-			Vec3d& relpos,
-			const int& numFrames,
-			int& frameIndex,
-			float& sample
-			) = 0;
-
-	/// Render each source per buffer
-	virtual void perform(
-			AudioIOData& io,
-			SoundSource& src,
-			Vec3d& relpos,
-			const int& numFrames,
-			float *samples
-			) = 0;
-
-	/// Called once per listener, after sources are rendered. ex. ambisonics decode
-	virtual void finalize(AudioIOData& io){};
-
-
-	/// Print out information about spatializer
-	virtual void print(){};
-
-	/// Get number of speakers
-	int numSpeakers() const { return mSpeakers.size(); }
-
-	/// Enable Spatializaion(true by default)
-	void setEnabled(bool _enable) {mEnabled = _enable;}
-
-protected:
-	Speakers mSpeakers;
-	bool mEnabled;
-};
 
 
 
@@ -189,6 +134,9 @@ protected:
 ///
 /// @ingroup allocore
 class Listener : public AudioSceneObject {
+
+	friend class SoundSource;
+
 public:
 
 	/// Get history of orientations
@@ -219,7 +167,7 @@ protected:
 enum DopplerType{
 	DOPPLER_NONE=0,			/**< Do not use Doppler Shift */
 	DOPPLER_SYMMETRICAL,	/**< Symmetrical Frequency Shift (not physically accurate) */
-	DOPPLER_PHYSICAL			/**< Physically Accurate Doppler Shift. Requires per sample processingfor AudioScene and SoundSource. */
+	DOPPLER_PHYSICAL		/**< Physically Accurate Doppler Shift. Requires per sample processing for AudioScene and SoundSource. */
 };
 
 /// The attenuation policy may be different per source, i.e., because a bee has
@@ -236,23 +184,119 @@ public:
 	/// @param[in] delaySize	Size of internal delay line. This should be
 	///							large enough for the most distant sound:
 	///							samples = sampleRate * (near + range)/speedOfSound
-	SoundSource(
-		double nearClip=0.1, double farClip=20, AttenuationLaw law = ATTEN_INVERSE, DopplerType dopplerType = DOPPLER_SYMMETRICAL,
-		double farBias=0, int delaySize=100000
-	);
+	SoundSource(double nearClip=0.1, double farClip=20,
+	            AttenuationLaw law = ATTEN_INVERSE,
+	            DopplerType dopplerType = DOPPLER_SYMMETRICAL,
+	            double sampleRate = 44100,
+	            double farBias=0, int delaySize=100000);
 
 	virtual ~SoundSource(){}
 
+	float getNextSample(Pose listeningPose) {
+
+		float s = 0.0f;
+		double dist = listeningPose.vec().mag(); //Compute distance in world-space units
+		Vec3d relDirection = posHistory()[0] - listeningPose.vec();
+
+		Quatd srcRot = listeningPose.quat();
+		relDirection = srcRot.rotate(relDirection);
+		double distanceToSample = 0;
+		double samplesAgo = 1024; // TODO how can we set a better default
+		if(dopplerType() == DOPPLER_SYMMETRICAL) {
+			distanceToSample = mSampleRate / mSpeedOfSound;
+			samplesAgo = dist * distanceToSample;
+		} else if(dopplerType() == DOPPLER_PHYSICAL) {
+			// FIXME AC Can we use the current pose here for distance or should we calculate from listener history?
+			double prevDistance = (posHistory()[1] - listeningPose.vec()).mag();
+			double sourceVel = (dist - prevDistance)*mSampleRate; //positive when moving away, negative moving toward
+//			if(sourceVel == -mSpeedOfSound) sourceVel -= 0.001; //prevent divide by 0 / inf freq
+			double sumSpeed = mSpeedOfSound + sourceVel;
+			if (sumSpeed < 0.001) { sumSpeed = 0.001; }
+
+			distanceToSample = fabs(mSampleRate / sumSpeed);
+			samplesAgo = dist * distanceToSample;
+		}
+		updateHistory();
+
+//		// Add on time delay (in samples) - only needed if the source is rendered per buffer
+		if(!usePerSampleProcessing()) {
+			samplesAgo -= mFrameCounter++;
+		}
+
+		// Is our delay line big enough?
+		if(samplesAgo <= maxIndex()){
+			double gain = attenuation(dist);
+
+			//reading samplesAgo-i causes a discontinuity
+			s = readSample(samplesAgo) * gain;
+
+			// s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
+
+		} else {
+			std::cout << "Delay line exceeded in SoundSource" << std::endl;
+		}
+		return s;
+	}
+
+	float getNextSample(Listener &l) {
+		return getNextSample(l.pose());
+	}
+
+	void getBuffer(Listener &l, float *buffer, const int size) {
+		frame(0);
+		for (int i = 0; i < size; i++) {
+			*buffer++ = getNextSample(l);
+		}
+	}
+
+	void getBuffer(Pose listeningPose, float *buffer, const int size) {
+		frame(0);
+		for (int i = 0; i < size; i++) {
+			*buffer++ = getNextSample(listeningPose);
+		}
+	}
+
+	void frame(int v) { mFrameCounter = v; }
+
+	/// Read sample from delay-line using linear interpolation
+	/// The index specifies how many samples ago by which to read back from
+	/// the buffer. The index must be less than or equal to bufferSize()-2.
+	float readSample(double index) const {
+		int index0 = (int) index;
+		float a = mSound.read(index0);
+		float b = mSound.read(index0-1);
+		float frac = -(index0 - index);
+		//return ipl::linear(frac, a, b);
+
+		float a0 = mSound.read(index0+1);
+		float b1 = mSound.read(index0-2);
+		return ipl::cubic(frac, a0, a, b, b1);
+	}
 
 	/// Returns whether distance-based attenuation is enabled
 	bool useAttenuation() const { return mUseAtten; }
+	/// Enable/disable distance-based gain attenuation
+	void useAttenuation(bool enable){ mUseAtten = enable; }
 
 	/// Returns Doppler Type
 	DopplerType dopplerType() const { return mDopplerType; }
+	/// Set Doppler Type
+	void dopplerType(DopplerType type){ mDopplerType = type; }
 
 	/// Returns attentuation factor based on distance to listener
 	double attenuation(double distance) const {
 		return mUseAtten ? DistAtten<double>::attenuation(distance) : 1.0;
+	}
+
+	/// Write sample to internal delay-line
+	void writeSample(float v){ mSound.next() = v; }
+
+	/// Returns whether the source is using per sample processing (AudioScene::render will call this source's onProcessSample)
+	bool usePerSampleProcessing() const { return mUsePerSampleProcessing; }
+
+	/// Enable per sample processing
+	void usePerSampleProcessing(bool shouldUsePerSampleProcessing){
+		mUsePerSampleProcessing = shouldUsePerSampleProcessing;
 	}
 
 	/// Get size of delay in samples
@@ -272,54 +316,110 @@ public:
 	/// Returns maximum index that can be used for reading samples
 	int maxIndex() const { return delaySize()-2; }
 
-	/// Read sample from delay-line using linear interpolation
-	/// The index specifies how many samples ago by which to read back from
-	/// the buffer. The index must be less than or equal to bufferSize()-2.
-	float readSample(double index) const {
-		int index0 = index;
-		float a = mSound.read(index0);
-		float b = mSound.read(index0+1);
-		float frac = index - index0;
-		//return ipl::linear(frac, a, b);
-
-		float a0 = mSound.read(index0-1);
-		float b1 = mSound.read(index0+2);
-		return ipl::cubic(frac, a0, a, b, b1);
-
-	}
-
-	/// Enable/disable distance-based gain attenuation
-	void useAttenuation(bool enable){ mUseAtten = enable; }
-
-	/// Set Doppler Type
-	void dopplerType(DopplerType type){ mDopplerType = type; }
-
-	/// Write sample to internal delay-line
-	void writeSample(float v){ mSound.write(v); }
-
-	/// optional onProcessSample for sample rate processing of sound sources
-	virtual void onProcessSample(int frame){}
-
-	/// Returns whether the source is using per sample processing (AudioScene::render will call this source's onProcessSample)
-	bool usePerSampleProcessing() const { return mUsePerSampleProcessing; }
-
-	/// Enable per sample processing
-	void usePerSampleProcessing(bool shouldUsePerSampleProcessing){
-		mUsePerSampleProcessing = shouldUsePerSampleProcessing;
-	}
-
 	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
 	// probably want to add io.samplesPerBuffer() to this for safety.
 	static int bufferSize(double samplerate, double speedOfSound, double distance);
 
-	BiQuadNX presenceFilter; //used for presence filtering and spatial modulation BW control
+	/// Set speed of sound for computation in m/s
+	void setSpeedOfSound(float speedOfSound) {mSpeedOfSound = speedOfSound; }
 
-protected:
+	void cachedIndex(unsigned int v){ mCachedIndex = v; } // FIXME: For VBAP. There should be a better place for this
+	unsigned int cachedIndex(){ return mCachedIndex; }
+
+private:
 	RingBuffer<float> mSound;		// spherical wave around position
 	bool mUseAtten;
 	DopplerType mDopplerType;
 	bool mUsePerSampleProcessing;
+    unsigned int mCachedIndex; // for VBAP with multiple sources
+	float mSampleRate;
+	float mSpeedOfSound;
+	int mFrameCounter;
+
+	BiQuadNX presenceFilter; //used for presence filtering and spatial modulation BW control
 };
+
+
+
+/// Abstract class for all spatializers: Ambisonics, DBAP, VBAP, etc.
+///
+/// @ingroup allocore
+class Spatializer {
+public:
+
+	/// @param[in] sl	A speaker layout to use
+	Spatializer(const SpeakerLayout& sl);
+
+	virtual ~Spatializer(){}
+
+	/// Perform any necessary updates when the listener or speaker layout changes, ex. new speaker triplets for VBAP
+	virtual void compile(Listener& l){}
+
+	/// Called once per listener, before sources are rendered. ex. zero ambisonics coefficients
+	virtual void prepare(){}
+
+	/// Render audio buffer in position
+	virtual void renderBuffer(AudioIOData& io,
+	                          const Pose& listeningPose,
+	                          const float *samples,
+	                          const int& numFrames
+	                          ) = 0;
+
+	/// Render audio sample in position
+	virtual void renderSample(AudioIOData& io, const Pose& listeningPose,
+	                          const float& sample,
+	                          const int& frameIndex) = 0;
+
+	/// Called once per listener, after sources are rendered. ex. ambisonics decode
+	virtual void finalize(AudioIOData& io){}
+
+	/// Print out information about spatializer
+	virtual void print(){}
+
+	/// Get number of speakers
+	int numSpeakers() const { return mSpeakers.size(); }
+
+	/// Set number of frames
+	virtual void numFrames(int v){ mNumFrames = v;}
+
+	/// Enable Spatializaion(true by default)
+	void setEnabled(bool _enable) {mEnabled = _enable;}
+
+protected:
+	/// Render each source per sample
+	virtual void perform(AudioIOData& io,
+	                     SoundSource& src,
+	                     Vec3d& reldir,
+	                     const int& frameIndex
+	                     ) {
+		renderSample(io, reldir, src.readSample(frameIndex), frameIndex);
+	}
+
+	/// Render each source per buffer
+	virtual void perform(AudioIOData& io,
+	                     SoundSource& src,
+	                     Vec3d& reldir,
+	                     float gain
+	                     ) {
+		if (mBuffer.size() != io.framesPerBuffer()) {
+			mBuffer.reserve(io.framesPerBuffer());
+		}
+        for(unsigned int i = 0; i < io.framesPerBuffer(); i++)
+		{
+			double readIndex = (io.framesPerBuffer() - i - 1);
+			mBuffer[i] = src.readSample(readIndex);
+		}
+//		src.getBuffer()
+		renderBuffer(io, reldir, mBuffer.data(), io.framesPerBuffer());
+	}
+
+	Speakers mSpeakers;
+	bool mEnabled;
+
+	std::vector<float> mBuffer;	// temporary frame buffer
+	int mNumFrames;
+};
+
 
 
 /// An audio scene consisting of Listeners and Sources.
@@ -383,7 +483,6 @@ protected:
 	Sources mSources;
 	int mNumFrames;				// audio frames per block
 	std::vector<float> mBuffer;	// temporary frame buffer
-	double mSpeedOfSound;		// distance per second
 	bool mPerSampleProcessing;
 };
 

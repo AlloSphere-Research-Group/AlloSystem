@@ -1,9 +1,14 @@
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/math/al_Constants.hpp"
 
+
+#include <iostream>
+
 namespace al{
 
-Spatializer::Spatializer(const SpeakerLayout& sl){
+Spatializer::Spatializer(const SpeakerLayout& sl) :
+    mEnabled(true)
+{
 	unsigned numSpeakers = sl.speakers().size();
 	for(unsigned i=0;i<numSpeakers;++i){
 		mSpeakers.push_back(sl.speakers()[i]);
@@ -46,12 +51,13 @@ void Listener::compile(){
 
 
 
-SoundSource::SoundSource(
-		double nearClip, double farClip, AttenuationLaw law, DopplerType dopplerType,
-		double farBias, int delaySize
-		)
-	:	DistAtten<double>(nearClip, farClip, law, farBias),
-	  mSound(delaySize), mUseAtten(true), mDopplerType(dopplerType), mUsePerSampleProcessing(false)
+SoundSource::SoundSource(double nearClip, double farClip,
+                         AttenuationLaw law, DopplerType dopplerType,
+                         double sampleRate, double farBias, int delaySize
+                         )
+    :	DistAtten<double>(nearClip, farClip, law, farBias),
+      mSound(delaySize), mUseAtten(true), mDopplerType(dopplerType), mUsePerSampleProcessing(false),
+      mCachedIndex(0), mSampleRate(sampleRate), mSpeedOfSound(340), mFrameCounter(0)
 {
 	// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves...
 	for(int i=0; i<mPosHistory.size(); ++i){
@@ -61,7 +67,6 @@ SoundSource::SoundSource(
 	presenceFilter.set(2700);
 }
 
-/*static*/
 int SoundSource::bufferSize(double samplerate, double speedOfSound, double distance){
 	return (int)ceil(samplerate * distance / speedOfSound);
 }
@@ -69,7 +74,7 @@ int SoundSource::bufferSize(double samplerate, double speedOfSound, double dista
 
 
 AudioScene::AudioScene(int numFrames_)
-	:   mNumFrames(0), mSpeedOfSound(340), mPerSampleProcessing(false)
+	:   mNumFrames(0), mPerSampleProcessing(false)
 {
 	numFrames(numFrames_);
 }
@@ -94,7 +99,6 @@ void AudioScene::removeSource(SoundSource& src){
 
 void AudioScene::numFrames(int v){
 	if(mNumFrames != v){
-		mBuffer.resize(v);
 
 		Listeners::iterator it = mListeners.begin();
 		while(it != mListeners.end()){
@@ -102,6 +106,7 @@ void AudioScene::numFrames(int v){
 			++it;
 		}
 		mNumFrames = v;
+		mBuffer.resize(mNumFrames);
 	}
 }
 
@@ -120,10 +125,10 @@ Listener * AudioScene::createListener(Spatializer* spatializer){
 	The head-size sets the effective doppler near-clip.
 */
 
-
 void AudioScene::render(AudioIOData& io) {
-	const int numFrames = io.framesPerBuffer();
-	double sampleRate = io.framesPerSecond();
+	assert(io.framesPerBuffer() == mNumFrames);
+
+	// double sampleRate = io.framesPerSecond();
 	io.zeroOut();
 
 	// iterate through all listeners adding contribution from all sources
@@ -134,100 +139,25 @@ void AudioScene::render(AudioIOData& io) {
 		spatializer->prepare();
 
 		// update listener history data:
-		l.updateHistory(numFrames);
+		l.updateHistory(mNumFrames);
 
 		// iterate through all sound sources
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 			SoundSource& src = *(*it);
-
-			// scalar factor to convert distances into delayline indices
-			double distanceToSample = 0;
-			if(src.dopplerType() == DOPPLER_SYMMETRICAL)
-				distanceToSample = sampleRate / mSpeedOfSound;
-
-			if(!src.usePerSampleProcessing()) //if our src is using per sample processing we will update this in the frame loop instead
-				src.updateHistory();
-
-			if(mPerSampleProcessing) //audioscene per sample processing
-			{
-				// iterate time samples
-				for(int i=0; i < numFrames; ++i){
-
-					Vec3d relpos;
-
-					if(src.usePerSampleProcessing() && il == 0) //if src is using per sample processing, we can only do this for the first listener (TODO: better design for this)
-					{
-						src.updateHistory();
-						src.onProcessSample(i);
-
-						relpos = src.posHistory()[0] - l.posHistory()[0];
-
-						if(src.dopplerType() == DOPPLER_PHYSICAL)
-						{
-							double currentDist = relpos.mag();
-							double prevDistance = (src.posHistory()[1] - l.posHistory()[0]).mag();
-							double sourceVel = (currentDist - prevDistance)*sampleRate; //positive when moving away, negative moving toward
-
-							if(sourceVel == -mSpeedOfSound) sourceVel -= 0.001; //prevent divide by 0 / inf freq
-
-							distanceToSample = fabs(sampleRate / (mSpeedOfSound + sourceVel));
-						}
-					}
-					else
-					{
-						// compute interpolated source position relative to listener
-						// TODO: this tends to warble when moving fast
-						double alpha = double(i)/numFrames;
-
-						// moving average:
-						// cheaper & slightly less warbly than cubic,
-						// less glitchy than linear
-						relpos = (
-									(src.posHistory()[3]-l.posHistory()[3])*(1.-alpha) +
-								(src.posHistory()[2]-l.posHistory()[2]) +
-								(src.posHistory()[1]-l.posHistory()[1]) +
-								(src.posHistory()[0]-l.posHistory()[0])*(alpha)
-								)/3.0;
-					}
-
-					//Compute distance in world-space units
-					double dist = relpos.mag();
-
-					// Compute how many samples ago to read from buffer
-					// Start with time delay due to speed of sound
-					double samplesAgo = dist * distanceToSample;
-
-					// Add on time delay (in samples) - only needed if the source is rendered per buffer
-					if(!src.usePerSampleProcessing())
-						samplesAgo += (numFrames-i);
-
-					// Is our delay line big enough?
-					if(samplesAgo <= src.maxIndex()){
-						double gain = src.attenuation(dist);
-						float s = src.readSample(samplesAgo) * gain;
-						//s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
-						spatializer->perform(io, src,relpos, numFrames, i, s);
-					}
-
-				} //end for each frame
-			} //end per sample processing
-
-			else //more efficient, per buffer processing for audioscene (does not work well with doppler)
-			{
-				Vec3d relpos = src.pose().pos() - l.pose().pos();
-				double distance = relpos.mag();
-				double gain = src.attenuation(distance);
-
-				for(int i = 0; i < numFrames; i++)
-				{
-					double readIndex = distance * distanceToSample;
-					readIndex += (numFrames - i - 1);
-					mBuffer[i] = gain * src.readSample(readIndex);
+			if(mPerSampleProcessing) { //audioscene per sample processing
+				src.frame(0);
+                for(int i=0; i < mNumFrames; ++i){
+                    Pose relpos(src.pose().pos() - l.pose().pos(), src.pose().quat() /l.pose().quat());
+					spatializer->renderSample(io, relpos, src.getNextSample(l), i);
 				}
-
-				spatializer->perform(io, src, relpos, numFrames, &mBuffer[0]);
+			} else { //more efficient, per buffer processing for audioscene (does not work well with doppler)
+				Pose relpos(src.pose().pos() - l.pose().pos(), src.pose().quat() /l.pose().quat());
+				src.getBuffer(relpos, mBuffer.data(), mNumFrames);
+//				std::cout << l.pose().x() << "," << l.pose().z() << " ---- ";
+//				std::cout << src.pos().x << "," << src.pos().z << " ----- ";
+//				std::cout << relpos.x << "," << relpos.z << std::endl;
+				spatializer->renderBuffer(io, relpos, mBuffer.data(), mNumFrames);
 			}
-
 		} //end for each source
 
 		spatializer->finalize(io);
@@ -313,5 +243,3 @@ struct AmbiSource{
 		}
 	}
 */
-
-

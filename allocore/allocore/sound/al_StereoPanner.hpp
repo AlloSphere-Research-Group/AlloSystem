@@ -1,10 +1,10 @@
 #ifndef INCLUDE_AL_PANNING_STEREO
 #define INCLUDE_AL_PANNING_STEREO
 
+#include <memory>
+
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/math/al_Constants.hpp"
-//#include "allocore/math/al_Quat.hpp"
-////#include "allocore/spatial/al_CoordinateFrame.hpp"
 
 namespace al{
 
@@ -14,36 +14,37 @@ namespace al{
 /// @ingroup allocore
 class StereoPanner : public Spatializer{
 public:
-	
-	StereoPanner(SpeakerLayout &sl) : Spatializer(sl), numSpeakers(0){}
-
-	void dump() {
-		printf("Using Stereo Panning- need to add panner info for dump function\n");
+	StereoPanner(SpeakerLayout &sl) : Spatializer(sl), numSpeakers(0) {
+		numSpeakers = mSpeakers.size();
+		if(numSpeakers != 2) {
+			printf("Stereo Panner Requires exactly 2 speakers (%i used), no panning will occur!\n", numSpeakers);
+		}
 	}
 
-	void compile(Listener& listener){
+//	virtual void print() override {
+//		printf("Using Stereo Panning- need to add panner info for print() function\n");
+//	}
+
+	/// Compile is
+	virtual void compile(Listener& listener) override {
 		mListener = &listener;
-		numSpeakers = mSpeakers.size();
-		if(numSpeakers == 2)
-		{
-			printf("Stereo Panner Compiled with %d speakers\n", numSpeakers);
-		}
-		else
-			printf("Stereo Panner Requires exactly 2 speakers (%i used), no panning will occur!\n", numSpeakers);
 	}
 
 	///Per Sample Processing
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
+	virtual void renderSample(AudioIOData& io, const Pose& listeningPose, const float& sample, const int& frameIndex) override
 	{
+		Vec3d vec = listeningPose.vec();
+		Quatd srcRot = listeningPose.quat();
+		vec = srcRot.rotate(vec);
 		if(numSpeakers == 2 && mEnabled)
 		{
 			float gainL, gainR;
-			equalPowerPan(relpos.x, gainL, gainR);
+			equalPowerPan(vec, gainL, gainR);
 
 			io.out(0, frameIndex) += gainL*sample;
 			io.out(1, frameIndex) += gainR*sample;
 		}
-		else // dont pan
+		else // don't pan
 		{
 			for(int i = 0; i < numSpeakers; i++)
 				io.out(i, frameIndex) = sample;
@@ -52,15 +53,18 @@ public:
 	}
 
 	/// Per Buffer Processing
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
+    virtual void renderBuffer(AudioIOData& io, const Pose& listeningPose, const float *samples, const int& numFrames) override
 	{
+		Vec3d vec = listeningPose.vec();
+		Quatd srcRot = listeningPose.quat();
+		vec = srcRot.rotate(vec);
 		if(numSpeakers == 2 && mEnabled)
 		{
 			float *bufL = io.outBuffer(0);
 			float *bufR = io.outBuffer(1);
 
 			float gainL, gainR;
-			equalPowerPan(relpos.x, gainL, gainR);
+			equalPowerPan(vec, gainL, gainR);
 
 			for(int i = 0; i < numFrames; i++)
 			{
@@ -75,28 +79,17 @@ public:
 		}
 	}
 
-	
+
 private:
 	Listener* mListener;
 	int numSpeakers;
+	std::vector<float> mBuffer;
 
-	void equalPowerPan(float xPos, float &gainL, float &gainR)
+	void equalPowerPan(const Vec3d& relPos, float &gainL, float &gainR)
 	{
-		//*
-		if(xPos > 1) xPos = 1;
-		else if(xPos < -1) xPos = -1;
-		//*/
-
-		/*/
-		if(xPos > 5) xPos = 5;
-		else if(xPos < -5) xPos = -5;
-		xPos /= 5;
-		//*/
-
-		float panVal = (xPos + 1) /2.f; //[0, 1], L to R
-
-		gainL = cos((M_PI/2)*panVal);
-		gainR = sin((M_PI/2)*panVal);
+		double panVal = 1.0 - std::fabs(std::atan2(relPos.z, relPos.x)/M_PI);
+		gainL = std::cos((M_PI/2.0)*panVal);
+		gainR = std::sin((M_PI/2.0)*panVal);
 	}
 
 };

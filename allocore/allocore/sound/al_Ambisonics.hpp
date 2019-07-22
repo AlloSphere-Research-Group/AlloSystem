@@ -158,6 +158,11 @@ protected:
 };
 
 
+class AmbiDecodeConfig {
+public:
+	bool discardNegativeWeights {false};
+	float weightOffset {0.0};
+};
 
 /// Higher Order Ambisonic Decoding class
 ///
@@ -175,12 +180,20 @@ public:
 
 
 	/// @param[out] dec				output time domain buffers (non-interleaved)
-	/// @param[in ] enc				input Ambisonic domain buffers (non-interleaved)
-	/// @param[in ] numDecFrames	number of frames in time domain buffers
+	/// @param[in] enc				input Ambisonic domain buffers (non-interleaved)
+	/// @param[in] numDecFrames	number of frames in time domain buffers
 	virtual void decode(float * dec, const float * enc, int numDecFrames) const;
 
+	/// @param[out] dec				output time domain buffer (non-interleaved buffer)
+	/// @param[in] enc				input Ambisonic domain buffers (non-interleaved)
+	/// @param[in] numFrames		number of frames in time domain buffers
+	/// @param[in] timeIndex		index into enc buffer to decode
+	virtual void decode(float *dec, const float * enc, int numFrames, int timeIndex) const;
+
+	void setConfiguration(AmbiDecodeConfig &config) {mConfig = config;}
+
 	float decodeWeight(int speaker, int channel) const {
-		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
+		return /*mWeights[channel] **/ mDecodeMatrix[speaker * channels() + channel];
 	}
 
 	/// Returns decode flavor
@@ -203,7 +216,7 @@ public:
 	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0, float amp=1.f);
 	//void zero();					///< Zeroes out internal ambisonic frame.
 
-	void setSpeakers(Speakers *spkrs);
+	void setSpeakers(Speakers &spkrs);
 
 //	float * azimuths();				///< Returns pointer to speaker azimuths.
 //	float * elevations();			///< Returns pointer to speaker elevations.
@@ -230,6 +243,8 @@ protected:
 	float decode(float * encFrame, int encNumChannels, int speakerNum);	// is this useful?
 
 	static float flavorWeights[4][5][5];
+
+	AmbiDecodeConfig mConfig;
 };
 
 
@@ -253,10 +268,17 @@ public:
 	/// Encode a single time sample
 
 	/// @param[out] ambiChans	Ambisonic domain channels (non-interleaved)
-	/// @param[in ] numFrames	number of frames in time buffer
-	/// @param[in ] timeIndex	index at which to encode time sample
-	/// @param[in ] timeSample	value of time sample
+	/// @param[in] numFrames	number of frames in time buffer
+	/// @param[in] timeIndex	index at which to encode time sample
+	/// @param[in] timeSample	value of time sample
 	void encode(float * ambiChans, int numFrames, int timeIndex, float timeSample) const;
+
+	/// Encode buffer with constant position throughout buffer
+
+	/// @param ambiChans	Ambisonic domain channels (non-interleaved)
+	/// @param input		time-domain sample buffer to encode
+	/// @param numFrames	number of frames to encode
+	void encode(float * ambiChans, const float * input, int numFrames);
 
 	/// Encode a buffer of samples
 
@@ -284,27 +306,32 @@ public:
 
 	AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
 
+	virtual void compile(Listener& l) override;
+
+	virtual void numFrames(int v) override;
+
+	virtual void prepare() override;
+
+	virtual void renderBuffer(AudioIOData& io,
+	                  const Pose& listeningPose,
+	                  const float *samples,
+	                  const int& numFrames
+	                  ) override;
+
+	virtual void renderSample(AudioIOData& io, const Pose& listeningPose,
+	                          const float& sample,
+	                          const int& frameIndex) override;
+
+	void numSpeakers(int num);
+
+	void setSpeakerLayout(SpeakerLayout& sl);
+
 	void zeroAmbi();
 
 	float * ambiChans(unsigned channel=0);
 
-	void compile(Listener& l);
 
-	void numFrames(int v);
-
-	void numSpeakers(int num);
-
-	void setSpeakerLayout(const SpeakerLayout& sl);
-
-	void prepare();
-
-	/// Per sample processing
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
-
-	/// Per buffer processing
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
-
-	void finalize(AudioIOData& io);
+//	virtual void finalize(AudioIOData& io) override;
 
 private:
 	AmbiDecode mDecoder;
@@ -426,6 +453,19 @@ inline void AmbiEncode::encode(float * ambiChans, int numFrames, int timeIndex, 
 	#undef CS
 }
 
+inline void AmbiEncode::encode(float * ambiChans, const float * input, int numFrames)
+{
+	float * pAmbi = ambiChans; // non-interleaved ambi buffers, we can use fast pointer arithmetic
+
+	for(int c=0; c<channels(); ++c){
+		const float * pInput = input;
+		float weight = weights()[c];
+		for(int i=0; i<numFrames; ++i){
+			*pAmbi++ += weight * *pInput++;
+		}
+	}
+}
+
 template <class XYZ>
 void AmbiEncode::encode(float * ambiChans, const XYZ * dir, const float * input, int numFrames){
 
@@ -461,31 +501,6 @@ void AmbiEncode::encode(float * ambiChans, const XYZ * dir, const float * input,
 inline float * AmbisonicsSpatializer::ambiChans(unsigned channel) {
 	return &mAmbiDomainChannels[channel * mNumFrames];
 }
-
-inline void AmbisonicsSpatializer::perform(
-	AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample
-){
-    // compute azimuth & elevation of relative position in current listener's coordinate frame:
-    Vec3d urel(relpos);
-    urel.normalize();	// unit vector in axis listener->source
-    // project into listener's coordinate frame:
-    //						Vec3d axis;
-    //						l.mQuatHistory[i].toVectorX(axis);
-    //						double rr = urel.dot(axis);
-    //						l.mQuatHistory[i].toVectorY(axis);
-    //						double ru = urel.dot(axis);
-    //						l.mQuatHistory[i].toVectorZ(axis);
-    //						double rf = urel.dot(axis);
-
-    // cheaper:
-    Vec3d direction = mListener->quatHistory()[frameIndex].rotateTransposed(urel);
-
-    //mEncoder.direction(azimuth, elevation);
-    //mEncoder.direction(-rf, -rr, ru);
-    mEncoder.direction(-direction[2], -direction[0], direction[1]);
-    mEncoder.encode(ambiChans(), numFrames, frameIndex, sample);
-}
-
 
 } // al::
 #endif
