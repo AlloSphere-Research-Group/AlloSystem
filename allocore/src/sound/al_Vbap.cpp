@@ -203,7 +203,7 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 	while(itA != triplets.end()){
 		bool breakOuter = false;
 		SpeakerTriple trip = (*itA);
-		int numSpeaks = 3;
+		//int numSpeaks = 3;
 
 		for(int i = 0 ;i < 3;i++){
 
@@ -223,7 +223,7 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 					continue;
 				}
 
-				if( trip.speakerChan[spkIdx1] == s.deviceChannel || trip.speakerChan[spkIdx2] == s.deviceChannel){
+				if( trip.speakerChan[spkIdx1] == (int)s.deviceChannel || trip.speakerChan[spkIdx2] == (int)s.deviceChannel){
 					continue;
 				}
 

@@ -401,10 +401,10 @@ protected:
 	                     Vec3d& reldir,
 	                     float gain
 	                     ) {
-		if (mBuffer.size() != io.framesPerBuffer()) {
+		if ((int)mBuffer.size() != io.framesPerBuffer()) {
 			mBuffer.reserve(io.framesPerBuffer());
 		}
-        for(unsigned int i = 0; i < io.framesPerBuffer(); i++)
+        for(int i = 0; i < io.framesPerBuffer(); i++)
 		{
 			double readIndex = (io.framesPerBuffer() - i - 1);
 			mBuffer[i] = src.readSample(readIndex);
