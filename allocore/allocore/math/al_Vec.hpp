@@ -197,18 +197,14 @@ public:
 
 	/// Get a subvector
 	template <int M>
-	Vec<M,T> sub(int begin=0) const {
-		return Vec<M,T>(elems()+begin);
-	}
+	const Vec<M,T>& sub(int begin=0) const { return Vec<M,T>::pun(elems()+begin); }
 
 	template <int M>
-	Vec<M,T>& sub(int begin=0){
-		return *(Vec<M,T> *)(elems()+begin);
-	}
+	Vec<M,T>& sub(int begin=0){ return Vec<M,T>::pun(elems()+begin); }
 
-	Vec<2,T> xy() const { return sub<2>(); }
+	const Vec<2,T>& xy() const { return sub<2>(); }
 	Vec<2,T>& xy(){ return sub<2>(); }
-	Vec<3,T> xyz() const { return sub<3>(); }
+	const Vec<3,T>& xyz() const { return sub<3>(); }
 	Vec<3,T>& xyz(){ return sub<3>(); }
 
 
