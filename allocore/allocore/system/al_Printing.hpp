@@ -104,6 +104,8 @@ void err(const char * msg, const char * src="", bool exits=true);
 void _warn(const char * fileName, int lineNumber, const char * fmt, ...);
 void _warnOnce(const char * fileName, int lineNumber, const char * fmt, ...);
 
+/// Enable/disable echoing stdin
+void stdinEcho(bool enable);
 
 
 // Implementation --------------------------------------------------------------
