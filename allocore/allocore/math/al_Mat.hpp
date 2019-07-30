@@ -262,7 +262,7 @@ public:
 	const T& operator()(int i, int j) const { return (*this)[j*N+i]; }
 
 	/// Return column i as vector
-	Vec<N,T> col(int i) const { return Vec<N,T>(elems() + i*N); }
+	const Vec<N,T>& col(int i) const { return Vec<N,T>::pun(elems() + i*N); }
 	Vec<N,T>& col(int i){ return Vec<N,T>::pun(elems() + i*N); }
 
 	/// Return row i as vector
