@@ -104,7 +104,7 @@ public:
 
 
 	/// @param[in] v		value to initialize all elements to
-	Vec(const T& v=T()){ set(v); }
+	Vec(const T& v=T()){ *this = v; }
 
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
@@ -123,7 +123,7 @@ public:
 
 	/// @param[in] v		vector to initialize all elements to
 	template <int N2, class T2>
-	Vec(const Vec<N2, T2>& v){ set(v); }
+	Vec(const Vec<N2, T2>& v){ *this = v; }
 
 	/// @param[in] v		vector to initialize all elements to
 	/// @param[in] s		value of last element
@@ -171,96 +171,18 @@ public:
 	/// Get element at index with no bounds checking
 	const T& operator[](int i) const { return elems()[i]; }
 
-	/// Return true if objects are element-wise equal, false otherwise
-	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
+	Vec& operator = (const   T& v){ IT(N) (*this)[i] = v; return *this; }
 
-	/// Return true if all elements are equal to value, false otherwise
-	bool operator ==(const T& v) const { IT(N){ if((*this)[i] != v   ) return false; } return true; }
-
-	/// Return true if objects are not element-wise equal, false otherwise
-	bool operator !=(const Vec& v) const { return !(*this == v); }
-
-	/// Return true if all elements are not equal to value, false otherwise
-	bool operator !=(const T& v) const { return !(*this == v); }
-
-	/// Get a vector comprised of indexed elements
-	Vec<2,T> get(int i0, int i1) const {
-		return Vec<2,T>((*this)[i0], (*this)[i1]); }
-
-	/// Get a vector comprised of indexed elements
-	Vec<3,T> get(int i0, int i1, int i2) const {
-		return Vec<3,T>((*this)[i0], (*this)[i1], (*this)[i2]); }
-
-	/// Get a vector comprised of indexed elements
-	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
-		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
-
-	/// Get a subvector
-	template <int M>
-	const Vec<M,T>& sub(int begin=0) const { return Vec<M,T>::pun(elems()+begin); }
-
-	template <int M>
-	Vec<M,T>& sub(int begin=0){ return Vec<M,T>::pun(elems()+begin); }
-
-	const Vec<2,T>& xy() const { return sub<2>(); }
-	Vec<2,T>& xy(){ return sub<2>(); }
-	const Vec<3,T>& xyz() const { return sub<3>(); }
-	Vec<3,T>& xyz(){ return sub<3>(); }
-
-
-	//--------------------------------------------------------------------------
-	// Basic Arithmetic Operations
-
-	Vec& operator  =(const   T& v){ return set(v); }
-	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
-	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
-	Vec& operator -=(const Vec& v){ IT(N) (*this)[i] -= v[i]; return *this; }
-	Vec& operator -=(const   T& v){ IT(N) (*this)[i] -= v;    return *this; }
-	Vec& operator *=(const Vec& v){ IT(N) (*this)[i] *= v[i]; return *this; }
-	Vec& operator *=(const   T& v){ IT(N) (*this)[i] *= v;    return *this; }
-	Vec& operator /=(const Vec& v){ IT(N) (*this)[i] /= v[i]; return *this; }
-	Vec& operator /=(const   T& v){ IT(N) (*this)[i] /= v;    return *this; }
-
-	Vec operator + (const Vec& v) const { return Vec(*this) += v; }
-	Vec operator + (const   T& v) const { return Vec(*this) += v; }
-	Vec operator - (const Vec& v) const { return Vec(*this) -= v; }
-	Vec operator - (const   T& v) const { return Vec(*this) -= v; }
-	Vec operator * (const Vec& v) const { return Vec(*this) *= v; }
-	Vec operator * (const   T& v) const { return Vec(*this) *= v; }
-	Vec operator / (const Vec& v) const { return Vec(*this) /= v; }
-	Vec operator / (const   T& v) const { return Vec(*this) /= v; }
-	Vec operator - () const { return Vec(*this).negate(); }
-	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
-	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
-
-	/// Set elements from another vector
-	template <class T2>
-	Vec& set(const Vec<N, T2> &v){ IT(N){ (*this)[i] = T(v[i]); } return *this; }
-
-	/// Set elements from another vector
 	template <int N2, class T2>
-	Vec& set(const Vec<N2, T2> &v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
+	Vec& operator = (const Vec<N2,T2>& v){ IT(N<N2?N:N2) (*this)[i] = T(v[i]); return *this; }
 
 	/// Set elements from another vector and scalar
 	template <class Tv, class Ts>
-	Vec& set(const Vec<N-1, Tv> &v, const Ts& s){ (*this)[N-1]=s; return set(v); }
+	Vec& set(const Vec<N-1, Tv> &v, const Ts& s){ (*this)[N-1]=s; return (*this = v); }
 
-	/// Set all elements to the same value
-	Vec& set(const T& v){ IT(N){ (*this)[i] = v; } return *this; }
-
-	/// Set elements from raw C-pointer
+	/// Set elements from (strided) raw C-pointer
 	template <class T2>
-	Vec& set(const T2 * v){
-		IT(N){ (*this)[i] = T(v[i]); }
-		return *this;
-	}
-
-	/// Set elements from strided raw C-pointer
-	template <class T2>
-	Vec& set(const T2 * v, int stride){
-		IT(N){ (*this)[i] = T(v[i*stride]); }
-		return *this;
-	}
+	Vec& set(const T2 * v, int stride=1){ IT(N) (*this)[i] = T(v[i*stride]); return *this; }
 
 	/// Set first 2 elements
 	Vec& set(const T& v1, const T& v2){
@@ -291,12 +213,69 @@ public:
 		return *this;
 	}
 
-	/// Set all elements to zero
-	Vec& zero(){ return set(T(0)); }
+	/// Return true if objects are element-wise equal, false otherwise
+	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
+
+	/// Return true if all elements are equal to value, false otherwise
+	bool operator ==(const   T& v) const { IT(N){ if((*this)[i] != v   ) return false; } return true; }
+
+	/// Return true if objects are not element-wise equal, false otherwise
+	bool operator !=(const Vec& v) const { return !(*this == v); }
+
+	/// Return true if all elements are not equal to value, false otherwise
+	bool operator !=(const   T& v) const { return !(*this == v); }
+
+	/// Get a vector comprised of indexed elements
+	Vec<2,T> get(int i0, int i1) const {
+		return Vec<2,T>((*this)[i0], (*this)[i1]); }
+
+	/// Get a vector comprised of indexed elements
+	Vec<3,T> get(int i0, int i1, int i2) const {
+		return Vec<3,T>((*this)[i0], (*this)[i1], (*this)[i2]); }
+
+	/// Get a vector comprised of indexed elements
+	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
+		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
+
+	/// Get a subvector
+	template <int M>
+	const Vec<M,T>& sub(int begin=0) const { return Vec<M,T>::pun(elems()+begin); }
+
+	template <int M>
+	Vec<M,T>& sub(int begin=0){ return Vec<M,T>::pun(elems()+begin); }
+
+	const Vec<2,T>& xy() const { return sub<2>(); }
+	Vec<2,T>& xy(){ return sub<2>(); }
+	const Vec<3,T>& xyz() const { return sub<3>(); }
+	Vec<3,T>& xyz(){ return sub<3>(); }
 
 	/// Swap elements
-	Vec& swap(int i, int j){
-		std::swap((*this)[i], (*this)[j]); return *this; }
+	Vec& swap(int i, int j){ std::swap((*this)[i], (*this)[j]); return *this; }
+
+
+	//--------------------------------------------------------------------------
+	// Basic Arithmetic Operations
+
+	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
+	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
+	Vec& operator -=(const Vec& v){ IT(N) (*this)[i] -= v[i]; return *this; }
+	Vec& operator -=(const   T& v){ IT(N) (*this)[i] -= v;    return *this; }
+	Vec& operator *=(const Vec& v){ IT(N) (*this)[i] *= v[i]; return *this; }
+	Vec& operator *=(const   T& v){ IT(N) (*this)[i] *= v;    return *this; }
+	Vec& operator /=(const Vec& v){ IT(N) (*this)[i] /= v[i]; return *this; }
+	Vec& operator /=(const   T& v){ IT(N) (*this)[i] /= v;    return *this; }
+
+	Vec operator + (const Vec& v) const { return Vec(*this) += v; }
+	Vec operator + (const   T& v) const { return Vec(*this) += v; }
+	Vec operator - (const Vec& v) const { return Vec(*this) -= v; }
+	Vec operator - (const   T& v) const { return Vec(*this) -= v; }
+	Vec operator * (const Vec& v) const { return Vec(*this) *= v; }
+	Vec operator * (const   T& v) const { return Vec(*this) *= v; }
+	Vec operator / (const Vec& v) const { return Vec(*this) /= v; }
+	Vec operator / (const   T& v) const { return Vec(*this) /= v; }
+	Vec operator - () const { return Vec(*this).negate(); }
+	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
+	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
 
 
 	/// Clip to range:
@@ -702,7 +681,7 @@ Vec<N,T>& Vec<N,T>::mag(T v){
 		(*this) *= (v/m);
 	}
 	else{
-		set(T(0));
+		*this = T(0);
 		(*this)[0] = v;
 	}
 	return *this;

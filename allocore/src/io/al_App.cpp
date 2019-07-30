@@ -413,12 +413,11 @@ Rayd App::getPickRay(const ViewpointWindow& w, int screenX, int screenY){
 	screenPos.y = ((w.height() - screenY)*1. / w.height()) * 2. - 1.;
 	screenPos.z = -1.;
 	Vec3d worldPos = stereo().unproject(screenPos);
-	r.origin().set(worldPos);
+	r.origin() = worldPos;
 
 	screenPos.z = 1.;
 	worldPos = stereo().unproject(screenPos);
-	r.direction().set( worldPos );
-	r.direction() -= r.origin();
+	r.direction() = worldPos - r.origin();
 	r.direction().normalize();
 	return r;
 }

@@ -130,20 +130,20 @@ public:
 
 
 	/// Get world space X unit vector
-	Vec3d ux() const { return quat().toVectorX(); }
+	Vec3d ux() const { return mQuat.toVectorX(); }
 
 	/// Get world space Y unit vector
-	Vec3d uy() const { return quat().toVectorY(); }
+	Vec3d uy() const { return mQuat.toVectorY(); }
 
 	/// Get world space Z unit vector
-	Vec3d uz() const { return quat().toVectorZ(); }
+	Vec3d uz() const { return mQuat.toVectorZ(); }
 
 	/// Get world space unit vectors
 	template <class T>
 	void unitVectors(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {
-		quat().toVectorX(ux);
-		quat().toVectorY(uy);
-		quat().toVectorZ(uz);
+		mQuat.toVectorX(ux);
+		mQuat.toVectorY(uy);
+		mQuat.toVectorZ(uz);
 	}
 
 	/// Get local right, up, and forward unit vectors
@@ -178,7 +178,7 @@ public:
 	Pose& set(const Pose& v){ mVec=v.vec(); mQuat=v.quat(); return *this; }
 
 	/// Set to identity transform
-	Pose& setIdentity(){ quat().setIdentity(); vec().set(0); return *this; }
+	Pose& setIdentity(){ mQuat.setIdentity(); mVec = 0; return *this; }
 
 	/// Set position
 	template <class T>
@@ -189,16 +189,16 @@ public:
 
 	/// Set vector component
 	template <class T>
-	Pose& vec(const Vec<3,T>& v){ mVec.set(v); return *this; }
+	Pose& vec(const Vec<3,T>& v){ mVec = v; return *this; }
 
 	/// Set quaternion component
 	template <class T>
-	Pose& quat(const Quat<T>& v){ quat() = v; return *this; }
+	Pose& quat(const Quat<T>& v){ mQuat = v; return *this; }
 
 
 	// Overloaded cast operators
-	operator Vec3d() { return pos(); }
-	operator Quatd() { return quat(); }
+	operator Vec3d() { return mVec; }
+	operator Quatd() { return mQuat; }
 
 
 	/// Print to standard output
@@ -236,9 +236,9 @@ public:
 
 	// set the target to smoothly interpolate to:
 	Pose& target() { return mTarget; }
-	void target(const Pose& p) { mTarget.set(p); }
-	void target(const Vec3d& p) { mTarget.pos().set(p); }
-	void target(const Quatd& p) { mTarget.quat().set(p); }
+	void target(const Pose& v) { mTarget.set(v); }
+	void target(const Vec3d& v) { mTarget.pos() = v; }
+	void target(const Quatd& v) { mTarget.quat() = v; }
 
 	// set immediately (without smoothing):
 	void jump(Pose& p) {
@@ -247,11 +247,11 @@ public:
 	}
 	void jump(Vec3d& v) {
 		target(v);
-		pos().set(v);
+		pos() = v;
 	}
 	void jump(Quatd& q) {
 		target(q);
-		quat().set(q);
+		quat() = q;
 	}
 
 protected:
