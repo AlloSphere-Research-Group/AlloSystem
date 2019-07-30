@@ -154,12 +154,12 @@ void Nav::nudgeToward(const Vec3d& p, double amt){
 }
 
 Nav& Nav::halt(){
-	mMove0.set(0);
-	mMove1.set(0);
-	mSpin0.set(0);
-	mSpin1.set(0);
-	mTurn.set(0);
-	mNudge.set(0);
+	mMove0 = 0;
+	mMove1 = 0;
+	mSpin0 = 0;
+	mSpin1 = 0;
+	mTurn = 0;
+	mNudge = 0;
 	updateDirectionVectors();
 	return *this;
 }
@@ -169,7 +169,7 @@ Nav& Nav::home(){
 	view(0, 0, 0);
 	turn(0, 0, 0);
 	spin(0, 0, 0);
-	vec().set(0);
+	mVec = 0;
 	updateDirectionVectors();
 	return *this;
 }
@@ -215,8 +215,8 @@ void Nav::step(double dt){
 	mSpin1.lerp(mSpin0*dt + mTurn , amt);
 
 	// Turn and nudge are a one-shot increments, so clear each step
-	mTurn.set(0);
-	mNudge.set(0);
+	mTurn = 0;
+	mNudge = 0;
 
 	// Update orientation from smoothed orientation differential
 	// Note that vel() returns a smoothed Pose diff from mMove1 and mSpin1.

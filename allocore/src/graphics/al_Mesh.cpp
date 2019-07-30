@@ -619,8 +619,8 @@ Mesh& Mesh::merge(const Mesh& src){
 
 void Mesh::getBounds(Vertex& min, Vertex& max) const {
 	if(vertices().size()){
-		min.set(vertices()[0]);
-		max.set(min);
+		min = vertices()[0];
+		max = min;
 		for(int v=1; v<vertices().size(); ++v){
 			const Vertex& vt = vertices()[v];
 			for(int i=0; i<3; ++i){

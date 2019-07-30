@@ -474,7 +474,7 @@ inline void HashSpace :: numObjects(int numObjects) {
 template<typename T>
 inline HashSpace& HashSpace :: move(uint32_t objectId, Vec<3,T> pos) {
 	Object& o = mObjects[objectId];
-	o.pos.set(wrap(pos));
+	o.pos = wrap(pos);
 	uint32_t newhash = hash(o.pos);
 	if (newhash != o.hash) {
 		if (o.hash != invalidHash()) mVoxels[o.hash].remove(&o);

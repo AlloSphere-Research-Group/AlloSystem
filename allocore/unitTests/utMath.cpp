@@ -57,12 +57,14 @@ int utMath(){
 		a.z = 3;				assert(a[2] == 3);
 		a.w = 4;				assert(a[3] == 4);
 
-		a.set(1);				assert(a == 1);
-		b.set(a);				assert(b == 1);
+		a = 1;					assert(a == 1);
+		b = a;					assert(b == 1);
+								assert(b == a);
+		b = 2;					assert(b != a);
 
 		{
-		a.set(1);
-		b.set(0);
+		a = 1;
+		b = 0;
 		double * p = a.elems();	assert(p[0] == a[0]);
 		b.set(p);				assert(a == b);
 
@@ -72,17 +74,11 @@ int utMath(){
 		char c2[] = {1,0,1,0,1,0,1,0};
 		a.set(c2,2);			assert(a == 1);
 
-		a.zero();
+		a = 0;
 		a.set(Vec<N-1,int>(1,2,3), 4);
 								assert(a[0] == 1 && a[1] == 2 && a[2] == 3 && a[3] == 4);
 		}
 
-		a.zero();				assert(a == 0);
-
-		a = 1;					assert(a == 1);
-								assert(!(a != 1));
-		b = a;					assert(b == a);
-								assert(!(b != a));
 		a = 3;
 		b = 3;
 		a -= b;					assert(a == 0);
@@ -122,9 +118,9 @@ int utMath(){
 		assert(a.norm1() == N);
 		assert(a.norm2() == sqrt(N));
 
-		a.set(1).negate();		assert(a == -1);
-		a.set(1).normalize();	assert(a == 1./sqrt(N));
-		assert(a == b.set(10).normalized());
+		(a = 1).negate();		assert(a == -1);
+		(a = 1).normalize();	assert(a == 1./sqrt(N));
+		assert(a == (b = 10).normalized());
 
 		b = a = 1;
 		assert(concat(a,b) == 1);
