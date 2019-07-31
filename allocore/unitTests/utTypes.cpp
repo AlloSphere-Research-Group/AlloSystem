@@ -264,34 +264,43 @@ int utTypes(){
 		// Test ring buffering
 		a.resize(4);
 		assert(a.size() == 4);
+		assert(a.fill() == 0);
 
 		a.write(1);
 		a.write(2);
-		//assert(a.fill() == 2);
+		assert(a.fill() == 2);
 
 		a.write(3);
 		a.write(4);
 
 		assert(a.pos() == 3);
-
 		assert(a[0] == 1);
 		assert(a[1] == 2);
 		assert(a[2] == 3);
 		assert(a[3] == 4);
-
 		assert(a.read(0) == 4);
 		assert(a.read(1) == 3);
 		assert(a.read(2) == 2);
 		assert(a.read(3) == 1);
+		assert(a.newest() == 4);
+		assert(a.oldest() == 1);
 
-		//assert(a.fill() == 4);
 		a.write(5);
-		//assert(a.fill() == 4);
+
+		assert(a.fill() == 4);
 		assert(a[0] == 5);
 		assert(a.read(0) == 5);
 		assert(a.read(1) == 4);
 		assert(a.read(2) == 3);
 		assert(a.read(3) == 2);
+		assert(a.newest() == 5);
+		assert(a.oldest() == 2);
+
+		a.next() = 6;
+		assert(a.newest() == 6);
+
+		a.reset();
+		assert(a.fill() == 0);
 	}
 
 	return 0;
