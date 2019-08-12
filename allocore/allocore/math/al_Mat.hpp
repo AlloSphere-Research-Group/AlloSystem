@@ -241,7 +241,7 @@ public:
 	static const Mat& pun(const T * src){ return *(const Mat*)(src); }
 
 	/// Returns total number of elements
-	static int size(){ return N*N; }
+	static constexpr int size(){ return N*N; }
 
 	/// Get read-only pointer to elements
 	const T* elems() const { return mElems; }
@@ -286,6 +286,7 @@ public:
 	/// Get an MxM submatrix
 	template <int M>
 	Mat<M,T> sub(int row=0, int col=0) const {
+		static_assert(M<=N, "Submatrix size cannot be larger than matrix size");
 		Mat<M,T> res(MAT_NO_INIT);
 		for(int j=0; j<M; ++j){
 		for(int i=0; i<M; ++i){
@@ -433,12 +434,14 @@ public:
 
 	/// Set a (sub)column
 	Mat& setCol2(const T& v1, const T& v2, int col=0, int row=0){
+		static_assert(N>=2, "Attempt to set matrix elements out of bounds");
 		(*this)(row  , col) = v1;
 		(*this)(row+1, col) = v2; return *this;
 	}
 
 	/// Set a (sub)column
 	Mat& setCol3(const T& v1, const T& v2, const T& v3, int col=0, int row=0){
+		static_assert(N>=3, "Attempt to set matrix elements out of bounds");
 		(*this)(row  , col) = v1;
 		(*this)(row+1, col) = v2;
 		(*this)(row+2, col) = v3; return *this;
@@ -446,6 +449,7 @@ public:
 
 	/// Set a (sub)column
 	Mat& setCol4(const T& v1, const T& v2, const T& v3, const T& v4, int col=0, int row=0){
+		static_assert(N>=4, "Attempt to set matrix elements out of bounds");
 		(*this)(row,   col) = v1;
 		(*this)(row+1, col) = v2;
 		(*this)(row+2, col) = v3;
