@@ -55,11 +55,11 @@
 #undef sinc
 #endif
 
-#ifdef __MINGW32__
+//#ifdef __MINGW32__
 	#ifndef AL_USE_STD_ROUND
 		#define AL_USE_STD_ROUND
 	#endif
-#endif
+//#endif
 
 namespace al {
 
@@ -385,12 +385,12 @@ namespace{
 	template<> inline const float  roundEps<float >(){ return 0.499999925f; }
 	template<> inline const double roundEps<double>(){ return 0.499999985; }
 
-	inline uint32_t deBruijn(uint32_t v){
-		static const uint32_t deBruijnBitPosition[32] = {
+	inline uint8_t deBruijn(uint32_t v){
+		static const uint8_t bitPos[32] = {
 			 0, 1,28, 2,29,14,24, 3,30,22,20,15,25,17, 4, 8,
 			31,27,13,23,21,19,16, 7,26,12,18, 6,11, 5,10, 9
 		};
-		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
+		return bitPos[(uint32_t(v * 0x077CB531UL)) >> 27];
 	}
 
 	const uint32_t mFactorial12u[13] = {
@@ -417,9 +417,9 @@ inline bool aeq(float a, float b, int maxULP){
 	// Make sure maxULP is non-negative and small enough that the
 	// default NAN won't compare as equal to anything.
 	//assert(maxULP > 0 && maxULP < 4 * 1024 * 1024);
-	union{ float f; int32_t i; } u;
-	u.f=a; int32_t ai = u.i;
-	u.f=b; int32_t bi = u.i;
+	union{ float f; int32_t i; };
+	f=a; auto ai = i;
+	f=b; auto bi = i;
 	// Make ai and bi lexicographically ordered as a twos-complement int
 	if(ai < 0) ai = 0x80000000 - ai;
 	if(bi < 0) bi = 0x80000000 - bi;
@@ -430,9 +430,9 @@ inline bool aeq(double a, double b, int maxULP){
 	// Make sure maxULP is non-negative and small enough that the
 	// default NAN won't compare as equal to anything.
 	//assert(maxULP > 0 && maxULP < 4 * 1024 * 1024);
-	union{ double f; int64_t i; } u;
-	u.f=a; int64_t ai = u.i;
-	u.f=b; int64_t bi = u.i;
+	union{ double f; int64_t i; };
+	f=a; auto ai = i;
+	f=b; auto bi = i;
 	// Make ai and bi lexicographically ordered as a twos-complement int
 	if(ai < 0) ai = 0x8000000000000000ULL - ai;
 	if(bi < 0) bi = 0x8000000000000000ULL - bi;
@@ -498,10 +498,9 @@ TEM inline bool even(const T& v){ return 0 == al::odd(v); }
 
 /// @see http://en.wikipedia.org/wiki/Error_function
 TEM inline T erf(const T& x) {
-	static T a = 0.147;
 	const T x2 = x*x;
-	const T ax2 = a * x2;
-	return al::sgn(x)*std::sqrt(T(1) - std::exp(-x2*(T(4./M_PI) + ax2)/(T(1)+ax2)));
+	const T ax2 = T(0.147) * x2;
+	return al::sgn(x)*std::sqrt(T(1) - std::exp(x2*(T(-4./M_PI) - ax2)/(T(1)+ax2)));
 }
 
 inline uint32_t factorial(uint32_t v){ return mFactorial12u[v]; }
