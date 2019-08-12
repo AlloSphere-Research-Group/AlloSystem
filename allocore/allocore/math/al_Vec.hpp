@@ -141,7 +141,7 @@ public:
 	// Memory Operations
 
 	/// Returns number of elements
-	static int size(){ return N; }
+	static constexpr int size(){ return N; }
 
 	/// Returns C array type punned into a vector
 	static Vec& pun(T * src){ return *(Vec*)(src); }
@@ -149,10 +149,16 @@ public:
 
 	/// Get reference to self as another type
 	template <class V>
-	V& as(){ return *(V *)(elems()); }
+	V& as(){
+		static_assert(sizeof(V) <= sizeof(*this), "Attempt to pun vector to object of larger size");
+		return *(V *)(elems());
+	}
 
 	template <class V>
-	const V& as() const { return *(const V *)(elems()); }
+	const V& as() const {
+		static_assert(sizeof(V) <= sizeof(*this), "Attempt to pun vector to object of larger size");
+		return *(const V *)(elems());
+	}
 
 	/// Get read-only pointer to elements
 	const T * elems() const { return &x; }
@@ -171,47 +177,55 @@ public:
 	/// Get element at index with no bounds checking
 	const T& operator[](int i) const { return elems()[i]; }
 
-	Vec& operator = (const   T& v){ IT(N) (*this)[i] = v; return *this; }
+	Vec& operator = (const T& v){ IT(N) (*this)[i] = v; return *this; }
 
 	template <int N2, class T2>
 	Vec& operator = (const Vec<N2,T2>& v){ IT(N<N2?N:N2) (*this)[i] = T(v[i]); return *this; }
 
 	/// Set elements from another vector and scalar
 	template <class Tv, class Ts>
-	Vec& set(const Vec<N-1, Tv> &v, const Ts& s){ (*this)[N-1]=s; return (*this = v); }
+	Vec& set(const Vec<N-1, Tv>& v, const Ts& s){ (*this)[N-1]=s; return (*this = v); }
 
 	/// Set elements from (strided) raw C-pointer
 	template <class T2>
-	Vec& set(const T2 * v, int stride=1){ IT(N) (*this)[i] = T(v[i*stride]); return *this; }
+	Vec& set(const T2 * const v, int stride=1){ IT(N) (*this)[i] = T(v[i*stride]); return *this; }
 
 	/// Set first 2 elements
 	Vec& set(const T& v1, const T& v2){
-		return set(v1,v2,v1,v1,v1,v1); }
+		static_assert(N>=2, "Attempt to set vector elements out of bounds");
+		(*this)[1] = v2;
+		(*this)[0] = v1;
+		return *this;
+	}
 
 	/// Set first 3 elements
 	Vec& set(const T& v1, const T& v2, const T& v3){
-		return set(v1,v2,v3,v1,v1,v1); }
+		static_assert(N>=3, "Attempt to set vector elements out of bounds");
+		(*this)[2] = v3;
+		return set(v1,v2);
+	}
 
 	/// Set first 4 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
-		return set(v1,v2,v3,v4,v1,v1); }
+		static_assert(N>=4, "Attempt to set vector elements out of bounds");
+		(*this)[3] = v4;
+		return set(v1,v2,v3);
+	}
 
 	/// Set first 5 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
-		return set(v1,v2,v3,v4,v5,v1); }
+		static_assert(N>=5, "Attempt to set vector elements out of bounds");
+		(*this)[4] = v5;
+		return set(v1,v2,v3,v4);
+	}
 
 	/// Set first 6 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){
-		switch(N){
-		default:(*this)[5] = v6;
-		case 5: (*this)[4] = v5;
-		case 4: (*this)[3] = v4;
-		case 3: (*this)[2] = v3;
-		case 2: (*this)[1] = v2;
-		case 1: (*this)[0] = v1;
-		}
-		return *this;
+		static_assert(N>=6, "Attempt to set vector elements out of bounds");
+		(*this)[5] = v6;
+		return set(v1,v2,v3,v4,v5);
 	}
+
 
 	/// Return true if objects are element-wise equal, false otherwise
 	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
@@ -239,10 +253,16 @@ public:
 
 	/// Get a subvector
 	template <int M>
-	const Vec<M,T>& sub(int begin=0) const { return Vec<M,T>::pun(elems()+begin); }
+	const Vec<M,T>& sub(int begin=0) const {
+		static_assert(M<=N, "Subvector size cannot be larger than vector size");
+		return Vec<M,T>::pun(elems()+begin);
+	}
 
 	template <int M>
-	Vec<M,T>& sub(int begin=0){ return Vec<M,T>::pun(elems()+begin); }
+	Vec<M,T>& sub(int begin=0){
+		static_assert(M<=N, "Subvector size cannot be larger than vector size");
+		return Vec<M,T>::pun(elems()+begin);
+	}
 
 	const Vec<2,T>& xy() const { return sub<2>(); }
 	Vec<2,T>& xy(){ return sub<2>(); }
@@ -321,6 +341,7 @@ public:
 	/// @param[in]	shift		The amount to shift along specified dimension
 	template<int Dimension>
 	Vec by(T shift) const {
+		static_assert(Dimension<N, "Dimension out of bounds");
 		Vec res(*this);
 		res[Dimension] += shift;
 		return res;
