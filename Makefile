@@ -28,7 +28,6 @@ help:
 	@echo "    vsr .............. build vsr external [use with optional INSTALL_VSR_PCH flag set to 1 or 0]"
 	@echo "    clean ............ clean all modules found in this directory"
 	@echo "    docs ............. open API documentation"
-	@echo "    gatherexamples ... create examples/ directory with symlinks to module examples"
 
 
 all:
