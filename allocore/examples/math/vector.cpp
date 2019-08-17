@@ -109,8 +109,8 @@ int main(){
 	*/
 	{	Vec3f a, b;
 		a.set(1,2,3);			// Sets 'a' to {1, 2, 3}
-		b.set(1);				// Sets 'b' to {1, 1, 1}
-		a.set(b);				// Sets 'a' to {1, 1, 1}
+		b = 1;					// Sets 'b' to {1, 1, 1}
+		a = b;					// Sets 'a' to {1, 1, 1}
 
 		Vec2f c(9,1);
 		a.set(c, 3);			// Sets 'a' to {9, 1, 3}
