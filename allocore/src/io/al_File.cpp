@@ -188,8 +188,15 @@ public:
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <windows.h>
-#include <direct.h> // _getcwd
 #include <Shlwapi.h> // PathFileExists, PathIsDirectory
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+	#include <direct.h>
+	#define GetCurrentDir _getcwd
+#else
+	#include <unistd.h>
+	#define GetCurrentDir getcwd
+#endif
 
 struct ReadOnlyFileHandle{
 	HANDLE mHandle = INVALID_HANDLE_VALUE;
@@ -372,7 +379,7 @@ private:
 
 /*static*/ std::string Dir::cwd(){
 	char buf[AL_PATH_MAX];
-	if(_getcwd(buf, sizeof(buf))){
+	if(GetCurrentDir(buf, sizeof(buf))){
 		return std::string(buf);
 	}
 	return "";
@@ -542,11 +549,8 @@ std::string File::conformPathToOS(const std::string& path){
 	std::string res(path);
 
 	// Ensure delimiters are correct
-	for(unsigned i=0; i<path.size(); ++i){
-		char c = res[i];
-		if('\\'==c || '/'==c){
-			res[i] = AL_FILE_DELIMITER;
-		}
+	for(auto& c : res){
+		if('\\'==c || '/'==c) c = AL_FILE_DELIMITER;
 	}
 
 	// Ensure that directories end with a delimiter
