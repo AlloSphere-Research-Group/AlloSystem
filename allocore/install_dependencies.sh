@@ -102,7 +102,7 @@ elif binary_exists "port"; then
 
 	build_and_install_assimp
 
-elif uname -o | grep "Msys"; then
+elif uname -o | grep -q "Msys"; then
 
 	# MSYS
 	if files_exist /msys.bat; then
@@ -310,20 +310,23 @@ elif uname -o | grep "Msys"; then
 
 	# MSYS2
 	else
-		echo 'Found MinGW / MSYS2'
+		echo 'Found MinGW-w64 / MSYS2'
 		ARCH="mingw-w64-"$(uname -m)
-		LIBS="portaudio libsndfile glbinding glew freeglut freeimage freetype apr apr-util libusb"
+		LIBS="portaudio libsndfile glew freeglut freeimage freetype assimp libusb"
 		PKGS=
 		for L in $LIBS
 		do
 			PKGS=$PKGS" $ARCH-$L"
 		done
 
-		# AssImp manual build w/o boost (unfortunately, not working ATM)
-		#pacman -S cmake unzip $PKGS
-		#build_and_install_assimp
+		# Libs with deps (other then gcc-libs):
+		# libsndfile: flac libvorbis speex
+		# freeimage: jxrlib libjpeg-turbo libpng libtiff libraw libwebp openjpeg2 openexr
+		# freetype: bzip2 harfbuzz libpng zlib
+		# assimp: minizip zziplib zlib
 
-		pacman -S ${ARCH}-assimp
+		#echo $PKGS
+		pacman -S $PKGS
 	fi
 else
 	echo 'Error: No suitable package manager found.'
