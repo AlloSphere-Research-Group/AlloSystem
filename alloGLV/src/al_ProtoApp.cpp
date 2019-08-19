@@ -136,7 +136,7 @@ void ProtoApp::init(
 
 	// setup model manager
 	if(!App::name().empty()){
-		glv::ModelManager& MM = mGUI.modelManager();
+		auto& MM = mGUI.modelManager();
 
 		//
 		std::string idName = App::name();
@@ -158,7 +158,7 @@ void ProtoApp::init(
 
 ProtoApp& ProtoApp::resourceDir(const std::string& dir, bool searchBack){
 
-	std::string modDir = dir;
+	auto modDir = al::File::conformPathToOS(dir);
 	bool pathExists = false;
 
 	if(searchBack){
