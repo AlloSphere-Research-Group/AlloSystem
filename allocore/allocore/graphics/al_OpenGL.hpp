@@ -86,6 +86,9 @@
 		#define AL_GRAPHICS_USE_OPENGL
 	#endif
 	#ifdef AL_GRAPHICS_USE_OPENGL
+		#ifndef __MINGW32__
+			#define GLEW_NO_GLU // GLU not used and throws errors with Mingw-w64
+		#endif
 		#include <GL/glew.h> // needed for certain parts of OpenGL API
 		#include <GL/gl.h>
 		#pragma comment( lib, "winmm.lib")
