@@ -3,20 +3,71 @@
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Thread.hpp"
 
-#ifdef AL_WINDOWS
-	#define USE_THREADEX
-#else
-	#define USE_PTHREAD
+#if !defined(AL_THREAD_USE_STD) && !defined(AL_THREAD_USE_THREADEX) && !defined(AL_THREAD_USE_PTHREAD)
+	// Try to derive best thread backend to use
+	#ifdef AL_WINDOWS
+		#if defined(__MINGW32__) || defined(_MSC_VER)
+			#define AL_THREAD_USE_THREADEX
+		#else  // MinGW-w64 / MSYS2
+			#define AL_THREAD_USE_STD
+		#endif
+	#else
+		#define AL_THREAD_USE_PTHREAD
+	#endif
 #endif
 
-namespace al {
+using namespace al;
 
-#ifdef USE_PTHREAD
+#ifdef AL_THREAD_USE_STD
+#include <thread>
+
+struct Thread::Impl{
+	Impl(){}
+
+	~Impl(){}
+
+	bool start(std::function<void(void)>& func){
+		if(mThread.joinable()) return false; // invalid or already running
+		mThread = std::thread(func);
+		return mThread.joinable();
+	}
+
+	bool join(double timeout){
+		if(mThread.joinable()){
+			mThread.join();
+			return true;
+		}
+		return false;
+	}
+
+	void priority(int v){
+	}
+
+	/*
+	bool cancel(){
+		return false;
+	}
+
+	void testCancel(){
+		pthread_testcancel();
+	}
+	*/
+
+	void * handle(){ return &mThread; }
+
+	std::thread mThread;
+};
+
+
+void * Thread::current(){
+	// pthread_t pthread_self(void);
+	static pthread_t r;
+	r = pthread_self();
+	return (void*)(&r);
+}
+
+#elif defined(AL_THREAD_USE_PTHREAD)
 #include <pthread.h>
-
-//typedef pthread_t ThreadHandle;
-//typedef void * (*ThreadFunction)(void *);
-//#define THREAD_FUNCTION(name) void * name(void * user)
 
 struct Thread::Impl{
 	Impl()
@@ -32,14 +83,18 @@ struct Thread::Impl{
 		pthread_attr_destroy(&mAttr);
 	}
 
-
-	bool start(ThreadFunction& func){
+	bool start(std::function<void(void)>& func){
 		if(mHandle) return false;
-		//return 0 == pthread_create(&mHandle, NULL, cThreadFunc, &func);
-		return 0 == pthread_create(&mHandle, &mAttr, cThreadFunc, &func);
+		struct F{
+			static void * cFunc(void * user){
+				(*((std::function<void(void)> *)user))();
+				return NULL;
+			}
+		};
+		return 0 == pthread_create(&mHandle, &mAttr, F::cFunc, &func);
 	}
 
-	bool join(){
+	bool join(double timeout){
 		if(pthread_join(mHandle, NULL) == 0){
 			mHandle = 0;
 			return true;
@@ -64,23 +119,21 @@ struct Thread::Impl{
 			pthread_attr_setschedparam(&mAttr, &param);
 		}
 	}
+	
+	/*
+	bool cancel(){
+		return 0 == pthread_cancel(mHandle);
+	}
 
-//	bool cancel(){
-//		return 0 == pthread_cancel(mHandle);
-//	}
-//
-//	void testCancel(){
-//		pthread_testcancel();
-//	}
+	void testCancel(){
+		pthread_testcancel();
+	}
+	*/
+
+	void * handle(){ return &mHandle; }
 
 	pthread_t mHandle;
 	pthread_attr_t mAttr;
-
-	static void * cThreadFunc(void * user){
-		ThreadFunction& tfunc = *((ThreadFunction*)user);
-		tfunc();
-		return NULL;
-	}
 };
 
 
@@ -92,34 +145,39 @@ void * Thread::current(){
 }
 
 
-#elif defined(USE_THREADEX)
+#elif defined(AL_THREAD_USE_THREADEX)
 
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #include <process.h>
 
-//typedef unsigned long ThreadHandle;
-//typedef unsigned (__stdcall *ThreadFunction)(void *);
-//#define THREAD_FUNCTION(name) unsigned _stdcall * name(void * user)
-
 class Thread::Impl{
 public:
-	Impl(): mHandle(0){}
+	Impl(): mHandle(NULL){}
 
-	bool start(ThreadFunction& func){
-		if(mHandle) return false;
-		unsigned thread_id;
-		mHandle = _beginthreadex(NULL, 0, cThreadFunc, &func, 0, &thread_id);
-		if(mHandle) return true;
-		return false;
+	bool start(std::function<void(void)>& func){
+		if(NULL==mHandle){
+			struct F{
+				static unsigned _stdcall cFunc(void * user){
+					(*((std::function<void(void)> *)user))();
+					return 0;
+				}
+			};
+
+			mHandle = (HANDLE)_beginthreadex(NULL, 0, F::cFunc, &func, 0, NULL);
+		}
+		return NULL!=mHandle;
 	}
 
-	bool join(){
-		long retval = WaitForSingleObject((HANDLE)mHandle, INFINITE);
-		if(retval == WAIT_OBJECT_0){
-			CloseHandle((HANDLE)mHandle);
-			mHandle = 0;
-			return true;
+	bool join(double timeout){
+		if(mHandle){
+			DWORD waitms = timeout>=0. ? (DWORD)(timeout*1e3 + 0.5) : INFINITE;
+			long retval = WaitForSingleObject(mHandle, waitms);
+			if(retval == WAIT_OBJECT_0){
+				CloseHandle(mHandle);
+				mHandle = NULL;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -128,23 +186,19 @@ public:
 	void priority(int v){
 	}
 
-//	bool cancel(){
-//		TerminateThread((HANDLE)mHandle, 0);
-//		return true;
-//	}
-//
-//	void testCancel(){
-//	}
-
-	unsigned long mHandle;
-//	ThreadFunction mRoutine;
-
-	static unsigned cThreadFunc(void * user){
-	// static unsigned _stdcall cThreadFunc(void * user){
-		ThreadFunction& tfunc = *((ThreadFunction*)user);
-		tfunc();
-		return 0;
+	/*
+	bool cancel(){
+		TerminateThread((HANDLE)mHandle, 0);
+		return true;
 	}
+
+	void testCancel(){
+	}
+	*/
+
+	void * handle(){ return &mHandle; }
+
+	HANDLE mHandle;
 };
 
 #endif
@@ -168,7 +222,7 @@ Thread::Thread(void * (*cThreadFunc)(void * userData), void * userData)
 }
 
 Thread::Thread(const Thread& other)
-:	mImpl(new Impl), mCFunc(other.mCFunc), mJoinOnDestroy(other.mJoinOnDestroy)
+:	mImpl(new Impl), mFunc(other.mFunc), mJoinOnDestroy(other.mJoinOnDestroy)
 {
 }
 
@@ -177,46 +231,38 @@ Thread::~Thread(){
 	delete mImpl;
 }
 
-
-void swap(Thread& a, Thread& b){
+Thread& Thread::operator= (Thread t){
 	using std::swap;
-	swap(a.mImpl, b.mImpl);
-	swap(a.mCFunc, b.mCFunc);
-	swap(a.mJoinOnDestroy, b.mJoinOnDestroy);
-}
-
-Thread& Thread::operator= (Thread other){
-	swap(*this, other);
+	swap(mImpl, t.mImpl);
+	swap(mFunc, t.mFunc);
+	swap(mJoinOnDestroy, t.mJoinOnDestroy);
 	return *this;
 }
-
-/*Thread& Thread::operator= (const Thread& other){
-//printf("Thread::operator=\n");
-	if(this != &other){
-		//join();
-		// delete Impl only if we are sure we are the owner
-		if(mImpl != other.mImpl) delete mImpl;
-
-		// always construct a new Impl
-		mImpl = new Impl;
-
-		mCFunc = other.mCFunc;
-		mJoinOnDestroy = other.mJoinOnDestroy;
-	}
-	return *this;
-}*/
 
 Thread& Thread::priority(int v){
 	mImpl->priority(v);
 	return *this;
 }
 
+bool Thread::start(void * (*threadFunc)(void * userData), void * userData){
+	return start([threadFunc,userData](){ threadFunc(userData); });
+}
+
+bool Thread::start(std::function<void (void)> func){
+	mFunc = func;
+	return mImpl->start(mFunc);
+}
+
 bool Thread::start(ThreadFunction& func){
-	return mImpl->start(func);
+	return start([&func](){ func(); });
 }
 
-bool Thread::join(){
-	return mImpl->join();
+bool Thread::join(double timeout){
+	return mImpl->join(timeout);
 }
 
-} // al::
+void * Thread::nativeHandle(){
+	return mImpl->handle();
+}
+
+//} // al::
