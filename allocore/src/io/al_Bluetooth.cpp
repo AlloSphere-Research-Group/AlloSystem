@@ -446,7 +446,8 @@ struct al::Bluetooth::Impl{
 		}
 
 		bool bBlocking = false;
-		u_long blockingMode = bBlocking ? 0 : 1; // Non-zero means non-blocking
+		// Using decltyp vs. u_long here due to bug in Ming64-w64
+		decltype(WSABUF::len) blockingMode = bBlocking ? 0 : 1; // Non-zero means non-blocking
 		if(SOCKET_ERROR == ::ioctlsocket(mSocket, FIONBIO, &blockingMode)){
 			printLastError();
 			close();
