@@ -142,8 +142,6 @@ public:
 	///
 	static void * current();
 
-	// Stuff for assignment
-	friend void swap(Thread& a, Thread& b);
 	Thread& operator= (Thread other);
 
 protected:

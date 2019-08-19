@@ -3,15 +3,70 @@
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Thread.hpp"
 
-#ifdef AL_WINDOWS
-	#define USE_THREADEX
-#else
-	#define USE_PTHREAD
+#if !defined(AL_THREAD_USE_STD) && !defined(AL_THREAD_USE_THREADEX) && !defined(AL_THREAD_USE_PTHREAD)
+	// Try to derive best thread backend to use
+	#ifdef AL_WINDOWS
+		#if defined(__MINGW32__) || defined(_MSC_VER)
+			#define AL_THREAD_USE_THREADEX
+		#else  // MinGW-w64 / MSYS2
+			#define AL_THREAD_USE_STD
+		#endif
+	#else
+		#define AL_THREAD_USE_PTHREAD
+	#endif
 #endif
 
-namespace al {
+using namespace al;
 
-#ifdef USE_PTHREAD
+#ifdef AL_THREAD_USE_STD
+#include <thread>
+
+struct Thread::Impl{
+	Impl(){}
+
+	~Impl(){}
+
+	bool start(std::function<void(void)>& func){
+		if(mThread.joinable()) return false; // invalid or already running
+		mThread = std::thread(func);
+		return mThread.joinable();
+	}
+
+	bool join(double timeout){
+		if(mThread.joinable()){
+			mThread.join();
+			return true;
+		}
+		return false;
+	}
+
+	void priority(int v){
+	}
+
+	/*
+	bool cancel(){
+		return false;
+	}
+
+	void testCancel(){
+		pthread_testcancel();
+	}
+	*/
+
+	void * handle(){ return &mThread; }
+
+	std::thread mThread;
+};
+
+
+void * Thread::current(){
+	// pthread_t pthread_self(void);
+	static pthread_t r;
+	r = pthread_self();
+	return (void*)(&r);
+}
+
+#elif defined(AL_THREAD_USE_PTHREAD)
 #include <pthread.h>
 
 struct Thread::Impl{
@@ -64,14 +119,16 @@ struct Thread::Impl{
 			pthread_attr_setschedparam(&mAttr, &param);
 		}
 	}
+	
+	/*
+	bool cancel(){
+		return 0 == pthread_cancel(mHandle);
+	}
 
-//	bool cancel(){
-//		return 0 == pthread_cancel(mHandle);
-//	}
-//
-//	void testCancel(){
-//		pthread_testcancel();
-//	}
+	void testCancel(){
+		pthread_testcancel();
+	}
+	*/
 
 	void * handle(){ return &mHandle; }
 
@@ -88,7 +145,7 @@ void * Thread::current(){
 }
 
 
-#elif defined(USE_THREADEX)
+#elif defined(AL_THREAD_USE_THREADEX)
 
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
@@ -106,6 +163,7 @@ public:
 					return 0;
 				}
 			};
+
 			mHandle = (HANDLE)_beginthreadex(NULL, 0, F::cFunc, &func, 0, NULL);
 		}
 		return NULL!=mHandle;
@@ -128,13 +186,15 @@ public:
 	void priority(int v){
 	}
 
-//	bool cancel(){
-//		TerminateThread((HANDLE)mHandle, 0);
-//		return true;
-//	}
-//
-//	void testCancel(){
-//	}
+	/*
+	bool cancel(){
+		TerminateThread((HANDLE)mHandle, 0);
+		return true;
+	}
+
+	void testCancel(){
+	}
+	*/
 
 	void * handle(){ return &mHandle; }
 
@@ -171,34 +231,13 @@ Thread::~Thread(){
 	delete mImpl;
 }
 
-
-void swap(Thread& a, Thread& b){
+Thread& Thread::operator= (Thread t){
 	using std::swap;
-	swap(a.mImpl, b.mImpl);
-	swap(a.mFunc, b.mFunc);
-	swap(a.mJoinOnDestroy, b.mJoinOnDestroy);
-}
-
-Thread& Thread::operator= (Thread other){
-	swap(*this, other);
+	swap(mImpl, t.mImpl);
+	swap(mFunc, t.mFunc);
+	swap(mJoinOnDestroy, t.mJoinOnDestroy);
 	return *this;
 }
-
-/*Thread& Thread::operator= (const Thread& other){
-//printf("Thread::operator=\n");
-	if(this != &other){
-		//join();
-		// delete Impl only if we are sure we are the owner
-		if(mImpl != other.mImpl) delete mImpl;
-
-		// always construct a new Impl
-		mImpl = new Impl;
-
-		mCFunc = other.mCFunc;
-		mJoinOnDestroy = other.mJoinOnDestroy;
-	}
-	return *this;
-}*/
 
 Thread& Thread::priority(int v){
 	mImpl->priority(v);
@@ -226,4 +265,4 @@ void * Thread::nativeHandle(){
 	return mImpl->handle();
 }
 
-} // al::
+//} // al::
