@@ -557,6 +557,16 @@ std::string File::conformDirectory(const std::string& path){
 std::string File::conformPathToOS(const std::string& path){
 	std::string res(path);
 
+	#ifdef __MSYS__
+	// Replace paths like /c and /c/mydir with c: and c:/mydir
+	if(	(res.size() == 2 && '/'==res[0]) ||
+		(res.size() >= 3 && '/'==res[0] && '/'==res[2])
+	){
+		res[0] = res[1];
+		res[1] = ':';
+	}
+	#endif
+
 	// Ensure delimiters are correct
 	for(auto& c : res){
 		if('\\'==c || '/'==c) c = AL_FILE_DELIMITER;
