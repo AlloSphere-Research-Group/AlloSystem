@@ -25,8 +25,16 @@ files_exist ${BUILDEXEBASE}* || {
 	exit
 }
 
-# MSYS
-if files_exist /msys.bat; then
+# MinGW
+if uname | grep -q MINGW; then
+
+	if files_exist /msys.bat; then
+		LIBDIRS="/mingw/bin/ /usr/local/bin/"
+	elif uname | grep -q MINGW64; then
+		LIBDIRS="/mingw64/bin/ /usr/bin/"
+	elif uname | grep -q MINGW32; then
+		LIBDIRS="/mingw32/bin/ /usr/bin/"
+	fi
 
 	getDeps(){
 		LIBNAMES="`objdump -p $1 | grep "DLL Name"`"
@@ -42,7 +50,6 @@ if files_exist /msys.bat; then
 		echo $LIBPATHS
 	}
 
-	LIBDIRS="/mingw/bin/ /usr/local/bin/"
 	LIBS=`getDeps "${BUILDEXEBASE}.exe"`
 
 	# TODO: make this recursive!!!
