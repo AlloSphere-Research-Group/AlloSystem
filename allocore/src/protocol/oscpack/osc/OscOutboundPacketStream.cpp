@@ -34,7 +34,9 @@
 #include <assert.h>
 
 #if defined(__WIN32__) || defined(WIN32)
-#include <malloc.h> // for alloca
+	#include <malloc.h> // for alloca
+#else
+	#include <alloca.h>
 #endif
 
 #include "OscHostEndianness.h"
