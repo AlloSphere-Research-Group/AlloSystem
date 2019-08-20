@@ -1,11 +1,11 @@
+# RUN_DIRS must contain the directory of the source file to be executed.
+
 #RUN_INC_DIRS	?=
 #RUN_SRC_DIRS	?=
 
 # Include user file, if present
 RUN_DIR = $(dir $(lastword $(MAKECMDGOALS)))
 -include $(RUN_DIR)Makefile.user
-
-RUN_DIRS	+= examples/ work/
 
 VPATH += $(RUN_SRC_DIRS)
 RUN_CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS))
@@ -20,6 +20,7 @@ ifeq ($(PLATFORM), macosx)
 RUN_SRCS	+= $(wildcard $(addsuffix /*.mm, $(RUN_SRC_DIRS)))
 endif
 
+# Generate .o targets from all sources in RUN_SRC_DIRS
 RUN_OBJS	 = $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
 #RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
 RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
@@ -31,16 +32,17 @@ LINK_LIBS_FLAGS =
 
 ALL_CXXFLAGS := $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
 
-# Compile and run source files in examples/ folder
 # For whatever reason, we need this rule so the objects don't get rm'ed by make
 runobjs: $(RUN_OBJS)
 
-# Hack to prevent circular dependencies with compile-and-run rule
-.PHONY: %.hpp
-%.hpp:
+# Prevent circular dependencies with compile-and-run rule
+#.PHONY: %.hpp
+#%.hpp:
 
-# FIXME: this rule should only work for .cpp and .c
-EXEC_TARGETS = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS)) $(addsuffix %.mm, $(RUN_DIRS))
+# Compile and run source files in any of the RUN_DIRS directories
+# Note that if any of the directories in RUN_DIRS match those in RUN_SRC_DIRS,
+# a circular dependency is likely to occur with the standard %.o : %.cpp rule.
+EXEC_TARGETS = $(addsuffix *.cpp, $(RUN_DIRS)) $(addsuffix *.c, $(RUN_DIRS)) $(addsuffix *.mm, $(RUN_DIRS))
 ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
 endif
