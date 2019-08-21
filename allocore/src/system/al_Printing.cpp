@@ -5,14 +5,6 @@
 #include <stdlib.h>
 #include "allocore/system/al_Printing.hpp"
 
-// For stdinEcho
-#ifdef AL_WINDOWS
-	#include <windows.h>
-#else
-	#include <termios.h>
-	#include <unistd.h>
-#endif
-
 namespace al{
 
 void printPlot(float value, uint32_t width, bool spaces, const char * point){
@@ -92,24 +84,29 @@ void _warnOnce(const char * fileName, int lineNumber, const char * fmt, ...){
 	}
 }
 
+} // al::
+
 // From:
 // http://forums.codeguru.com/showthread.php?466009-Reading-from-stdin-(without-echo)
 // https://stackoverflow.com/questions/1413445/reading-a-password-from-stdcin
-void stdinEcho(bool enable){
-#ifdef AL_WINDOWS
-    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
-    DWORD mode;
-    GetConsoleMode(hStdin, &mode);
-    if(!enable) mode &= ~ENABLE_ECHO_INPUT;
-    else        mode |=  ENABLE_ECHO_INPUT;
-    SetConsoleMode(hStdin, mode );
+#if defined(AL_WINDOWS) && !defined(__MSYS__) /*No Mingw-w64*/
+	#include <windows.h>
+	void al::stdinEcho(bool enable){
+		HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
+		DWORD mode;
+		GetConsoleMode(hStdin, &mode);
+		if(!enable) mode &= ~ENABLE_ECHO_INPUT;
+		else        mode |=  ENABLE_ECHO_INPUT;
+		SetConsoleMode(hStdin, mode );
+	}
 #else
-    struct termios tty;
-    tcgetattr(STDIN_FILENO, &tty);
-    if(!enable) tty.c_lflag &= ~ECHO;
-    else        tty.c_lflag |= ECHO;
-    (void) tcsetattr(STDIN_FILENO, TCSANOW, &tty);
+	#include <termios.h>
+	#include <unistd.h>
+	void al::stdinEcho(bool enable){
+		struct termios tty;
+		tcgetattr(STDIN_FILENO, &tty);
+		if(!enable) tty.c_lflag &= ~ECHO;
+		else        tty.c_lflag |= ECHO;
+		(void) tcsetattr(STDIN_FILENO, TCSANOW, &tty);
+	}
 #endif
-}
-
-} // ::al::
