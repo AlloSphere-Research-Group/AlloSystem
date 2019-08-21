@@ -72,10 +72,8 @@ USING_PUREDYNE	= 0
 #--------------------------------------------------------------------------
 # Language version
 CXX_VERSION ?= 14
-ifeq ($(CXX_VERSION), 14)
-	CXXFLAGS += -std=c++14
-else ifeq ($(CXX_VERSION), 11)
-	CXXFLAGS += -std=c++11
+ifneq ($(CXX_VERSION),)
+	CXXFLAGS += -std=c++$(CXX_VERSION)
 endif
 
 # Name of the library
