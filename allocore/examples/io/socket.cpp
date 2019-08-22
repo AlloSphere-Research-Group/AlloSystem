@@ -65,7 +65,9 @@ int main(){
 			int bytesRecv = server.recv(buf, sizeof buf);
 
 			if(bytesRecv){
-				printf("UDP server received %d bytes:\n%s\n\n", bytesRecv, buf);
+				printf("UDP server received %d bytes:\n", bytesRecv);
+				for(int i=0; i<bytesRecv; ++i) printf("%c", buf[i]);
+				printf("\n\n");
 				break;
 			}
 		}
