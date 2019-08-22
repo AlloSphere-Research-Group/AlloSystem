@@ -84,7 +84,7 @@ public:
 	double period() const;
 
 	/// Start calling the supplied function periodically
-	void start(std::function<void (void)> func);
+	void start(Thread::Function func);
 
 	/// Stop the thread
 	void stop();
@@ -102,7 +102,7 @@ private:
 	al_nsec mWait;					// actual time to sleep between frames
 	al_nsec mTimeBehind;
 	float mAutocorrect;
-	std::function<void(void)> mUserFunc;
+	Thread::Function mUserFunc;
 	bool mRun;
 };
 

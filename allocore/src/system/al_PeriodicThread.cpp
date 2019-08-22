@@ -31,7 +31,7 @@ double PeriodicThread::period() const {
 	return mPeriod * 1e-9;
 }
 
-void PeriodicThread::start(std::function<void (void)> func){
+void PeriodicThread::start(Thread::Function func){
 	mUserFunc = func;
 	mRun = true;
 	Thread::start([this](){go();});

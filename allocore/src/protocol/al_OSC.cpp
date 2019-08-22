@@ -346,15 +346,6 @@ int Send::send(const Packet& p){
 
 
 
-static void * recvThreadFunc(void * user){
-	Recv * r = static_cast<Recv *>(user);
-	while(r->background()){
-		r->recv();
-	}
-//	printf("thread done\n");
-	return NULL;
-}
-
 Recv::Recv()
 :	mHandler(0), mBuffer(1024), mBackground(false)
 {
@@ -398,7 +389,12 @@ bool Recv::start(){
 	if (timeout() <= 0) {
 		printf("warning (osc::Recv): timeout <= 0 and background polling may eat up your CPU! Set timeout(seconds) to avoid this.\n");
 	}
-	return mThread.start(recvThreadFunc, this);
+
+	return mThread.start([this](){
+		while(background()){
+			recv();
+		}
+	});
 }
 
 void Recv::stop(){
