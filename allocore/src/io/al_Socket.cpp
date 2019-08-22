@@ -20,7 +20,6 @@ Therefore, you will need to use sendto() on UDP socket in order to specify the d
 You can actually use connect() on UDP socket as an option. In that case, you can use send()/recv() on the UDP socket to send data to the address specified with the connect() and to receive data only from the address. (The connect() on UDP socket merely sets the default peer address and you can call connect() on UDP socket as many times as you want, and the connect() on UDP socket, of course, does not perform any handshake for connection.)
 */
 
-#include <string>
 #include "allocore/io/al_Socket.hpp"
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Printing.hpp"
@@ -32,23 +31,23 @@ using namespace al;
 class Socket::Impl{
 public:
 	Impl(){}
-	Impl(uint16_t port, const char * address, al_sec timeout_, int type){}
+	Impl(uint16_t port, const char * address, float timeout_, int type){}
 
 	const std::string& address() const { static std::string s; return s; }
 	uint16_t port() const { return 0; }
-	al_sec timeout() const { return 0; }
+	float timeout() const { return 0; }
 
-	bool open(uint16_t port, std::string address, al_sec timeoutSec, int type){ return false; }
+	bool open(uint16_t port, std::string address, float timeoutSec, int type){ return false; }
 	void close(){}
 	bool reopen(){ return false; }
 	bool bind(){ return false; }
 	bool connect(){ return false; }
-	void timeout(al_sec v){}
+	void timeout(float v){}
 	bool listen(){ return false; }
 	bool accept(Socket::Impl * newSock){ return false; }
 	bool opened() const { return false;	}
-	size_t recv(char * buffer, size_t maxlen, char *from){ return 0; }
-	size_t send(const char * buffer, size_t len){ return 0;	}
+	int recv(char * buffer, int maxlen, char *from){ return 0; }
+	int send(const char * buffer, int len){ return 0;	}
 };
 
 /*static*/ std::string Socket::hostIP(){ return "0.0.0.0"; }
@@ -59,7 +58,7 @@ public:
 #else
 
 // Windows and POSIX socket code match very closely, so we will just conform
-// the differences with some new types
+// the differences with some new types.
 
 #if defined(AL_WINDOWS)
 #include <Winsock2.h>
@@ -96,8 +95,8 @@ const char * errorString(){
 #define INIT_SOCKET WsInit::get()
 typedef SOCKET SocketHandle;
 #define SHUT_RDWR SD_BOTH
-DWORD secToTimeout(al_sec t){
-	return DWORD(t>0. ? t*1000. + 0.5 : -1); /*msec*/
+DWORD secToTimeout(float t){
+	return t>=0. ? DWORD(t*1000. + 0.5) : 4294967295; // msec
 }
 
 
@@ -116,8 +115,8 @@ const char * errorString(){ return strerror(errno); }
 
 #define INIT_SOCKET
 typedef int SocketHandle;
-timeval secToTimeout(al_sec t){
-	if(t<0) t = 2147483647.;
+timeval secToTimeout(float t){
+	if(t<0) t = 2147483520.; // largest representable 32-bit int
 	timeval tv;
 	tv.tv_sec = int(t);
 	tv.tv_usec = (t - tv.tv_sec) * 1000000;
@@ -136,7 +135,7 @@ public:
 		INIT_SOCKET;
 	}
 
-	Impl(uint16_t port, const char * address, al_sec timeout_, int type)
+	Impl(uint16_t port, const char * address, float timeout_, int type)
 	:	Impl()
 	{
 		// opens the socket also:
@@ -147,9 +146,9 @@ public:
 
 	const std::string& address() const { return mAddress; }
 	uint16_t port() const { return mPort; }
-	al_sec timeout() const { return mTimeout; }
+	float timeout() const { return mTimeout; }
 
-	bool open(uint16_t port, std::string address, al_sec timeoutSec, int type){
+	bool open(uint16_t port, std::string address, float timeoutSec, int type){
 
 		close();
 
@@ -186,7 +185,6 @@ public:
 
 		int sockFamily = type & (127<<16);
 		switch(sockFamily){
-		//case 0:		sockFamily = AF_UNSPEC; break; // AF_INET6 if addr=""
 		case 0:
 		case INET:  sockFamily = AF_INET; break;
 		case INET6:
@@ -284,14 +282,22 @@ public:
 		return true;
 	}
 
-	void timeout(al_sec v){
+	void timeout(float v){
 		mTimeout = v;
 		auto to = secToTimeout(v);
-		if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&to, sizeof(to))){
-			AL_WARN("unable to set snd timeout on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
-		}
-		if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&to, sizeof(to))){
-			AL_WARN("unable to set rcv timeout on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
+		for(auto opt : {SO_SNDTIMEO, SO_RCVTIMEO}){
+			/*if(mTimeout < 0){ // necessary?
+				#ifdef AL_WINDOWS
+				decltype(WSABUF::len) nb = 0;
+				::ioctlsocket(mSocket, FIONBIO, &nb);
+				#else
+				int nb = 0;
+				::ioctl(mSocket, FIONBIO, &nb);
+				#endif
+			} else */
+			if(SOCKET_ERROR == ::setsockopt(mSocket, SOL_SOCKET, opt, (char *)&to, sizeof(to))){
+				AL_WARN("unable to set timeout on socket at %s:%i: %s", mAddress.c_str(), mPort, errorString());
+			}
 		}
 	}
 
@@ -329,17 +335,17 @@ public:
 		return INVALID_SOCKET != mSocket;
 	}
 
-	size_t recv(char * buffer, size_t maxlen, char *from){
-		return ::recv(mSocket, buffer, maxlen, 0);
+	int recv(char * buffer, int maxlen, char *from){
+		return (int)::recv(mSocket, buffer, maxlen, 0);
 	}
 
-	size_t send(const char * buffer, size_t len){
-		return ::send(mSocket, buffer, len, 0);
+	int send(const char * buffer, int len){
+		return (int)::send(mSocket, buffer, len, 0);
 	}
 
 private:
 	int mType = 0;
-	al_sec mTimeout = -1;
+	float mTimeout = -1;
 	std::string mAddress;
 	uint16_t mPort = 0;
 	struct addrinfo * mAddrInfo = NULL;
@@ -382,7 +388,7 @@ Socket::Socket()
 :	mImpl(new Impl)
 {}
 
-Socket::Socket(uint16_t port, const char * address, al_sec timeout, int type)
+Socket::Socket(uint16_t port, const char * address, float timeout, int type)
 :	mImpl(new Impl(port, address, timeout, type))
 {}
 
@@ -397,7 +403,7 @@ bool Socket::opened() const { return mImpl->opened(); }
 
 uint16_t Socket::port() const { return mImpl->port(); }
 
-al_sec Socket::timeout() const { return mImpl->timeout(); }
+float Socket::timeout() const { return mImpl->timeout(); }
 
 bool Socket::bind(){ return mImpl->bind(); }
 
@@ -405,21 +411,21 @@ bool Socket::connect(){ return mImpl->connect(); }
 
 void Socket::close(){ mImpl->close(); }
 
-bool Socket::open(uint16_t port, const char * address, al_sec timeout, int type){
+bool Socket::open(uint16_t port, const char * address, float timeout, int type){
 	return
 		mImpl->open(port, address, timeout, type)
 		&& onOpen();
 }
 
-void Socket::timeout(al_sec v){
+void Socket::timeout(float v){
 	mImpl->timeout(v);
 }
 
-size_t Socket::recv(char * buffer, size_t maxlen, char *from){
+int Socket::recv(char * buffer, int maxlen, char *from){
 	return mImpl->recv(buffer, maxlen, from);
 }
 
-size_t Socket::send(const char * buffer, size_t len) {
+int Socket::send(const char * buffer, int len) {
 	return mImpl->send(buffer, len);
 }
 
