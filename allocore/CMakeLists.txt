@@ -101,7 +101,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   find_package(Threads QUIET)
   if(CMAKE_THREAD_LIBS_INIT)
   list(APPEND ALLOCORE_SRC
-    src/system/al_ThreadNative.cpp
+    src/system/al_Thread.cpp
 )
   else()
     message("NOT building native thread Library (pthreads not found).")
@@ -109,7 +109,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 else()
 # Windows and OS X come with threading libraries installed.
   list(APPEND ALLOCORE_SRC
-    src/system/al_ThreadNative.cpp
+    src/system/al_Thread.cpp
 )
 endif()
 
