@@ -16,9 +16,7 @@ Lance Putnam, 1/2012
 using namespace al;
 
 // The function each worker thread will execute
-struct Func : public ThreadFunction{
-
-	Func(): sum(0){}
+struct Func{
 
 	void operator()(){
 		printf("Summing indices %u to %u ...\n", ival[0], ival[1]-1);
@@ -26,7 +24,7 @@ struct Func : public ThreadFunction{
 	}
 
 	unsigned ival[2];		// processing interval
-	double sum;				// final result
+	double sum = 0.;		// final result
 	const double * data;	// read-only data
 };
 

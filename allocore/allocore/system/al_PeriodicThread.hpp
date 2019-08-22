@@ -41,8 +41,8 @@
 	File author(s):
 	Lance Putnam, 2013, putnam.lance@gmail.com
 */
-#include <functional>
 
+#include <functional> // std::function
 #include "allocore/system/al_Thread.hpp"
 #include "allocore/system/al_Time.hpp"
 
@@ -54,13 +54,13 @@ namespace al{
 /// user-supplied thread function. This prevents drift that would occur in a
 /// more simplistic implementation using a fixed sleep interval.
 ///
+/// Upon destruction, the thread loop will be stopped and, by default, joined.
+///
 /// @ingroup allocore
 class PeriodicThread : public Thread{
 public:
 
 	/// @param[in] periodSec	calling period in seconds
-	/// @param[in] oneShot		determines if the timer triggers only once.
-	/// @param[in] triggerOnStart	if true, calling start() calls the function, otherwise function is called on next timeout
 	PeriodicThread(double periodSec=1);
 
 	/// Copy constructor
@@ -86,23 +86,17 @@ public:
 	double period() const;
 
 	/// Start calling the supplied function periodically
-	void start(ThreadFunction& func);
-
-	/// Start calling the supplied function periodically
-	void start(std::function<void(void *data)> function, void *userData = nullptr);
+	void start(Thread::Function func);
 
 	/// Stop the thread
 	void stop();
 
-	/// True if timer thread is running
-	bool running() const;
 
 	// Stuff for assignment
 	friend void swap(PeriodicThread& a, PeriodicThread& b);
 	PeriodicThread& operator= (PeriodicThread other);
 
 private:
-	static void * sPeriodicFunc(void * userData);
 	void go();
 
 	al_nsec mPeriod;
@@ -110,9 +104,7 @@ private:
 	al_nsec mWait;					// actual time to sleep between frames
 	al_nsec mTimeBehind;
 	float mAutocorrect;
-	ThreadFunction * mUserFunc;
-	void *mUserData;
-	std::function<void(void *data)> mFunction;
+	Thread::Function mUserFunc;
 	bool mRun;
 };
 

@@ -26,7 +26,7 @@ struct Thread::Impl{
 
 	~Impl(){}
 
-	bool start(std::function<void(void)>& func){
+	bool start(Thread::Function& func){
 		if(mThread.joinable()) return false; // invalid or already running
 		mThread = std::thread(func);
 		return mThread.joinable();
@@ -83,7 +83,7 @@ struct Thread::Impl{
 		pthread_attr_destroy(&mAttr);
 	}
 
-	bool start(std::function<void(void)>& func){
+	bool start(Thread::Function& func){
 		if(mHandle) return false;
 		struct F{
 			static void * cFunc(void * user){
@@ -155,7 +155,7 @@ class Thread::Impl{
 public:
 	Impl(): mHandle(NULL){}
 
-	bool start(std::function<void(void)>& func){
+	bool start(Thread::Function& func){
 		if(NULL==mHandle){
 			struct F{
 				static unsigned _stdcall cFunc(void * user){
@@ -206,19 +206,13 @@ public:
 
 
 Thread::Thread()
-:	mImpl(new Impl), mJoinOnDestroy(false)
+:	mImpl(new Impl)
 {}
 
-Thread::Thread(ThreadFunction& func)
-:	mImpl(new Impl), mJoinOnDestroy(false)
+Thread::Thread(Thread::Function func)
+:	mImpl(new Impl)
 {
 	start(func);
-}
-
-Thread::Thread(void * (*cThreadFunc)(void * userData), void * userData)
-:	mImpl(new Impl), mJoinOnDestroy(false)
-{
-	start(cThreadFunc, userData);
 }
 
 Thread::Thread(const Thread& other)
@@ -244,17 +238,9 @@ Thread& Thread::priority(int v){
 	return *this;
 }
 
-bool Thread::start(void * (*threadFunc)(void * userData), void * userData){
-	return start([threadFunc,userData](){ threadFunc(userData); });
-}
-
-bool Thread::start(std::function<void (void)> func){
+bool Thread::start(Thread::Function func){
 	mFunc = func;
 	return mImpl->start(mFunc);
-}
-
-bool Thread::start(ThreadFunction& func){
-	return start([&func](){ func(); });
 }
 
 bool Thread::join(double timeout){

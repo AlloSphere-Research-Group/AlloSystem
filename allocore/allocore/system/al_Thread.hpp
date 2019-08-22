@@ -49,61 +49,20 @@
 namespace al{
 
 
-/// Function object interface used by thread
-struct ThreadFunction{
-	virtual ~ThreadFunction(){}
-
-	/// Routine called on thread execution start
-	virtual void operator()() = 0;
-};
-
-
-/// C-style thread function with user data
-struct CThreadFunction : public ThreadFunction{
-
-	/// Prototype of thread execution function
-	typedef void * (*CFunc)(void * userData);
-
-	/// @param[in] threadFunc	thread execution function
-	/// @param[in] userData		user data passed into thread execution function
-	CThreadFunction(CFunc threadFunc=0, void * userData=0)
-	:	func(threadFunc), user(userData)
-	{}
-
-	void operator()(){ func(user); }
-
-	/*template <class Function>
-	void assign(Function& f){
-		struct F{
-			static void * cfunc(void * user){
-				(*(Function *)(user))();
-				return NULL;
-			}
-		};
-		func = F::cfunc;
-		user = &f;
-	}*/
-
-	CFunc func;		///< Thread execution function
-	void * user;	///< User data passed into thread execution function
-};
-
-
 /// Thread
 ///
 /// @ingroup allocore
 class Thread{
 public:
 
+	typedef std::function<void (void)> Function;
+
+
 	/// Create thread without starting
 	Thread();
 
-	/// @param[in] func			thread function object
-	Thread(ThreadFunction& func);
-
-	/// @param[in] cFunc		thread C function
-	/// @param[in] userData		user data passed to C function
-	Thread(void * (*cFunc)(void * userData), void * userData);
+	/// Start thread calling passed in function
+	Thread(Function func);
 
 	/// Copy constructor
 	Thread(const Thread& other);
@@ -122,7 +81,7 @@ public:
 
 
 	/// Start executing function
-	bool start(std::function<void (void)> func);
+	bool start(Function func);
 
 
 	/// Block the calling routine indefinitely until the thread terminates
@@ -147,14 +106,8 @@ public:
 protected:
 	class Impl;
 	Impl * mImpl;
-	std::function<void(void)> mFunc;
-	bool mJoinOnDestroy;
-
-public:
-	/// \deprecated
-	bool start(ThreadFunction& func);
-	/// \deprecated
-	bool start(void * (*threadFunc)(void * userData), void * userData);
+	Function mFunc;
+	bool mJoinOnDestroy = false;
 };
 
 
@@ -197,7 +150,7 @@ public:
 	/// Start all worker threads
 	void start(bool joinAll=true){
 		for(int i=0; i<size(); ++i){
-			thread(i).start(function(i));
+			thread(i).start(std::ref(function(i)));
 		}
 		if(joinAll) join();
 	}

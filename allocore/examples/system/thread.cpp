@@ -2,7 +2,7 @@
 AlloCore Example: Thread
 
 Description:
-Demontration of basic usage of the Thread class.
+Demonstration of basic usage of the Thread class.
 
 Author:
 Lance Putnam, 10/2012
@@ -13,70 +13,48 @@ Lance Putnam, 10/2012
 using namespace al;
 
 
-// We subclass ThreadFunction to define both the data and execution function of
-// the thread.
-struct MyThreadFunction : public ThreadFunction{
-	int i; // We'll use this integer to identify the thread
-
-	MyThreadFunction(int i_=0): i(i_){}
-
-	// This is the function that will get executed once the thread starts
-	void operator()(){
-		printf("Thread function %d\n", i);
-	}
-};
-
-
 int main(){
 
-	// First, we will show very simple use of a single thread.
-	Thread thread;
-	MyThreadFunction function1(1);
+	// The main purpose of threads is to run complex operations in parallel
+	// rather than sequentially.
+	{
+		Thread thread1, thread2;
 
-	// Start execution of the thread.
-	// The program will continue immediately after starting the thread.
-	thread.start(function1);
+		// Start both threads passing in functions that print a message.
+		// The thread functions may begin now and the program continues without
+		// waiting for the functions to return.
+		thread1.start([](){ printf("Hello from thread 1!\n"); });
+		thread2.start([](){ printf("Hello from thread 2!\n"); });
 
-	// Join the thread with the main thread.
-	// When we call join on a thread, the main program will wait until that
-	// thread is finished.
-	thread.join();
+		// Print message from main thread; this waits until the function returns
+		printf("Hello from main thread!\n");
 
-	// We can reuse threads, possibly with other functions, as long as they are
-	// not running.
-	MyThreadFunction function2(2);
-	thread.start(function2);
-	thread.join();
-
-
-	// Up to this point, we haven't really done any parallel processing which
-	// is the whole point of using threads.
-
-	// Declare multiple threads and functions
-	const int N = 8;
-	MyThreadFunction functions[N];
-	Thread threads[N];
-
-	// Initialize the data in our thread function objects
-	for(int i=0; i<N; ++i){
-		functions[i].i = i+10;
+		// Call 'join' to wait until the thread functions finish
+		thread1.join();
+		thread2.join();
 	}
 
-	// Start all the threads.
-	// The threads will execute in parallel in an indeterminate order. Run the
-	// example multiple times to observe how the print statements get
-	// interleaved in a seemingly random way.
-	printf("Starting multiple threads from the main thread.\n");
-	for(int i=0; i<N; ++i){
-		threads[i].start(functions[i]);
-	}
-	printf("All threads started.\n");
+	// We may also pass a functor (function with persistant data) to a thread,
+	// but must be a bit careful...
+	{
+		struct Functor{
+			int i;
+			void operator()(){ ++i; }
+		};
 
-	// Join all the threads with the main thread.
-	for(int i=0; i<N; ++i){
-		printf("Joining %d\n", functions[i].i);
-		threads[i].join();
+		Functor functor{1};
+
+		{	// The wrong way (passes copy of functor data)
+			Thread thread(functor);
+			thread.join();
+			printf("functor.i is %d\n", functor.i); // a copy was incremented
+		}
+
+		{	// The right way (passes reference to functor data)
+			Thread thread(std::ref(functor));
+			thread.join();
+			printf("functor.i is %d\n", functor.i); // actual object was incremented
+		}
 	}
 
-	printf("All threads joined.\n");
 }
