@@ -12,6 +12,7 @@ list(APPEND ALLOCORE_SRC
   src/io/al_MRC.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
+  src/io/al_Socket.cpp
   src/io/al_CSVReader.cpp
   src/io/hidapi.c
   src/protocol/al_Serialize.cpp
@@ -160,7 +161,7 @@ include(modules/font_module.cmake)
 include(modules/freeimage_module.cmake)
 include(modules/assimp_module.cmake)
 
-include(modules/apr_module.cmake)
+#include(modules/apr_module.cmake)
 include(modules/portaudio_module.cmake)
 include(modules/libsndfile_module.cmake)
 
