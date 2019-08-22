@@ -27,7 +27,7 @@ struct Thread::Impl{
 	~Impl(){}
 
 	bool start(Thread::Function& func){
-		if(mThread.joinable()) return false; // invalid or already running
+		if(mThread.joinable()) return false; // already running
 		mThread = std::thread(func);
 		return mThread.joinable();
 	}
