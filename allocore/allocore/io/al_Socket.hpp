@@ -45,7 +45,7 @@
 
 
 #include <string>
-#include "allocore/system/al_Config.h"
+#include <cstdint>
 
 namespace al{
 
@@ -77,9 +77,9 @@ public:
 
 	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address
-	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block with timeout
+	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block for timeout seconds
 	/// @param[in] type		Protocol type
-	Socket(uint16_t port, const char * address, al_sec timeout, int type);
+	Socket(uint16_t port, const char * address, float timeout, int type);
 
 	virtual ~Socket();
 
@@ -101,11 +101,11 @@ public:
 	uint16_t port() const;
 
 	/// Get timeout duration, in seconds
-	al_sec timeout() const;
+	float timeout() const;
 
 
 	/// Open socket (reopening if currently open)
-	bool open(uint16_t port, const char * address, al_sec timeout, int type);
+	bool open(uint16_t port, const char * address, float timeout, int type);
 
 	/// Close the socket
 	void close();
@@ -129,7 +129,7 @@ public:
 	///					If t = 0, the socket never blocks.
 	///					If t < 0, the socket blocks forever.
 	/// Note that setting the timeout will close and re-open the socket.
-	void timeout(al_sec t);
+	void timeout(float t);
 
 
 	/// Read data from a network
@@ -137,20 +137,20 @@ public:
 	/// @param[in] buffer	A buffer to copy the received data into
 	/// @param[in] maxlen	The maximum length, in bytes, of data to copy
 	/// @param[out] from	The sender's IP address is copied here if pointer not null
-	/// \returns bytes read
+	/// \returns bytes read or a negative value if an error occured
 	//
 	/// Note: to ensure receipt of all messages in the queue, use
 	/// while(recv()){}
 	///
 	/// The from pointer should be at least the size of Message::mSenderAddr
-	size_t recv(char * buffer, size_t maxlen, char *from = nullptr);
+	int recv(char * buffer, int maxlen, char *from = nullptr);
 
 	/// Send data over a network
 
 	/// @param[in] buffer	The buffer of data to send
 	/// @param[in] len		The length, in bytes, of the buffer
-	/// \returns bytes sent
-	size_t send(const char * buffer, size_t len);
+	/// \returns bytes sent or a negative value if an error occured
+	int send(const char * buffer, int len);
 
 
 	/// Listen for incoming connections from remote clients
@@ -190,11 +190,11 @@ public:
 
 	/// @param[in] port		Remote port number (valid range is 0-65535)
 	/// @param[in] address	Remote IP address
-	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block with timeout
+	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block for timeout seconds
 	/// @param[in] type		Protocol type
 	SocketClient(
 		uint16_t port, const char * address = "localhost",
-		al_sec timeout = 0, int type = UDP|DGRAM
+		float timeout = 0, int type = UDP|DGRAM
 	)
 	:	Socket(port, address, timeout, type)
 	{
@@ -220,11 +220,11 @@ public:
 
 	/// @param[in] port		Local port number (valid range is 0-65535)
 	/// @param[in] address	Local IP address. If empty, will bind all network interfaces to socket.
-	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block with timeout
+	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block for timeout seconds
 	/// @param[in] type		Protocol type
 	SocketServer(
 		uint16_t port, const char * address = "",
-		al_sec timeout = 0, int type = UDP|DGRAM
+		float timeout = 0, int type = UDP|DGRAM
 	)
 	:	Socket(port, address, timeout, type)
 	{
