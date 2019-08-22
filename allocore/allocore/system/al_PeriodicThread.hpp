@@ -66,6 +66,8 @@ public:
 	/// Copy constructor
 	PeriodicThread(const PeriodicThread& other);
 
+	~PeriodicThread();
+
 
 	/// Set autocorrection factor
 
