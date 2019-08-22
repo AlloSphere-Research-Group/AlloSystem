@@ -63,12 +63,6 @@ allovsr: FORCE allocore
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
 
-clean:
-	@for v in $(MODULE_DIRS); do\
-		$(MAKE) --no-print-directory -C $$v clean;\
-	done
-
-
 # Create/view API documentation
 DOC_INDEX_FILE := doc/www/doxy/html/index.html
 $(DOC_INDEX_FILE): doc/Doxyfile allocore/allocore/*
@@ -113,6 +107,13 @@ endif
 ifneq ($(shell ls $(BUILD_DIR)/lib/ 2> /dev/null | grep GLV),)
 	BUILT_MODULES += ../GLV/
 endif
+
+
+clean:
+	@for v in $(BUILT_MODULES); do\
+		$(MAKE) --no-print-directory -C $$v clean;\
+	done
+
 
 -include $(addsuffix /Makefile.link, $(BUILT_MODULES))
 
