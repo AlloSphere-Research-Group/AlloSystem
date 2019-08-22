@@ -20,7 +20,7 @@ int main(){
 	server code would be running on separate machines.
 	*/
 	{
-		int port = 11111;
+		unsigned short port = 11111;
 		const char * addr = "127.0.0.1";
 		char data[] = {'H','e','l','l','o',' ','N','e','t','w','o','r','k','!'};
 
@@ -53,7 +53,7 @@ int main(){
 
 
 		// Receive data
-		char buf[128] = {0};
+		char buf[128];
 
 		// Typically, a server will loop to check for incoming packets
 		while(1){
@@ -92,7 +92,7 @@ int main(){
 
 			// Now, we go into a busy loop checking for a response from the server
 			while(1){
-				char buf[512] = {0};
+				char buf[512];
 				int n = client.recv(buf, sizeof buf);
 
 				if(n == 0) break;
