@@ -21,10 +21,7 @@ static void serializeToBigEndian(char * out, float in){
 
 
 RenderToDisk::RenderToDisk(Mode m)
-:	mMode(m), mFrameNumber(0), mElapsedSec(0),
-	mGraphicsBuf(-1),
-	mImageExt("png"), mImageCompress(50),
-	mActive(false), mWroteImages(false), mWroteAudio(false)
+:	mMode(m)
 {
 	mPBOs[0] = 0;
 	resetPBOQueue();
@@ -58,9 +55,10 @@ RenderToDisk& RenderToDisk::path(const std::string& v){
 	return *this;
 }
 
-RenderToDisk& RenderToDisk::imageFormat(const std::string& ext, int compress){
+RenderToDisk& RenderToDisk::imageFormat(const std::string& ext, int compress, int paletteSize){
 	mImageExt = ext;
 	mImageCompress = compress;
+	mImagePaletteSize = paletteSize;
 	return *this;
 }
 
@@ -155,36 +153,34 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 	mActive = true;
 
 	if(mAudioIO){
-		struct F{ static void * threadFunc(void * user){
-			RenderToDisk& outer = *(RenderToDisk*)(user);
-	
-			while(outer.mActive){
-				//printf("SoundFile writer thread\n");
-
-				const int readCode = outer.mAudioRing.read();
-				if(readCode){
-					//printf("SoundFile writer thread: %s\n", readCode>0 ? "read" : "underrun");
-					if(readCode<0) fprintf(stderr, "SoundFile writer thread: underrun\n");
-					outer.mSoundFile.write(
-						reinterpret_cast<const char*>(outer.mAudioRing.readBuffer()),
-						outer.mAudioRing.blockSizeInSamples() * sizeof(float)
-					);
-				}
-				else{
-					//printf("SoundFile writer thread: overrun (sleeping...)\n");
-					al_sleep(0.01);
-				}
-			}
-			return NULL;
-		}};
-
-		mSoundFileThread.start(F::threadFunc, this);
 
 		if(NON_REAL_TIME == mMode){
 			mAudioIO->stop();
 		}
 
 		mAudioIO->append(*this);
+
+		mSoundFileThread.start(
+			[this](){
+				while(mActive){
+					//printf("SoundFile writer thread\n");
+
+					const int readCode = mAudioRing.read();
+					if(readCode){
+						//printf("SoundFile writer thread: %s\n", readCode>0 ? "read" : "underrun");
+						if(readCode<0) fprintf(stderr, "SoundFile writer thread: underrun\n");
+						mSoundFile.write(
+							reinterpret_cast<const char*>(mAudioRing.readBuffer()),
+							mAudioRing.blockSizeInSamples() * sizeof(float)
+						);
+					}
+					else{
+						//printf("SoundFile writer thread: overrun (sleeping...)\n");
+						al_sleep(0.01);
+					}
+				}
+			}
+		);
 	}
 
 	if(mWindow){
@@ -250,7 +246,7 @@ void RenderToDisk::stop(){
 
 
 void RenderToDisk::saveScreenshot(unsigned w, unsigned h, unsigned l, unsigned b){
-	makePath();
+	if(mPath.empty()) makePath();
 	saveImage(w,h,l,b, /*usePBO=*/false);
 }
 
@@ -263,7 +259,7 @@ void RenderToDisk::makePath(){
 	// If no user path specified, create default with time string
 	if(mUserPath.empty()){
 		mPath = "./render";
-		mPath += al::toString((unsigned long long)(al::timeNow()*1000) % 31536000000ull);
+		mPath += al::timecodeNow("DHMS");
 	}
 	else{
 		mPath = mUserPath;
@@ -415,7 +411,7 @@ void RenderToDisk::saveImage(
 		int i=0;
 		for(; i<Nthreads; ++i){
 			//printf("Checking if image writer %d is free ...\n", i);
-			if(mImageWriters[i].run(name, mPixels, w,h, format, mImageCompress)){
+			if(mImageWriters[i].run(name, mPixels, w,h, format, mImageCompress, mImagePaletteSize)){
 				//printf("Running image writer %d\n", i);
 				break;
 			}
@@ -426,7 +422,7 @@ void RenderToDisk::saveImage(
 			al::wait(1./1e3); // wait 1 ms for disk i/o to finish up (hopefully)
 			goto CHECK_THREADS;
 			// Use main thread---this will definitely stall
-			//al::Image::save(name, pixs, w,h, format, mImageCompress);
+			//al::Image::save(name, pixs, w,h, format, mImageCompress, mImagePaletteSize);
 		}
 	
 		++mFrameNumber;
@@ -469,7 +465,7 @@ void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
 
 
 RenderToDisk::AudioRing::AudioRing()
-:	mChannels(0), mBlockSize(0), mNumBlocks(0), mWriteBlock(0), mReadBlock(0)
+:	mWriteBlock(0), mReadBlock(0)
 {}
 
 void RenderToDisk::AudioRing::resize(
@@ -549,7 +545,7 @@ unsigned RenderToDisk::AudioRing::blockSizeInSamples() const {
 bool RenderToDisk::ImageWriter::run(
 	const std::string& path,
 	const std::vector<unsigned char>& pixels, unsigned w, unsigned h,
-	Image::Format format, unsigned compress
+	Image::Format format, int compress, int paletteSize
 ){
 	if(mBusy) return false;
 
@@ -560,22 +556,18 @@ bool RenderToDisk::ImageWriter::run(
 	memcpy(mImage.pixels<void>(), &pixels[0], pixels.size());
 
 	mImage.compression(compress);
+	mImage.paletteSize(paletteSize);
 	mPath = path;
 
 	// Wait for any thread function in progress
 	mThread.join();
 
-	struct F{
-		static void * threadFunc(void * user){
-			ImageWriter& outer = *(ImageWriter*)(user);
-			//outer.mBusy = true;
-			outer.mImage.save(outer.mPath);
-			outer.mBusy = false;
-			return NULL;
+	mThread.start(
+		[this](){
+			mImage.save(mPath);
+			mBusy = false;
 		}
-	};
-
-	mThread.start(F::threadFunc, this);
+	);
 
 	return true;
 }
