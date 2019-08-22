@@ -6,6 +6,7 @@ namespace al{
 PeriodicThread::PeriodicThread(double periodSec)
 :	mAutocorrect(0.1)
 {
+	joinOnDestroy(true);
 	period(periodSec);
 }
 
@@ -16,6 +17,10 @@ PeriodicThread::PeriodicThread(const PeriodicThread& o)
 	mUserFunc(o.mUserFunc),
 	mRun(o.mRun)
 {}
+
+PeriodicThread::~PeriodicThread(){
+	stop();
+}
 
 PeriodicThread& PeriodicThread::autocorrect(float factor){
 	mAutocorrect=factor;

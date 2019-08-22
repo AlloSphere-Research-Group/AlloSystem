@@ -54,6 +54,8 @@ namespace al{
 /// user-supplied thread function. This prevents drift that would occur in a
 /// more simplistic implementation using a fixed sleep interval.
 ///
+/// Upon destruction, the thread loop will be stopped and, by default, joined.
+///
 /// @ingroup allocore
 class PeriodicThread : public Thread{
 public:
@@ -63,6 +65,8 @@ public:
 
 	/// Copy constructor
 	PeriodicThread(const PeriodicThread& other);
+
+	~PeriodicThread();
 
 
 	/// Set autocorrection factor
