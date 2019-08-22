@@ -326,7 +326,7 @@ OSCTRY("PacketHandler::parse",
 
 
 
-Send::Send(uint16_t port, const char * address, al_sec timeout, int size)
+Send::Send(uint16_t port, const char * address, float timeout, int size)
 :	SocketClient(port, address, timeout, Socket::UDP),
 	Packet(size)
 {}
@@ -353,7 +353,7 @@ Recv::Recv()
 }
 
 
-Recv::Recv(uint16_t port, const char * address, al_sec timeout)
+Recv::Recv(uint16_t port, const char * address, float timeout)
 :	SocketServer(port, address, timeout, Socket::UDP),
 	mHandler(0), mBuffer(1024), mBackground(false)
 {

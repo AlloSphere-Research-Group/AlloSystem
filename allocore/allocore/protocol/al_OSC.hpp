@@ -274,9 +274,9 @@ public:
 
 	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address
-	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
+	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block for timeout seconds
 	/// @param[in] size 	Packet buffer size
-	Send(uint16_t port, const char * address = "localhost", al_sec timeout=0, int size=1024);
+	Send(uint16_t port, const char * address = "localhost", float timeout=0, int size=1024);
 
 	/// Send and clear current packet contents
 	int send();
@@ -345,8 +345,8 @@ public:
 
 	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address. If empty, will bind all network interfaces to socket.
-	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	Recv(uint16_t port, const char * address = "", al_sec timeout=0);
+	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block for timeout seconds
+	Recv(uint16_t port, const char * address = "", float timeout=0);
 
 	virtual ~Recv() { stop(); }
 
