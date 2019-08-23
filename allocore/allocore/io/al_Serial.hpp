@@ -44,7 +44,7 @@
 #include <exception>
 #include <stdexcept>
 //#include <serial/v8stdint.h>
-#include "allocore/system/pstdint.h"
+#include <cstdint>
 
 #define THROW(exceptionClass, message) throw exceptionClass(__FILE__, \
 __LINE__, (message) )

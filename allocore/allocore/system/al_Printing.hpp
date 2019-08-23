@@ -90,7 +90,7 @@ template<class T> void print2D(const T* arr, int nx, int ny, FILE * fp=stdout);
 /// @param[in]	width	Character width of plot excluding center point
 /// @param[in]	spaces	Print extra filling spaces to the right
 /// @param[in]	point	The print character for points
-void printPlot(float value, uint32_t width=50, bool spaces=true, const char * point="o");
+void printPlot(float value, int width=50, bool spaces=true, const char * point="o");
 
 /// Prints error message to stderr and optionally calls exit()
 void err(const char * msg, const char * src="", bool exits=true);

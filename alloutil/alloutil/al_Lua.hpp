@@ -43,7 +43,7 @@
 */
 
 #include "lua.hpp"
-#include "allocore/system/pstdint.h"
+#include <cstdint>
 #include <string>
 
 #ifndef MAX

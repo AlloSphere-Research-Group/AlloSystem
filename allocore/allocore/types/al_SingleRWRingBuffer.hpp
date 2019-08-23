@@ -42,9 +42,8 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include <cstring>
-
-#include "allocore/system/pstdint.h"
+#include <cstdint>
+#include <cstring> // memcpy
 
 namespace al {
 

@@ -79,27 +79,22 @@
 	#define AL_API extern
 #endif
 
-#define AL_SNPRINTF snprintf
-#define AL_VSNPRINTF vsnprintf
-
 #ifdef __MINGW32__
-	#undef AL_SNPRINTF
 	#define AL_SNPRINTF _snprintf
-	#undef AL_VSNPRINTF
 	#define AL_VSNPRINTF _vsnprintf
+#else
+	#define AL_SNPRINTF snprintf
+	#define AL_VSNPRINTF vsnprintf
 #endif
 
 /*
 	primitive typedefs
 */
 #if !defined(AL_WINDOWS) || defined(__MSYS__)
-	#include "allocore/system/pstdint.h"
 	#define AL_PRINTF_LL "ll"
 #else
-	#include <stdint.h>
 	#define AL_PRINTF_LL "I64"
 #endif
-
 
 typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 years) */
 typedef double al_sec;						/**< seconds type */
