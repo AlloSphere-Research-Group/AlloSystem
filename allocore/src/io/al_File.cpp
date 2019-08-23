@@ -190,6 +190,8 @@ public:
 #include <windows.h>
 #include <Shlwapi.h> // PathFileExists, PathIsDirectory
 
+#pragma comment(lib, "Shlwapi.lib")
+
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	#include <direct.h>
 	#define GetCurrentDir _getcwd
@@ -201,7 +203,7 @@ public:
 struct ReadOnlyFileHandle{
 	HANDLE mHandle = INVALID_HANDLE_VALUE;
 	ReadOnlyFileHandle(const std::string& path){
-		mHandle = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+		mHandle = CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	}
 	~ReadOnlyFileHandle(){
 		if(opened()) CloseHandle(mHandle);
@@ -270,13 +272,13 @@ size_t File::sizeFile() const {
 }
 
 size_t File::storage() const {
-	return GetCompressedFileSize(path().c_str(), NULL);
+	return GetCompressedFileSizeA(path().c_str(), NULL);
 }
 
 /*static*/ std::string File::absolutePath(const std::string& path){
 	TCHAR dirPart[4096];
 	TCHAR ** filePart={NULL};
-	GetFullPathName((LPCTSTR)path.c_str(), sizeof(dirPart), dirPart, filePart);
+	GetFullPathNameA(path.c_str(), sizeof(dirPart), dirPart, filePart);
 	std::string result = (char *)dirPart;
 	if(filePart != NULL && *filePart != 0){
 		result += (char *)*filePart;
@@ -285,11 +287,11 @@ size_t File::storage() const {
 }
 
 /*static*/ bool File::exists(const std::string& path){
-	return PathFileExists(path.c_str());
+	return PathFileExistsA(path.c_str());
 }
 
 /*static*/ bool File::isDirectory(const std::string& path){
-	return PathIsDirectory(path.c_str());
+	return PathIsDirectoryA(path.c_str());
 }
 
 
