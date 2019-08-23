@@ -7,7 +7,7 @@
 
 namespace al{
 
-void printPlot(float value, uint32_t width, bool spaces, const char * point){
+void printPlot(float value, int width, bool spaces, const char * point){
 	bool clipped = false;
 	if(value < -1.f){ value=-1.f; clipped=true; }
 	else if(value > 1.f){ value=1.f; clipped=true; }
@@ -16,9 +16,9 @@ void printPlot(float value, uint32_t width, bool spaces, const char * point){
 
 	value = (value + 1.f) * 0.5f * (float)(width);
 	value += value>=0 ? 0.5 : -0.5;
-	uint32_t pos = uint32_t(value);
-	uint32_t mid = width >> 1;
-	uint32_t i=0;
+	auto mid = width/2;
+	auto pos = decltype(width)(value);
+	decltype(width) i = 0;
 
 	if(pos < mid){	// [-1, 0)
 		for(; i<pos; ++i) printf(" ");
