@@ -74,7 +74,6 @@
 #include "allocore/math/al_Spherical.hpp"
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/protocol/al_OSC.hpp"
-#include "allocore/protocol/al_Serialize.hpp"
 #include "allocore/sound/al_Ambisonics.hpp"
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/sound/al_Dbap.hpp"
