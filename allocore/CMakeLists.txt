@@ -42,6 +42,7 @@ list(APPEND ALLOCORE_HEADERS
     allocore/io/al_MIDI.hpp
     allocore/io/al_MRC.hpp
     allocore/io/al_Serial.hpp
+    allocore/io/al_Socket.hpp
     allocore/io/al_CSVReader.hpp
     allocore/math/al_Analysis.hpp
     allocore/math/al_Complex.hpp
