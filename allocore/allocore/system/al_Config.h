@@ -91,8 +91,10 @@
 	primitive typedefs
 */
 #if !defined(AL_WINDOWS) || defined(__MSYS__)
+	#include "allocore/system/pstdint.h"
 	#define AL_PRINTF_LL "ll"
 #else
+	#include <stdint.h>
 	#define AL_PRINTF_LL "I64"
 #endif
 
