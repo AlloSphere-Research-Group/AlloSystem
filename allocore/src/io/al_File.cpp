@@ -606,15 +606,16 @@ std::string File::extension(const std::string& path){
 }
 
 bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
-	if(prefixPath[0]){
-		prefixPath = conformDirectory(prefixPath);
+	auto pre = prefixPath;
+	if(pre[0]) pre = conformDirectory(pre);
+	for(int i=0; i<maxDepth; ++i){
+		if(File::exists(pre + matchPath)){
+			prefixPath = pre;
+			return true;
+		}
+		pre += ".." AL_FILE_DELIMITER_STR;
 	}
-	int i=0;
-	for(; i<maxDepth; ++i){
-		if(File::exists(prefixPath + matchPath)) break;
-		prefixPath += ".." AL_FILE_DELIMITER_STR;
-	}
-	return i<maxDepth;
+	return false;
 }
 
 bool File::searchBack(std::string& path, int maxDepth){
