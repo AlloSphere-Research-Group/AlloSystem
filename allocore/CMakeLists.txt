@@ -15,7 +15,6 @@ list(APPEND ALLOCORE_SRC
   src/io/al_Socket.cpp
   src/io/al_CSVReader.cpp
   src/io/hidapi.c
-  src/protocol/al_Serialize.cpp
   src/spatial/al_HashSpace.cpp
   src/spatial/al_Pose.cpp
   src/system/al_Info.cpp
@@ -59,8 +58,6 @@ list(APPEND ALLOCORE_HEADERS
     allocore/math/al_Ray.hpp
     allocore/math/al_Spherical.hpp
     allocore/math/al_Vec.hpp
-    allocore/protocol/al_Serialize.h
-    allocore/protocol/al_Serialize.hpp
     allocore/spatial/al_Curve.hpp
     allocore/spatial/al_DistAtten.hpp
     allocore/spatial/al_HashSpace.hpp
