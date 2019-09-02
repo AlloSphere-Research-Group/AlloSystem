@@ -459,7 +459,7 @@ public:
 		return (*this) - projection(u);
 	}
 
-	/// Relect vector around a unit vector
+	/// Reflect vector around a unit vector
 	Vec& reflect(const Vec& u){
 		return (*this) -= ((T(2) * dot(u)) * u);
 	}
