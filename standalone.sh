@@ -52,17 +52,15 @@ if uname | grep -q MINGW; then
 
 	LIBS=`getDeps "${BUILDEXEBASE}.exe"`
 
+	# Drill down one more layer to check if dependencies have dependencies
 	# TODO: make this recursive!!!
 	for lib in $LIBS; do
-		FILE="`basename $lib`"
-		if [ $FILE == "libgomp-1.dll" ]; then
-			NEWLIBS="`getDeps $lib`"
-			for newlib in $NEWLIBS; do
-				if [[ $LIBS != *"$newlib"* ]]; then
-					LIBS+=" $newlib"
-				fi
-			done
-		fi
+		NEWLIBS="`getDeps $lib`"
+		for newlib in $NEWLIBS; do
+			if [[ $LIBS != *"$newlib"* ]]; then
+				LIBS+=" $newlib"
+			fi
+		done
 	done
 	#echo $LIBS
 
