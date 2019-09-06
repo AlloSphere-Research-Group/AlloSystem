@@ -109,7 +109,10 @@ ifneq ($(shell ls $(BUILD_DIR)/lib/ 2> /dev/null | grep GLV),)
 endif
 
 
+.PHONY: clean
 clean:
+	@$(RM) $(LIB_PATH)
+	$(call RemoveDir, $(OBJ_DIR))
 	@for v in $(BUILT_MODULES); do\
 		$(MAKE) --no-print-directory -C $$v clean;\
 	done
