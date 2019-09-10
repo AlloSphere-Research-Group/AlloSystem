@@ -557,8 +557,8 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 }
 
 /// Returns dot product
-template <class T>
-inline T dot(const Vec<3,T>& a, const Vec<3,T>& b){
+template <int N, class T>
+inline T dot(const Vec<N,T>& a, const Vec<N,T>& b){
 	return a.dot(b);
 }
 
