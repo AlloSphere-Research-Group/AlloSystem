@@ -665,6 +665,12 @@ struct RGB{
 	RGB mix(const RGB& v, float amt=0.5f) const {
 		return (v-*this)*amt + *this;
 	}
+
+	/// Set value of color in HSV space (leaving hue and saturation unchanged)
+	RGB& value(float v){
+		auto mx = r>g ? (r>b?r:b) : (g>b?g:b);
+		return mx > 0. ? *this *= v/mx : *this = v;
+	}
 };
 
 
