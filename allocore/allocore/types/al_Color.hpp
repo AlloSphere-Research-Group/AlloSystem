@@ -46,7 +46,7 @@
 	Owen Campbell, 2014, owen.campbell@gmail.com
 */
 
-#include "allocore/system/al_Config.h"
+#include <cstdint> // uint8_t, uint32_t in Colori
 
 namespace al{
 /// @addtogroup allocore

@@ -1,10 +1,27 @@
 #include "allocore/types/al_Color.hpp"
-#include "allocore/math/al_Constants.hpp"
-#include "allocore/math/al_Mat.hpp"
 #include <algorithm> // min,max
 #include <cmath>
 
 namespace al{
+
+constexpr auto twoPi = 6.28318530717958647692;
+
+// Returns vector v transformed by matrix m (via m * v)
+template <class T, class Vec>
+Vec transform(
+	T m11, T m12, T m13,
+	T m21, T m22, T m23,
+	T m31, T m32, T m33,
+	const Vec& v
+){
+	static_assert(sizeof(v)/sizeof(v[0]) >= 3, "Vector needs at least 3 components");
+	return Vec(
+		m11*v[0] + m12*v[1] + m13*v[2],
+		m21*v[0] + m22*v[1] + m23*v[2],
+		m31*v[0] + m32*v[1] + m33*v[2]
+	);
+}
+
 
 RGB& RGB::complement(){
 	auto mn = std::min({r, g, b});
@@ -70,16 +87,14 @@ HSV& HSV::operator= (const RGB& c){
 
 
 RGB& RGB::operator= (const CIEXYZ& v){
+	//convert CIEXYZ to rgb (linear with respect to energy)
 	//using sRGB and reference white D65
-	static const Mat3f transformMatrix(
+	*this = transform(
 		 3.2405f, -1.5371f, -0.4985f,
 		-0.9693f,  1.8760f,  0.0416f,
-		 0.0556f, -0.2040f,  1.0572f
+		 0.0556f, -0.2040f,  1.0572f,
+		RGB(v.components)
 	);
-
-	//convert CIEXYZ to rgb (linear with respect to energy)
-	auto rgbLin = transformMatrix * Vec3f(v.components);
-	set(&rgbLin[0]);
 
 	//convert linear RGB values to vanilla RGB
 	for(auto& c : components)
@@ -93,13 +108,6 @@ RGB& RGB::operator= (const CIEXYZ& v){
 
 
 CIEXYZ& CIEXYZ::operator= (const RGB& v){
-	//using sRGB and reference white D65
-	static const Mat3f transformMatrix(
-		0.4124f,  0.3576f,  0.1805f,
-		0.2126f,  0.7152f,  0.0722f,
-		0.0193f,  0.1192f,  0.9505f
-	);
-
 	auto rgbLin = v;
 
 	//convert vanilla RGB values to be linear with respect to energy
@@ -107,8 +115,13 @@ CIEXYZ& CIEXYZ::operator= (const RGB& v){
 		c = c <= 0.04045f ? c/12.92f : float(pow(((c + 0.055)/1.055), 2.4));
 
 	//convert rgb to CIEXYZ
-	auto xyz = transformMatrix * Vec3f(rgbLin.components);
-	x=xyz[0], y=xyz[1], z=xyz[2];
+	//using sRGB and reference white D65
+	*this = transform(
+		0.4124f,  0.3576f,  0.1805f,
+		0.2126f,  0.7152f,  0.0722f,
+		0.0193f,  0.1192f,  0.9505f,
+		CIEXYZ(rgbLin.components)
+	);
 
 	//cout << "CIEXYZ from RGB: {" << x << ", " << y << ", " << z << "}" << endl;
 	return *this;
@@ -186,9 +199,8 @@ Lab& Lab::operator= (const CIEXYZ& v){
 
 Lab& Lab::operator=(const HCLab& v){
 	l = v.l * 100.0f;
-	static const float TAU = 2 * M_PI;
-	a = (v.c * 133.419f) * cos(v.h * TAU);
-	b = (v.c * 133.419f) * sin(v.h * TAU);
+	a = (v.c * 133.419f) * cos(v.h * twoPi);
+	b = (v.c * 133.419f) * sin(v.h * twoPi);
 	//cout << "Lab from HCLab: {" << l << ", " << a << ", " << b << "}" << endl;
 	return *this;
 }
@@ -197,7 +209,7 @@ Lab& Lab::operator=(const HCLab& v){
 HCLab& HCLab::operator= (const Lab& v){
 	float L = v.l, a = v.a, b = v.b;
 	//calculate hue angle from 0 to 1
-	h = atan2(b, a) * (1.f / (2.f*M_PI));	// hue in [-0.5, 0.5]
+	h = atan2(b, a) * (1.f / twoPi);	// hue in [-0.5, 0.5]
 	if(h < 0.f) h += 1.f;					// wrap hue angle into [0, 1]
 
 	c = sqrt(a * a + b * b) / 133.419f; //range determined empirically using
@@ -232,9 +244,8 @@ Luv& Luv::operator= (const CIEXYZ& w){
 
 Luv& Luv::operator=(const HCLuv& w){
 	l = w.l * 100.0f;
-	static const float TAU = 2 * M_PI;
-	u = (w.c * 178.387f) * cos(w.h * TAU);
-	v = (w.c * 178.387f) * sin(w.h * TAU);
+	u = (w.c * 178.387f) * cos(w.h * twoPi);
+	v = (w.c * 178.387f) * sin(w.h * twoPi);
 	//cout << "Luv from HCLuv: {" << l << ", " << u << ", " << v << "}" << endl;
 	return *this;
 }
@@ -243,7 +254,7 @@ Luv& Luv::operator=(const HCLuv& w){
 HCLuv& HCLuv::operator= (const Luv& w){
 	float L = w.l, u = w.u, v = w.v;
 	//calculate hue angle from 0 to 1
-	h = atan2(v, u) * (1.f / (2.f*M_PI));	// hue in [-0.5, 0.5]
+	h = atan2(v, u) * (1.f / twoPi);	// hue in [-0.5, 0.5]
 	if(h < 0.f) h += 1.f;					// wrap hue angle into [0, 1]
 
 	c = sqrt(u * u + v * v) / 178.387f; //range determined empirically using
