@@ -49,6 +49,8 @@
 #include "allocore/system/al_Config.h"
 
 namespace al{
+/// @addtogroup allocore
+/// @{
 
 struct RGB;
 struct HSV;
@@ -70,8 +72,6 @@ namespace{
 
 
 /// Color represented by red, green, blue, and alpha components
-///
-/// @ingroup allocore
 struct Color{
 
 	union{
@@ -265,8 +265,6 @@ private:
 /// The component accessor methods operate exclusively with integer types. To
 /// convert to and from floating point values in the interval [0, 1], use the
 /// overloaded assignment (=) operators.
-///
-/// @ingroup allocore
 struct Colori {
 
 	union{
@@ -745,8 +743,6 @@ struct CIEXYZ{
 
 
 /// Color represented by L* (lightness), a*, b*
-///
-/// @ingroup allocore
 struct Lab{
 	union{
 		struct{
@@ -827,8 +823,6 @@ struct Lab{
 
 
 /// Color represented by hue, chroma, luminance(ab)
-///
-/// @ingroup allocore
 struct HCLab{
 	union{
 		struct{
@@ -916,8 +910,6 @@ struct HCLab{
 
 
 /// Color represented by L* (lightness), u*, v*
-///
-/// @ingroup allocore
 struct Luv{
 	union{
 		struct{
@@ -997,8 +989,6 @@ struct Luv{
 
 
 /// Color represented by hue, chroma, luminance(uv)
-///
-/// @ingroup allocore
 struct HCLuv{
 
 	union{
@@ -1084,6 +1074,7 @@ struct HCLuv{
 	}
 };
 
+/// @} // end allocore group
 
 
 
@@ -1124,7 +1115,7 @@ inline Colori& Colori::operator= (const RGB& v){
 }
 
 
-inline HSV operator * (float s, const HSV& c){ return  c*s; }
+inline HSV operator * (float s, const HSV& c){ return c*s; }
 
 } // al::
 
