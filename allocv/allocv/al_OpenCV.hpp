@@ -71,7 +71,7 @@ void fromCV(AlloArrayHeader& hdr, int CV_TYPE);
 
 
 /// Converts an AlloTy type and component count into an OpenCV type flag:
-int toCV(AlloTy type, uint8_t components);
+int toCV(AlloTy type, unsigned char components);
 
 /// Creates a cv::Mat which directly uses an Array's data (no copying)
 

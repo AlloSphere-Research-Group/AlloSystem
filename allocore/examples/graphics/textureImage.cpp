@@ -79,7 +79,7 @@ public:
     // pixel.  Since templating happens at compile time we can't just ask the
     // array at runtime what type to put in here (hence the "assert" above):
     //
-    Image::RGBAPix<uint8_t> pixel;
+    Image::RGBAPix<unsigned char> pixel;
 
     // Loop through all the pixels.  Note that the columns go from left to
     // right and the rows go from bottom to top.  (So the "row" and "column"

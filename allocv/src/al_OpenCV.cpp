@@ -98,7 +98,7 @@ void fromCV(AlloArrayHeader& hdr, int CV_TYPE) {
 	}
 }
 
-int toCV(AlloTy type, uint8_t components){
+int toCV(AlloTy type, unsigned char components){
 	switch(type) {
 		case AlloFloat32Ty:
 			switch(components) {

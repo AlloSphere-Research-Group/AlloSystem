@@ -34,7 +34,7 @@ struct MyApp : Window {
 		audio.start();
 	}
 
-	static void filler(uint8_t * c, double normx, double normy) {
+	static void filler(unsigned char * c, double normx, double normy) {
 		int frame = vcr.frame();
 
 		c[0] = normx * frame * 255.;

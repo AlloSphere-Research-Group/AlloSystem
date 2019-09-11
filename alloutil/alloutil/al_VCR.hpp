@@ -317,7 +317,7 @@ inline void VCR::writeImages(Image& image) {
 		Array& src = mImageRing[r];
 
 		//printf("save (w %d r %d) %s %p %d %d\n", w, r, path, src.data.ptr, (int)src.width(), (int)src.height());
-		image.save(std::string(path), (uint8_t *)src.data.ptr, (int)src.width(), (int)src.height(), Image::RGB);
+		image.save(std::string(path), (unsigned char *)src.data.ptr, (int)src.width(), (int)src.height(), Image::RGB);
 
 		r = r + 1;
 		if (r >= mImageRing.size()) r = 0;

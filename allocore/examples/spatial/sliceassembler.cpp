@@ -183,7 +183,7 @@ Voxels voxelsFromDirectory(string dir) {
     Array &array(RGBImage.array());
 
     // For now assume 8-bit RGBA
-    Image::RGBAPix<uint8_t> pixel;
+    Image::RGBAPix<unsigned char> pixel;
 
     // Copy it out pixel-by-pixel:
     for (size_t row = 0; row < array.height(); ++row) {
