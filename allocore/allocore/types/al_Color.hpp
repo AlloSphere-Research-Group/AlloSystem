@@ -46,9 +46,11 @@
 	Owen Campbell, 2014, owen.campbell@gmail.com
 */
 
-#include "allocore/system/al_Config.h"
+#include <cstdint> // uint8_t, uint32_t in Colori
 
 namespace al{
+/// @addtogroup allocore
+/// @{
 
 struct RGB;
 struct HSV;
@@ -61,9 +63,15 @@ struct HCLab;
 struct Luv;
 struct HCLuv;
 
+
+namespace{
+	template <class T> T clampValue(const T& v, const T& max){
+		return v<T(0) ? T(0) : (v>max ? max : v);
+	}
+}
+
+
 /// Color represented by red, green, blue, and alpha components
-///
-/// @ingroup allocore
 struct Color{
 
 	union{
@@ -87,12 +95,12 @@ struct Color{
 	/// @param[in] rgba			4-vector of RGBA components
 	template<class T>
 	Color(const T * rgba)
-	:	r(rgba[0]), g(rgba[1]), b(rgba[2]), a(rgba[3]){}
+	:	Color(rgba[0], rgba[1], rgba[2], rgba[3]){}
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Color(float gray=1.f, float a=1.f)
-	:	r(gray), g(gray), b(gray), a(a){}
+	:	Color(gray, gray, gray, a){}
 
 	/// @param[in] c	RGBA color to convert from
 	Color(const Colori& c){ *this = c; }
@@ -163,7 +171,7 @@ struct Color{
 	Color& set(float v){ return set(v,v,v); }
 
 	/// Set from gray value and alpha
-	Color& set(float v, float al){ return set(v,v,v,a); }
+	Color& set(float v, float al){ return set(v,v,v,al); }
 
 	/// Set from an array of RGBA components
 	template <class T>
@@ -228,10 +236,7 @@ struct Color{
 
 	/// Clamp all components into [0,max] range
 	Color& clamp(float max=1.f){
-		for(int i=0; i<4; ++i){
-			float& v = components[i];
-			v<0.f ? v=0.f : (v>max ? v=max : 0);
-		}
+		for(auto& c : components) c = clampValue(c,max);
 		return *this;
 	}
 
@@ -260,8 +265,6 @@ private:
 /// The component accessor methods operate exclusively with integer types. To
 /// convert to and from floating point values in the interval [0, 1], use the
 /// overloaded assignment (=) operators.
-///
-/// @ingroup allocore
 struct Colori {
 
 	union{
@@ -285,12 +288,13 @@ struct Colori {
 
 	/// @param[in] rgba			4-vector of RGBA components
 	template<class T>
-	Colori(const T * rgba): r(rgba[0]), g(rgba[1]), b(rgba[2]), a(rgba[3]){}
+	Colori(const T * rgba)
+	:	Colori(rgba[0], rgba[1], rgba[2], rgba[3]){}
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Colori(uint8_t gray=255, uint8_t a=255)
-	:	r(gray), g(gray), b(gray), a(a){}
+	:	Colori(gray, gray, gray, a){}
 
 	/// @param[in] c			RGBA color to convert from
 	Colori(const Color& c){ *this = c; }
@@ -423,7 +427,7 @@ struct HSV{
 	/// @param[in] hsv			3-vector of HSV components
 	template<class T>
 	HSV(const T * hsv)
-	:	h(hsv[0]), s(hsv[1]), v(hsv[2]){}
+	:	HSV(hsv[0], hsv[1], hsv[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	HSV(const Color& v){ *this = v; }
@@ -528,11 +532,11 @@ struct RGB{
 	/// @param[in] rgb			3-vector of RGB components
 	template<class T>
 	RGB(const T * rgb)
-	:	r(rgb[0]), g(rgb[1]), b(rgb[2]){}
+	:	RGB(rgb[0], rgb[1], rgb[2]){}
 
 	/// @param[in] gray			red/green/blue components
 	RGB(float gray=1.f)
-	:	r(gray), g(gray), b(gray){}
+	:	RGB(gray, gray, gray){}
 
 	/// @param[in] v			RGB color to convert from
 	RGB(const Color& v){ *this = v; }
@@ -639,10 +643,7 @@ struct RGB{
 
 	/// Clamp all components into [0,max] range
 	RGB& clamp(float max=1.f){
-		for(int i=0; i<3; ++i){
-			float& v = components[i];
-			v<0.f ? v=0.f : (v>max ? v=max : 0);
-		}
+		for(auto& c : components) c = clampValue(c,max);
 		return *this;
 	}
 
@@ -665,18 +666,24 @@ struct RGB{
 	RGB mix(const RGB& v, float amt=0.5f) const {
 		return (v-*this)*amt + *this;
 	}
+
+	/// Set value of color in HSV space (leaving hue and saturation unchanged)
+	RGB& value(float v){
+		auto mx = r>g ? (r>b?r:b) : (g>b?g:b);
+		return mx > 0. ? *this *= v/mx : *this = v;
+	}
 };
 
 
-
+/// Color represented in CIE 1931 XYZ color space
 struct CIEXYZ{
 	union{
 		struct{
-			float x;///			< red component in [0, 1]
-			float y;///			< green component in [0, 1]
-			float z;///			< blue component in [0, 1]
+			float x;			///< CIE X component in [0, 1]
+			float y;			///< CIE Y component in [0, 1]
+			float z;			///< CIE Z component in [0, 1]
 		};
-		float components[3];///< CIEXYZ component vector
+		float components[3];	///< CIE XYZ component vector
 	};
 
 	/// @param[in] x			CIE X
@@ -686,7 +693,7 @@ struct CIEXYZ{
 
 	/// @param[in] xyz			3-vector of CIEXYZ components
 	template<class T>
-	CIEXYZ(const T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
+	CIEXYZ(const T * xyz): CIEXYZ(xyz[0], xyz[1], xyz[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	CIEXYZ(const Color& v){ *this = v; }
@@ -736,8 +743,6 @@ struct CIEXYZ{
 
 
 /// Color represented by L* (lightness), a*, b*
-///
-/// @ingroup allocore
 struct Lab{
 	union{
 		struct{
@@ -759,9 +764,9 @@ struct Lab{
 	/// @param[in] b			b
 	Lab(float l=1, float a=1, float b=1): l(l), a(a), b(b){}
 
-	/// @param[in] hsv			3-vector of Lab components
+	/// @param[in] lab			3-vector of Lab components
 	template<class T>
-	Lab(const T * Lab): l(Lab[0]), a(Lab[1]), b(Lab[2]){}
+	Lab(const T * lab): Lab(lab[0], lab[1], lab[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	Lab(const Color& v){ *this = v; }
@@ -818,8 +823,6 @@ struct Lab{
 
 
 /// Color represented by hue, chroma, luminance(ab)
-///
-/// @ingroup allocore
 struct HCLab{
 	union{
 		struct{
@@ -841,7 +844,7 @@ struct HCLab{
 
 	/// @param[in] hcl			3-vector of HCLab components
 	template<class T>
-	HCLab(const T * HCLab): h(HCLab[0]), c(HCLab[1]), l(HCLab[2]){}
+	HCLab(const T * hcl): HCLab(hcl[0], hcl[1], hcl[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	HCLab(const Color& v){ *this = v; }
@@ -907,8 +910,6 @@ struct HCLab{
 
 
 /// Color represented by L* (lightness), u*, v*
-///
-/// @ingroup allocore
 struct Luv{
 	union{
 		struct{
@@ -930,9 +931,9 @@ struct Luv{
 	/// @param[in] v			v
 	Luv(float l=1, float u=1, float v=1): l(l), u(u), v(v){}
 
-	/// @param[in] hsv			3-vector of Luv components
+	/// @param[in] luv			3-vector of Luv components
 	template<class T>
-	Luv(const T * Luv): l(Luv[0]), u(Luv[1]), v(Luv[2]){}
+	Luv(const T * luv): Luv(luv[0], luv[1], luv[2]){}
 
 	/// @param[in] w			RGB color to convert from
 	Luv(const Color& w){ *this = w; }
@@ -988,8 +989,6 @@ struct Luv{
 
 
 /// Color represented by hue, chroma, luminance(uv)
-///
-/// @ingroup allocore
 struct HCLuv{
 
 	union{
@@ -1013,7 +1012,7 @@ struct HCLuv{
 
 	/// @param[in] hcl			3-vector of HCLuv components
 	template<class T>
-	HCLuv(const T * HCLuv): h(HCLuv[0]), c(HCLuv[1]), l(HCLuv[2]){}
+	HCLuv(const T * hcl): HCLuv(hcl[0], hcl[1], hcl[2]){}
 
 	/// @param[in] w			RGB color to convert from
 	HCLuv(const Color& w){ *this = w; }
@@ -1075,6 +1074,7 @@ struct HCLuv{
 	}
 };
 
+/// @} // end allocore group
 
 
 
@@ -1115,7 +1115,7 @@ inline Colori& Colori::operator= (const RGB& v){
 }
 
 
-inline HSV operator * (float s, const HSV& c){ return  c*s; }
+inline HSV operator * (float s, const HSV& c){ return c*s; }
 
 } // al::
 
