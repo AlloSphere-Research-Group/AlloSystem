@@ -61,6 +61,14 @@ struct HCLab;
 struct Luv;
 struct HCLuv;
 
+
+namespace{
+	template <class T> T clampValue(const T& v, const T& max){
+		return v<T(0) ? T(0) : (v>max ? max : v);
+	}
+}
+
+
 /// Color represented by red, green, blue, and alpha components
 ///
 /// @ingroup allocore
@@ -228,10 +236,7 @@ struct Color{
 
 	/// Clamp all components into [0,max] range
 	Color& clamp(float max=1.f){
-		for(int i=0; i<4; ++i){
-			float& v = components[i];
-			v<0.f ? v=0.f : (v>max ? v=max : 0);
-		}
+		for(auto& c : components) c = clampValue(c,max);
 		return *this;
 	}
 
@@ -639,10 +644,7 @@ struct RGB{
 
 	/// Clamp all components into [0,max] range
 	RGB& clamp(float max=1.f){
-		for(int i=0; i<3; ++i){
-			float& v = components[i];
-			v<0.f ? v=0.f : (v>max ? v=max : 0);
-		}
+		for(auto& c : components) c = clampValue(c,max);
 		return *this;
 	}
 
