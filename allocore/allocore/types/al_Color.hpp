@@ -676,15 +676,15 @@ struct RGB{
 };
 
 
-
+/// Color represented in CIE 1931 XYZ color space
 struct CIEXYZ{
 	union{
 		struct{
-			float x;///			< red component in [0, 1]
-			float y;///			< green component in [0, 1]
-			float z;///			< blue component in [0, 1]
+			float x;			///< CIE X component in [0, 1]
+			float y;			///< CIE Y component in [0, 1]
+			float z;			///< CIE Z component in [0, 1]
 		};
-		float components[3];///< CIEXYZ component vector
+		float components[3];	///< CIE XYZ component vector
 	};
 
 	/// @param[in] x			CIE X
