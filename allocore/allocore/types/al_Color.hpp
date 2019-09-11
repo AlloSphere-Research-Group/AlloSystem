@@ -95,12 +95,12 @@ struct Color{
 	/// @param[in] rgba			4-vector of RGBA components
 	template<class T>
 	Color(const T * rgba)
-	:	r(rgba[0]), g(rgba[1]), b(rgba[2]), a(rgba[3]){}
+	:	Color(rgba[0], rgba[1], rgba[2], rgba[3]){}
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Color(float gray=1.f, float a=1.f)
-	:	r(gray), g(gray), b(gray), a(a){}
+	:	Color(gray, gray, gray, a){}
 
 	/// @param[in] c	RGBA color to convert from
 	Color(const Colori& c){ *this = c; }
@@ -290,12 +290,13 @@ struct Colori {
 
 	/// @param[in] rgba			4-vector of RGBA components
 	template<class T>
-	Colori(const T * rgba): r(rgba[0]), g(rgba[1]), b(rgba[2]), a(rgba[3]){}
+	Colori(const T * rgba)
+	:	Colori(rgba[0], rgba[1], rgba[2], rgba[3]){}
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Colori(uint8_t gray=255, uint8_t a=255)
-	:	r(gray), g(gray), b(gray), a(a){}
+	:	Colori(gray, gray, gray, a){}
 
 	/// @param[in] c			RGBA color to convert from
 	Colori(const Color& c){ *this = c; }
@@ -428,7 +429,7 @@ struct HSV{
 	/// @param[in] hsv			3-vector of HSV components
 	template<class T>
 	HSV(const T * hsv)
-	:	h(hsv[0]), s(hsv[1]), v(hsv[2]){}
+	:	HSV(hsv[0], hsv[1], hsv[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	HSV(const Color& v){ *this = v; }
@@ -533,11 +534,11 @@ struct RGB{
 	/// @param[in] rgb			3-vector of RGB components
 	template<class T>
 	RGB(const T * rgb)
-	:	r(rgb[0]), g(rgb[1]), b(rgb[2]){}
+	:	RGB(rgb[0], rgb[1], rgb[2]){}
 
 	/// @param[in] gray			red/green/blue components
 	RGB(float gray=1.f)
-	:	r(gray), g(gray), b(gray){}
+	:	RGB(gray, gray, gray){}
 
 	/// @param[in] v			RGB color to convert from
 	RGB(const Color& v){ *this = v; }
@@ -694,7 +695,7 @@ struct CIEXYZ{
 
 	/// @param[in] xyz			3-vector of CIEXYZ components
 	template<class T>
-	CIEXYZ(const T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
+	CIEXYZ(const T * xyz): CIEXYZ(xyz[0], xyz[1], xyz[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	CIEXYZ(const Color& v){ *this = v; }
@@ -767,9 +768,9 @@ struct Lab{
 	/// @param[in] b			b
 	Lab(float l=1, float a=1, float b=1): l(l), a(a), b(b){}
 
-	/// @param[in] hsv			3-vector of Lab components
+	/// @param[in] lab			3-vector of Lab components
 	template<class T>
-	Lab(const T * Lab): l(Lab[0]), a(Lab[1]), b(Lab[2]){}
+	Lab(const T * lab): Lab(lab[0], lab[1], lab[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	Lab(const Color& v){ *this = v; }
@@ -849,7 +850,7 @@ struct HCLab{
 
 	/// @param[in] hcl			3-vector of HCLab components
 	template<class T>
-	HCLab(const T * HCLab): h(HCLab[0]), c(HCLab[1]), l(HCLab[2]){}
+	HCLab(const T * hcl): HCLab(hcl[0], hcl[1], hcl[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	HCLab(const Color& v){ *this = v; }
@@ -938,9 +939,9 @@ struct Luv{
 	/// @param[in] v			v
 	Luv(float l=1, float u=1, float v=1): l(l), u(u), v(v){}
 
-	/// @param[in] hsv			3-vector of Luv components
+	/// @param[in] luv			3-vector of Luv components
 	template<class T>
-	Luv(const T * Luv): l(Luv[0]), u(Luv[1]), v(Luv[2]){}
+	Luv(const T * luv): Luv(luv[0], luv[1], luv[2]){}
 
 	/// @param[in] w			RGB color to convert from
 	Luv(const Color& w){ *this = w; }
@@ -1021,7 +1022,7 @@ struct HCLuv{
 
 	/// @param[in] hcl			3-vector of HCLuv components
 	template<class T>
-	HCLuv(const T * HCLuv): h(HCLuv[0]), c(HCLuv[1]), l(HCLuv[2]){}
+	HCLuv(const T * hcl): HCLuv(hcl[0], hcl[1], hcl[2]){}
 
 	/// @param[in] w			RGB color to convert from
 	HCLuv(const Color& w){ *this = w; }
