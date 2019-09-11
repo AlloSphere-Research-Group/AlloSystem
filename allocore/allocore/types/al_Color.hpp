@@ -171,7 +171,7 @@ struct Color{
 	Color& set(float v){ return set(v,v,v); }
 
 	/// Set from gray value and alpha
-	Color& set(float v, float al){ return set(v,v,v,a); }
+	Color& set(float v, float al){ return set(v,v,v,al); }
 
 	/// Set from an array of RGBA components
 	template <class T>
