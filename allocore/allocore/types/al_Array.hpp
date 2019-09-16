@@ -327,18 +327,18 @@ protected:
 /*
 	Type traits by partial specialization:
  */
-template<> inline AlloTy Array::type<uint8_t  >(){ return AlloUInt8Ty; }
-template<> inline AlloTy Array::type<uint16_t >(){ return AlloUInt16Ty; }
-template<> inline AlloTy Array::type<uint32_t >(){ return AlloUInt32Ty; }
-template<> inline AlloTy Array::type<uint64_t >(){ return AlloUInt64Ty; }
-template<> inline AlloTy Array::type<int8_t   >(){ return AlloSInt8Ty; }
-template<> inline AlloTy Array::type<int16_t  >(){ return AlloSInt16Ty; }
-template<> inline AlloTy Array::type<int32_t  >(){ return AlloSInt32Ty; }
-template<> inline AlloTy Array::type<int64_t  >(){ return AlloSInt64Ty; }
-template<> inline AlloTy Array::type<float    >(){ return AlloFloat32Ty; }
-template<> inline AlloTy Array::type<double   >(){ return AlloFloat64Ty; }
-template<> inline AlloTy Array::type<AlloArray>(){ return AlloArrayTy; }
-template<> inline AlloTy Array::type<void *>(){
+template<> constexpr AlloTy Array::type<uint8_t  >(){ return AlloUInt8Ty; }
+template<> constexpr AlloTy Array::type<uint16_t >(){ return AlloUInt16Ty; }
+template<> constexpr AlloTy Array::type<uint32_t >(){ return AlloUInt32Ty; }
+template<> constexpr AlloTy Array::type<uint64_t >(){ return AlloUInt64Ty; }
+template<> constexpr AlloTy Array::type<int8_t   >(){ return AlloSInt8Ty; }
+template<> constexpr AlloTy Array::type<int16_t  >(){ return AlloSInt16Ty; }
+template<> constexpr AlloTy Array::type<int32_t  >(){ return AlloSInt32Ty; }
+template<> constexpr AlloTy Array::type<int64_t  >(){ return AlloSInt64Ty; }
+template<> constexpr AlloTy Array::type<float    >(){ return AlloFloat32Ty; }
+template<> constexpr AlloTy Array::type<double   >(){ return AlloFloat64Ty; }
+template<> constexpr AlloTy Array::type<AlloArray>(){ return AlloArrayTy; }
+template<> constexpr AlloTy Array::type<void *>(){
 	switch(sizeof(void *)) {
 		case 4: return AlloPointer32Ty;
 		case 8: return AlloPointer64Ty;
