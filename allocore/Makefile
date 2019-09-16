@@ -7,7 +7,7 @@ include ../Makefile.common
 BIG_ENDIAN	= 0
 AUDIO_BINDING	= PortAudio
 WINDOW_BINDING	= GLUT
-IMAGE_BINDING	= FreeImage
+#IMAGE_BINDING	= FreeImage
 AUTORUN_TESTS	= 1
 STRICT_WARNINGS = 1
 
