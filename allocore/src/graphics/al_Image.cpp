@@ -1,8 +1,26 @@
-#include <stdio.h>
-
 #include "allocore/graphics/al_Image.hpp"
-#include "allocore/system/al_Config.h"
-#include "allocore/system/al_Printing.hpp"
+#include "allocore/system/al_Printing.hpp" // AL_WARN
+
+#if defined(AL_IMAGE_DUMMY)
+
+namespace al{
+
+class Image::Impl {
+public:
+	Impl(){}
+	~Impl(){}
+	bool load(const std::string& filename, Array &arr){
+		return false;
+	}
+	bool save(const std::string& filename, const Array& arr, int compressFlags, int paletteSize){
+		return false;
+	}
+};
+
+} // al::
+
+
+#elif defined(AL_IMAGE_FREEIMAGE)
 
 #include "FreeImage.h"
 /*
@@ -21,9 +39,9 @@
 
 namespace al{
 
-class FreeImageImpl : public Image::Impl {
+class Image::Impl {
 public:
-	FreeImageImpl(){
+	Impl(){
 		// Initialization singleton
 		struct Init{
 			Init(){ FreeImage_Initialise(); }
@@ -37,11 +55,11 @@ public:
 		Init::get();
 	}
 
-	virtual ~FreeImageImpl() {
+	~Impl(){
 		destroy();
 	}
 
-	virtual bool load(const std::string& filename, Array &arr) {
+	bool load(const std::string& filename, Array& arr){
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
 		if(type == FIF_UNKNOWN) {
 			AL_WARN("image format not recognized: %s", filename.c_str());
@@ -221,7 +239,7 @@ public:
 	}
 
 
-	virtual bool save(const std::string& filename, const Array& arr, int compressFlags, int paletteSize) {
+	bool save(const std::string& filename, const Array& arr, int compressFlags, int paletteSize){
 
 		// check existing image type
 		FREE_IMAGE_FORMAT fileType = FreeImage_GetFIFFromFilename(filename.c_str());
@@ -423,7 +441,7 @@ public:
 	}
 
 
-	void getDim(int &w, int &h) {
+	void getDim(int &w, int &h){
 		if(mFIBitmap) {
 			w = FreeImage_GetWidth(mFIBitmap);
 			h = FreeImage_GetHeight(mFIBitmap);
@@ -455,13 +473,104 @@ public:
 		}
 	}
 protected:
-	void destroy() {
+	void destroy(){
 		if (mFIBitmap) FreeImage_Unload(mFIBitmap);
 		mFIBitmap = NULL;
 	}
 
 	FIBITMAP * mFIBitmap = NULL;
 };
+
+} // al::
+// End FreeImage implementation
+
+
+#else
+
+#include <cctype> // tolower
+#include <vector>
+#define STB_IMAGE_IMPLEMENTATION
+#include "external/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "external/stb_image_write.h"
+
+namespace al{
+
+class Image::Impl {
+public:
+	Impl(){}
+
+	~Impl(){}
+
+	bool load(const std::string& filename, Array& arr){
+		stbi_set_flip_vertically_on_load(1); // rows go bottom to top
+		int w,h,n;
+		// components always uint8_t
+		unsigned char * data = stbi_load(filename.c_str(), &w, &h, &n, 0);
+		if(data){
+			arr.formatAligned(n, AlloUInt8Ty, w,h, 1);
+			memcpy(arr.data.ptr, data, w*h*n);
+			stbi_image_free(data);
+			return true;
+		}
+		return false;
+	}
+
+	bool save(const std::string& filename, const Array& arr, int compressFlags, int paletteSize){
+		auto ext = filename.substr(filename.find_last_of('.'));
+		for(auto& c:ext) c=std::tolower(c);
+		auto compressAmt = compressFlags & 127;
+		if(compressAmt > 100) compressAmt=100;
+		auto w = arr.dim(0);
+		auto h = (arr.dimcount() > 1) ? arr.dim(1) : 1;
+		auto n = arr.components();
+		auto s = arr.stride(0);
+		const void * data = arr.data.ptr;
+		std::vector<unsigned char> packui8;
+		if(arr.type() != AlloUInt8Ty || s != w*n){
+			switch(arr.type()){
+				#define CS(T, op)\
+				case Array::type<T>():\
+				for(unsigned j=0; j<h; ++j){\
+				for(unsigned i=0; i<w; ++i){\
+				for(unsigned c=0; c<n; ++c){\
+					packui8.push_back(arr.elem<T>(c,i,j) op);\
+				}}} break;
+				CS(uint8_t,);
+				CS(uint16_t, >>16);
+				CS(uint32_t, >>24);
+				CS(uint64_t, >>56);
+				CS(float, *255.f);
+				CS(double, *255.);
+				default:
+					AL_WARN("Data type not supported");
+					return false;
+			}
+			data = &packui8[0];
+		}
+
+		stbi_flip_vertically_on_write(1); // rows go bottom to top
+		if(".png" == ext){
+			stbi_write_png_compression_level = compressAmt;
+			return stbi_write_png(filename.c_str(), w,h,n, data, w*n);
+		} else if(".jpg" == ext || ".jpeg" == ext){
+			return stbi_write_jpg(filename.c_str(), w,h,n, data, 100-compressAmt);
+		} else if(".tga" == ext){
+			stbi_write_tga_with_rle = compressAmt >= 50;
+			return stbi_write_tga(filename.c_str(), w,h,n, data);
+		} else if(".bmp" == ext){
+			return stbi_write_bmp(filename.c_str(), w,h,n, data);
+		}
+		return false;
+	}
+};
+
+} // al::
+
+#endif
+
+
+namespace al{
 
 Image :: Image(){
 }
@@ -470,29 +579,21 @@ Image :: Image(const std::string& filename){
 	load(filename);
 }
 
-Image :: ~Image() {
-	if (mImpl) delete mImpl;
+Image::~Image() {
+	if(mImpl) delete mImpl;
 }
 
-bool Image :: load(const std::string& filename) {
-	if (!mImpl) mImpl = new FreeImageImpl();
-//	// TODO: if we add other image formats/libraries,
-//	// detect by file extension & redirect to appropriate implementation here:
-//	if (mImpl) delete mImpl;
-//	mImpl = new FreeImageImpl();
+bool Image::load(const std::string& filename) {
+	if(!mImpl) mImpl = new Impl();
 	mLoaded = mImpl->load(filename, mArray);
-	if (mLoaded) mFilename = filename;
+	if(mLoaded) mFilename = filename;
 	return mLoaded;
 }
 
-bool Image :: save(const std::string& filename) {
-	if (!mImpl) mImpl = new FreeImageImpl();
-//	// TODO: if we add other image formats/libraries,
-//	// detect by file extension & redirect to appropriate implementation here:
-//	if (mImpl) delete mImpl;
-//	mImpl = new FreeImageImpl();
+bool Image::save(const std::string& filename) {
+	if(!mImpl) mImpl = new Impl();
 	mLoaded = mImpl->save(filename, mArray, mCompression, mPaletteSize);
-	if (mLoaded) mFilename = filename;
+	if(mLoaded) mFilename = filename;
 	return mLoaded;
 }
 

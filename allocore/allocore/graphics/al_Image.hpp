@@ -47,22 +47,8 @@
 
 namespace al{
 
-/*!
-	\class Image
-
-	Loads and saves images.
-
-	Default implementation uses the FreeImage library. Supported formats include:
-
-		bmp, chead, cut, dcx, dds, doom, doomFlat, exif, gif, hdr, ico, jasc_pal, jpg,
-		lbm, lif, mdl, pcd, pcx, pic, pix, png, pnm, psd, psp, pxr, raw, sgi, tgo, tif,
-		wal, xpm
-
-	FreeImage is used under the FreeImage Public License (FIPL) v1.0
-	See the /licenses folder in the source tree, or
-	http://freeimage.sourceforge.net/freeimage-license.txt
-*/
-
+/// Loads and saves images.
+///
 /// @ingroup allocore
 class Image {
 public:
@@ -236,16 +222,10 @@ public:
 
 	static Format getFormat(int planes);
 
-	class Impl {
-	public:
-		virtual ~Impl() {};
-		virtual bool load(const std::string& filename, Array& lat) = 0;
-		virtual bool save(const std::string& filename, const Array& lat, int compressFlags, int paletteSize) = 0;
-	};
-
 protected:
+	class Impl;
+	Impl * mImpl = NULL;	// backend implementation
 	Array mArray;			// pixel data
-	Impl * mImpl = NULL;	// library implementation
 	std::string mFilename;
 	int mCompression = 50;
 	int mPaletteSize = -1;	// number of colors in palette
