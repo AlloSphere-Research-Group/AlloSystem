@@ -1,4 +1,3 @@
-#include "allocore/system/al_Config.h" // al_sec
 #include "allocore/io/al_Socket.hpp" // Socket::hostname
 #include "allocore/protocol/al_Zeroconf.hpp"
 
@@ -212,7 +211,7 @@ public:
 		delegate = nil;
 	}
 
-	void poll(al_sec timeout) {}
+	void poll(double timeout) {}
 
 	Client * master;
 	ClientDelegate * delegate;
@@ -220,7 +219,7 @@ public:
 
 class Service::Impl : public ImplBase {
 public:
-	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain)
+	Impl(Service * master, const std::string& name, const std::string& host, unsigned short port, const std::string& type, const std::string& domain)
 	:	ImplBase(), name(name), host(host), type(type), domain(domain), port(port), master(master) {
 		NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 		delegate = [[ServerDelegate alloc]
@@ -237,10 +236,10 @@ public:
 		delegate = nil;
 	}
 
-	void poll(al_sec timeout) {}
+	void poll(double timeout) {}
 
 	std::string name, host, type, domain;
-	uint16_t port;
+	unsigned short port;
 	Service * master;
 
 	ServerDelegate * delegate;
@@ -257,13 +256,13 @@ Client::~Client() {
 	delete mImpl;
 }
 
-void Client::poll(al_sec interval) {
+void Client::poll(double interval) {
 	NSDate * date = [[NSDate alloc] initWithTimeIntervalSinceNow:interval];
 	[[NSRunLoop currentRunLoop] runUntilDate:date];
 	[date release];
 }
 
-Service::Service(const std::string& name, uint16_t port, const std::string& type, const std::string& domain) {
+Service::Service(const std::string& name, unsigned short port, const std::string& type, const std::string& domain) {
 	mImpl = new Impl(this, name, Socket::hostName(), port, type, domain);
 }
 
