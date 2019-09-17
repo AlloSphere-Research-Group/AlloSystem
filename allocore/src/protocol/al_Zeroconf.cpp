@@ -3,9 +3,9 @@
 #include "allocore/io/al_Socket.hpp" // Socket::hostname
 #include "allocore/protocol/al_Zeroconf.hpp"
 #include "allocore/system/al_MainLoop.hpp"
-#include "allocore/system/al_Printing.hpp"
+#include "allocore/system/al_Printing.hpp" // AL_WARN
 
-// On OSX these are implemented in al_mDNS_OSX.mm instead
+// On OSX these are implemented in al_Zeroconf_OSX.mm instead
 #ifndef AL_OSX
 
 #include <avahi-client/client.h>
@@ -23,7 +23,7 @@ using namespace al::zero;
 
 static AvahiSimplePoll * poller = 0;
 
-void al_avahi_poll(al_sec interval=0.01) {
+void al_avahi_poll(double interval=0.01) {
 	avahi_simple_poll_iterate(poller, interval * 1000);
 	MainLoop::queue().send(1, al_avahi_poll);
 }
@@ -181,7 +181,7 @@ public:
 		const char *domain,
 		const char *host_name,
 		const AvahiAddress *address,
-		uint16_t port,
+		unsigned short port,
 		AvahiStringList *txt,
 		AvahiLookupResultFlags flags,
 		void* userdata) {
@@ -238,7 +238,7 @@ public:
 
 class Service::Impl : public ImplBase<Service::Impl> {
 public:
-	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain)
+	Impl(Service * master, const std::string& name, const std::string& host, unsigned short port, const std::string& type, const std::string& domain)
 :	name(name), host(host), type(type), domain(domain), port(port), group(0), master(master) {
 		start();
 	}
@@ -341,7 +341,7 @@ public:
 	}
 
 	std::string name, host, type, domain;
-	uint16_t port;
+	unsigned short port;
 	AvahiEntryGroup * group;
 	Service * master;
 };
@@ -355,11 +355,11 @@ Client::~Client() {
 	delete mImpl;
 }
 
-void Client::poll(al_sec interval) {
+void Client::poll(double interval) {
 	al_avahi_poll(interval);
 }
 
-Service::Service(const std::string& name, uint16_t port, const std::string& type, const std::string& domain) {
+Service::Service(const std::string& name, unsigned short port, const std::string& type, const std::string& domain) {
 	mImpl = new Impl(this, name, Socket::hostName(), port, type, domain);
 }
 
