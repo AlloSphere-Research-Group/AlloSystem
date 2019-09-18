@@ -286,6 +286,12 @@ public:
 	/// Get seconds since application start
 	double appTime() const;
 
+	/// Get app time at start of animate clock
+
+	/// Unlike appTime(), this is held constant throughout the entire animation
+	/// clock cycle and thus is the correct time to use for any animation.
+	double animateTime() const { return mAnimateTime; }
+
 
 	/// Get navigation pose (position/orientation)
 	Nav& nav(){ return mNav; }
@@ -367,7 +373,9 @@ private:
 
 	Viewpoints mFacViewpoints;
 	Windows mFacWindows;
-	double mStartTime;
+	double mStartTime = 0.;
+	friend class SceneWindowHandler;
+	double mAnimateTime = 0.;
 
 	// graphics
 	Windows mWindows;
@@ -390,8 +398,8 @@ private:
 	osc::Send mOSCSend;
 
 	std::string mName;
-	void * mClockAnimate;
-	void * mClockNav;
+	void * mClockAnimate = NULL;
+	void * mClockNav = NULL;
 };
 
 } // al::

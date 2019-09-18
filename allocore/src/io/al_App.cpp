@@ -137,6 +137,7 @@ bool SceneWindowHandler::onFrame(){
 	}
 
 	if(app.clockAnimate() == &win){
+		app.mAnimateTime = app.appTime();
 		app.onAnimate(win.spfActual());
 	}
 
@@ -233,9 +234,7 @@ bool SceneWindowHandler::onFrame(){
 
 
 App::App()
-:	mName(""),
-	mNavControl(mNav),
-	mClockAnimate(0), mClockNav(0)
+:	mNavControl(mNav)
 {}
 
 
@@ -258,6 +257,7 @@ void App::initAudio(
 		}
 
 		if(clockAnimate() == &audioIO()){
+			mAnimateTime = appTime();
 			onAnimate(io.secondsPerBuffer());
 		}
 
@@ -316,28 +316,13 @@ App& App::add(ViewpointWindow& win){
 
 
 void App::start(){
+	mStartTime = timeNow();
+
 	if(!clockAnimate() && !mWindows.empty()){
 		clockAnimate(mWindows[0]);
 	}
 	if(usingAudio()) mAudioIO.start();
 	if(oscSend().opened() && !name().empty()) sendHandshake();
-
-	/*
-	// factories OKAY
-	for(unsigned i=0; i<mFacViewpoints.size(); ++i)
-		printf("%p\n", mFacViewpoints[i].parentTransform());
-
-	// window pointers OKAY
-	for(unsigned j=0; j<windows().size(); ++j){
-		ViewpointWindow& w = *windows()[j];
-		for(unsigned i=0; i<w.viewpoints().size(); ++i){
-			Viewpoint& vp = *w.viewpoints()[i];
-			printf("%d,%d: %p\n", j,i, vp.parentTransform());
-			printf("anchor : %g %g\n", vp.anchorX(), vp.anchorY());
-			printf("stretch: %g %g\n", vp.stretchX(), vp.stretchY());
-		}
-	}
-	//*/
 
 	/* Add a handler to close i/o when Main exits.
 	This is done to ensure members of derived classes are not accessed by i/o 
@@ -367,14 +352,10 @@ void App::start(){
 	if(windows().size()){
 		// create the windows
 		for(auto& w : windows()) w->create();
-
-		mStartTime = timeNow();
-
 		// start the main loop
 		Main::get().start();
 	}
 	else{
-		mStartTime = timeNow();
 		#ifdef AL_EMSCRIPTEN
 		Main::get().start();
 		#else
