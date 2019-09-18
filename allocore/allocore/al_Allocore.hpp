@@ -81,7 +81,6 @@
 #include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_StereoPanner.hpp"
 #include "allocore/sound/al_Vbap.hpp"
-#include "allocore/spatial/al_Curve.hpp"
 #include "allocore/spatial/al_DistAtten.hpp"
 #include "allocore/spatial/al_Pose.hpp"
 #include "allocore/system/al_Info.hpp"
