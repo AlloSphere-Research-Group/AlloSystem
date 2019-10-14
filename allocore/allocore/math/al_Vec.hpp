@@ -45,8 +45,9 @@
 
 
 #include <cmath>
-#include <stdio.h>
+#include <initializer_list>
 #include <ostream>
+#include <stdio.h>
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Functions.hpp"
 
@@ -121,16 +122,19 @@ public:
 	/// @param[in] v4		value to initialize fourth element
 	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); }
 
-	/// @param[in] v		vector to initialize all elements to
+	/// @params[in] v		values to initialize elements to
+	Vec(std::initializer_list<T> v){ set(v); }
+
+	/// @param[in] v		vector to initialize elements to
 	template <int N2, class T2>
 	Vec(const Vec<N2, T2>& v){ *this = v; }
 
-	/// @param[in] v		vector to initialize all elements to
+	/// @param[in] v		vector to initialize first N-1 elements to
 	/// @param[in] s		value of last element
 	template <class Tv, class Ts>
 	Vec(const Vec<N-1, Tv>& v, const Ts& s){ set(v,s); }
 
-	/// @param[in] v		pointer to array to initialize all elements to
+	/// @param[in] v		pointer to array to initialize elements to
 	/// @param[in] stride	stride factor through array
 	template <class T2>
 	Vec(const T2 * v, int stride=1){ set(v,stride); }
@@ -226,6 +230,12 @@ public:
 		return set(v1,v2,v3,v4,v5);
 	}
 
+	/// Set elements from initializer list {a,b,...}
+	Vec& set(std::initializer_list<T> v){
+		(*this) = T(0);
+		IT(N<v.size()?N:v.size()) (*this)[i] = v.begin()[i];
+		return *this;
+	}
 
 	/// Return true if objects are element-wise equal, false otherwise
 	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
