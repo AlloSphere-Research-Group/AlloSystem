@@ -58,13 +58,11 @@ struct Thread::Impl{
 	std::thread mThread;
 };
 
-
-void * Thread::current(){
-	// pthread_t pthread_self(void);
-	static pthread_t r;
-	r = pthread_self();
-	return (void*)(&r);
+/*static*/ void * Thread::current(){
+	// std::this_thread
+	return NULL;
 }
+
 
 #elif defined(AL_THREAD_USE_PTHREAD)
 #include <pthread.h>
@@ -136,8 +134,7 @@ struct Thread::Impl{
 	pthread_attr_t mAttr;
 };
 
-
-void * Thread::current(){
+/*static*/ void * Thread::current(){
 	// pthread_t pthread_self(void);
 	static pthread_t r;
 	r = pthread_self();
@@ -200,6 +197,10 @@ public:
 
 	HANDLE mHandle;
 };
+
+/*static*/ void * Thread::current(){
+	return (void *)&GetCurrentThread();
+}
 
 #endif
 

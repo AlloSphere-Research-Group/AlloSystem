@@ -98,7 +98,7 @@ public:
 	/// Return pointer to current OS thread object
 
 	/// E.g., if using pthreads internally, will return the pthread_t.
-	///
+	/// Will return NULL if current thread is not available.
 	static void * current();
 
 	Thread& operator= (Thread other);
