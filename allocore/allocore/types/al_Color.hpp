@@ -74,6 +74,8 @@ namespace{
 /// Color represented by red, green, blue, and alpha components
 struct Color{
 
+	typedef float value_type;
+
 	union{
 		struct{
 			float r;			///< Red component in [0, 1]
@@ -408,6 +410,8 @@ private:
 /// Color represented by hue, saturation, and value
 struct HSV{
 
+	typedef float value_type;
+
 	union{
 		struct{
 			float h;			///< Hue component in [0, 1]
@@ -513,6 +517,9 @@ struct HSV{
 #undef RGB
 #endif
 struct RGB{
+
+	typedef float value_type;
+
 	union{
 		struct{
 			float r;			///< Red component in [0, 1]
