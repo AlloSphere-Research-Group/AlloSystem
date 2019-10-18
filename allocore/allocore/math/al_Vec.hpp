@@ -619,8 +619,8 @@ inline void centroid3(Vec<N,T>& c, const Vec<N,T>& p1, const Vec<N,T>& p2, const
 	c = (p1+p2+p3)*_1_3;
 }
 
-template <int N, class T>
-Vec<N,T> closestPointOnLineSegment(T& frac,const Vec<N,T>& a, const Vec<N,T>& b, const Vec<N,T>& p){
+template <int N, class T, class Tf>
+Vec<N,T> closestPointOnLineSegment(Tf& frac, const Vec<N,T>& a, const Vec<N,T>& b, const Vec<N,T>& p){
 	auto ab = b - a;
 	auto dot = (p - a).dot(ab);	// projection of ap onto ab
 	auto magAB = ab.magSqr();
