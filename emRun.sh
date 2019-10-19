@@ -3,11 +3,19 @@
 # Build and run source file in browser using Emscripten
 # Note that the first time running this may take some time as Emscripten configures its libraries.
 
+# EM_DIR will be something like */emsdk/emscripten/1.37.34
 EM_DIR=`grep EMSCRIPTEN_ROOT ~/.emscripten | cut -d "=" -f 2 | tr -d "'"`
+
+# If passed a .html, just emrun it
+if [ "${1##*.}" == "html" ]; then
+	$EM_DIR/emrun --no_emrun_detect "$1"
+	exit
+fi
+
 ALLO_DIR=$PWD
 BUILD_DIR=$ALLO_DIR/build/em/
 PROJ_NAME=$(basename "$1" | cut -d. -f1)
-OUTPUT_DIR="$BUILD_DIR/$PROJ_NAME"
+OUTPUT_DIR="$BUILD_DIR/bin/$PROJ_NAME"
 
 OBJS=`ls $BUILD_DIR/obj/*.o`
 CPPFLAGS="-I$BUILD_DIR/include -O2"
