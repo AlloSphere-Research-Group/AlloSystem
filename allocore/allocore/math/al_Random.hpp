@@ -45,7 +45,6 @@
 
 #include <time.h>							/* req'd for time() */
 #include <cmath>
-#include "allocore/types/al_Conversion.hpp"	/* req'd for int to float conversion */
 #include "allocore/math/al_Constants.hpp"
 
 namespace al {
@@ -88,7 +87,11 @@ public:
 
 
 	/// Returns uniform random in [0, 1)
-	float uniform(){ return al::uintToUnit<float>(mRNG()); }
+	float uniform(){
+		union{ uint32_t u; float f; };
+		u = mRNG() >> 9 | 0x3F800000;
+		return f - 1.f;
+	}
 
 	/// Returns uniform random in [0, hi)
 	template <class T>
@@ -99,7 +102,11 @@ public:
 	T uniform(const T& hi, const T& lo){ return T((hi-lo)*uniform()) + lo; }
 
 	/// Returns uniform random in [-1, 1)
-	float uniformS(){ return al::uintToUnitS<float>(mRNG()); }
+	float uniformS(){
+		union{ uint32_t u; float f; };
+		u = mRNG() >> 9 | 0x40000000;
+		return f - 3.f;
+	}
 
 	/// Returns uniform random in [-lim, lim)
 	template <class T>
