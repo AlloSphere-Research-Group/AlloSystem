@@ -43,9 +43,8 @@
 */
 
 
-#include <time.h>							/* req'd for time() */
+#include <time.h> // time()
 #include <cmath>
-#include "allocore/math/al_Constants.hpp"
 
 namespace al {
 
