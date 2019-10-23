@@ -215,6 +215,9 @@ private:
 
 				// update modifiers here for shift-mouse etc.
 				setModifiers(ev);
+				if(!mUsingTouch){ // always 0,0 on touch devices!
+					win->mMouse.position(ev.button.x, ev.button.y);
+				}
 				win->mMouse.button(btn, buttonDown);
 				buttonDown ? win->callHandlersOnMouseDown() : win->callHandlersOnMouseUp();
 			}	break;
@@ -222,17 +225,50 @@ private:
 			case SDL_MOUSEWHEEL: //printf("Mouse wheel: %d\n", ev.wheel.y);
 				break;
 
-			case SDL_MOUSEMOTION: //printf("Mouse motion: %d %d\n", ev.button.x, ev.button.y);
-			{	win->mMouse.position(ev.button.x, ev.button.y);
+			case SDL_MOUSEMOTION: //printf("Mouse motion: %d %d\n", ev.motion.x, ev.motion.y);
+			{	if(!mUsingTouch) win->mMouse.position(ev.motion.x, ev.motion.y);
 				bool anyButtonDown = false;
 				for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i) anyButtonDown |= win->mMouse.down(i);
-				if(anyButtonDown){
-					win->callHandlersOnMouseDrag();
-				}else{
-					win->callHandlersOnMouseMove();
+				if(anyButtonDown)	win->callHandlersOnMouseDrag();
+				else				win->callHandlersOnMouseMove();
+			}	break;
+
+			// For a single finger swipe, we get: SDL_MOUSEBUTTONDOWN, SDL_FINGERDOWN, SDL_FINGERMOTION, SDL_MOUSEBUTTONUP, SDL_FINGERUP. For multi-gesture, we get SDL_FINGERMOTION followed by SDL_MULTIGESTURE for each finger.
+
+			case SDL_FINGERDOWN:
+			{	mUsingTouch = true;
+				++mFingersDown;
+				if(1 == mFingersDown){ // prevent multiple triggers from different fingers
+					win->mMouse.position(ev.tfinger.x*win->width(), ev.tfinger.y*win->height());
 				}
 			}	break;
 
+			case SDL_FINGERUP:
+			{	--mFingersDown;
+				if(mFingersDown<0) mFingersDown=0; // just in case...
+			}	break;
+
+			case SDL_FINGERMOTION:
+			{	if(1 == mFingersDown){ // prevent multiple triggers from different fingers
+					win->mMouse.position(ev.tfinger.x*win->width(), ev.tfinger.y*win->height());
+					win->callHandlersOnMouseDrag();
+				}
+			}	break;
+			/*
+			case SDL_MULTIGESTURE:
+			{	switch(ev.mgesture.numFingers){
+				case 2: win->mMouse.button(Mouse::RIGHT, true);
+				case 3: win->mMouse.button(Mouse::MIDDLE, true);
+				default:;
+				}
+				win->mMouse.position(ev.mgesture.x*win->width(), ev.mgesture.y*win->height());
+				win->callHandlersOnMouseDrag();
+			}	break;
+
+			case SDL_FINGERUP:
+			{	for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i) win->mMouse.button(i, false);
+			}	break;
+			*/
 			default:;
 			}
 		}
@@ -320,6 +356,8 @@ private:
 	SDL_Window * mSDLWindow = NULL;
 	SDL_GLContext mGLContext = NULL;
 	bool mScheduled = false;
+	bool mUsingTouch = false;
+	int mFingersDown = 0;
 
 	friend class Window;
 };

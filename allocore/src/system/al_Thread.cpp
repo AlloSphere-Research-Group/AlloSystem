@@ -199,7 +199,9 @@ public:
 };
 
 /*static*/ void * Thread::current(){
-	return (void *)&GetCurrentThread();
+	static HANDLE handle;
+	handle = GetCurrentThread();
+	return (void *)&handle;
 }
 
 #endif
