@@ -140,8 +140,7 @@ Shader& Shader::source(const std::string& src, Shader::Type type){
 
 
 ShaderProgram::ShaderProgram()
-:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES), mOutVertices(3),
-	mActive(true)
+:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES)
 {}
 
 ShaderProgram::~ShaderProgram(){
@@ -330,12 +329,58 @@ int ShaderProgram::attribute(const char * name) const {
 	return loc;
 }
 
-const ShaderProgram& ShaderProgram::uniform(int loc, int v) const{
-	glUniform1i(loc, v); return *this;
+#define DEF_UNIFORM(T, suf)\
+template<> const ShaderProgram& ShaderProgram::uniform<T>(int loc, const T& v) const {\
+	glUniform1##suf(loc, v); return *this;\
 }
-const ShaderProgram& ShaderProgram::uniform(int loc, float v) const{
-	glUniform1f(loc, v); return *this;
+
+DEF_UNIFORM(float, f)
+DEF_UNIFORM(double, f)
+DEF_UNIFORM(int, i)
+DEF_UNIFORM(bool, i)
+
+template<> const ShaderProgram& ShaderProgram::uniform<Vec2f>(int loc, const Vec2f& v) const {
+	return uniformVec(loc, v);
 }
+template<> const ShaderProgram& ShaderProgram::uniform<Vec3f>(int loc, const Vec3f& v) const {
+	return uniformVec(loc, v);
+}
+template<> const ShaderProgram& ShaderProgram::uniform<Vec4f>(int loc, const Vec4f& v) const {
+	return uniformVec(loc, v);
+}
+template<> const ShaderProgram& ShaderProgram::uniform<Vec2d>(int loc, const Vec2d& v) const {
+	return uniform(loc, Vec2f(v));
+}
+template<> const ShaderProgram& ShaderProgram::uniform<Vec3d>(int loc, const Vec3d& v) const {
+	return uniform(loc, Vec3f(v));
+}
+template<> const ShaderProgram& ShaderProgram::uniform<Vec4d>(int loc, const Vec4d& v) const {
+	return uniform(loc, Vec4f(v));
+}
+template<> const ShaderProgram& ShaderProgram::uniform<Color>(int loc, const Color& v) const {
+	return uniformVec(loc, v);
+}
+template<> const ShaderProgram& ShaderProgram::uniform<RGB>(int loc, const RGB& v) const {
+	return uniformVec(loc, v);
+}
+
+template<> const ShaderProgram& ShaderProgram::uniform<Mat3f>(int loc, const Mat3f& v) const {
+	return uniformMatrix3(loc, &v[0]);
+}
+template<> const ShaderProgram& ShaderProgram::uniform<Mat3d>(int loc, const Mat3d& v) const {
+	return uniform(loc, Mat3f(v));
+}
+
+template<> const ShaderProgram& ShaderProgram::uniform<Mat4f>(int loc, const Mat4f& v) const {
+	return uniformMatrix4(loc, &v[0]);
+}
+template<> const ShaderProgram& ShaderProgram::uniform<Mat4d>(int loc, const Mat4d& v) const {
+	return uniform(loc, Mat4f(v));
+}
+template<> const ShaderProgram& ShaderProgram::uniform<Matrix4d>(int loc, const Matrix4d& v) const {
+	return uniform(loc, Mat4f(v));
+}
+
 const ShaderProgram& ShaderProgram::uniform(int loc, float v0, float v1) const{
 	glUniform2f(loc, v0,v1); return *this;
 }
@@ -362,12 +407,6 @@ const ShaderProgram& ShaderProgram::uniform3(const char * name, const float * v,
 }
 const ShaderProgram& ShaderProgram::uniform4(const char * name, const float * v, int count) const{
 	glUniform4fv(uniform(name), count, v); return *this;
-}
-const ShaderProgram& ShaderProgram::uniform(const char * name, int v) const{
-	return uniform(uniform(name), v);
-}
-const ShaderProgram& ShaderProgram::uniform(const char * name, float v) const{
-	return uniform(uniform(name), v);
 }
 const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1) const{
 	return uniform(uniform(name), v0,v1);

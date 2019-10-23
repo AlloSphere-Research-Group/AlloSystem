@@ -227,96 +227,48 @@ public:
 	int attribute(const char * name) const;
 
 
-	const ShaderProgram& uniform(int loc, int v) const;
-	const ShaderProgram& uniform(int loc, float v) const;
-	const ShaderProgram& uniform(int loc, double v) const { return uniform(loc, float(v)); }
+	/// Set uniform via location
+	template <typename T>
+	const ShaderProgram& uniform(int loc, const T& v) const;
+
+	/// Set uniform via name
+	template <typename T>
+	const ShaderProgram& uniform(const char * name, const T& v) const {
+		return uniform(uniform(name), v);
+	}
+
+
+	/// Set uniform via location from fixed-sized vector/array
+	template <typename VecN>
+	const ShaderProgram& uniformVec(int loc, const VecN& v) const {
+		constexpr auto N = sizeof(v)/sizeof(v[0]);
+		static_assert(1<=N && N<=4, "Vector must have 1-4 elements");
+		switch(N){
+		case 1: return uniform<typename VecN::value_type>(loc, v[0]); 
+		case 2: return uniform(loc, v[0], v[1]); 
+		case 3: return uniform(loc, v[0], v[1], v[2]); 
+		case 4: return uniform(loc, v[0], v[1], v[2], v[3]);
+		default:;
+		}
+		return *this;
+	}
+
+	/// Set uniform via name from fixed-sized vector/array
+	template <typename VecN>
+	const ShaderProgram& uniformVec(const char * name, const VecN& v) const {
+		return uniformVec(uniform(name), v); }
+
+
 	const ShaderProgram& uniform(int loc, float v0, float v1) const;
 	const ShaderProgram& uniform(int loc, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(int loc, float v0, float v1, float v2, float v3) const;
 
-	template <typename T>
-	const ShaderProgram& uniform(int loc, const Vec<2,T>& v) const {
-		return uniform(loc, v.x, v.y);
-	}
-	template <typename T>
-	const ShaderProgram& uniform(int loc, const Vec<3,T>& v) const {
-		return uniform(loc, v.x, v.y, v.z);
-	}
-	template <typename T>
-	const ShaderProgram& uniform(int loc, const Vec<4,T>& v) const {
-		return uniform(loc, v.x, v.y, v.z, v.w);
-	}
-
 	const ShaderProgram& uniformMatrix3(int loc, const float * v, bool transpose=false) const;
 	const ShaderProgram& uniformMatrix4(int loc, const float * v, bool transpose=false) const;
-	const ShaderProgram& uniform(int loc, const Mat3f& m) const{
-		return uniformMatrix3(loc, m.elems());
-	}
-	template<typename T>
-	const ShaderProgram& uniform(int loc, const Mat<3,T>& m) const{
-		return uniform(loc, Mat3f(m));
-	}
-	const ShaderProgram& uniform(int loc, const Mat4f& m) const{
-		return uniformMatrix4(loc, m.elems());
-	}
-	template<typename T>
-	const ShaderProgram& uniform(int loc, const Mat<4,T>& m) const{
-		return uniform(loc, Mat4f(m));
-	}
 
-	const ShaderProgram& uniform(int loc, const Color& c) const {
-		return uniform(loc, c.r, c.g, c.b, c.a);
-	}
-	const ShaderProgram& uniform(int loc, const RGB& c) const {
-		return uniform(loc, c.r, c.g, c.b);
-	}
-
-	const ShaderProgram& uniform(const char * name, int v) const;
-	const ShaderProgram& uniform(const char * name, float v) const;
-	const ShaderProgram& uniform(const char * name, double v) const { return uniform(name, float(v)); }
 	const ShaderProgram& uniform(const char * name, float v0, float v1) const;
 	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2, float v3) const;
-
-	template <typename T>
-	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) const {
-		return uniform(name, v.x, v.y);
-	}
-	template <typename T>
-	const ShaderProgram& uniform(const char * name, const Vec<3,T>& v) const {
-		return uniform(name, v.x, v.y, v.z);
-	}
-	template <typename T>
-	const ShaderProgram& uniform(const char * name, const Vec<4,T>& v) const {
-		return uniform(name, v.x, v.y, v.z, v.w);
-	}
-
-	const ShaderProgram& uniform(const char * name, const Mat3f& m) const{
-		return uniformMatrix3(name, m.elems());
-	}
-	template<typename T>
-	const ShaderProgram& uniform(const char * name, const Mat<3,T>& m) const{
-		return uniform(name, Mat3f(m));
-	}
-	const ShaderProgram& uniform(const char * name, const Mat4f& m) const{
-		return uniformMatrix4(name, m.elems());
-	}
-	template<typename T>
-	const ShaderProgram& uniform(const char * name, const Mat<4,T>& m) const{
-		return uniform(name, Mat4f(m));
-	}
-	template <typename T>
-	const ShaderProgram& uniform(const char * name, const Quat<T>& q) const {
-		// note wxyz => xyzw for GLSL vec4:
-		return uniform(name, q.x, q.y, q.z, q.w);
-	}
-
-	const ShaderProgram& uniform(const char * name, const Color& c) const {
-		return uniform(name, c.r, c.g, c.b, c.a);
-	}
-	const ShaderProgram& uniform(const char * name, const RGB& c) const {
-		return uniform(name, c.r, c.g, c.b);
-	}
 
 	const ShaderProgram& uniform1(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform2(const char * name, const float * v, int count=1) const;
@@ -365,17 +317,16 @@ public:
 	}
 
 
-
 	static void use(unsigned programID);
 
 protected:
 	int mInPrim, mOutPrim;	// IO primitives for geometry shaders
-	unsigned int mOutVertices;
+	unsigned int mOutVertices = 3;
 	std::string mVertSource, mFragSource, mGeomSource;
 	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
 	std::vector<std::string> mTFVaryings;
 	std::string mPreamble;
-	bool mActive;
+	bool mActive = true;
 
 	virtual void get(int pname, void * params) const;
 	virtual void getLog(char * buf) const;
