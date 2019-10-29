@@ -42,13 +42,15 @@ runobjs: $(RUN_OBJS)
 # Compile and run source files in any of the RUN_DIRS directories
 # Note that if any of the directories in RUN_DIRS match those in RUN_SRC_DIRS,
 # a circular dependency is likely to occur with the standard %.o : %.cpp rule.
+# Note, the crazy regex used to determine RUN_MAIN_SOURCE_PATH replaces single
+# letter drive paths /c/ with c:/ which are compatible with Windows file system.
 EXEC_TARGETS = $(addsuffix *.cpp, $(RUN_DIRS)) $(addsuffix *.c, $(RUN_DIRS)) $(addsuffix *.mm, $(RUN_DIRS))
 ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
 endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
-$(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_PATH="\"$(realpath $(@D))/\""
+$(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_PATH="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
 	$(CXX) $(RUN_CPPFLAGS) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
