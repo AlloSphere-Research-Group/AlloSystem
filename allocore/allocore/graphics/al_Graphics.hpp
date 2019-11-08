@@ -631,6 +631,9 @@ public:
 	Graphics& shaderOnMaterial(const std::string& s);
 
 	/// Set current vertex buffer and optionally update
+
+	/// The buffer is automatically updated the first time a mesh is used.
+	///
 	void setVertexBuffer(const Mesh& m, bool updateBuffer=false);
 
 	/// Draw currently set vertex buffer
