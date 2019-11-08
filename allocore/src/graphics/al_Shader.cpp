@@ -244,9 +244,9 @@ bool ShaderProgram::compile(
 		attach(mShaderG);
 	}
 	link(false);
-	mShaderV.printLog();
+	/*mShaderV.printLog();
 	mShaderF.printLog();
-	if(bGeom) mShaderG.printLog();
+	if(bGeom) mShaderG.printLog();*/
 	printLog();
 
 	// OpenGL.org says to detach shaders after linking:
