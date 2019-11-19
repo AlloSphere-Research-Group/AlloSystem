@@ -373,7 +373,7 @@ int Recv::recv(){
 	OSCTRY("Packet::endMessage",
 		char sender[16] = "";
 		r = Socket::recv(&mBuffer[0], mBuffer.size(), sender);
-		if(r && mHandler){
+		if(r>0 && mHandler){
 			DPRINTF("Recv:recv() Received %d bytes from %s; parsing...\n", r, sender);
 			mHandler->parse(&mBuffer[0], r, 1, sender);
 		}
