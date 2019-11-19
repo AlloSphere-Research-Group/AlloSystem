@@ -17,11 +17,10 @@ using namespace al;
 
 /// Test data we would like to send/receive
 struct PacketData{
-	PacketData(): i(123456), f(1), d(1), c(1){}
-	int i;
-	float f;
-	double d;
-	char c;
+	int i = 123456;
+	float f = 1;
+	double d = 1;
+	char c = 1;
 
 	void clear(){ i=0; f=0; d=0; c=0; }
 	bool valid() const { return 123456==i && 1==f && 1==d && 1==c; }
@@ -137,12 +136,11 @@ int main(){
 		osc::Send s(port, addr);
 		osc::Recv r(port);
 
-                if (!r.opened()) {
-                  printf("Failed to open socket on UDP port %d for OSC receipt.\n", port);
-                  printf("Probably another program is already listening on that port; I quit.\n");
-                  exit(1);
-                }
-
+		if(!r.opened()){
+			printf("Failed to open socket on UDP port %d for OSC receipt.\n", port);
+			printf("Probably another program is already listening on that port; I quit.\n");
+			exit(1);
+		}
 
 
 		// Assign a handler to the receiver
@@ -170,37 +168,23 @@ int main(){
 
 		// If we want more control over when to check for packets, we can poll
 		// the receiver manually.
-//		r.timeout(0);	// do not block
-//
-//		for(int i=0; i<numTrials; ++i){
-//			s.clear();
-//			s.beginBundle(i);
-//			s.beginMessage("/test");
-//				s << "a string" << data.i << data.f << data.d << data.c;
-//				s << osc::Blob(&data, sizeof(data));
-//			s.endMessage();
-//			s.endBundle();
-//			s.send();
-//
-//			while(r.recv()){}
-//		}
+		/*
+		r.timeout(0);	// do not block
 
+		for(int i=0; i<numTrials; ++i){
+			s.clear();
+			s.beginBundle(i);
+			s.beginMessage("/test");
+				s << "a string" << data.i << data.f << data.d << data.c;
+				s << osc::Blob(&data, sizeof(data));
+			s.endMessage();
+			s.endBundle();
+			s.send();
+
+			while(r.recv()){}
+		}
+		//*/
 	}
 
 	return 0;
 }
-
-/*
-TODO: example code previous in header file
-
-	// Poll socket manually at periodic intervals ...
-	r.timeout(0);	// set to be non-blocking
-	void myThreadFunc(){
-		while (r.recv()) {}	// use while loop to empty queue
-	}
-
-	// or, launch an automatic background thread
-	r.timeout(1);	// ensure waiting period is greater than 0
-	r.start();
-
-*/
