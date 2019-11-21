@@ -44,6 +44,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include <cmath> // abs
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Vec.hpp"
@@ -343,9 +344,6 @@ public:
 	static T accuracyMax(){ return 1.000001; }
 	static T accuracyMin(){ return 0.999999; }
 	static T eps(){ return 0.0000001; }
-
-private:
-	static T abs(T v){ return v>T(0) ? v : -v; }
 };
 
 template<class T> Quat<T> operator + (T r, const Quat<T>& q){ return  q+r; }
@@ -408,7 +406,7 @@ Quat<T> Quat<T> :: pow(T expo) const {
 	}
 
 	T theta = ::acos(w_m);
-	Vec<3,T> imag = Vec<3,T>(x,y,z) / (m * ::sin(theta));
+	auto imag = Vec<3,T>(x,y,z) / (m * ::sin(theta));
 	imag *= ::sin(expo*theta);
 	return Quat(::cos(expo*theta), imag) * ::pow(m, expo);
 }
@@ -766,7 +764,7 @@ Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 	}
 
 	T cos_angle = acos(dot_prod);
-	if(Quat::abs(cos_angle) > eps()) {
+	if(std::abs(cos_angle) > eps()) {
 		T sine = sin(cos_angle);
 		T inv_sine = 1./sine;
 
@@ -834,7 +832,7 @@ void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buf
 	const T cos_angle = acos(dot_prod);
 	const T inv_frames = 1./((T)numFrames);
 
-	if(Quat::abs(cos_angle) > eps())
+	if(std::abs(cos_angle) > eps())
 	{
 		const T sine = sin(cos_angle);
 		const T inv_sine = 1./sine;
@@ -917,55 +915,55 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 template<typename T>
 Quat<T> Quat<T> :: getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T>& up) {
 
-  Vec<3, T> vector = forward;
-  Vec<3, T> vector2 = Vec<3, T>(cross(up, vector)).normalize();
-  Vec<3, T> vector3 = cross(vector, vector2);
-  T m00 = vector2.x;
-  T m01 = vector2.y;
-  T m02 = vector2.z;
-  T m10 = vector3.x;
-  T m11 = vector3.y;
-  T m12 = vector3.z;
-  T m20 = vector.x;
-  T m21 = vector.y;
-  T m22 = vector.z;
+	auto vector = forward;
+	auto vector2 = cross(up, vector).normalize();
+	auto vector3 = cross(vector, vector2);
+	T m00 = vector2.x;
+	T m01 = vector2.y;
+	T m02 = vector2.z;
+	T m10 = vector3.x;
+	T m11 = vector3.y;
+	T m12 = vector3.z;
+	T m20 = vector.x;
+	T m21 = vector.y;
+	T m22 = vector.z;
 
-  T num8 = (m00 + m11) + m22;
-  Quat<T> q;
-  if (num8 > 0){
-    T num = sqrt(num8 + 1);
-    q.w = num * 0.5;
-    num = 0.5 / num;
-    q.x = (m12 - m21) * num;
-    q.y = (m20 - m02) * num;
-    q.z = (m01 - m10) * num;
-    return q;
-  }
-  if ((m00 >= m11) && (m00 >= m22)){
-    T num7 = sqrt(((1 + m00) - m11) - m22);
-    T num4 = 0.5 / num7;
-    q.x = 0.5 * num7;
-    q.y = (m01 + m10) * num4;
-    q.z = (m02 + m20) * num4;
-    q.w = (m12 - m21) * num4;
-    return q;
-  }
-  if (m11 > m22){
-    T num6 = sqrt(((1 + m11) - m00) - m22);
-    T num3 = 0.5 / num6;
-    q.x = (m10+ m01) * num3;
-    q.y = 0.5 * num6;
-    q.z = (m21 + m12) * num3;
-    q.w = (m20 - m02) * num3;
-    return q; 
-  }
-  T num5 = sqrt(((1 + m22) - m00) - m11);
-  T num2 = 0.5 / num5;
-  q.x = (m20 + m02) * num2;
-  q.y = (m21 + m12) * num2;
-  q.z = 0.5 * num5;
-  q.w = (m01 - m10) * num2;
-  return q;
+	T num8 = (m00 + m11) + m22;
+	Quat<T> q;
+	if (num8 > 0){
+		T num = sqrt(num8 + 1);
+		q.w = num * 0.5;
+		num = 0.5 / num;
+		q.x = (m12 - m21) * num;
+		q.y = (m20 - m02) * num;
+		q.z = (m01 - m10) * num;
+		return q;
+	}
+	if ((m00 >= m11) && (m00 >= m22)){
+		T num7 = sqrt(((1 + m00) - m11) - m22);
+		T num4 = 0.5 / num7;
+		q.x = 0.5 * num7;
+		q.y = (m01 + m10) * num4;
+		q.z = (m02 + m20) * num4;
+		q.w = (m12 - m21) * num4;
+		return q;
+	}
+	if (m11 > m22){
+		T num6 = sqrt(((1 + m11) - m00) - m22);
+		T num3 = 0.5 / num6;
+		q.x = (m10+ m01) * num3;
+		q.y = 0.5 * num6;
+		q.z = (m21 + m12) * num3;
+		q.w = (m20 - m02) * num3;
+		return q; 
+	}
+	T num5 = sqrt(((1 + m22) - m00) - m11);
+	T num2 = 0.5 / num5;
+	q.x = (m20 + m02) * num2;
+	q.y = (m21 + m12) * num2;
+	q.z = 0.5 * num5;
+	q.w = (m01 - m10) * num2;
+	return q;
 }
 
 /*!
@@ -988,8 +986,8 @@ void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T
 	//Vec<3,T>::cross(axis, zaxis, diff);
 	axis.normalize();
 
-	float axis_mag_sqr = axis.dot(axis);
-	float along = zaxis.dot(diff); //Vec<3,T>::dot(zaxis, diff);
+	auto axis_mag_sqr = axis.dot(axis);
+	auto along = zaxis.dot(diff); //Vec<3,T>::dot(zaxis, diff);
 
 	if(axis_mag_sqr < 0.001 && along < 0) {
 		//Vec<3,T>::cross(axis, zaxis, Vec<3,T>(0., 0., 1.));
@@ -1006,8 +1004,8 @@ void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T
 	}
 
 	if(along < 0.9995 && axis_mag_sqr > 0.001) {
-		float theta = Quat::abs(amt)*acos(along);
-//			printf("theta: %f  amt: %f\n", theta, amt);
+		auto theta = std::abs(amt)*acos(along);
+			//printf("theta: %f  amt: %f\n", theta, amt);
 		fromAxisAngle(theta, axis[0], axis[1], axis[2]);
 	}
 	else {
@@ -1020,8 +1018,7 @@ void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T
 template<typename T>
 Quat<T> Quat<T> :: rotor(const Vec<3,T>& v1, const Vec<3,T>& v2) {
 	// get the normal to the plane (i.e. the unit bivector containing the v1 and v2)
-	Vec<3,T> n;
-	cross(n, v1, v2);
+	auto n = cross(v1, v2);
 	n.normalize();	// normalize because the cross product can get slightly denormalized
 
 	// calculate half the angle between v1 and v2
@@ -1029,10 +1026,9 @@ Quat<T> Quat<T> :: rotor(const Vec<3,T>& v1, const Vec<3,T>& v2) {
 	T theta = acos(dotmag)*0.5;
 
 	// calculate the scaled actual bivector generaed by v1 and v2
-	Vec<3,T> bivec = n*sin(theta);
-	Quat<T> q(cos(theta), bivec[0], bivec[1], bivec[2]);
-
-	return q;
+	auto bivec = n*sin(theta);
+	
+	return Quat<T>(cos(theta), bivec[0], bivec[1], bivec[2]);;
 }
 
 template<typename T>
