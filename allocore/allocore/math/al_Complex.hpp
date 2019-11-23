@@ -43,6 +43,7 @@
 */
 
 #include <cmath>
+#include <utility> // swap
 #include "allocore/math/al_Constants.hpp"
 
 namespace al {
@@ -146,6 +147,9 @@ public:
 	C& operator *=(T v){ r*=v; i*=v; return *this; }
 	C& operator /=(const C& v){ return (*this) *= v.recip(); }
 	C& operator /=(T v){ r/=v; i/=v; return *this; }
+
+	C& muli(){ std::swap(r,i); i=-i; return *this; } ///< Multiply by i (rotate 90 deg counter-clockwise)
+	C& divi(){ std::swap(r,i); r=-r; return *this; } ///< Divide by i (multiply by -i)
 
 	C operator - () const { return C(-r, -i); }
 	C operator - (const C& v) const { return C(*this) -= v; }
