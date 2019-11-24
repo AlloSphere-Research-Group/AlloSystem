@@ -149,8 +149,9 @@ public:
 	/// Transform vertices by projective transform matrix
 
 	/// @param[in] m		projective transform matrix
-	/// @param[in] begin	beginning index of vertices
-	/// @param[in] end		ending index of vertices, negative amounts specify
+	/// @param[in] begin	beginning index of vertices; negative value specifies
+	///						distance from last element
+	/// @param[in] end		ending index of vertices; negative value specifies
 	///						distance from one past last element
 	template <class T>
 	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
@@ -443,7 +444,8 @@ public:
 
 template <class T>
 Mesh& Mesh::transform(const Mat<4,T>& m, int begin, int end){
-	if(end<0) end += vertices().size()+1; // negative index wraps to end of array
+	if(begin<0) begin += vertices().size();
+	if(  end<0)   end += vertices().size()+1; // negative index wraps to end of array
 	for(int i=begin; i<end; ++i){
 		vertices()[i] = m * Vec<4,T>(vertices()[i], T(1));
 	}
