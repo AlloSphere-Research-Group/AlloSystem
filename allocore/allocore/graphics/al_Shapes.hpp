@@ -241,6 +241,7 @@ int addCylinder(
 /// Add a tessellated rectangular surface as an indexed triangle strip
 
 /// This creates a flat, regularly-tesselated surface lying on the xy plane.
+/// The surface normal points along +z with counter-clockwise triangle winding.
 /// This shape can be used as a starting point for more complex meshes such as 
 /// height maps/terrains and texture-mapped spheres and torii.
 ///
