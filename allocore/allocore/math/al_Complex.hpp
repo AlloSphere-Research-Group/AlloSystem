@@ -105,21 +105,32 @@ public:
 		T elems[2];
 	};
 
-	Complex(const Complex& v): r(v.r), i(v.i){}
-	Complex(const Polar<T>& v){ *this = v; }
-	Complex(const T& r=T(0), const T& i=T(0)): r(r), i(i){}
-	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar<T>(m,p); }
 
+	/// Construct from real and imaginary values
+	Complex(const T& r=T(0), const T& i=T(0)): r(r), i(i){}
+
+	/// Construct from another complex number
+	template <class V>
+	Complex(const Complex<V>& v){ *this = v; }
+
+	/// Construct from polar coordinates
+	template <class V>
+	Complex(const Polar<V>& v){ *this = v; }
+
+
+	template <class V>
+	C& operator = (const Polar<V>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
+	template <class V>
+	C& operator = (const Complex<V>& v){ r=v.r; i=v.i; return *this; }
+	C& operator = (T v){ r=v;   i=T(0); return *this; }
+
+	C& set(T vr, T vi){ r=vr; i=vi; return *this; }				///< Set real and imaginary components
 
 	C& arg(T v){ return fromPolar(norm(), v); }					///< Set argument leaving norm the same
 	C& norm(T v){ return fromPolar(v, arg()); }					///< Set norm leaving argument the same
 
-	C& fromPolar(T phase){ r=::cos(phase); i=::sin(phase); return *this; }	///< Set phase and normalize
-	C& fromPolar(T m, T p){ return set(Polar<T>(m,p)); }		///< Set magnitude and phase
-
-	/// Set real and imaginary components
-	C& set(T vr, T vi){ r=vr; i=vi; return *this; }
-	C& set(const Polar<T>& p){ return *this = p; }
+	C& fromPolar(T phase){ r=::cos(phase); i=::sin(phase); return *this; }	///< Set phase with unit magnitude
+	C& fromPolar(T m, T p){ return *this = Polar<T>(m,p); }		///< Set magnitude and phase
 
 	T& operator[](int i){ return elems[i];}
 	const T& operator[](int i) const { return elems[i]; }
@@ -136,9 +147,6 @@ public:
 	bool operator > (const C& v) const { return normSqr() > v.normSqr(); }	///< Returns true if norm is greater than argument's norm
 	bool operator < (const C& c) const { return normSqr() < c.normSqr(); }	///< Returns true if norm is less than argument's norm
 
-	C& operator = (const Polar<T>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
-	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
-	C& operator = (T v){ r=v;   i=T(0); return *this; }
 	C& operator -=(const C& v){ r-=v.r; i-=v.i; return *this; }
 	C& operator -=(T v){ r-=v; return *this; }
 	C& operator +=(const C& v){ r+=v.r; i+=v.i; return *this; }
