@@ -26,7 +26,6 @@ int utMathSpherical();
 int utGraphicsDraw();
 int utGraphicsMesh();
 int utProtocolOSC();
-int utProtocolSerialize();
 int utSpatial();
 int utSystem();
 int utTypes();

@@ -49,33 +49,6 @@ int utTypesConversion(){
 	assert(toString(1.1) == "1.1");
 	assert(toString(-1.1) == "-1.1");
 
-	// Signed 16-bit integer and unit real conversions
-	for(int i=-32768; i<32768; ++i){
-		float f = float(i)/32768;
-		assert(unitToInt16(f) == i);
-		assert(intToUnit(int16_t(i)) == f);
-	}
-
-	assert(uintToUnit<float>(1<< 0) == 0.00);
-	assert(uintToUnit<float>(1UL<<29) == 1./8);
-	assert(uintToUnit<float>(1UL<<30) == 1./4);
-	assert(uintToUnit<float>(1UL<<31) == 1./2);
-
-	assert(uintToUnitS<float>(1UL<<31) == 0.0);
-	assert(uintToUnitS<float>((1UL<<31) - (1<<30)) ==-0.5);
-	assert(uintToUnitS<float>((1UL<<31) + (1<<30)) ==+0.5);
-
-	//assert(unitToUInt2(0.0) == 0);
-	//printf("%lu %lu\n", unitToUInt2(1./8), 1UL<<29);
-	assert(unitToUInt2(1./8) == (1UL<<29));
-	assert(unitToUInt2(1./4) == (1UL<<30));
-	assert(unitToUInt2(1./2) == (1UL<<31));
-
-	assert(unitToUInt8(0) == 0);
-	assert(unitToUInt8(1./8) ==  32);
-	assert(unitToUInt8(1./4) ==  64);
-	assert(unitToUInt8(1./2) == 128);
-
 	return 0;
 }
 

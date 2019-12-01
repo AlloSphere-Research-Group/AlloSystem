@@ -32,7 +32,6 @@ int main (int argc, char * const argv[]) {
 	RUNTEST(Spatial);
 	RUNTEST(System);
 	RUNTEST(ProtocolOSC);
-	RUNTEST(ProtocolSerialize);
 
 	RUNTEST(IOSocket);
 	RUNTEST(File);
