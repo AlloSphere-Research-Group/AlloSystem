@@ -215,6 +215,10 @@ TEM Complex<T> pow(const Complex<T>& b, const T& e){ return b.pow(e); }
 //TEM Complex<T> sin(const Complex<T>& v){ return v.sin(); }
 #undef TEM
 
+/// Returns cos(t) + i sin(t)
+template <class T>
+inline Complex<T> cis(T t){ return Complex<T>().fromPolar(t); }
+
 template <class T>
 inline Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
 
