@@ -149,6 +149,9 @@ public:
 	/// Get height, in pixels
 	unsigned height() const { return array().height(); }
 
+	/// Get number of pixel color components
+	unsigned components() const { return array().components(); }
+
 
 	/// Get compression flags for saving
 	int compression() const { return mCompression; }
