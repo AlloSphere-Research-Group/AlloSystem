@@ -346,6 +346,13 @@ public:
 	template <class T>
 	void allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format format);
 
+	template <class T>
+	void allocate(const T * src, unsigned w, unsigned c);
+	template <class T>
+	void allocate(const T * src, unsigned w, unsigned h, unsigned c);
+	template <class T>
+	void allocate(const T * src, unsigned w, unsigned h, unsigned d, unsigned c);
+
 	/// Deallocate any allocated client-side memory
 	void deallocate();
 
@@ -429,6 +436,18 @@ void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphi
 	deriveTarget();
 	allocate();
 	memcpy(mArray.data.ptr, src, mArray.size());
+}
+
+template <class T>
+void Texture::allocate(const T * src, unsigned w, unsigned c){ allocate(src, w,0,0,c); }
+
+template <class T>
+void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned c){ allocate(src, w,h,0,c); }
+
+template <class T>
+void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, unsigned c){
+	static Graphics::Format fmts[] = {Graphics::LUMINANCE, Graphics::LUMINANCE_ALPHA, Graphics::RGB, Graphics::RGBA};
+	if(1 <= c && c <= 4) allocate(src, w,h,d, fmts[c-1]);
 }
 
 inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){
