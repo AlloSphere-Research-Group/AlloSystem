@@ -47,6 +47,32 @@ size_t CSVReader::typeSize(CSVReader::DataType type) const{
 	}
 }
 
+// getline() may not handle newlines correctly, esp. \r, hence the following:
+// https://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
+std::istream& safeGetline(std::istream& is, std::string& t){
+    t.clear();
+    std::istream::sentry se(is, true);
+    std::streambuf* sb = is.rdbuf();
+    for(;;) {
+        int c = sb->sbumpc();
+        switch (c) {
+        case '\n':
+            return is;
+        case '\r':
+            if(sb->sgetc() == '\n')
+                sb->sbumpc();
+            return is;
+        case std::streambuf::traits_type::eof():
+            // Also handle the case when the last line has no line ending
+            if(t.empty())
+                is.setstate(std::ios::eofbit);
+            return is;
+        default:
+            t += (char)c;
+        }
+    }
+}
+
 bool CSVReader::readFile(std::string fileName) {
 	std::ifstream f(fileName);
 	if (!f.is_open()) {
@@ -57,7 +83,7 @@ bool CSVReader::readFile(std::string fileName) {
 	std::string line;
 
 	{	// Get column names (assuming they are the first row)
-		getline(f, line);
+		safeGetline(f, line);
 		Tokenizer tk(line, mDelim);
 		mColumnNames.clear();
 		while(tk()){
@@ -76,10 +102,11 @@ bool CSVReader::readFile(std::string fileName) {
 
 	auto rowLength = calculateRowLength();
 
-	while (getline(f, line)) {
+	while (safeGetline(f, line)) {
 		if (line.size() == 0) {
 			continue;
 		}
+
 		if (std::count(line.begin(), line.end(), mDelim) == int(mDataTypes.size() - 1)) { // Check that we have enough commas
 			Tokenizer tk(line, mDelim);
 			char *row = new char[!derivingTypes() ? rowLength : mDataTypes.size()*maxStringSize];
