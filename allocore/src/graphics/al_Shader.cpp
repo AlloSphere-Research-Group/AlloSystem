@@ -377,6 +377,9 @@ template<> const ShaderProgram& ShaderProgram::uniform<Mat4f>(int loc, const Mat
 template<> const ShaderProgram& ShaderProgram::uniform<Mat4d>(int loc, const Mat4d& v) const {
 	return uniform(loc, Mat4f(v));
 }
+template<> const ShaderProgram& ShaderProgram::uniform<Matrix4f>(int loc, const Matrix4f& v) const {
+	return uniform(loc, Mat4f(v));
+}
 template<> const ShaderProgram& ShaderProgram::uniform<Matrix4d>(int loc, const Matrix4d& v) const {
 	return uniform(loc, Mat4f(v));
 }
