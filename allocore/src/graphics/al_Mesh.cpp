@@ -925,7 +925,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 			s << vrt.x << " " << vrt.y << " " << vrt.z;
 			if(hasNormals){
 				auto nrm = m.normals()[i];
-				s << nrm.x << " " << nrm.y << " " << nrm.z;
+				s << " " << nrm.x << " " << nrm.y << " " << nrm.z;
 			}
 			if(hasColors){
 				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
