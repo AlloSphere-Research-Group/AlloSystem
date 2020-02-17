@@ -34,18 +34,13 @@ int utMath(){
 
 	// Vec
 	{
-		const int N = 4;
-
 		// Should be able to hold objects with constructors
 		{ Vec<1, Vec<1, int> > t; }
 		{ Vec<4, Complex<float> > t; }
 		{ Vec<5, char> t; }
 		{ Vec<0,int> t; }
 
-		//Vec<0,int>().print();
-		//Vec<1,int>(1).print();
-		//Vec<2,int>(1,2).print();
-		//std::cout << Vec<0,int>();
+		const int N = 4;
 
 		Vec<N,double> a, b, c;	assert(a.size() == N);
 
@@ -122,16 +117,22 @@ int utMath(){
 		(a = 1).normalize();	assert(a == 1./sqrt(N));
 		assert(a == (b = 10).normalized());
 
-		b = a = 1;
-		assert(concat(a,b) == 1);
-
-		// conversion
-		{
-		a = 0;
-		Vec<N+1, double> t = concat(a, Vec<1,char>(1));
-		assert(t.size() == a.size()+1);
+		// constructors
+		{ decltype(a) t(a);			assert(t == a); }
+		{ Vec<3,float> t(1);		assert(t[0] == 1 && t[1] == 1 && t[2] == 1); }
+		{ Vec<3,float> t(1,2);		assert(t[0] == 1 && t[1] == 2 && t[2] == 0); }
+		{ Vec<3,float> t(1,2,3);	assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
+		{ Vec<3,float> t({1,2,3});	assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
+		{ Vec<3,float> t(Vec<2,float>(1,2), 3); assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
+		{ Vec<3,float> t(Vec<2,float>(1,2)); assert(t[0] == 1 && t[1] == 2 && t[2] == 0); }
+		{	float s[] = {1,2,3};
+			Vec<3,float> t(s);		assert(t[0] == 1 && t[1] == 2 && t[2] == 3);
+		}
+		{	float s[] = {1,10,2,20,3,30};
+			Vec<3,float> t(s,2);	assert(t[0] == 1 && t[1] == 2 && t[2] == 3);
 		}
 
+		// access
 		for(int i=0; i<a.size(); ++i) a[i]=i;
 		assert(a.get(0,1) == Vec2d(0,1));
 		assert(a.get(2,2) == Vec2d(2,2));
@@ -143,10 +144,21 @@ int utMath(){
 		Vec<2, double> t;
 		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
 		t = a.sub<2>(2);		assert(t[0] == 2 && t[1] == 3);
-		// Verify in-place operations
+			// verify in-place operations
 		a.sub<2>() += 10;		assert(a[0] == 10 && a[1] == 11);
 		}
 
+		// Vec-Vec ops
+		b = a = 1;
+		assert(concat(a,b) == 1);
+
+		{
+		a = 0;
+		Vec<N+1, double> t = concat(a, Vec<1,char>(1));
+		assert(t.size() == a.size()+1);
+		}
+
+		// geometry and other math ops
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(1, 0, 0)), 0.));
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(0, 1, 0)), M_PI_2));
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(0,-1, 0)), M_PI_2));
@@ -158,13 +170,6 @@ int utMath(){
 
 		normal(r, Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(-1,0,0));
 		assert(eq(r, Vec3d(0,0,1)));
-
-		Vec3d pos(1,2,3);
-		Vec3d to(4,5,6);
-		Vec3d rel = to - pos;
-
-		assert(rel[0]==3 && rel[1]==3 && rel[2]==3);
-
 		}
 
 		a = 0;
