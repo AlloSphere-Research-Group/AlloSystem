@@ -123,6 +123,8 @@ public:
 	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); reduce<4>(); }
 
 	/// @params[in] v		values to initialize elements to
+	/// If the initializer list has one element, then it is assigned to all
+	/// vector components.
 	Vec(std::initializer_list<T> v){ set(v); }
 
 	/// @param[in] v		vector to initialize elements to
@@ -231,9 +233,17 @@ public:
 	}
 
 	/// Set elements from initializer list {a,b,...}
+
+	/// If the initializer list has one element, then it is assigned to all
+	/// vector components.
 	Vec& set(std::initializer_list<T> v){
-		(*this) = T(0);
-		IT(N<v.size()?N:v.size()) (*this)[i] = v.begin()[i];
+		if(v.size() == 1){
+			(*this) = v.begin()[0];
+		} else {
+			const int M = N<v.size() ? N : v.size();
+			for(int i=0; i<M; ++i) (*this)[i] = v.begin()[i];
+			for(int i=M; i<N; ++i) (*this)[i] = T();
+		}
 		return *this;
 	}
 
