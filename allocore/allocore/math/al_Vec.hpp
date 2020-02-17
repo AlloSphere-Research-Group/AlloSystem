@@ -109,25 +109,25 @@ public:
 
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
-	Vec(const T& v1, const T& v2){ set(v1, v2); }
+	Vec(const T& v1, const T& v2){ set(v1, v2); reduce<2>(); }
 
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
 	/// @param[in] v3		value to initialize third element
-	Vec(const T& v1, const T& v2, const T& v3){ set(v1, v2, v3); }
+	Vec(const T& v1, const T& v2, const T& v3){ set(v1, v2, v3); reduce<3>(); }
 
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
 	/// @param[in] v3		value to initialize third element
 	/// @param[in] v4		value to initialize fourth element
-	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); }
+	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); reduce<4>(); }
 
 	/// @params[in] v		values to initialize elements to
 	Vec(std::initializer_list<T> v){ set(v); }
 
 	/// @param[in] v		vector to initialize elements to
 	template <int N2, class T2>
-	Vec(const Vec<N2, T2>& v){ *this = v; }
+	Vec(const Vec<N2, T2>& v){ *this = v; reduce<N2>(); }
 
 	/// @param[in] v		vector to initialize first N-1 elements to
 	/// @param[in] s		value of last element
@@ -501,6 +501,13 @@ public:
 
 	/// debug printing
 	void print(FILE * out=stdout) const;
+
+private:
+	// set last N-M elements to default value
+	template <int M>
+	void reduce(){
+		for(int i=M; i<size(); ++i) (*this)[i] = T();
+	}
 };
 
 
