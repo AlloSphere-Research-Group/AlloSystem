@@ -326,7 +326,8 @@ elif uname -o | grep -q "Msys"; then
 		# assimp: minizip zziplib zlib
 
 		#echo $PKGS
-		pacman -S $PKGS
+		pacman -Syu
+		pacman -S make msys/gcc $PKGS
 	fi
 else
 	echo 'Error: No suitable package manager found.'
