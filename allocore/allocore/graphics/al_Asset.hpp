@@ -146,9 +146,6 @@ public:
 	/// Read a mesh from the Scene
 	void mesh(unsigned int i, Mesh& mesh) const;
 
-	/// Alternative read a mesh from the Scene
-	void meshAlt(unsigned int i, Mesh& mesh) const;
-
 	/// Read all meshes
 	void meshAll(Mesh& dst) const { for (unsigned i=0; i<meshes(); i++) mesh(i, dst); }
 
