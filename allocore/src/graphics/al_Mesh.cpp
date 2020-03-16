@@ -997,4 +997,52 @@ void Mesh::print(FILE * dst) const {
 	fprintf(dst, "%8d bytes (%.1f kB)\n", bytes, double(bytes)/1000);
 }
 
+bool Mesh::debug(FILE * dst) const {
+
+	#define DPRINTF(...) if(dst){ fprintf(dst, __VA_ARGS__); }
+
+	bool ok = true;
+	int Nv = vertices().size();
+	if(!Nv){ DPRINTF("No vertices\n"); ok=false; }
+
+	#define CHECK_ARR(arr, oneOkay)\
+	if(arr().size() && arr().size() != Nv){\
+		if(!oneOkay || arr().size()!=1){\
+			DPRINTF("%d " #arr ", but %d vertices\n", arr().size(), Nv);\
+			ok=false;\
+		}\
+	}
+	CHECK_ARR(normals, false);
+	CHECK_ARR(colors, true);
+	CHECK_ARR(coloris, true);
+	CHECK_ARR(texCoord1s, false);
+	CHECK_ARR(texCoord2s, false);
+	CHECK_ARR(texCoord3s, false);
+	#undef CHECK_ARR
+
+	if(colors().size() && coloris().size()){
+		DPRINTF("More than one color array populated\n");
+		ok=false;
+	}
+
+	if(texCoord1s().size() && texCoord2s().size() && texCoord2s().size()){
+		DPRINTF("More than one texture coordinate array populated\n");
+		ok=false;
+	}
+
+	if(indices().size()){
+		for(auto i : indices()){
+			if(i > Nv){
+				DPRINTF("Index out of bounds: %d (%d max)\n", i, Nv);
+				ok=false;
+				break;
+			}
+		}
+	}
+
+	#undef DPRINTF
+
+	return ok;
+}
+
 } // al::
