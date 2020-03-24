@@ -370,6 +370,27 @@ double App::appTime() const {
 	return timeNow() - mStartTime;
 }
 
+
+float mousePos1(const App * app, int window, int coord, bool clip){
+	if(window < app->windows().size()){
+		const auto& w = app->window(window);
+		if(w.created() && w.width() && w.height()){
+			float v = coord==0 ? float(w.mouse().x())/w.width() : float(w.mouse().y())/w.height();
+			return clip ? (v<0.f ? 0.f : v>1.f ? 1.f : v) : v;
+		}
+	}
+	return 0.f;
+}
+
+float App::mouseX1(int window, bool clip){
+	return mousePos1(this, window, 0, clip);
+}
+
+float App::mouseY1(int window, bool clip){
+	return mousePos1(this, window, 1, clip);
+}
+
+
 void App::sendHandshake(){
 	oscSend().send("/handshake", name(), oscRecv().port());
 }

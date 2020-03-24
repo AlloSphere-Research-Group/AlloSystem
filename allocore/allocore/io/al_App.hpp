@@ -322,6 +322,12 @@ public:
 	ViewpointWindow& window(int i=0){ return *(windows()[i]); }
 	const ViewpointWindow& window(int i=0) const { return *(windows()[i]); }
 
+	/// Get mouse x coordinate in [0,1]
+	float mouseX1(int window=0, bool clip=true);
+	/// Get mouse y coordinate in [0,1]
+	float mouseY1(int window=0, bool clip=true);
+
+
 	/// Get graphics renderer
 	Graphics& graphics(){ return mGraphics; }
 	const Graphics& graphics() const { return mGraphics; }
