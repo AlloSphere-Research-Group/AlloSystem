@@ -254,6 +254,15 @@ public:
 		return index(indices...);
 	}
 
+	/// Append index to index buffer relative to current number of vertices
+	Mesh& indexRel(unsigned int i){ return index(vertices().size()+i); }
+
+	template <class...Indices>
+	Mesh& indexRel(unsigned i, Indices... indices){
+		indexRel(i);
+		return indexRel(indices...);
+	}
+
 
 	/// Append color to color buffer
 	Mesh& color(const Color& v) { colors().append(v); return *this; }
