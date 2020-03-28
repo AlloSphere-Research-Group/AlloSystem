@@ -44,7 +44,8 @@
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
-#include "allocore/system/al_Printing.hpp"
+#include <cstring> // memcpy
+#include <functional>
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
@@ -286,6 +287,14 @@ public:
 	/// Get reference to a pixel
 	template<class T> T& at(unsigned x, unsigned y){ return array().as<T>(x,y); }
 	template<class T> const T& at(unsigned x, unsigned y) const { return array().as<T>(x,y); }
+
+	/// Assign pixel values using a visitor function
+
+	/// onPixel is called for each pixel in the texture.
+	/// (s,t) is the texture coordinate in [0,1] at the current pixel.
+	/// rgba should be filled with the desired values. The pixel color array has
+	/// the default value (0,0,0,1).
+	void assign(const std::function<void(float s, float t, float * rgba)>& onPixel);
 
 	/// Flags resubmission of pixel data upon next bind
 

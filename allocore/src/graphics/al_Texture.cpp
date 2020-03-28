@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 
@@ -685,6 +685,54 @@ void Texture::quadViewport(
 	g.popMatrix(g.MODELVIEW);
 }
 
+
+void Texture::assign(const std::function<void(float s, float t, float * rgba)>& onPixel){
+	if(mTarget == TEXTURE_2D){
+		for(int j=0; j<height(); ++j){
+			float s = float(j)/(height()-1);
+			for(int i=0; i<width(); ++i){
+				float t = float(i)/(width()-1);
+				float rgba[4] = {0.f, 0.f, 0.f, 1.f};
+				onPixel(s,t, rgba);
+				#define SET_PIXEL(type, op){\
+					auto * pixel = data<type>() + (j*height()+i)*numComponents();\
+					switch(mFormat){\
+					case Graphics::RGBA:\
+						pixel[0] = rgba[0] op;\
+						pixel[1] = rgba[1] op;\
+						pixel[2] = rgba[2] op;\
+						pixel[3] = rgba[3] op;\
+						break;\
+					case Graphics::RGB:\
+						pixel[0] = rgba[0] op;\
+						pixel[1] = rgba[1] op;\
+						pixel[2] = rgba[2] op;\
+						break;\
+					case Graphics::LUMINANCE_ALPHA:\
+						pixel[0] = rgba[0] op;\
+						pixel[1] = rgba[3] op;\
+						break;\
+					case Graphics::LUMINANCE:\
+						pixel[0] = rgba[0] op;\
+						break;\
+					case Graphics::ALPHA:\
+						pixel[0] = rgba[3] op;\
+						break;\
+					default:;\
+					}\
+				}
+				switch(mType){
+				case Graphics::UBYTE:  SET_PIXEL(uint8_t,  *  255.99); break;
+				case Graphics:: BYTE:  SET_PIXEL( int8_t,  *  127.99 + 128.); break;
+				case Graphics::USHORT: SET_PIXEL(uint16_t, *65535.99); break;
+				case Graphics:: SHORT: SET_PIXEL( int16_t, *32767.99 + 32768.); break;
+				case Graphics::FLOAT:  SET_PIXEL(float,             ); break;
+				default:;
+				}
+			}
+		}
+	}
+}
 
 
 void Texture :: print() {
