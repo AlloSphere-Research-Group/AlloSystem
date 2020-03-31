@@ -296,6 +296,16 @@ public:
 	/// the default value (0,0,0,1).
 	void assign(const std::function<void(float s, float t, float * rgba)>& onPixel);
 
+	template <class Trgba>
+	void assign(const std::function<Trgba (float s, float t)>& onPixel){
+		static_assert(sizeof(Trgba)/sizeof(typename Trgba::value_type)>=4,
+			"Requires 4 element RGBA array");
+		assign([&](float s, float t, float * rgba){
+			auto trgba = onPixel(s,t);
+			for(int i=0; i<4; ++i) rgba[i] = trgba[i];
+		});
+	}
+
 	/// Flags resubmission of pixel data upon next bind
 
 	/// Calling this ensures that pixels get submitted on the next bind().
