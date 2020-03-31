@@ -182,14 +182,14 @@ public:
 
 	/// This converts a coordinate from normalized device coordinate (NDC) space
 	/// to world space. The range of each coordinate in NDC space is [-1,1].
-	Vec3d unproject(const Vec3d& ndc);
+	Vec3d unproject(const Vec3d& ndc) const;
 
 	/// Convert screen pixel coordinate to world position
 	template <class T>
-	Vec3d pixelToWorld(const Vec<2,T>& p);
+	Vec3d pixelToWorld(const Vec<2,T>& p) const;
 
 	template <class T>
-	Vec3d pixelToWorld(T x, T y){ return pixelToWorld(Vec<2,T>(x,y)); }
+	Vec3d pixelToWorld(T x, T y) const { return pixelToWorld(Vec<2,T>(x,y)); }
 
 	/// Transform a vector from world space to clip space
 	template <class T>
@@ -241,7 +241,7 @@ public:
 
 
 template <class T>
-Vec3d Stereographic::pixelToWorld(const Vec<2,T>& p){
+Vec3d Stereographic::pixelToWorld(const Vec<2,T>& p) const {
 	Vec3d ndc;
 	ndc.x = (p.x / mVP.w) * 2. - 1.;
 	ndc.y = (p.y / mVP.h) *-2. + 1.;
