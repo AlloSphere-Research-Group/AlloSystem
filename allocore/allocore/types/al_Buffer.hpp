@@ -220,6 +220,9 @@ public:
 	/// Get absolute index of most recently written element
 	int pos() const { return mPos; }
 
+	/// Get absolute index of oldest element
+	int posOldest() const { auto i=mPos-(fill()-1); return i<0?i+size():i; }
+
 	/// Get fill amount of buffer
 	int fill() const { return mFill; }
 
@@ -286,6 +289,31 @@ public:
 		mElems.resize(n,v);
 		if(mPos >=n) mPos = n-1;
 	}
+
+
+	struct iterator {
+		typedef T value_type;
+		typedef T& reference;
+		typedef T* pointer;
+        typedef std::forward_iterator_tag iterator_category;
+		typedef std::ptrdiff_t difference_type;
+
+		iterator(T * data_, int len_, int tap_, int idx_)
+			: data(data_), len(len_), tap(tap_), idx(idx_){}
+		iterator& operator++(){ ++idx; return *this;}
+		iterator operator++(int){ auto t=*this; ++(*this); return t;}
+		bool operator==(iterator other) const { return idx == other.idx;}
+		bool operator!=(iterator other) const { return !(*this == other);}
+		reference operator*(){ auto i=idx+tap; return data[i<len?i:i-len]; }
+		pointer operator->(){ return &*(*this); }
+	private:
+		T * data;
+		int len, tap, idx;
+	};
+
+	/// @param[in] i	start index past oldest element
+	iterator begin(int i=0){ return iterator(&mElems[0], mElems.size(), posOldest(), i); }
+	iterator   end(){ return iterator(&mElems[0], mElems.size(), posOldest(), fill()); }
 
 protected:
 	std::vector<T, Alloc> mElems;
