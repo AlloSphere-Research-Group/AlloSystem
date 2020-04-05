@@ -103,6 +103,9 @@ public:
 
 	Shader& source(const std::string& v);
 	Shader& source(const std::string& v, Shader::Type type);
+
+	const std::string& source() const { return mSource; }
+
 	Shader& compile();
 	bool compiled() const;
 
