@@ -233,6 +233,8 @@ public:
 		if(mCompileShader){
 			mCompileShader = false; // will only make one attempt
 
+// Note: Presence of backslashes '\' anywhere in code, including comments, are
+// known to trip up compilation in Firefox 74.
 			mShader.preamble(
 R"(
 #ifdef GL_ES
@@ -372,7 +374,7 @@ float _pow5(float x){ float xx=x*x; return xx*xx*x; }
 /// @param[in] N		normal to surface
 /// @param[in] V		direction from surface to eye
 /// @param[in] light	Light structure
-/// \returns light color
+/// returns light color
 LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in Material mat){
 	// Note: light attenuation over distance is an exponential decay (Beer-Lambert)
 	vec3 lightVec = light.pos - pos;
