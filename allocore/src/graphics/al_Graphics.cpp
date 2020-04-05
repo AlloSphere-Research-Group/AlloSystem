@@ -234,232 +234,239 @@ public:
 			mCompileShader = false; // will only make one attempt
 
 			mShader.preamble(
-			R"(
-				#ifdef GL_ES
-				precision mediump float; // req'd by ES2
-				#endif
-			)" +
-				mPreamble
-			+ R"(
-				const float pi = 3.141592653589793;
-				varying vec3 pos;		// position (eye space)
-				varying vec3 normal;	// normal (eye space)
-				varying vec3 posObj;	// position (object space)
-				varying vec4 color;
-				varying vec2 texCoord2;
+R"(
+#ifdef GL_ES
+precision mediump float; // req'd by ES2
+#endif
+)" +
+mPreamble
++ R"(
+const float pi = 3.141592653589793;
+varying vec3 pos;		// position (eye space)
+varying vec3 normal;	// normal (eye space)
+varying vec3 posObj;	// position (object space)
+varying vec4 color;
+varying vec2 texCoord2;
 
-				uniform mat4 view;		// view matrix (convert from world to eye space)
-				uniform bool doTex2;
+uniform mat4 view;		// view matrix (convert from world to eye space)
+uniform bool doTex2;
 
-				struct Fog{
-					vec3 color;
-					float start, end;
-					float scale; // 1/(end-start)
-				};
-				uniform Fog fog;// = Fog(vec3(0.), 0., 1., 1.);
-				varying float fogMix;
-			)"
+struct Fog{
+	vec3 color;
+	float start, end;
+	float scale; // 1/(end-start)
+};
+uniform Fog fog;// = Fog(vec3(0.), 0., 1., 1.);
+varying float fogMix;
+)"
 			);
 
 			mShader.compile(
-			R"(
-				uniform mat4 MV;
-				uniform mat4 P;
-				uniform mat3 normalMatrix;
-				uniform vec4 singleColor;
-				uniform float pointSize;
-				uniform bool hasNormals;
-				attribute vec3 posIn;
-				attribute vec3 normalIn;
-				attribute vec4 colorIn;
-				attribute vec2 texCoord2In;
+// VERTEX PROGRAM
+// ==============
+R"(
+uniform mat4 MV;
+uniform mat4 P;
+uniform mat3 normalMatrix;
+uniform vec4 singleColor;
+uniform float pointSize;
+uniform bool hasNormals;
+attribute vec3 posIn;
+attribute vec3 normalIn;
+attribute vec4 colorIn;
+attribute vec2 texCoord2In;
 
-				void main(){
-					posObj = posIn;
-					color = singleColor.a==8192. ? colorIn : singleColor;
-					if(hasNormals){
-						normal = normalMatrix * normalIn;
-					} else {
-						normal = vec3(1.,0.,0.);
-					}
-					if(doTex2){
-						texCoord2 = texCoord2In;
-					}
-					gl_PointSize = pointSize;
-			)" +
-					mOnVertex
-			+ R"(
-					pos = (MV * vec4(posObj,1.)).xyz; // to eye space
-					gl_Position = P * vec4(pos,1.); // to screen space
+void main(){
+	posObj = posIn;
+	color = singleColor.a==8192. ? colorIn : singleColor;
+	if(hasNormals){
+		normal = normalMatrix * normalIn;
+	} else {
+		normal = vec3(1.,0.,0.);
+	}
+	if(doTex2){
+		texCoord2 = texCoord2In;
+	}
+	gl_PointSize = pointSize;
+)" +
+	mOnVertex +
+R"(
+	pos = (MV * vec4(posObj,1.)).xyz; // to eye space
+	gl_Position = P * vec4(pos,1.); // to screen space
 
-					// fogMix: [0,1] -> [start, end]
-					fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
-				}
-			)",
+	// fogMix: [0,1] -> [start, end]
+	fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
+}
+)",
 
-				"#define MAX_LIGHTS " + std::to_string(AL_MAX_LIGHTS) + "\n" +
-			R"(
-				#ifndef MAX_LIGHTS
-				#define MAX_LIGHTS 4
-				#endif
 
-				// Light source
-				struct Light{
-					vec3 pos;			// Position of light
-					vec3 dir;			// Direction of cone
-					float halfDist;		// Distance at which intensity is 50%
-					float spread;		// Spread of cone, in degrees
-					float strength;		// Overall strength of light
-					vec3 diffuse;		// Component scattered off surface
-					vec3 specular;		// Component bounced/reflected off surface
-					float ambient;		// Amount of light bounced off walls (uses diffuse color)
-				};
+// FRAGMENT PROGRAM
+// ================
+"#define MAX_LIGHTS " + std::to_string(AL_MAX_LIGHTS) + "\n" +
 
-				struct LightFall{ // For storing intermediate results
-					vec3 diffuse;
-					vec3 specular;
-				};
+R"(
+#ifndef MAX_LIGHTS
+#define MAX_LIGHTS 4
+#endif
 
-				void zero(inout LightFall l){
-					l.diffuse = vec3(0.);
-					l.specular = vec3(0.);
-				}
+// Light source
+struct Light{
+	vec3 pos;			// Position of light
+	vec3 dir;			// Direction of cone
+	float halfDist;		// Distance at which intensity is 50%
+	float spread;		// Spread of cone, in degrees
+	float strength;		// Overall strength of light
+	vec3 diffuse;		// Component scattered off surface
+	vec3 specular;		// Component bounced/reflected off surface
+	float ambient;		// Amount of light bounced off walls (uses diffuse color)
+};
 
-				// Surface material
-				struct Material{
-					vec3 diffuse;		// Component scattered off surface
-					vec3 specular;		// Component bounced/reflected off surface
-					vec3 emission;		// Component emitted from surface
-					float shininess;	// Concentration of specular (its lack of scattering)
-					float reflectance;	// Reflectance coef for Fresnel specular factor
-				};
+struct LightFall{ // For storing intermediate results
+	vec3 diffuse;
+	vec3 specular;
+};
 
-				uniform Light lights[MAX_LIGHTS];
-				uniform vec3 globalAmbient;
-				uniform Material materials[2];
-				uniform sampler2D tex2;
-				uniform bool lightTwoSided;
-				uniform bool doLighting;
-				uniform bool colorMaterial;
-				uniform bool materialOneSided;
+void zero(inout LightFall l){
+	l.diffuse = vec3(0.);
+	l.specular = vec3(0.);
+}
 
-				Material lerp(in Material m1, in Material m2, float frac){
-					Material m;
-					m.diffuse    = mix(m1.diffuse,    m2.diffuse,    frac);
-					m.specular   = mix(m1.specular,   m2.specular,   frac);
-					m.emission   = mix(m1.emission,   m2.emission,   frac);
-					m.shininess  = mix(m1.shininess,  m2.shininess,  frac);
-					m.reflectance= mix(m1.reflectance,m2.reflectance,frac);
-					return m;
-				}
+// Surface material
+struct Material{
+	vec3 diffuse;		// Component scattered off surface
+	vec3 specular;		// Component bounced/reflected off surface
+	vec3 emission;		// Component emitted from surface
+	float shininess;	// Concentration of specular (its lack of scattering)
+	float reflectance;	// Reflectance coef for Fresnel specular factor
+};
 
-				float _pow5(float x){ float xx=x*x; return xx*xx*x; }
+uniform Light lights[MAX_LIGHTS];
+uniform vec3 globalAmbient;
+uniform Material materials[2];
+uniform sampler2D tex2;
+uniform bool lightTwoSided;
+uniform bool doLighting;
+uniform bool colorMaterial;
+uniform bool materialOneSided;
 
-				/* OpenGL fixed pipeline lighting (li = light i, m = material):
-					Em + Ag Am +
-					sum_i{ ali [Ali Am + max(L.N, 0) Dli Dm + max(H.N, 0)^s Sli Sm] }
-				*/
+Material lerp(in Material m1, in Material m2, float frac){
+	Material m;
+	m.diffuse    = mix(m1.diffuse,    m2.diffuse,    frac);
+	m.specular   = mix(m1.specular,   m2.specular,   frac);
+	m.emission   = mix(m1.emission,   m2.emission,   frac);
+	m.shininess  = mix(m1.shininess,  m2.shininess,  frac);
+	m.reflectance= mix(m1.reflectance,m2.reflectance,frac);
+	return m;
+}
 
-				/// Blinn-Phong lighting
-				///
-				/// @param[in] pos		position on surface
-				/// @param[in] N		normal to surface
-				/// @param[in] V		direction from surface to eye
-				/// @param[in] light	Light structure
-				/// \returns light color
-				LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in Material mat){
-					// Note: light attenuation over distance is an exponential decay (Beer-Lambert)
-					vec3 lightVec = light.pos - pos;
-					vec3 L = normalize(lightVec); // dir from surface to light
+float _pow5(float x){ float xx=x*x; return xx*xx*x; }
 
-					float intens = light.strength;
+/* OpenGL fixed pipeline lighting (li = light i, m = material):
+	Em + Ag Am +
+	sum_i{ ali [Ali Am + max(L.N, 0) Dli Dm + max(H.N, 0)^s Sli Sm] }
+*/
 
-					// Distance attenuation: 1/(1+[d/h]^2) = h^2 / (h^2 + d^2)
-					{	float hh = light.halfDist*light.halfDist;
-						intens *= hh / (hh + dot(lightVec,lightVec));
-					}
+/// Blinn-Phong lighting
+///
+/// @param[in] pos		position on surface
+/// @param[in] N		normal to surface
+/// @param[in] V		direction from surface to eye
+/// @param[in] light	Light structure
+/// \returns light color
+LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in Material mat){
+	// Note: light attenuation over distance is an exponential decay (Beer-Lambert)
+	vec3 lightVec = light.pos - pos;
+	vec3 L = normalize(lightVec); // dir from surface to light
 
-					// Spotlight
-					if(light.spread < 180.){
-						float coneAmt = -dot(light.dir, L); // cos of angle: [1,-1] -> [coincident, opposing]
-						//coneAmt = coneAmt*-0.5+0.5; // [1,-1] -> [0,1]
-						float cosMax = cos(light.spread * pi/180.);
-						float coneDist = (1.-coneAmt)/(1.-cosMax); // apx dist from cone center [0,1]
-						//float coneAmp = 1.-min(coneDist,1.); // linear falloff
-						float coneAmp = min(coneDist,1.)-1.; coneAmp*=coneAmp; // parabolic falloff
-						intens *= coneAmp;
-					}
+	float intens = light.strength;
 
-					// Diffuse/specular
-					float diffAmt = (max(dot(N,L), 0.) + light.ambient) * intens;
-					vec3 H = normalize(L + V); // half-vector
-					float specAmt = pow(max(dot(N,H), 0.), mat.shininess) * intens; // Blinn-Phong
-					//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), mat.shininess*0.25) * intens; // Phong
+	// Distance attenuation: 1/(1+[d/h]^2) = h^2 / (h^2 + d^2)
+	{	float hh = light.halfDist*light.halfDist;
+		intens *= hh / (hh + dot(lightVec,lightVec));
+	}
 
-					/* Specular approx [Lyon, 1993. "Phong Shading Reformulation"]
-					vec3 R = reflect(-L,N), D = R-V;
-					//vec3 H = L+V, D = dot(H,N)*N - H; // bug: flaring effect
-					//float c = 1.-min(1.,mat.shininess*0.25*0.5*dot(D,D)); // 1st order apx
-					float c = 1.-min(1.,mat.shininess*0.25*0.25*dot(D,D)); c*=c; // 2nd order apx
-					//float c = 1.-min(1.,mat.shininess*0.25*0.125*dot(D,D)); c*=c; c*=c; // 3rd order apx
-					float specAmt = c * intens;
-					//*/
+	// Spotlight
+	if(light.spread < 180.){
+		float coneAmt = -dot(light.dir, L); // cos of angle: [1,-1] -> [coincident, opposing]
+		//coneAmt = coneAmt*-0.5+0.5; // [1,-1] -> [0,1]
+		float cosMax = cos(light.spread * pi/180.);
+		float coneDist = (1.-coneAmt)/(1.-cosMax); // apx dist from cone center [0,1]
+		//float coneAmp = 1.-min(coneDist,1.); // linear falloff
+		float coneAmp = min(coneDist,1.)-1.; coneAmp*=coneAmp; // parabolic falloff
+		intens *= coneAmp;
+	}
 
-					// Fresnel "specular grazing" using Schlick apx
-					specAmt *= mix(mat.reflectance, 1., _pow5(1. - dot(H,V)));
+	// Diffuse/specular
+	float diffAmt = (max(dot(N,L), 0.) + light.ambient) * intens;
+	vec3 H = normalize(L + V); // half-vector
+	float specAmt = pow(max(dot(N,H), 0.), mat.shininess) * intens; // Blinn-Phong
+	//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), mat.shininess*0.25) * intens; // Phong
 
-					LightFall fall;
-					fall.diffuse  = light.diffuse  * diffAmt;
-					fall.specular = light.specular * specAmt;
-			)" +
-					mOnLight
-			+ R"(
-					return fall;
-				}
+	/* Specular approx [Lyon, 1993. "Phong Shading Reformulation"]
+	vec3 R = reflect(-L,N), D = R-V;
+	//vec3 H = L+V, D = dot(H,N)*N - H; // bug: flaring effect
+	//float c = 1.-min(1.,mat.shininess*0.25*0.5*dot(D,D)); // 1st order apx
+	float c = 1.-min(1.,mat.shininess*0.25*0.25*dot(D,D)); c*=c; // 2nd order apx
+	//float c = 1.-min(1.,mat.shininess*0.25*0.125*dot(D,D)); c*=c; c*=c; // 3rd order apx
+	float specAmt = c * intens;
+	//*/
 
-				vec3 lightColor(
-					in vec3 pos, in vec3 N, in vec3 V,
-					in Material material
-				){
-					LightFall lsum;
-					zero(lsum);
-					for(int i=0; i<MAX_LIGHTS; ++i){
-						if(lights[i].strength != 0.){
-							LightFall l = light(pos, N, V, lights[i], material);
-							lsum.diffuse += l.diffuse;
-							lsum.specular += l.specular;
-						}
-					}
+	// Fresnel "specular grazing" using Schlick apx
+	specAmt *= mix(mat.reflectance, 1., _pow5(1. - dot(H,V)));
 
-					return (lsum.diffuse + globalAmbient) * material.diffuse
-						+ lsum.specular * material.specular
-						+ material.emission;
-				}
+	LightFall fall;
+	fall.diffuse  = light.diffuse  * diffAmt;
+	fall.specular = light.specular * specAmt;
+)" +
+	mOnLight +
+R"(
+	return fall;
+}
 
-				void main(){
-					vec3 col = color.rgb;
-					if(doTex2){
-						col *= texture2D(tex2, texCoord2).rgb;
-					}
-					if(doLighting){
-						vec3 N = normalize(normal);
-						vec3 V = normalize(-pos); // surface to eye
-						// Two-sided lighting: make normal always face eye
-						if(lightTwoSided && !gl_FrontFacing) N=-N;
-						Material material;
-						if(gl_FrontFacing || materialOneSided) material = materials[0];
-						else material = materials[1];
-						if(colorMaterial) material.diffuse *= col;
-			)" +
-						mOnMaterial
-			+ R"(
-						col = lightColor(pos, N, V, material);
-					}
-					col = mix(col, fog.color, fogMix);
-					gl_FragColor = vec4(col, color.a);
-					//gl_FragColor = vec4(1.,0.,0.,1.); //debug
-				}
-			)");
+vec3 lightColor(
+	in vec3 pos, in vec3 N, in vec3 V,
+	in Material material
+){
+	LightFall lsum;
+	zero(lsum);
+	for(int i=0; i<MAX_LIGHTS; ++i){
+		if(lights[i].strength != 0.){
+			LightFall l = light(pos, N, V, lights[i], material);
+			lsum.diffuse += l.diffuse;
+			lsum.specular += l.specular;
+		}
+	}
+
+	return (lsum.diffuse + globalAmbient) * material.diffuse
+		+ lsum.specular * material.specular
+		+ material.emission;
+}
+
+void main(){
+	vec3 col = color.rgb;
+	if(doTex2){
+		col *= texture2D(tex2, texCoord2).rgb;
+	}
+	if(doLighting){
+		vec3 N = normalize(normal);
+		vec3 V = normalize(-pos); // surface to eye
+		// Two-sided lighting: make normal always face eye
+		if(lightTwoSided && !gl_FrontFacing) N=-N;
+		Material material;
+		if(gl_FrontFacing || materialOneSided) material = materials[0];
+		else material = materials[1];
+		if(colorMaterial) material.diffuse *= col;
+)" +
+		mOnMaterial +
+R"(
+		col = lightColor(pos, N, V, material);
+	}
+	col = mix(col, fog.color, fogMix);
+	gl_FragColor = vec4(col, color.a);
+	//gl_FragColor = vec4(1.,0.,0.,1.); //debug
+}
+)"
+			);
 
 			if(mShader.linked()){
 				mLocPos       = mShader.attribute("posIn");
@@ -494,6 +501,7 @@ public:
 				mShader.end();
 			} else {
 				printf("Critical error: al::Graphics failed to compile shader\n");
+				mShader.printLog();
 			}
 		}
 
