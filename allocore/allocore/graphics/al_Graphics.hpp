@@ -301,6 +301,9 @@ public:
 	/// Turn face culling on/off and set the face direction to cull
 	void cullFace(bool b, Direction d);
 
+	/// Turn back face culling on/off
+	void cullBack(bool b){ cullFace(b, BACK); }
+
 
 	/// Set antialiasing mode
 	void antialiasing(AntiAliasMode v);
