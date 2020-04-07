@@ -37,12 +37,12 @@ EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
 mkdir -p $OUTPUT_DIR
 
 #$EM_DIR/emcc $CPPFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.html
-#$EM_DIR/emcc $CPPFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js
-
-sed s/PROJ_NAME/$PROJ_NAME/g emMain.html > $OUTPUT_DIR/$PROJ_NAME.html
+$EM_DIR/emcc $CPPFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js
 
 # Exit if compilation errors...
 if [[ $? != 0 ]]; then exit $?; fi
+
+sed s/PROJ_NAME/$PROJ_NAME/g emMain.html > $OUTPUT_DIR/$PROJ_NAME.html
 
 # Run HTML
 # You cannot simply double-click the .html since you need a local server.
