@@ -24,20 +24,19 @@ OUTPUT_DIR="$BUILD_DIR/bin/$PROJ_NAME"
 OBJS=`ls $BUILD_DIR/obj/*.o`
 CPPFLAGS="-I$BUILD_DIR/include -O2"
 CPPFLAGS+=' -DRUN_MAIN_SOURCE_PATH="./"'
-CXXFLAGS="-std=c++14 -O2"
+CFLAGS="-O2"
+CXXFLAGS="-std=c++14"
 EMFLAGS+=" -s USE_SDL=2"
 #EMFLAGS+=" -s LEGACY_GL_EMULATION=1"
 #EMFLAGS+=" -s USE_WEBGL2=1" #default, recommended setting
 EMFLAGS+=" -s FULL_ES2=1" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
-#EMFLAGS+=" -s EMTERPRETIFY=1"
-#EMFLAGS+=" -s LINKABLE=1"
 EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
 #EMFLAGS+=" --cpuprofiler" # adds profiler to generated page
 
 mkdir -p $OUTPUT_DIR
 
-#$EM_DIR/emcc $CPPFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.html
-$EM_DIR/emcc $CPPFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js
+#$EM_DIR/emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.html
+$EM_DIR/emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js
 
 # Exit if compilation errors...
 if [[ $? != 0 ]]; then exit $?; fi
