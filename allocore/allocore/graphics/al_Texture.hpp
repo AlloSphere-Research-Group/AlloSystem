@@ -291,18 +291,31 @@ public:
 	/// Assign pixel values using a visitor function
 
 	/// onPixel is called for each pixel in the texture.
-	/// (s,t) is the texture coordinate in [0,1] at the current pixel.
+	/// (i,j) is the pixel column and row.
 	/// rgba should be filled with the desired values. The pixel color array has
 	/// the default value (0,0,0,1).
-	void assign(const std::function<void(float s, float t, float * rgba)>& onPixel);
+	void assign(const std::function<void(int i, int j, float * rgba)>& onPixel);
 
 	template <class Trgba>
-	void assign(const std::function<Trgba (float s, float t)>& onPixel){
+	void assign(const std::function<Trgba (int i, int j)>& onPixel){
 		static_assert(sizeof(Trgba)/sizeof(typename Trgba::value_type)>=4,
 			"Requires 4 element RGBA array");
-		assign([&](float s, float t, float * rgba){
-			auto trgba = onPixel(s,t);
+		assign([&onPixel](int i, int j, float * rgba){
+			auto trgba = onPixel(i,j);
 			for(int i=0; i<4; ++i) rgba[i] = trgba[i];
+		});
+	}
+
+	/// Assign pixel values using a visitor function
+	void assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel);
+		// Note: Through a C++ quirk, cannot overload on std::function
+
+	template <class Trgba>
+	void assignFromTexCoord(const std::function<Trgba (float s, float t)>& onPixel){
+		const auto rw = 1.f/(width()-1);
+		const auto rh = 1.f/(height()-1);
+		assign<Trgba>([rw,rh,&onPixel](int i, int j){
+			return onPixel(float(i)*rw, float(j)*rh);
 		});
 	}
 

@@ -685,15 +685,12 @@ void Texture::quadViewport(
 	g.popMatrix(g.MODELVIEW);
 }
 
-
-void Texture::assign(const std::function<void(float s, float t, float * rgba)>& onPixel){
+void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPixel){
 	if(mTarget == TEXTURE_2D){
 		for(int j=0; j<height(); ++j){
-			float s = float(j)/(height()-1);
 			for(int i=0; i<width(); ++i){
-				float t = float(i)/(width()-1);
 				float rgba[4] = {0.f, 0.f, 0.f, 1.f};
-				onPixel(s,t, rgba);
+				onPixel(i,j, rgba);
 				#define SET_PIXEL(type, op){\
 					auto * pixel = data<type>() + (j*height()+i)*numComponents();\
 					switch(mFormat){\
@@ -734,6 +731,13 @@ void Texture::assign(const std::function<void(float s, float t, float * rgba)>& 
 	}
 }
 
+void Texture::assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel){
+	const float rw = 1.f/(width()-1);
+	const float rh = 1.f/(height()-1);
+	assign([rw,rh, &onPixel](int i, int j, float * rgba){
+		onPixel(float(i)*rw, float(j)*rh, rgba);
+	});
+}
 
 void Texture :: print() {
 
