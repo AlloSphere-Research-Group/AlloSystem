@@ -42,7 +42,7 @@
 	Lance Putnam, 2006, putnam.lance@gmail.com
 */
 
-
+#include "allocore/system/al_Config.h" // uint32_t
 #include <time.h> // time()
 #include <cmath>
 
