@@ -7,7 +7,6 @@ ALLO_DIR=$PWD
 BUILD_DIR=$ALLO_DIR/build/em/
 EM_DIR=`grep EMSCRIPTEN_ROOT ~/.emscripten | cut -d = -f 2 | sed -e s/^..// -e s/.$//`
 
-sed 's/^..\(.*\).$/\1/'
 export PATH=$EM_DIR:$PATH # Change PATH since emmake calls emar, etc.
 
 for libdir in $LIB_DIRS; do
