@@ -244,10 +244,10 @@ bool ShaderProgram::compile(
 		attach(mShaderG);
 	}
 	link(false);
-	/*mShaderV.printLog();
+	mShaderV.printLog();
 	mShaderF.printLog();
-	if(bGeom) mShaderG.printLog();*/
-	printLog();
+	if(bGeom) mShaderG.printLog();
+	//printLog(); // program log is usually not helpful or is redundant
 
 	// OpenGL.org says to detach shaders after linking:
 	//   https://www.opengl.org/wiki/Shader_Compilation
