@@ -239,6 +239,10 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_WRAP_EXTRA
 #endif
 
+#if !defined(AL_GRAPHICS_USE_OPENGLES2) && !defined(AL_GRAPHICS_USE_OPENGLES3)
+	#define AL_GRAPHICS_TEXTURE_NEEDS_ENABLE
+#endif
+
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
 	#define AL_GRAPHICS_SUPPORTS_MIPMAP
 #endif

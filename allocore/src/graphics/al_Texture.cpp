@@ -264,8 +264,10 @@ void Texture :: bind(int unit) {
 	if(tryBind()){
 		AL_GRAPHICS_ERROR("binding texture", id());
 
+		#ifdef AL_GRAPHICS_TEXTURE_NEEDS_ENABLE
 		glEnable(target());
 			AL_GRAPHICS_ERROR("enable target binding texture", id());
+		#endif
 
 		shapeFromArray();
 
@@ -283,7 +285,9 @@ void Texture :: unbind(int unit) {
 	// multitexturing:
 	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(target(), 0);
+	#ifdef AL_GRAPHICS_TEXTURE_NEEDS_ENABLE
 	glDisable(target());
+	#endif
 }
 
 void Texture :: resetArray(unsigned align) {
