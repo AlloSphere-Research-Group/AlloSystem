@@ -193,6 +193,9 @@ public:
 		mCurrentColor.set(r,g,b,a);
 	}
 
+	const Mat4f& modelView() const { return mMatrixStacks[MODELVIEW].get().top(); }
+	const Mat4f& projection() const { return mMatrixStacks[PROJECTION].get().top(); }
+
 	void matrixMode(MatrixMode mode){ mMatrixMode=mode; }
 	void pushMatrix(){
 		//printf("push %s (%d/%d)\n", mMatrixMode==MODELVIEW?"MV":"Proj", (int)currentMatrixStack().get().size(), (int)maxStackSize(mMatrixMode));
@@ -733,8 +736,6 @@ protected:
 	const MatrixStack& currentMatrixStack() const {
 		return mMatrixStacks[mMatrixMode];
 	}
-	const Mat4f& modelView() const { return mMatrixStacks[MODELVIEW].get().top(); }
-	const Mat4f& projection() const { return mMatrixStacks[PROJECTION].get().top(); }
 	Mat4f& currentMatrix(){ return currentMatrixStack().var().top(); }
 	const Mat4f& currentMatrix() const { return currentMatrixStack().get().top(); }
 	ShaderProgram mShader;
@@ -773,6 +774,16 @@ public:
 	}
 	void currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
 	void pointSize(float v){ glPointSize(v); }
+
+	const Mat4f& modelView() const {
+		glGetFloatv(GL_MODELVIEW_MATRIX, &mModelViewTemp[0]);
+		return mModelViewTemp;
+	}
+	const Mat4f& projection() const { 
+		glGetFloatv(GL_PROJECTION_MATRIX, &mProjectionTemp[0]);
+		return mProjectionTemp;
+	}
+	
 	void matrixMode(MatrixMode mode){
 		switch(mode){
 		case MODELVIEW:		glMatrixMode(GL_MODELVIEW); break;
@@ -946,6 +957,7 @@ public:
 private:
 	int mRescaleNormal = 0;
 	std::vector<unsigned short> mIndices16;
+	mutable Mat4f mModelViewTemp, mProjectionTemp;
 };
 #endif // AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 

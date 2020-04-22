@@ -415,6 +415,9 @@ public:
 	/// Get current viewport
 	Viewport viewport() const;
 
+	const Mat4f& modelView() const;
+	const Mat4f& projection() const;
+	Mat4f modelViewProjection() const { return projection()*modelView(); }
 
 	/// Set current matrix
 	void matrixMode(MatrixMode mode);
@@ -656,6 +659,8 @@ protected:
 		virtual void disable(Capability v){}
 		virtual void currentColor(float r, float g, float b, float a){}
 
+		virtual const Mat4f& modelView() const = 0;
+		virtual const Mat4f& projection() const = 0;
 		virtual void matrixMode(MatrixMode mode){}
 		virtual void pushMatrix(){}
 		virtual void popMatrix(){}
@@ -757,6 +762,8 @@ const char * toString(Graphics::Format v);
 inline void Graphics::enable(Capability v){ mBackend->enable(v); }
 inline void Graphics::disable(Capability v){ mBackend->disable(v); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ mBackend->currentColor(r,g,b,a); }
+inline const Mat4f& Graphics::modelView() const { return mBackend->modelView(); }
+inline const Mat4f& Graphics::projection() const { return mBackend->projection(); }
 inline void Graphics::matrixMode(MatrixMode mode){ mBackend->matrixMode(mode); }
 inline void Graphics::pushMatrix(){ mBackend->pushMatrix(); }
 inline void Graphics::popMatrix(){ mBackend->popMatrix(); }
