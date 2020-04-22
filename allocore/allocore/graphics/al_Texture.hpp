@@ -397,17 +397,17 @@ protected:
 	//int mBorder;
 	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc.
 	Format mFormat;				// RGBA, ALPHA, etc.
-	int mTexelFormat;			// default is 0 = auto
+	int mTexelFormat=0;			// default is 0 = auto
 	DataType mType;				// UBYTE, FLOAT, etc.
 	Wrap mWrapS, mWrapT, mWrapR;
 	Filter mFilterMin, mFilterMag;
-	unsigned mWidth, mHeight, mDepth;
+	unsigned mWidth=0, mHeight=0, mDepth=0;
 
 	Array mArray;				// Array representation of client-side pixel data
-	bool mParamsUpdated;		// Flags change in texture params (wrap, filter)
-	bool mPixelsUpdated;		// Flags change in pixel data
-	bool mShapeUpdated;			// Flags change in size, format, type, etc.
-	bool mArrayDirty;
+	bool mParamsUpdated=true;	// Flags change in texture params (wrap, filter)
+	bool mPixelsUpdated=true;	// Flags change in pixel data
+	bool mShapeUpdated=true;	// Flags change in size, format, type, etc.
+	bool mArrayDirty=false;
 	bool mMipmap;
 
 	virtual void onCreate();
@@ -480,14 +480,6 @@ template <class T>
 void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, unsigned c){
 	static Graphics::Format fmts[] = {Graphics::LUMINANCE, Graphics::LUMINANCE_ALPHA, Graphics::RGB, Graphics::RGBA};
 	if(1 <= c && c <= 4) allocate(src, w,h,d, fmts[c-1]);
-}
-
-inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){
-	if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
-		mWrapS = S; mWrapT = T; mWrapR = R;
-		mParamsUpdated = true;
-	}
-	return *this;
 }
 
 } // al::

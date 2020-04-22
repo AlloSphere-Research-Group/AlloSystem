@@ -7,20 +7,13 @@ namespace al{
 void Texture::init(){
 	wrap(Texture::CLAMP_TO_EDGE);
 	filter(Texture::LINEAR);
-	mTexelFormat = 0;
-	mShapeUpdated = true;
-	mPixelsUpdated = true;
-	mArrayDirty = false;
 }
 
 
 Texture::Texture()
 : 	mTarget(NO_TARGET),
 	mFormat(Graphics::RGBA),
-	mType(Graphics::UBYTE),
-	mWidth(0),
-	mHeight(0),
-	mDepth(0)
+	mType(Graphics::UBYTE)
 {
 	init();
 }
@@ -34,9 +27,7 @@ Texture :: Texture(
 :	mTarget(TEXTURE_1D),
 	mFormat(format),
 	mType(type),
-	mWidth(width),
-	mHeight(0),
-	mDepth(0)
+	mWidth(width)
 {
 	init();
 	if(alloc) allocate();
@@ -52,8 +43,7 @@ Texture :: Texture(
 	mFormat(format),
 	mType(type),
 	mWidth(width),
-	mHeight(height),
-	mDepth(0)
+	mHeight(height)
 {
 	init();
 	if(alloc) allocate();
@@ -133,6 +123,14 @@ Texture& Texture::filterMag(Filter v){
 	default:;
 	}
 	return update(v, mFilterMag, mParamsUpdated);
+}
+
+Texture& Texture::wrap(Wrap S, Wrap T, Wrap R){
+	if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
+		mWrapS = S; mWrapT = T; mWrapR = R;
+		mParamsUpdated = true;
+	}
+	return *this;
 }
 
 
@@ -405,6 +403,7 @@ void Texture::sendParams(bool force){
 			// deprecated in OpenGL 3.0 and above
 			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 		}*/
+			AL_GRAPHICS_ERROR("Texture::sendParams (glTexParameteri)", id());
 		mParamsUpdated = false;
 	}
 }
@@ -420,7 +419,10 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 
 		auto genMipmap = [this](){
 			#ifdef AL_GRAPHICS_SUPPORTS_MIPMAP
-			if(mMipmap) glGenerateMipmap(target());
+			if(mMipmap){
+				glGenerateMipmap(target());
+					AL_GRAPHICS_ERROR("Texture::sendPixels (glGenerateMipmap)", id());
+			}
 			#endif
 		};
 
@@ -437,18 +439,21 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 			case TEXTURE_1D:
 				glTexSubImage1D(target(), 0, 0, width(), format(), type(), pixels);
+					AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
 				genMipmap();
 				break;
 			#endif
 
 			case TEXTURE_2D:
 				glTexSubImage2D(target(), 0, 0,0, width(), height(), format(), type(), pixels);
+					AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
 				genMipmap();
 				break;
 
 			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 			case TEXTURE_3D:
 				glTexSubImage3D(target(), 0, 0,0,0, width(), height(), depth(), format(), type(), pixels);
+					AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
 				genMipmap();
 				break;
 			#endif
@@ -458,7 +463,6 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 			default:
 				AL_WARN("invalid texture target %d", target());
 		}
-		AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
 
 		// Set alignment back to default
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
