@@ -269,6 +269,7 @@ void Scene :: mesh(unsigned int meshIdx, Mesh& mesh) const {
 		}
 		mesh.primitive(prim);
 
+		int Nv = mesh.vertices().size(); // existing number of verts
 		bool hasNormals = amesh.HasNormals();
 		bool hasColors = amesh.HasVertexColors(0);
 		bool hasTexcoords = amesh.HasTextureCoords(0);
@@ -279,8 +280,6 @@ void Scene :: mesh(unsigned int meshIdx, Mesh& mesh) const {
 			if(hasNormals) mesh.normal(vec3FromAIVector3D(amesh.mNormals[i]));
 			if(hasTexcoords) mesh.texCoord(vec2FromAIVector3D(amesh.mTextureCoords[0][i]));
 		}
-
-		int Nv = mesh.vertices().size(); // since we are appending to mesh
 
 		for(unsigned j=0; j<amesh.mNumFaces; ++j){
 			const aiFace& face = amesh.mFaces[j];
