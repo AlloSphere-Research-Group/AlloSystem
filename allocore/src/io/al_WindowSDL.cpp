@@ -192,7 +192,8 @@ private:
 
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
-			{	bool keyDown = (ev.type == SDL_KEYDOWN);
+			if(ev.key.repeat == 0){
+				bool keyDown = (ev.type == SDL_KEYDOWN);
 				//printf("Key %s: %s (sym=%#x)\n", keyDown?"down":"up", SDL_GetKeyName(ev.key.keysym.sym), ev.key.keysym.sym);
 				win->mKeyboard.setKey(sdlToAlloKey(ev.key.keysym.sym), keyDown);
 				setModifiers(ev);
