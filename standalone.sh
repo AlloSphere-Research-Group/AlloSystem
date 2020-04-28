@@ -44,24 +44,24 @@ if uname | grep -q MINGW; then
 		for dir in $LIBDIRS; do
 			for lib in $LIBNAMES; do
 				DIR_LIB=$dir$lib
-				if files_exist $DIR_LIB; then LIBPATHS+=" $DIR_LIB"; fi
+				if files_exist $DIR_LIB; then
+					LIBPATHS+=" $DIR_LIB";
+					# Recurse to handle evil dependent dependencies
+					NEWLIBS="`getDeps $DIR_LIB`"
+					#echo $NEWLIBS
+					for newlib in $NEWLIBS; do
+						if [[ $LIBPATHS != *"$newlib"* ]]; then
+							LIBPATHS+=" $newlib"
+						fi
+					done
+				fi
+
 			done
 		done
 		echo $LIBPATHS
 	}
 
 	LIBS=`getDeps "${BUILDEXEBASE}.exe"`
-
-	# Drill down one more layer to check if dependencies have dependencies
-	# TODO: make this recursive!!!
-	for lib in $LIBS; do
-		NEWLIBS="`getDeps $lib`"
-		for newlib in $NEWLIBS; do
-			if [[ $LIBS != *"$newlib"* ]]; then
-				LIBS+=" $newlib"
-			fi
-		done
-	done
 	#echo $LIBS
 
 elif uname | grep -q Darwin; then
