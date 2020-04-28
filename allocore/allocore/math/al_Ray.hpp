@@ -64,9 +64,10 @@ public:
 		set(origin,direction);
 	}
 
-	void set(Vec<3,T> origin, Vec<3,T> direction){
-		o.set(origin);
-		d.set(direction.normalized());
+	Ray& set(Vec<3,T> origin, Vec<3,T> direction){
+		o = origin;
+		d = direction.normalized();
+		return *this;
 	}
 
 	// return point on ray
