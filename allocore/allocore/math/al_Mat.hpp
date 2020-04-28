@@ -265,8 +265,26 @@ public:
 	const Vec<N,T>& col(int i) const { return Vec<N,T>::pun(elems() + i*N); }
 	Vec<N,T>& col(int i){ return Vec<N,T>::pun(elems() + i*N); }
 
+	template <unsigned Index>
+	const Vec<N,T>& col() const {
+		static_assert(Index < N, "Column index out of bounds");
+		return col(Index);
+	}
+
+	template <unsigned Index>
+	Vec<N,T>& col(){
+		static_assert(Index < N, "Column index out of bounds");
+		return col(Index);
+	}
+
 	/// Return row i as vector
 	Vec<N,T> row(int i) const { return Vec<N,T>(elems()+i, N); }
+
+	template <unsigned Index>
+	Vec<N,T> row() const {
+		static_assert(Index < N, "Row index out of bounds");
+		return row(Index);
+	}
 
 	/// Return diagonal
 	Vec<N,T> diagonal() const { return Vec<N,T>(elems(), N+1); }
