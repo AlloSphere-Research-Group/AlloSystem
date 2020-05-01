@@ -78,46 +78,70 @@ public:
 	Vec<3,T>& origin(){ return o; }
 	Vec<3,T>& direction(){ return d; }
 
-
+	/// Get intersection with plane
 	T intersectPlane(Vec<3,T> p0, Vec<3,T> n){
 		T den = n.dot(d);
-		if(den == 0) return -1;
+		if(den == T(0)) return -1;
 		return n.dot(p0 - o) / den;
 	}
 
+	/// Get intersection with circle
 	T intersectCircle(Vec<3,T> p0, Vec<3,T> n, T r){
 		T den = n.dot(d);
-		if(den == 0) return -1;
+		if(den == T(0)) return -1;
 		T t = n.dot(p0 - o) / den;
 		if( ((*this)(t)-p0).mag() <= r) return t;
 		else return -1;
 	}
 
-	// intersect sphere
-	T intersectSphere( Vec<3,T> cen, T radius ){
-		Vec<3,T> o_c = o - cen;
-		T A = d.dot(d);
-		T B = 2. * ( d.dot( o_c ));
-		T C = (o_c.dot(o_c)) - radius*radius;
-		T det = B*B - 4*A*C;
+	template <int N>
+	static T intersectSphereBase(const Vec<N,T>& dir, const Vec<N,T>& dv, T radius){
+		T A = dir.dot(dir);
+		T B = T(2) * dir.dot(dv);
+		T C = dv.dot(dv) - radius*radius;
+		T det = B*B - T(4)*A*C;
 
-		if( det > 0. ){
-			T t1 = (-B - sqrt(det) ) / (2.*A);
-			if ( t1 > 0. ) return t1;
-			T t2 = (-B + sqrt(det) ) / (2.*A);
-			if ( t2 > 0. ) return t2;
-		} else if ( det == 0. ){
-			T t = -B / (2.*A);
-			if ( t > 0. ) return t;
+		if(det > T(0)){
+			T inv2A = T(-1) / (T(2)*A);
+			T r1 =         B * inv2A;
+			T r2 = sqrt(det) * inv2A;
+			if(r1 >-r2) return r1 + r2; // (-B - det^1/2) / (2A) > 0
+			if(r1 > r2) return r1 - r2; // (-B + det^1/2) / (2A) > 0
+		} else if(det == T(0)){
+			T t = B / (T(-2)*A);
+			if(t > T(0)) return t;
 		}
-		return -1.; // will be ignoring negative intersections -1 qualifies a miss
+		return -1.; // negative intersection qualifies as a miss
 	}
 
-	bool intersectsSphere( Vec<3,T> cen, T radius){
+	/// Get intersection with sphere
+	T intersectSphere(const Vec<3,T>& cen, T radius) const {
+		return intersectSphereBase(d, o-cen, radius);
+	}
+
+	/// Returns whether ray intersects sphere
+	bool intersectsSphere(const Vec<3,T>& cen, T radius) const {
 		return intersectSphere(cen,radius) > 0.;
 	}
 
-	bool intersectsBox(Vec<3,T> cen, Vec<3,T> scl, float t0=0.f, float t1 = 9e9){
+	/// Get intersection with cylinder perpendicular to axis-aligned plane
+	template <unsigned A1, unsigned A2>
+	T intersectCylinderAA(T radius) const {
+		static_assert(A1<3 && A2<3 && A1!=A2, "Invalid axes");
+		return intersectSphereBase(Vec<2,T>(d[A1], d[A2]), Vec<2,T>(o[A1],o[A2]), radius);
+	}
+
+	/// Get intersection with cylinder positioned at origin oriented with Z axis
+	T intersectCylinderXY(T radius) const {
+		return intersectCylinderAA<0,1>(radius);
+	}
+
+	/// Get intersection with cylinder positioned at origin oriented with Y axis
+	T intersectCylinderXZ(T radius) const {
+		return intersectCylinderAA<2,0>(radius);
+	}
+
+	bool intersectsBox(const Vec<3,T>& cen, const Vec<3,T>& scl, float t0=0.f, float t1=9e9) const {
 		// courtesy of http://www.cs.utah.edu/~awilliam/box/
 		float tmin, tmax, tymin, tymax, tzmin, tzmax;
 
@@ -152,51 +176,12 @@ public:
 		if (tzmax < tmax)
 			tmax = tzmax;
 		return ( (tmin < t1) && (tmax > t0) );
-
-	}
-
-	// intersect cylinder positioned at origin oriented with Z axis
-	T intersectCylinderXY( T radius ){
-		T A = d.x*d.x + d.y*d.y;
-		T B = 2. * (d.x*o.x + d.y*o.y);
-		T C = (o.x*o.x + o.y*o.y) - radius*radius;
-		T det = B*B - 4*A*C;
-
-		if( det > 0. ){
-			T t1 = (-B - sqrt(det) ) / (2.*A);
-			if ( t1 > 0. ) return t1;
-			T t2 = (-B + sqrt(det) ) / (2.*A);
-			if ( t2 > 0. ) return t2;
-		} else if ( det == 0. ){
-			T t = -B / (2.*A);
-			if ( t > 0. ) return t;
-		}
-		return -1.; // will be ignoring negative intersections so this is ok for now
-	}
-
-	// intersect cylinder positioned at origin oriented with Y axis
-	T intersectCylinderXZ( T radius ){
-		T A = d.x*d.x + d.z*d.z;
-		T B = 2. * (d.x*o.x + d.z*o.z);
-		T C = (o.x*o.x + o.z*o.z) - radius*radius;
-		T det = B*B - 4*A*C;
-
-		if( det > 0. ){
-			T t1 = (-B - sqrt(det) ) / (2.*A);
-			if ( t1 > 0. ) return t1;
-			T t2 = (-B + sqrt(det) ) / (2.*A);
-			if ( t2 > 0. ) return t2;
-		} else if ( det == 0. ){
-			T t = -B / (2.*A);
-			if ( t > 0. ) return t;
-		}
-		return -1.; // will be ignoring negative intersections so this is ok for now
 	}
 
 	// intersect with the capsule shape of the AlloSphere
 	// assumes the ray is originating near the center of the sphere
 	// check this..
-	T intersectAllosphere(){
+	T intersectAllosphere() const {
 		T radius = 4.842f;
 		T bridgeWidth2 = 2.09f / 2.;
 
