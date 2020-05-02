@@ -95,10 +95,10 @@ public:
 	}
 
 	template <int N>
-	static T intersectSphereBase(const Vec<N,T>& dir, const Vec<N,T>& dv, T radius){
+	static T intersectSphereBase(const Vec<N,T>& dir, const Vec<N,T>& pos, T radius){
 		T A = dir.dot(dir);
-		T B = T(2) * dir.dot(dv);
-		T C = dv.dot(dv) - radius*radius;
+		T B = T(2) * dir.dot(pos);
+		T C = pos.dot(pos) - radius*radius;
 		T det = B*B - T(4)*A*C;
 
 		if(det > T(0)){
