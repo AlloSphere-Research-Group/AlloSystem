@@ -95,7 +95,7 @@ struct PickRayDemo : App {
       // if sphere previously selected move sphere
       if(selected[i]){
         Vec3f newPos = r(dist[i]) + offset[i];
-        pos[i].set(newPos);
+        pos[i] = newPos;
       }
     }
   }

@@ -64,7 +64,7 @@ public:
 		case '2': // hourglass
 			for(auto& p : particles){
 				p.pos = rnd::ball<Vec3f>().mag(1);
-				p.vel = clone(p.pos).rotate(M_PI/2)*Vec3f(1,1,-1)*0.2;
+				p.vel = Vec3f(p.pos).rotate(M_PI/2)*Vec3f(1,1,-1)*0.2;
 			}
 			break;
 		case '3': // line orbit 1
