@@ -9,7 +9,8 @@ Author:
 Lance Putnam, Feb. 2011
 */
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_App.hpp"
+#include "allocore/graphics/al_Texture.hpp"
 using namespace al;
 
 class MyApp : public App{

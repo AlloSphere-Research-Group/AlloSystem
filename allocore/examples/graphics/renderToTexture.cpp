@@ -11,6 +11,8 @@ Lance Putnam, 2015
 
 
 #include "allocore/io/al_App.hpp"
+#include "allocore/graphics/al_FBO.hpp"
+#include "allocore/graphics/al_Texture.hpp"
 using namespace al;
 
 class MyApp : public App{

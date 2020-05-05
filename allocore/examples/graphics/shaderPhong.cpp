@@ -10,6 +10,7 @@ Lance Putnam, May 2011
 */
 
 #include "allocore/io/al_App.hpp"
+#include "allocore/graphics/al_Shader.hpp"
 using namespace al;
 
 class MyApp : public App {

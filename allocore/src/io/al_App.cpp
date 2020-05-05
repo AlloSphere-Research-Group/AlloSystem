@@ -1,5 +1,10 @@
 #include <stdio.h>
+#include <cmath> // pow
 #include "allocore/io/al_App.hpp"
+#include "allocore/math/al_Ray.hpp"
+#include "allocore/protocol/al_OSC.hpp"
+#include "allocore/system/al_MainLoop.hpp"
+#include "allocore/system/al_Time.hpp" // timeNow
 
 namespace al{
 //______________________________________________________________________________
@@ -130,7 +135,7 @@ bool SceneWindowHandler::onFrame(){
 	if(app.clockNav() == &win){
 		double dt = win.spfActual();
 		//double dt = win.spf(); // use theoretical dt for smooth control
-		app.nav().smooth(::pow(0.0001, dt));
+		app.nav().smooth(std::pow(0.0001, dt));
 		app.nav().step(dt * 40./*FPS*/);
 		//app.nav().smooth(0.8);
 		//app.nav().step(1.);
@@ -234,7 +239,7 @@ bool SceneWindowHandler::onFrame(){
 
 
 App::App()
-:	mNavControl(mNav)
+:	mNavControl(mNav), mOSCRecv(new osc::Recv), mOSCSend(new osc::Send)
 {}
 
 
@@ -390,6 +395,8 @@ float App::mouseY1(int window, bool clip){
 	return mousePos1(this, window, 1, clip);
 }
 
+osc::Recv& App::oscRecv(){ return *mOSCRecv; }
+osc::Send& App::oscSend(){ return *mOSCSend; }
 
 void App::sendHandshake(){
 	oscSend().send("/handshake", name(), oscRecv().port());

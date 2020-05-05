@@ -11,6 +11,9 @@ Lance Putnam, Nov. 2015 (port to App class)
 
 
 #include "allocore/io/al_App.hpp"
+#include "allocore/graphics/al_Shader.hpp"
+#include "allocore/graphics/al_Texture.hpp"
+#include "allocore/system/al_Time.hpp"
 using namespace al;
 
 // function used to initialize array data:

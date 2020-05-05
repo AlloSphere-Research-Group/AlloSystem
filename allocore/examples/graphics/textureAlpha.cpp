@@ -14,6 +14,7 @@ Author:
 Lance Putnam, Feb. 2015
 */
 #include "allocore/io/al_App.hpp"
+#include "allocore/graphics/al_Texture.hpp"
 using namespace al;
 
 
@@ -21,29 +22,22 @@ class MyApp : public App{
 public:
 
 	Mesh mesh;
-	Texture tex;
+	Texture tex{256,256};
 
 	MyApp(){
 
 		// Generate a texture with an alpha channel for transparency
-		tex.format(Graphics::RGBA);
-		tex.type(Graphics::UBYTE);
-		tex.resize(256,256);
 		tex.allocate();
-		int Nx = tex.width();
-		int Ny = tex.height();
-		Colori * pix = tex.data<Colori>();
 		
-		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
-		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
-			float px = x*M_PI;
-			float py = y*M_PI;
+		tex.assignFromTexCoord<Color>([](float u, float v){
+			float px = u*M_2PI;
+			float py = v*M_2PI;
 			float z = cos(2*px) * cos(5*py) - cos(5*px) * cos(2*py);
 			Color c = RGB(1);
 			// Make alpha channel 1 where function is zero using Gaussian
 			c.a = exp(-16*z*z);
-			pix[j*Nx + i] = c;
-		}}
+			return c;
+		});
 
 		// Load an image having an alpha channel
 		//Image img("myImage.png");
@@ -54,7 +48,7 @@ public:
 		mesh.vertex( 1,-1,-1); mesh.color(RGB(1,1,0));
 		mesh.vertex( 0, 1,-1); mesh.color(RGB(0,1,1));
 
-		nav().pos(0,0,4);
+		nav().pullBack(4);
 		initWindow();
 	}
 

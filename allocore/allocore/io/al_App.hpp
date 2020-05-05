@@ -41,25 +41,32 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#include <math.h>
+#include <functional>
+#include <memory> // unique_ptr
 #include <string>
 #include <vector>
-#include <functional>
-#include "allocore/al_Allocore.hpp"
-
-// #include "allocore/io/al_AudioIO.hpp"
-// #include "allocore/sound/al_AudioScene.hpp"
-// #include "allocore/types/al_Color.hpp"
-// #include "allocore/graphics/al_Lens.hpp"
-// #include "allocore/graphics/al_Stereographic.hpp"
-// #include "allocore/io/al_Window.hpp"
-// #include "allocore/io/al_ControlNav.hpp"
-// #include "allocore/protocol/al_OSC.hpp"
-// #include "allocore/system/al_MainLoop.hpp"
+// essential includes
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Lens.hpp"
+#include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/io/al_AudioIO.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/io/al_ControlNav.hpp"
+#include "allocore/math/al_Ray.hpp"
+#include "allocore/spatial/al_Pose.hpp"
+#include "allocore/types/al_Color.hpp"
+// helper includes (keep minimal)
+#include "allocore/graphics/al_Shapes.hpp"
+#include "allocore/math/al_Random.hpp"
 
 namespace al{
 
+namespace osc{
+	class Recv;
+	class Send;
+}
 class SceneWindowHandler;
+
 
 /// Viewpoint within a scene
 
@@ -183,7 +190,6 @@ private:
 class App {
 public:
 
-	typedef std::vector<Listener *> Listeners;
 	typedef std::vector<ViewpointWindow *> Windows;
 
 	App();
@@ -347,9 +353,8 @@ public:
 	App& background(const Color& c){ stereo().clearColor(c); return *this; }
 
 
-
-	osc::Recv& oscRecv(){ return mOSCRecv; }
-	osc::Send& oscSend(){ return mOSCSend; }
+	osc::Recv& oscRecv();
+	osc::Send& oscSend();
 	void sendHandshake();
 	void sendDisconnect();
 
@@ -359,7 +364,7 @@ public:
 	App& clockNav(void * v){ mClockNav=v; return *this; }
 	const void * clockNav() const { return mClockNav; }
 
-	/// Add a window to the world
+	/// Add a window to the app
 
 	/// @param[in] win			The window to add
 	///
@@ -391,8 +396,6 @@ private:
 
 	// sound
 	AudioIO mAudioIO;
-	//AudioScene mAudioScene;
-	//Listeners mListeners;
 
 	// spatial
 	Nav mNav;
@@ -400,8 +403,8 @@ private:
 
 	// control
 	NavInputControl mNavControl;
-	osc::Recv mOSCRecv;
-	osc::Send mOSCSend;
+	std::unique_ptr<osc::Recv> mOSCRecv;
+	std::unique_ptr<osc::Send> mOSCSend;
 
 	std::string mName;
 	void * mClockAnimate = NULL;
