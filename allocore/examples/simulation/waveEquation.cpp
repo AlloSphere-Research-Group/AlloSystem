@@ -37,9 +37,6 @@ public:
 	float velocity=0.5;	// Velocity of wave propagation, in (0, 0.5]
 
 	Mesh mesh;
-	Light light;
-	Material mtrl;
-
 
 	MyApp(){
 		for(auto& v : wave) v = 0;
@@ -114,12 +111,9 @@ public:
 		zcurr = zprev;
 	}
 
-	void onDraw(Graphics& g){
-		mtrl.specular(RGB(1));
-		mtrl.shininess(30);
-		mtrl();
-		light.dir(1,1,1);
-		light();
+	void onDraw(Graphics& g){		
+		g.material().specular(RGB(0.5)).shininess(30);
+		g.light().pos(100,100,100);
 		g.draw(mesh);
 	}
 };
