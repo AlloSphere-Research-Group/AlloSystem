@@ -58,10 +58,10 @@ class MyApp : public App{
 public:
 
 	Mesh mesh;
-	double phase;
+	double phase = 0.;
 
 	// This constructor is where we initialize the application
-	MyApp(): phase(0){
+	MyApp(){
 
 		// Add a unit sphere to the mesh
 		addSphere(mesh);
