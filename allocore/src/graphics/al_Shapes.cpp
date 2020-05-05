@@ -613,11 +613,12 @@ int addSurface(
 	// Note: the start and end points of each row are duplicated to create
 	// degenerate triangles.
 	for(int j=0; j<Ny-1; ++j){
-		m.index(j*Nx + Nv + Nx);
+		m.index(j*Nx + Nv);
 		for(int i=0; i<Nx; ++i){
 			int idx = j*Nx + i + Nv;
-			m.index(idx+Nx);
+			// First tri degenerate, so winding order seems reversed here
 			m.index(idx);
+			m.index(idx+Nx);
 		}
 		m.index((m.indices().last()));
 	}
