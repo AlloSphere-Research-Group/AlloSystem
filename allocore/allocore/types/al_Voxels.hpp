@@ -47,14 +47,10 @@
 #ifndef INCLUDE_ALLO_VOXELS_HPP
 #define INCLUDE_ALLO_VOXELS_HPP
 
-#include <cmath>
+#include <iostream> // FILE
 #include <string>
-#include <sstream>
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include "allocore/types/al_Array.hpp"
-#include "allocore/types/al_Conversion.hpp"
 
 
 namespace al {
@@ -195,37 +191,16 @@ public:
   float getVoxWidth(unsigned int axis) const { return m_voxWidth[axis]; }
   void setVoxWidth(unsigned int axis, float voxWidth) { m_voxWidth[axis] = voxWidth; }
 
-  std::string printVoxWidth(unsigned int axis) {
-    std::ostringstream ss;
-    ss << m_voxWidth[axis] << " " << printUnits(m_units);
-
-    return ss.str();
-  }
+  std::string printVoxWidth(unsigned int axis) const;
 
   UnitsTy getUnits() const { return m_units; }
   void setUnits(UnitsTy units) { m_units = units; }
 
-  std::string printUnits() {
+  std::string printUnits() const {
     return printUnits(m_units);
   }
   
-  const std::string printUnits(UnitsTy t) {
-    if (t == VOX_ANGSTROMS) {
-      return "angstroms";
-    } else if (t == VOX_NANOMETERS) {
-      return "nm";
-    } else if (t == VOX_MICROMETERS) {
-      return "µm";
-    } else if (t == VOX_MILLIMETERS) {
-      return "mm";
-    } else if (t == VOX_CENTIMETERS) {
-      return "cm";
-    } else {
-      std::ostringstream ss;
-      ss << "(m*10^" << t << ")";
-      return ss.str();
-    }
-  }
+  std::string printUnits(UnitsTy t) const;
 
   // functions to support MRC
   MRCHeader& parseMRC(const char * data);
@@ -267,7 +242,7 @@ public:
   
   bool loadFromFile(std::string filename);
   
-  void print(FILE * fp = stdout);
+  void print(FILE * fp = stdout) const;
 
   float min() const { return m_min; }
 

@@ -1,9 +1,13 @@
 //#include <cassert>
 #include <algorithm> // min,max
+#include <cmath> //pow
+#include <fstream>
+#include <sstream>
 #include "allocore/types/al_Voxels.hpp"
+#include "allocore/graphics/al_Image.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Printing.hpp"
-#include "allocore/graphics/al_Image.hpp"
+#include "allocore/types/al_Conversion.hpp"
 
 namespace al {
 
@@ -242,9 +246,33 @@ bool Voxels::writeToFile(std::string filename) {
   return true;
 }
   
-void Voxels::print(FILE * fp) {
+void Voxels::print(FILE * fp) const {
   Array::print(fp);
   fprintf(fp,"  cell:   %s, %s, %s\n", printVoxWidth(0).c_str(), printVoxWidth(1).c_str(), printVoxWidth(2).c_str());
+}
+
+std::string Voxels::printVoxWidth(unsigned int axis) const {
+  std::ostringstream ss;
+  ss << m_voxWidth[axis] << " " << printUnits(m_units);
+  return ss.str();
+}
+
+std::string Voxels::printUnits(UnitsTy t) const {
+  if (t == VOX_ANGSTROMS) {
+    return "angstroms";
+  } else if (t == VOX_NANOMETERS) {
+    return "nm";
+  } else if (t == VOX_MICROMETERS) {
+    return "µm";
+  } else if (t == VOX_MILLIMETERS) {
+    return "mm";
+  } else if (t == VOX_CENTIMETERS) {
+    return "cm";
+  } else {
+    std::ostringstream ss;
+    ss << "(m*10^" << t << ")";
+    return ss.str();
+  }
 }
 
 bool Voxels::getdir(std::string path, std::vector<std::string> &files) {
@@ -583,7 +611,7 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
   if (P.size() > 1){
     Vec2f *p2D = new Vec2f[P.size()];
     p2D[0] = Vec2f(0,0);
-    float x = sqrt(pow(P[1].x-P[0].x,2.0)+pow(P[1].y-P[0].y,2.0)+pow(P[1].z-P[0].z,2.0));
+    float x = sqrt(std::pow(P[1].x-P[0].x,2.0)+std::pow(P[1].y-P[0].y,2.0)+std::pow(P[1].z-P[0].z,2.0));
     std::cout << x << "\n";
     p2D[1] = Vec2f(x,0);
     if(P.size() == 2){
