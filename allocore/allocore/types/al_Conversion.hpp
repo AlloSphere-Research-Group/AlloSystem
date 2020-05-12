@@ -43,10 +43,6 @@
 */
 
 
-#include <cctype>		// tolower, toupper
-#include <cstdio>		// vsnprintf
-#include <cstdarg>		// vsnprintf
-#include <cstring>		// strlen
 #include <string>
 #include <sstream>		// string conversion
 #include "allocore/system/al_Config.h"
@@ -92,18 +88,10 @@ template <typename T>
 void swapBytes(T * data, unsigned count);
 
 /// Returns string with all characters converted to lowercase
-inline std::string toLower(const std::string& s){
-	auto r = s;
-	for(auto& c : r) c = ::tolower(c);
-	return r;
-}
+std::string toLower(const std::string& s);
 
 /// Returns string with all characters converted to uppercase
-inline std::string toUpper(const std::string& s){
-	auto r = s;
-	for(auto& c : r) c = ::toupper(c);
-	return r;
-}
+std::string toUpper(const std::string& s);
 
 /// Convert formatted arguments to a string
 std::string toString(const char * fmt, ...);
@@ -121,29 +109,8 @@ T fromString(const std::string& v);
 
 
 
-
-// Implementation
 //------------------------------------------------------------------------------
-
-inline char base10To36(int v){
-	static const char * c = "0123456789abcdefghijklmnopqrstuvwxyz";
-	if(v>=0 && v<=35) return c[v];
-	return '0';
-}
-
-inline int base36To10(char v){
-	v = tolower(v);
-	if(v>='0' && v<='9') return v - '0';
-	if(v>='a' && v<='z') return v - 'a' + 10;
-	return 0;	// non-alphanumeric
-}
-
-inline uint32_t bitsToUInt(const char * string){
-	uint32_t v=0; int n = ::strlen(string);
-	for(int i=0; i<n; ++i) if(string[i] == '1') v |= 1<<(n-1-i);
-	return v;
-}
-
+// Implementation
 inline int endian(){
 	static int x=1;
 	return *(char *)&x;
@@ -195,26 +162,9 @@ template<typename T>
 inline void swapBytes(T& v){ swapBytesN<sizeof(v)>(&v); }
 
 template<class T>
-inline void swapBytes(T * data, unsigned count){
+void swapBytes(T * data, unsigned count){
 	for(unsigned i=0; i<count; ++i) swapBytes(data[i]);
 }
-
-inline std::string toString(const char * fmt, ...){
-	char buf[64];
-	va_list args;
-	va_start(args, fmt);
-	std::vsnprintf(buf, sizeof(buf), fmt, args);
-	va_end(args);
-	return std::string(buf);
-}
-
-/* // Would prefer this, but snprintf has flakey support across platforms
-template <class... Args>
-std::string toString(const char * fmt, Args... args){
-	char buf[64];
-	AL_SNPRINTF(buf, sizeof(buf), fmt, args...);
-	return std::string(buf);
-}*/
 
 template <class T>
 std::string toString(const T * v, int n, int s){
