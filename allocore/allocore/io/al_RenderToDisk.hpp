@@ -41,18 +41,14 @@
 	Lance Putnam, 2015, putnam.lance@gmail.com
 */
 
-
 #include <fstream>
 #include <vector>
 #include "allocore/system/al_Thread.hpp"
-#include "allocore/graphics/al_OpenGL.hpp"
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/io/al_Window.hpp"
 
-
 namespace al{
-
 
 /// Renders sound and/or graphics to disk
 ///
@@ -192,10 +188,10 @@ private:
 	double mFrameDur; // graphics frame duration
 	double mWindowFPS;
 	std::vector<unsigned char> mPixels;
-	GLenum mGraphicsBuf = -1;
+	int mGraphicsBuf = -1;
 
 	enum { Npbos = 3 };
-	GLuint mPBOs[Npbos];
+	int mPBOs[Npbos];
 	int mPBOIdx;
 	bool mReadPBO;
 

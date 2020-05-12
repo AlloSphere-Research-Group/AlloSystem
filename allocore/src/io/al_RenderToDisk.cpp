@@ -1,4 +1,5 @@
 #include <cstdlib> // std::system
+#include "allocore/graphics/al_OpenGL.hpp"
 #include "allocore/io/al_RenderToDisk.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Time.hpp"
@@ -211,7 +212,8 @@ void RenderToDisk::stop(){
 		mWroteImages = true;
 
 		if(0 != mPBOs[0]){
-			glDeleteBuffers(Npbos, mPBOs);
+			auto * glPBOs = (GLuint *)mPBOs;
+			glDeleteBuffers(Npbos, glPBOs);
 			mPBOs[0] = 0;
 		}
 
@@ -362,7 +364,8 @@ void RenderToDisk::saveImage(
 	*/
 	if(usePBO){
 		if(0 == mPBOs[0]){ // create PBOs
-			glGenBuffers(Npbos, mPBOs);
+			auto * glPBOs = (GLuint *)mPBOs;
+			glGenBuffers(Npbos, glPBOs);
 			for(auto& pbo : mPBOs){
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
 				glBufferData(GL_PIXEL_PACK_BUFFER, numBytes, NULL, GL_STREAM_READ);
