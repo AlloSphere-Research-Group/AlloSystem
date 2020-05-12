@@ -44,6 +44,8 @@
 
 
 #include <cctype>		// tolower, toupper
+#include <cstdio>		// vsnprintf
+#include <cstdarg>		// vsnprintf
 #include <cstring>		// strlen
 #include <string>
 #include <sstream>		// string conversion
@@ -103,15 +105,15 @@ inline std::string toUpper(const std::string& s){
 	return r;
 }
 
-/// Convert argument to a string using snprintf
-template <class T> std::string toString(const char * fmt, const T& v);
+/// Convert formatted arguments to a string
+std::string toString(const char * fmt, ...);
 
 /// Convert numerical type to a string
 template <class T> std::string toString(const T& v);
 
 /// Convert array of numerical types to a comma separated string
 template <class T>
-std::string toString(const T * v, int num, int stride=1);
+std::string toString(const T * v, int num, int stride);
 
 /// Convert string to a typed value
 template <class T>
@@ -197,12 +199,22 @@ inline void swapBytes(T * data, unsigned count){
 	for(unsigned i=0; i<count; ++i) swapBytes(data[i]);
 }
 
-template <class T>
-std::string toString(const char * fmt, const T& v){
-	char buf[32];
-	AL_SNPRINTF(buf, sizeof(buf), fmt, v);
+inline std::string toString(const char * fmt, ...){
+	char buf[64];
+	va_list args;
+	va_start(args, fmt);
+	std::vsnprintf(buf, sizeof(buf), fmt, args);
+	va_end(args);
 	return std::string(buf);
 }
+
+/* // Would prefer this, but snprintf has flakey support across platforms
+template <class... Args>
+std::string toString(const char * fmt, Args... args){
+	char buf[64];
+	AL_SNPRINTF(buf, sizeof(buf), fmt, args...);
+	return std::string(buf);
+}*/
 
 template <class T>
 std::string toString(const T * v, int n, int s){
