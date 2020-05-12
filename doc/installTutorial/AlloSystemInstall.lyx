@@ -674,16 +674,153 @@ Install Code Editor
 You will need to install an editor that recognizes and syntax colorizes
  source code.
  We recommend either Visual Studio Express or Notepad++.
- Visual Studio is a full-blown IDE while Notepad++ is a lightweight text
- editor.
- Notepad++ is preferred as it starts up much more quickly.
+ Notepad++ is a lightweight text editor and starts up instantaneously (like
+ most modern software should).
 \end_layout
+
+\begin_layout Subsubsection
+Install MinGW-w64 and Msys2
+\end_layout
+
+\begin_layout Standard
+Before beginning, it is important that your Windows user name does not contain
+ any spaces.
+ Msys2 uses this as your user name and if it has spaces in it, it treats
+ them like command delimiters which creates many problems.
+\end_layout
+
+\begin_layout Standard
+Download Mingw-w64/Msys2 and follow the installations instructions at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://www.msys2.org
+\end_layout
+
+\end_inset
+
+.
+ Make sure to update the package database using 
+\family typewriter
+pacman
+\family default
+ as instructed.
+\end_layout
+
+\begin_layout Subsubsection
+Start Mingw-w64 Shell
+\end_layout
+
+\begin_layout Standard
+From now on, you will use the Mingw-w64 shell (not Msys2).
+ Double-click 
+\family typewriter
+mingw64.exe
+\family default
+ in 
+\family typewriter
+c:
+\backslash
+msys64
+\backslash
+
+\family default
+ and proceed to 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Install-AlloSystem"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Mingw/Msys Shell Tips
+\end_layout
+
+\begin_layout Standard
+Windows drives, like 
+\family typewriter
+C:
+\family default
+ and 
+\family typewriter
+D:
+\family default
+, can be accessed as 
+\family typewriter
+/c
+\family default
+ or 
+\family typewriter
+/d
+\family default
+, respectively.
+ Use the 
+\family typewriter
+mount
+\family default
+ command to get an overview of all the drive mappings.
+\end_layout
+
+\begin_layout Standard
+Normally, when you install libraries in a Unix environment, the libraries
+ get placed in 
+\family typewriter
+/usr/local/
+\family default
+.
+ Under the Mingw-w64 shell, libraries are instead installed to 
+\family typewriter
+/mingw64/
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Your user directory lives in 
+\family typewriter
+c:
+\backslash
+msys64
+\backslash
+home
+\backslash
+
+\family default
+.
+ If you would like to run some commands when the shell starts, then edit
+ the file 
+\family typewriter
+.bash_profile
+\family default
+ in your user directory.
+ For example, it is usually helpful to add the line 
+\family typewriter
+cd /c/code/AlloSystem/
+\family default
+ (or wherever you have AlloSystem installed) to 
+\family typewriter
+.bash_profile
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
 
 \begin_layout Subsubsection
 Install MinGW and MSYS
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset Note Note
 status open
 
@@ -774,7 +911,6 @@ MSYS provides a Unix-like CLI and commands (bash, make, grep, etc.).
 
 \begin_layout Plain Layout
 Finish the MinGW installer.
- 
 \end_layout
 
 \end_inset
@@ -782,7 +918,7 @@ Finish the MinGW installer.
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Together, MinGW and MSYS provide an assortment of development tools and
  a Unix-like command-line shell for Windows.
  The simplest way to install MinGW/MSYS is to use the automated GUI installer
@@ -800,7 +936,7 @@ http://sourceforge.net/projects/mingw/files/latest/download
 .
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 After the download completes, run the installer.
  When the MinGW Installation Manager (or mingw-get GUI) window pops up (Fig.
  
@@ -826,7 +962,7 @@ mingw32-gcc-g++-bin
 msys-base-bin
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset Float figure
 wide false
 sideways false
@@ -863,10 +999,6 @@ name "fig:MinGW-Installation-Manager"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 Next, click on `All Packages' in the left pane and then set the following
@@ -881,14 +1013,14 @@ msys-unzip-bin
 msys-wget-bin
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Then run the menu item Installation -> Apply Changes.
  Click `Apply' in the `Schedule of Pending Actions' window that pops up.
  After all the packages download and install, you can close the MinGW Installati
 on Manager window.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset Note Note
 status open
 
@@ -939,7 +1071,7 @@ This will install additional programs for MSYS that we will need later to
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset Note Note
 status open
 
@@ -1023,7 +1155,7 @@ wget
 Start MSYS
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Open a new MSYS shell (not to be confused with a DOS shell!) by launching
  MSYS from the Start menu or desktop or by running 
 \family typewriter
@@ -1045,7 +1177,7 @@ msys.bat
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \align center
 \begin_inset Graphics
 	filename fig/MSYS.png
@@ -1057,7 +1189,7 @@ msys.bat
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 If your user name (the text before the @ symbol) has spaces in it, then
  see section 
 \begin_inset CommandInset ref
@@ -1069,7 +1201,7 @@ reference "subsec:MinGW/MSYS:-Spaces-in-user-name"
 .
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset Note Note
 status open
 
@@ -1110,7 +1242,7 @@ C:/MinGW
 MSYS Tips
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 By default, the MSYS directory 
 \family typewriter
 C:
@@ -1186,6 +1318,11 @@ D:
 mount
 \family default
  command to get an overview of all the drive mappings.
+\end_layout
+
+\end_inset
+
+
 \begin_inset Newpage pagebreak
 \end_inset
 
