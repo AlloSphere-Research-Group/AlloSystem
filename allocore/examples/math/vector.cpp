@@ -124,9 +124,9 @@ int main(){
 	*/
 	{
 		Vec4f a(7,5,0,2);
-		a.sub<2>(0);			// Returns 2-vector {7, 5}
-		a.sub<2>(2);			// Returns 2-vector {0, 2}
-		a.sub<3>(1);			// Returns 3-vector {5, 0, 2}
+		a.sub<2>();				// Returns 2-vector {7, 5}
+		a.sub<2,2>();			// Returns 2-vector {0, 2}
+		a.sub<3,1>();			// Returns 3-vector {5, 0, 2}
 	}
 	/*
 	It is also possible to "swizzle", that is, obtain a new vector comprised of

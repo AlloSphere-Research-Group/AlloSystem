@@ -272,16 +272,15 @@ public:
 		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
 
 	/// Get a subvector
-	template <int M>
-	const Vec<M,T>& sub(int begin=0) const {
-		static_assert(M<=N, "Subvector size cannot be larger than vector size");
-		return Vec<M,T>::pun(elems()+begin);
+	template <int M, int Begin=0>
+	const Vec<M,T>& sub() const {
+		static_assert((Begin+M)<=N, "Invalid subvector range");
+		return Vec<M,T>::pun(elems()+Begin);
 	}
-
-	template <int M>
-	Vec<M,T>& sub(int begin=0){
-		static_assert(M<=N, "Subvector size cannot be larger than vector size");
-		return Vec<M,T>::pun(elems()+begin);
+	template <int M, int Begin=0>
+	Vec<M,T>& sub(){
+		static_assert((Begin+M)<=N, "Invalid subvector range");
+		return Vec<M,T>::pun(elems()+Begin);
 	}
 
 	const Vec<2,T>& xy() const { return sub<2>(); }
@@ -573,13 +572,21 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 }
 
 /// Get a subvector
-template <int M, int N, class T>
-inline Vec<M,T> sub(const Vec<N,T>& v, int begin=0){
-	return v.template sub<M>(begin);
+template <int M, int Begin, int N, class T>
+inline Vec<M,T> sub(const Vec<N,T>& v){
+	return v.template sub<M,Begin>();
+}
+template <int M, int Begin, int N, class T>
+inline Vec<M,T>& sub(Vec<N,T>& v){
+	return v.template sub<M,Begin>();
 }
 template <int M, int N, class T>
-inline Vec<M,T>& sub(Vec<N,T>& v, int begin=0){
-	return v.template sub<M>(begin);
+inline Vec<M,T> sub(const Vec<N,T>& v){
+	return sub<M,0>(v);
+}
+template <int M, int N, class T>
+inline Vec<M,T>& sub(Vec<N,T>& v){
+	return sub<M,0>(v);
 }
 
 /// Sets r to cross product, a x b

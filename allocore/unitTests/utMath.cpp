@@ -143,7 +143,7 @@ int utMath(){
 
 		Vec<2, double> t;
 		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
-		t = a.sub<2>(2);		assert(t[0] == 2 && t[1] == 3);
+		t = a.sub<2,2>();		assert(t[0] == 2 && t[1] == 3);
 			// verify in-place operations
 		a.sub<2>() += 10;		assert(a[0] == 10 && a[1] == 11);
 		}
