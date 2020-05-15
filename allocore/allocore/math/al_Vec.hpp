@@ -549,6 +549,20 @@ inline Vec<N,T> operator / (const T& s, const Vec<N,T>& v){
 template <int N, class T>
 inline T abs(const Vec<N,T>& v){ return v.mag(); }
 
+/// Get vector with each element raised to a power
+template <int N, class T>
+inline Vec<N,T> pow(const Vec<N,T>& v, const T& power){
+	auto r=v; for(auto& e:r) e = std::pow(e, power);
+	return r;
+}
+
+/// Get vector with each element raised to a power
+template <int N, class T>
+inline Vec<N,T> pow(const T& base, const Vec<N,T>& powers){
+	auto r=powers; for(auto& e:r) e = std::pow(base, e);
+	return r;
+}
+
 /// Returns concatenation of two vectors
 template <int N1, class T1, int N2, class T2>
 inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
