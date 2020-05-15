@@ -13,7 +13,7 @@ Stereographic::Stereographic()
 Vec3d Stereographic::unproject(const Vec3d& screenPos) const {
 	auto invprojview = Matrix4d::inverse(modelViewProjection());
 	auto worldPos4 = invprojview.transform(screenPos);
-	return worldPos4.sub<3>(0) / worldPos4.w;
+	return worldPos4.xyz() / worldPos4.w;
 }
 
 void Stereographic::pushDrawPop(Graphics& g, Drawable& draw){
