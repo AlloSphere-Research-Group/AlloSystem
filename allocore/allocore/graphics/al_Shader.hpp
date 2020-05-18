@@ -72,7 +72,7 @@ public:
 	const char * log() const;
 
 	/// Prints info log, if any
-	void printLog() const;
+	void printLog(const char * prepend = "") const;
 
 protected:
 	virtual void get(int pname, void * params) const = 0;

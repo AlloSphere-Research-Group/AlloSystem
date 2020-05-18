@@ -61,9 +61,9 @@ const char * ShaderBase::log() const {
 	return buf;
 }
 
-void ShaderBase::printLog() const {
+void ShaderBase::printLog(const char * prepend) const {
 	const char * s = log();
-	if(s && s[0]) printf("%s\n", s);
+	if(s && s[0]) printf("%s\n%s\n", prepend, s);
 }
 
 void Shader::getLog(char * buf) const {
@@ -244,9 +244,9 @@ bool ShaderProgram::compile(
 		attach(mShaderG);
 	}
 	link(false);
-	mShaderV.printLog();
-	mShaderF.printLog();
-	if(bGeom) mShaderG.printLog();
+	mShaderV.printLog("Vertex shader log:");
+	mShaderF.printLog("Fragment shader log:");
+	if(bGeom) mShaderG.printLog("Geometry shader log:");
 	//printLog(); // program log is usually not helpful or is redundant
 
 	// OpenGL.org says to detach shaders after linking:
