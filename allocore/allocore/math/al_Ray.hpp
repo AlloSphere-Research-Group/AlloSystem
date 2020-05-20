@@ -115,6 +115,9 @@ public:
 	}
 
 	/// Get intersection with sphere
+	
+	/// Returns positive value indicating distance along ray to intersection or
+	/// negative value if there is no intersection.
 	T intersectSphere(const Vec<3,T>& cen, T radius) const {
 		return intersectSphereBase(d, o-cen, radius);
 	}
