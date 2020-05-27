@@ -6,10 +6,10 @@
 #if !defined(AL_THREAD_USE_STD) && !defined(AL_THREAD_USE_THREADEX) && !defined(AL_THREAD_USE_PTHREAD)
 	// Try to derive best thread backend to use
 	#ifdef AL_WINDOWS
-		#if defined(__MINGW32__) || defined(_MSC_VER)
-			#define AL_THREAD_USE_THREADEX
-		#else  // MinGW-w64 / MSYS2
+		#if __cplusplus >= 201103L
 			#define AL_THREAD_USE_STD
+		#else
+			#define AL_THREAD_USE_THREADEX
 		#endif
 	#else
 		#define AL_THREAD_USE_PTHREAD

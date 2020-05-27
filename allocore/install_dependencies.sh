@@ -312,7 +312,7 @@ elif uname -o | grep -q "Msys"; then
 	else
 		echo 'Found MinGW-w64 / MSYS2'
 		ARCH="mingw-w64-"$(uname -m)
-		LIBS="portaudio libsndfile glew freeglut freeimage freetype assimp libusb"
+		LIBS="gcc portaudio libsndfile glew freeglut freeimage freetype assimp libusb"
 		PKGS=
 		for L in $LIBS
 		do
@@ -327,7 +327,7 @@ elif uname -o | grep -q "Msys"; then
 
 		#echo $PKGS
 		pacman -Syu
-		pacman -S make msys/gcc $PKGS
+		pacman -S make $PKGS
 	fi
 else
 	echo 'Error: No suitable package manager found.'
