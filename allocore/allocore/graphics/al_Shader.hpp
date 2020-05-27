@@ -51,6 +51,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Quat.hpp"
