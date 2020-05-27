@@ -38,12 +38,12 @@ if binary_exists "apt-get"; then
 	sudo apt-get update
 	sudo apt-get install \
 		build-essential \
-		portaudio19-dev libsndfile1-dev \
+		portaudio19-dev \
 		libglew-dev freeglut3-dev \
 		libavahi-client-dev \
 		libbluetooth-dev \
 		libudev-dev \
-		libfreeimage-dev libfreetype6-dev \
+		libfreetype6-dev \
 		libxi-dev libxmu-dev
 
 	# Get version of installed assimp
@@ -76,11 +76,7 @@ if binary_exists "apt-get"; then
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
 	brew update
-	brew install \
-		portaudio libsndfile \
-		glew \
-		freeimage \
-		freetype
+	brew install portaudio glew freetype
 
 	# Use precompiled library if on Mountain Lion or higher.
 	osx_version="$(sw_vers -productVersion | cut -d . -f 2)"
@@ -94,11 +90,7 @@ elif binary_exists "brew"; then
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
-	sudo port install \
-		portaudio libsndfile \
-		glew \
-		freeimage \
-		freetype
+	sudo port install portaudio glew freetype
 
 	build_and_install_assimp
 
@@ -119,29 +111,6 @@ elif uname -o | grep -q "Msys"; then
 		#DESTDIR=local/
 		DOWNLOAD="wget --no-check-certificate"
 		install -d $DESTDIR/bin/ $DESTDIR/include/ $DESTDIR/lib/
-
-		if files_exist $DESTDIR/lib/libsndfile*; then
-			echo 'Found libsndfile'
-		else
-			PKG=libsndfile-1.0.25
-			DIR=$PWD
-			cd /tmp
-				$DOWNLOAD http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
-				tar -xzf $PKG.tar.gz
-
-				cd $PKG
-					./configure --prefix=$DESTDIR --disable-external-libs
-					# make from src/ to avoid building tests and other gunk
-					cd src
-						make install
-					cd ..
-				cd ..
-
-				# Cleanup.
-				rm -rf $PKG
-				rm $PKG.*
-			cd $DIR
-		fi
 
 		if files_exist $DESTDIR/lib/libportaudio*; then
 			echo 'Found PortAudio'
@@ -200,25 +169,6 @@ elif uname -o | grep -q "Msys"; then
 				cp $PKG/lib/freetype*.def $DESTDIR/lib/
 				cp $PKG/lib/freetype.lib $DESTDIR/lib/
 				cp -r $PKG/include/* $DESTDIR/include/
-
-				# Cleanup.
-				rm -rf $PKG
-				rm $PKG.*
-			cd $DIR
-		fi
-
-		if files_exist $DESTDIR/lib/FreeImage*; then
-			echo 'Found FreeImage'
-		else
-			PKG=FreeImage3160Win32
-			DIR=$PWD
-			cd /tmp
-				$DOWNLOAD http://downloads.sourceforge.net/project/freeimage/Binary%20Distribution/3.16.0/$PKG.zip
-				unzip -q $PKG
-				mv FreeImage $PKG
-				cp $PKG/Dist/FreeImage.dll $DESTDIR/bin/
-				cp $PKG/Dist/FreeImage.lib $DESTDIR/lib/
-				cp $PKG/Dist/FreeImage.h $DESTDIR/include/
 
 				# Cleanup.
 				rm -rf $PKG
@@ -312,7 +262,7 @@ elif uname -o | grep -q "Msys"; then
 	else
 		echo 'Found MinGW-w64 / MSYS2'
 		ARCH="mingw-w64-"$(uname -m)
-		LIBS="gcc portaudio libsndfile glew freeglut freeimage freetype assimp libusb"
+		LIBS="gcc portaudio glew freeglut freetype assimp libusb"
 		PKGS=
 		for L in $LIBS
 		do
@@ -320,8 +270,6 @@ elif uname -o | grep -q "Msys"; then
 		done
 
 		# Libs with deps (other then gcc-libs):
-		# libsndfile: flac libvorbis speex
-		# freeimage: jxrlib libjpeg-turbo libpng libtiff libraw libwebp openjpeg2 openexr
 		# freetype: bzip2 harfbuzz libpng zlib
 		# assimp: minizip zziplib zlib
 
