@@ -164,6 +164,10 @@ public:
 	/// e.g. version, common uniforms, etc.
 	ShaderProgram& preamble(const std::string& s){ mPreamble=s; return *this; }
 
+	/// Add #version directive
+	ShaderProgram& version(const std::string v){ mVersion=v; return *this; }
+	ShaderProgram& version(int n){ return version(std::to_string(n)); }
+
 	/// Compile and link shader sources
 
 	/// If called outside of a graphics context, compiling and linking will
@@ -341,6 +345,7 @@ protected:
 	std::string mVertSource, mFragSource, mGeomSource;
 	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
 	std::vector<std::string> mTFVaryings;
+	std::string mVersion;
 	std::string mPreamble;
 	bool mActive = true;
 

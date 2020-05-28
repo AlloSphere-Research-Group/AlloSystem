@@ -232,15 +232,18 @@ bool ShaderProgram::compile(
 
 	if(!created()) return false;
 
+	std::string ver = mVersion.empty() ? "" : "#version " + mVersion + "\n";
+	auto pre = ver + mPreamble;
+
 	Shader mShaderV, mShaderF, mShaderG;
-	mShaderV.source(mPreamble + vertSource, al::Shader::VERTEX);
+	mShaderV.source(pre + vertSource, al::Shader::VERTEX);
 	attach(mShaderV);
-	mShaderF.source(mPreamble + fragSource, al::Shader::FRAGMENT);
+	mShaderF.source(pre + fragSource, al::Shader::FRAGMENT);
 	attach(mShaderF);
 	
 	bool bGeom = geomSource[0];
 	if(bGeom){
-		mShaderG.source(mPreamble + geomSource, al::Shader::GEOMETRY);
+		mShaderG.source(pre + geomSource, al::Shader::GEOMETRY);
 		attach(mShaderG);
 	}
 	link(false);
