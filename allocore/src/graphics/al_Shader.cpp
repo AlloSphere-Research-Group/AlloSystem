@@ -258,6 +258,21 @@ bool ShaderProgram::compile(
 	return linked();
 }
 
+bool ShaderProgram::compileUnified(
+	const std::string& source,
+	const std::string& vertMacro,
+	const std::string& fragMacro,
+	const std::string& geomMacro
+){
+	bool hasGeom = source.find(geomMacro) != std::string::npos;
+	return compile(
+		"#define " + vertMacro + "\n" + source,
+		"#define " + fragMacro + "\n" + source,
+		hasGeom ? "#define " + geomMacro + "\n" + source : ""
+	);
+}
+
+
 void ShaderProgram::onCreate(){
 	//mHandle = glCreateProgramObjectARB();
 	//mID = (long)handle();

@@ -158,6 +158,12 @@ public:
 	const ShaderProgram& link(bool doValidate=true) const;
 
 
+	/// Set preamble to be inserted before sources specified by compile
+
+	/// This is useful for inserting code that is used across all shader stages,
+	/// e.g. version, common uniforms, etc.
+	ShaderProgram& preamble(const std::string& s){ mPreamble=s; return *this; }
+
 	/// Compile and link shader sources
 
 	/// If called outside of a graphics context, compiling and linking will
@@ -168,11 +174,17 @@ public:
 		const std::string& geomSource=""
 	);
 
-	/// Set preamble to be inserted before sources specified by compile
+	/// Compile and link shader source
+	
+	/// This version is the same as compile(), but takes a single string with 
+	/// different shader stages separated by preprocessor conditionals.
+	bool compileUnified(
+		const std::string& source,
+		const std::string& vertMacro = "VERT_PROG",
+		const std::string& fragMacro = "FRAG_PROG",
+		const std::string& geomMacro = "GEOM_PROG"
+	);
 
-	/// This is useful for inserting code that is used across all shader stages,
-	/// e.g. version, common uniforms, etc.
-	ShaderProgram& preamble(const std::string& s){ mPreamble=s; return *this; }
 
 	const ShaderProgram& use();
 
