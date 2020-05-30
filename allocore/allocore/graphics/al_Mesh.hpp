@@ -182,6 +182,11 @@ public:
 	///							face rather than per vertex
 	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false);
 
+	Mesh& normalsMesh(Mesh& mesh, float length=0.1, bool perFace=false){
+		createNormalsMesh(mesh,length,perFace);
+		return mesh;
+	}
+
 	/// Ribbonize curve
 
 	/// This creates a two-dimensional ribbon from a one-dimensional space curve.
