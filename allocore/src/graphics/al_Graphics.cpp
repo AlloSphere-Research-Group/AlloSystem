@@ -172,6 +172,7 @@ public:
 			stack.var().emplace(1.f);
 		}
 
+		mShader.name("al::Graphics");
 		g.material(); // touch so shader uniforms get inited
 	}
 
