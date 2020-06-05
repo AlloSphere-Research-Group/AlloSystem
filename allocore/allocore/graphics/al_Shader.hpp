@@ -165,8 +165,12 @@ public:
 	ShaderProgram& preamble(const std::string& s){ mPreamble=s; return *this; }
 
 	/// Add #version directive
-	ShaderProgram& version(const std::string v){ mVersion=v; return *this; }
+	ShaderProgram& version(const std::string& v){ mVersion=v; return *this; }
 	ShaderProgram& version(int n){ return version(std::to_string(n)); }
+
+	/// Name of shader program (for debugging)
+	ShaderProgram& name(const std::string& v){ mName=v; return *this; }
+	const std::string& name() const { return mName; }
 
 	/// Compile and link shader sources
 
@@ -345,10 +349,13 @@ protected:
 	std::string mVertSource, mFragSource, mGeomSource;
 	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
 	std::vector<std::string> mTFVaryings;
+	std::string mName;
 	std::string mVersion;
 	std::string mPreamble;
 	bool mActive = true;
 
+	std::string idString() const;
+	
 	virtual void get(int pname, void * params) const;
 	virtual void getLog(char * buf) const;
 

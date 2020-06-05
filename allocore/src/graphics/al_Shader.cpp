@@ -221,6 +221,10 @@ bool ShaderProgram::validateProgram(bool doPrintLog) const {
 	return true;
 }
 
+std::string ShaderProgram::idString() const {
+	return mName.empty() ? std::to_string(id()) : "\""+mName+"\"";
+}
+
 bool ShaderProgram::compile(
 	const std::string& vertSource,
 	const std::string& fragSource,
@@ -247,9 +251,10 @@ bool ShaderProgram::compile(
 		attach(mShaderG);
 	}
 	link(false);
-	mShaderV.printLog("Vertex shader log:");
-	mShaderF.printLog("Fragment shader log:");
-	if(bGeom) mShaderG.printLog("Geometry shader log:");
+	auto idStr = "ShaderProgram " + idString();
+	mShaderV.printLog((idStr + " vertex log:").c_str());
+	mShaderF.printLog((idStr + " fragment log:").c_str());
+	if(bGeom) mShaderG.printLog((idStr + " geometry log:").c_str());
 	//printLog(); // program log is usually not helpful or is redundant
 
 	// OpenGL.org says to detach shaders after linking:
@@ -336,14 +341,14 @@ bool ShaderProgram::linked() const {
 int ShaderProgram::uniform(const char * name) const {
 	GET_LOC(mUniformLocs, glGetUniformLocation);
 	if(-1 == loc)
-		AL_WARN_ONCE("ShaderProgram %d has no uniform \"%s\"", id(), name);
+		AL_WARN_ONCE("ShaderProgram %s has no uniform \"%s\"", idString().c_str(), name);
 	return loc;
 }
 
 int ShaderProgram::attribute(const char * name) const {
 	GET_LOC(mAttribLocs, glGetAttribLocation);
 	if(-1 == loc)
-        AL_WARN_ONCE("ShaderProgram %d has no attribute \"%s\"", id(), name);
+        AL_WARN_ONCE("ShaderProgram %s has no attribute \"%s\"", idString().c_str(), name);
 	return loc;
 }
 
