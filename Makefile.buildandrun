@@ -55,5 +55,9 @@ $(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_PATH="\"$(shell echo $(realpath $
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
 	$(CXX) $(RUN_CPPFLAGS) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
-	@cd $(BIN_DIR) && ./$(*F)
+    ifeq ($(BUILD_CONFIG),Release)
+		@cd $(BIN_DIR) && ./$(*F)
+    else
+		$(DBG) $(BIN_DIR)$(*F) $(DBGFLAGS) -ex "cd $(BIN_DIR)" -ex "run"
+    endif
 endif
