@@ -690,6 +690,7 @@ Mesh& Mesh::scale(float x, float y, float z){
 	return *this;
 }
 
+bool Mesh::valid() const { return mVertices.size(); }
 
 // removes triplets with two matching values
 template <class T>

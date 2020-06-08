@@ -229,6 +229,8 @@ public:
 	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
 	const Buffer<Index>& indices() const { return mIndices; }
 
+	/// Returns whether mesh has valid data for rendering
+	bool valid() const;
 
 	/// Set geometric primitive
 	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
