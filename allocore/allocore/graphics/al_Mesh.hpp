@@ -260,6 +260,9 @@ public:
 	}
 
 	/// Append index to index buffer relative to current number of vertices
+
+	/// This should be called BEFORE adding the relevant vertex positions.
+	///
 	Mesh& indexRel(unsigned int i){ return index(vertices().size()+i); }
 
 	template <class...Indices>
