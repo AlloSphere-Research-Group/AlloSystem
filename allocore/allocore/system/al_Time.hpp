@@ -83,10 +83,10 @@ public:
 	al_sec elapsedSec() const { return al_time_ns2s * elapsed(); }
 
 	/// Set start time to current time
-	void start(){ mStart = getTime(); }
+	Timer& start(){ mStart = getTime(); return *this; }
 
 	/// Set stop time to current time
-	void stop(){ mStop = getTime(); }
+	Timer& stop(){ mStop = getTime(); return *this; }
 
 	/// Print current elapsed time
 	void print() const;
