@@ -178,6 +178,20 @@ protected:
 };
 
 
+/// Convenience macro for creating a scoped random environment
+#define AL_RNG_ENVIR(seed)\
+	al::rnd::Random<> rng(seed);\
+	auto P = [&](float p=0.5){ return rng.prob(p); };\
+	auto Bs= [&](float p=0.5){ return P(p)?1.:-1.; };\
+	auto U = [&](){ return rng.uniform(1.); };\
+	auto Us= [&](){ return rng.uniform(1.,-1.); };\
+	auto L0= [&](){ return std::min(U(), U()); }; /* more 0 than 1 */ \
+	auto L1= [&](){ return std::max(U(), U()); }; /* more 1 than 0 */ \
+	auto T = [&](){ return (U()+U())*0.5; };\
+	auto Ts= [&](){ return U()-U(); };\
+	auto Vs= [&](){ return rng.sign(L1()); }; /* [-1,1] */\
+	auto V = [&](){ return Vs()*0.5+0.5; }; /* [0,1] */
+
 
 /// Linear congruential uniform pseudo-random number generator.
 
