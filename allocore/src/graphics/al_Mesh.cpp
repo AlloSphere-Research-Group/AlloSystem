@@ -39,6 +39,9 @@ Mesh& Mesh::reset() {
 	return *this;
 }
 
+bool Mesh::isTriangles() const { return primitive() == Graphics::TRIANGLES; }
+bool Mesh::isTriangleStrip() const { return primitive() == Graphics::TRIANGLE_STRIP; }
+
 Mesh& Mesh::decompress(){
 	int Ni = indices().size();
 	if(Ni){
@@ -326,7 +329,7 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 
 		unsigned Ni = indices().size();
 
-		if(primitive() == Graphics::TRIANGLES){
+		if(isTriangles()){
 			Ni = Ni - (Ni%3); // must be multiple of 3
 
 			for(unsigned i=0; i<Ni; i+=3){
@@ -344,7 +347,7 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 				normals()[i3] += vn;
 			}
 		}
-		else if(primitive() == Graphics::TRIANGLE_STRIP){
+		else if(isTriangleStrip()){
 			for(unsigned i=0; i<Ni-2; ++i){
 
 				// Flip every other normal due to change in winding direction
@@ -372,7 +375,7 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 	// non-indexed case
 	else{
 		// compute face based normals
-		if(primitive() == Graphics::TRIANGLES){
+		if(isTriangles()){
 			auto N = Nv - (Nv % 3);
 
 			for(unsigned i=0; i<N; i+=3){
@@ -392,7 +395,7 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 			}
 		}
 		// compute vertex based normals
-		else if(primitive() == Graphics::TRIANGLE_STRIP){
+		else if(isTriangleStrip()){
 
 			for(auto& n : normals()) n = 0.;
 
@@ -737,7 +740,7 @@ static void stripToTri(Buffer<T>& buf){
 
 Mesh& Mesh::toTriangles(){
 
-	if(Graphics::TRIANGLE_STRIP == primitive()){
+	if(isTriangleStrip()){
 		primitive(Graphics::TRIANGLES);
 		int Nv = vertices().size();
 		int Ni = indices().size();
@@ -766,7 +769,7 @@ Mesh& Mesh::toTriangles(){
 bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) const {
 	int prim = primitive();
 
-	if(Graphics::TRIANGLES != prim && Graphics::TRIANGLE_STRIP != prim){
+	if(!isTriangles() || !isTriangleStrip()){
 		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
 		return false;
 	}
@@ -811,7 +814,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 
 	int prim = primitive();
 
-	if(Graphics::TRIANGLES != prim && Graphics::TRIANGLE_STRIP != prim){
+	if(!isTriangles() || !isTriangleStrip()){
 		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
 		return false;
 	}

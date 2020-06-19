@@ -235,6 +235,9 @@ public:
 	/// Set geometric primitive
 	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
 
+	bool isTriangles() const;
+	bool isTriangleStrip() const;
+
 	/// Set stroke size
 
 	/// For line primitives, this is the line width.
