@@ -136,6 +136,11 @@ public:
 	template <class Tv, class Ts>
 	Vec(const Vec<N-1, Tv>& v, const Ts& s){ set(v,s); }
 
+	/// @param[in] s		value of first element
+	/// @param[in] v		vector to initialize last N-1 elements to
+	template <class Ts, class Tv>
+	Vec(const Ts& s, const Vec<N-1, Tv>& v){ set(s,v); }
+
 	/// @param[in] v		pointer to array to initialize elements to
 	/// @param[in] stride	stride factor through array
 	template <class T2>
@@ -191,6 +196,9 @@ public:
 	/// Set elements from another vector and scalar
 	template <class Tv, class Ts>
 	Vec& set(const Vec<N-1, Tv>& v, const Ts& s){ (*this)[N-1]=s; return (*this = v); }
+
+	template <class Ts, class Tv>
+	Vec& set(const Ts& s, const Vec<N-1, Tv>& v){ (*this)[0]=s; sub<N-1,1>()=v; return *this; }
 
 	/// Set elements from (strided) raw C-pointer
 	template <class T2>
@@ -285,8 +293,12 @@ public:
 
 	const Vec<2,T>& xy() const { return sub<2>(); }
 	Vec<2,T>& xy(){ return sub<2>(); }
+	const Vec<2,T>& yz() const { return sub<2,1>(); }
+	Vec<2,T>& yz(){ return sub<2,1>(); }
 	const Vec<3,T>& xyz() const { return sub<3>(); }
 	Vec<3,T>& xyz(){ return sub<3>(); }
+	const Vec<3,T>& yzw() const { return sub<3,1>(); }
+	Vec<3,T>& yzw(){ return sub<3,1>(); }
 
 	/// Swap elements
 	Vec& swap(int i, int j){ std::swap((*this)[i], (*this)[j]); return *this; }
