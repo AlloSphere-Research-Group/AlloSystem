@@ -285,7 +285,7 @@ struct Colori {
 	/// @param[in] g			green component
 	/// @param[in] b			blue component
 	/// @param[in] a			alpha component
-	Colori(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255)
+	constexpr Colori(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255)
 	:	r(r), g(g), b(b), a(a){}
 
 	/// @param[in] rgba			4-vector of RGBA components
@@ -295,7 +295,7 @@ struct Colori {
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
-	Colori(uint8_t gray=255, uint8_t a=255)
+	constexpr Colori(uint8_t gray=255, uint8_t a=255)
 	:	Colori(gray, gray, gray, a){}
 
 	/// @param[in] c			RGBA color to convert from
@@ -342,6 +342,7 @@ struct Colori {
 	Colori(const HCLuv& hcluv, float a =1.f)
 	:	a(a)
 	{	*this = hcluv; }
+	
 
 	/// Set color component at index with no bounds checking
 	uint8_t& operator[](int i){ return components[i]; }
@@ -394,6 +395,14 @@ struct Colori {
 	/// Set from gray value and alpha
 	Colori& set(uint8_t v, uint8_t al){ return set(v,al); }
 
+	template <unsigned HexValue>
+	constexpr Colori& fromHexRGB(){
+		static_assert(HexValue <= 0xFFFFFF, "Hex value is greater than 0xFFFFFF");
+		r = (HexValue >> 16) & 255;
+		g = (HexValue >>  8) & 255;
+		b = (HexValue >>  0) & 255;
+		return *this;
+	}
 
 	/// Returns inverted color
 	Colori inverse() const { return Colori(*this).invert(); }
@@ -589,6 +598,13 @@ struct RGB{
 	/// Set from an array of RGB components
 	template <class T>
 	RGB& set(const T* rgb){ return set(rgb[0],rgb[1],rgb[2]); }
+
+	template <unsigned HexValue>
+	constexpr RGB& fromHex(){
+		auto ci = Colori().fromHexRGB<HexValue>();
+		r = ci.r/255.; g = ci.g/255.; b = ci.b/255.;
+		return *this;
+	}
 
 	/// Set components from tightly packed RGB array
 	template <class Array3>
