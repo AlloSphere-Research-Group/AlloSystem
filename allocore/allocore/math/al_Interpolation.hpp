@@ -105,8 +105,8 @@ template <class T> void lagrange3(T * h, T delay);
 
 /// Compute weights for cubic cardinal spline
 
-/// @param[out] w	output weights
-/// @param[ in] x	input domain values; spline in [x[1], x[2]]
+/// @param[out] w	four output weights
+/// @param[ in] x	four input domain values; spline in [x[1], x[2]]
 /// @param[ in] f	fraction in [0,1]
 /// @param[ in] b	smoothness parameter in [-1,1]; 1 = Catmull-Rom
 template <class Tf, class Tv>
