@@ -42,6 +42,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
+#include <cmath>
 #include "allocore/graphics/al_Mesh.hpp"
 
 namespace al{
@@ -325,10 +326,11 @@ void ellipse(Vec2 * dst, int len, float radx, float rady){
 	struct RSin{
 		float mul,val,val2;
 		RSin(float f=1, float a=1, float p=0){
-			f *= M_2PI, p *= M_2PI;
-			mul  = 2. * cos(f);
-			val2 = sin(p - f * 2.)*a;
-			val  = sin(p - f     )*a;
+			static const float twoPi = 6.283185307179586476925286766559;
+			f *= twoPi, p *= twoPi;
+			mul  = 2. * std::cos(f);
+			val2 = std::sin(p - f * 2.)*a;
+			val  = std::sin(p - f     )*a;
 		}
 		float operator()(){
 			auto v0 = mul * val - val2;
