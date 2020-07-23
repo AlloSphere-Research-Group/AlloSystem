@@ -550,7 +550,7 @@ inline Vec<N,T> operator * (const T& s, const Vec<N,T>& v){ return  v*s; }
 
 template <int N, class T>
 inline Vec<N,T> operator / (const T& s, const Vec<N,T>& v){
-	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
+	auto r=v; for(auto& e:r) e = s/e; return r;
 }
 
 
