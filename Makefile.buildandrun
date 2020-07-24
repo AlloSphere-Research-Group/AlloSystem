@@ -7,8 +7,9 @@
 RUN_DIR = $(dir $(lastword $(MAKECMDGOALS)))
 -include $(RUN_DIR)Makefile.user
 
+# Add user specified source dirs to global Make vars
 VPATH += $(RUN_SRC_DIRS)
-RUN_CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS))
+CPPFLAGS += $(addprefix -I, $(RUN_SRC_DIRS))
 
 # Create list of all valid source files found in RUN_SRC_DIRS
 RUN_SRCS	 = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
@@ -53,7 +54,7 @@ $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.t
 $(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_PATH="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	$(CXX) $(RUN_CPPFLAGS) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
+	$(CXX) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
     ifeq ($(BUILD_CONFIG),Release)
 		@cd $(BIN_DIR) && ./$(*F)
