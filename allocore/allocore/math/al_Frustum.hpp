@@ -221,7 +221,7 @@ template <class T>
 int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
 	int result = INSIDE;
 	for(const auto& plane : pl){
-		float distance = plane.distance(c);
+		auto distance = plane.distance(c);
 		if(distance < -r)		return OUTSIDE;
 		else if(distance < r)	result = INTERSECT;
 	}
