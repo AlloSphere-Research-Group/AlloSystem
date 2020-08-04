@@ -378,6 +378,26 @@ public:
 		return r;
 	}
 
+	/// Transform a point by this matrix treated as a homogenous transform
+	template <class U>
+	Vec<N-1,U> transformPoint(const Vec<N-1,U>& v){
+		Vec<N-1,U> r;
+		IT(N-1){
+			auto mrow = row(i);
+			r[i] = mrow.template sub<N-1>().dot(v) + mrow[N-1];
+		}
+		return r;
+	}
+
+	/// Transform a vector by this matrix treated as a homogenous transform
+	template <class U>
+	Vec<N-1,U> transformVector(const Vec<N-1,U>& v){
+		Vec<N-1,U> r;
+		IT(N-1){ r[i] = row(i).template sub<N-1>().dot(v); }
+		return r;
+	}
+	
+
 	/// Set elements from different sized matrix
 
 	/// Only the corresponding elements are copied from the source. Extra
