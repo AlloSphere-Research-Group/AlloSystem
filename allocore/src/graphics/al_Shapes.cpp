@@ -540,51 +540,56 @@ int addQuad(Mesh& m,
 }
 
 
-int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist){
+int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist, bool caps){
 
-	m.primitive(Graphics::TRIANGLE_STRIP);
+	m.primitive(Graphics::TRIANGLES);
 	unsigned Nv = m.vertices().size();
 	float height_2 = height/2;
 
-	if(twist == 0){
-		CSin csin(2*M_PI/slices);
-		for(unsigned i=0; i<slices; ++i){
-			m.vertex(csin.r*btmRadius, csin.i*btmRadius,  height_2);
-			m.vertex(csin.r*topRadius, csin.i*topRadius, -height_2);
-			csin();
-			m.index(Nv + 2*i);
-			m.index(Nv + 2*i+1);
-		}
+	double frq = 2*M_PI/slices;
+	CSin csinb(frq, btmRadius);
+	CSin csint = csinb;
+	csint.ampPhase(topRadius, twist*frq);
+	for(unsigned i=0; i<slices; ++i){
+		m.vertex(csinb.r, csinb.i, -height_2);
+		csinb();
+		m.vertex(csint.r, csint.i,  height_2);
+		csint();
+		
+		int j = (i+1)%slices; // next slice over
+		int ib0 = Nv + 2*i;
+		int ib1 = Nv + 2*j;
+		int it0 = ib0 + 1;
+		int it1 = ib1 + 1;
+		m.index(ib0, ib1, it0);
+		m.index(it0, ib1, it1);
 	}
-	else{
-		double frq = 2*M_PI/slices;
-		CSin csinb(frq, btmRadius);
-		CSin csint = csinb;
-		csint.ampPhase(topRadius, twist*frq);
-		for(unsigned i=0; i<slices; ++i){
-			m.vertex(csinb.r, csinb.i,  height_2);
-			csinb();
-			m.vertex(csint.r, csint.i, -height_2);
-			csint();
-			m.index(Nv + 2*i);
-			m.index(Nv + 2*i+1);
+
+	if(caps){
+		m.vertex(0.,0.,-height_2);
+		m.vertex(0.,0., height_2);
+		int ib = m.vertices().size()-2;
+		int it = m.vertices().size()-1;
+		for(int i=0; i<slices; ++i){
+			int j = (i+1)%slices; // next slice over
+			int ib0 = Nv + 2*i;
+			int ib1 = Nv + 2*j;
+			m.index(ib, ib1, ib0);
+			m.index(it, ib0+1, ib1+1);
 		}
 	}
 
-	m.index(Nv);
-	m.index(Nv+1);
-
-	return 2*slices;
+	return 2*slices + 2*caps;
 }
 
 
 int addAnnulus(Mesh& m, float inRadius, float outRadius, unsigned slices, float twist){
-	return addPrism(m, inRadius, outRadius, 0, slices, twist);
+	return addPrism(m, outRadius, inRadius, 0, slices, twist, false);
 }
 
 
-int addCylinder(Mesh& m, float radius, float height, unsigned slices, float twist){
-	return addPrism(m, radius, radius, height, slices, twist);
+int addCylinder(Mesh& m, float radius, float height, unsigned slices, float twist, bool caps){
+	return addPrism(m, radius, radius, height, slices, twist, caps);
 }
 
 

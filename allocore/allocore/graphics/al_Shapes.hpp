@@ -186,10 +186,9 @@ int addQuad(
 );
 
 
-/// Add a prism as an indexed triangle strip
+/// Add a prism as indexed triangles
 
-/// A prism is formed from a triangle strip between two parallel regular
-/// polygons.
+/// A prism is formed from the vertices of two parallel regular polygons.
 ///
 /// @param[in,out] m		Mesh to add vertices and indices to
 /// @param[in] btmRadius	Radius of bottom polygon (on xy plane)
@@ -198,15 +197,17 @@ int addQuad(
 /// @param[in] slices		Number of polygon vertices
 /// @param[in] twist		Rotation factor between polygons;
 ///							a value of 0.5 produces an antiprism
+/// @param[in] caps			Whether to generate end caps
 /// \returns number of vertices added
 int addPrism(
 	Mesh& m, float btmRadius=1, float topRadius=1, float height=2,
 	unsigned slices=16,
-	float twist=0
+	float twist=0,
+	bool caps=true
 );
 
 
-/// Add an annulus ("little ring") as an indexed triangle strip
+/// Add an annulus ("little ring") as indexed triangles
 
 /// @param[in,out] m		Mesh to add vertices and indices to
 /// @param[in] inRadius		Radius of inner circle (on xy plane)
@@ -221,7 +222,7 @@ int addAnnulus(
 );
 
 
-/// Add an open cylinder as an indexed triangle strip
+/// Add a cylinder as indexed triangles
 
 /// To create a cylinder with different radii for the top and bottom, /see
 /// addPrism.
@@ -231,11 +232,13 @@ int addAnnulus(
 /// @param[in] height		Height (along z axis)
 /// @param[in] slices		Number of polygon vertices
 /// @param[in] twist		Rotation factor between polygons
+/// @param[in] caps			Whether to generate end caps
 /// \returns number of vertices added
 int addCylinder(
 	Mesh& m, float radius=1, float height=2,
 	unsigned slices=16,
-	float twist=0
+	float twist=0,
+	bool caps=true
 );
 
 
