@@ -43,8 +43,7 @@ static void scaleVerts(Mesh& m, float radius, int N){
 	}
 }
 
-
-int addCube(Mesh& m, float l){
+int addCuboid(Mesh& m, float rx, float ry, float rz){
 
 	m.primitive(Graphics::TRIANGLES);
 	/* 0 1      t  b
@@ -53,10 +52,10 @@ int addCube(Mesh& m, float l){
 	6 7       f b       */
 
 	int Nv = 8;
-	m.vertex(-l, l,-l);	m.vertex( l, l,-l);
-	m.vertex(-l,-l,-l);	m.vertex( l,-l,-l);
-	m.vertex(-l, l, l);	m.vertex( l, l, l);
-	m.vertex(-l,-l, l);	m.vertex( l,-l, l);
+	m.vertex(-rx, ry,-rz);	m.vertex( rx, ry,-rz);
+	m.vertex(-rx,-ry,-rz);	m.vertex( rx,-ry,-rz);
+	m.vertex(-rx, ry, rz);	m.vertex( rx, ry, rz);
+	m.vertex(-rx,-ry, rz);	m.vertex( rx,-ry, rz);
 
 	static const int indices[] = {
 		6,5,4, 6,7,5, // front
