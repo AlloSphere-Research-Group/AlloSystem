@@ -44,99 +44,32 @@ static void scaleVerts(Mesh& m, float radius, int N){
 }
 
 
-int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
+int addCube(Mesh& m, float l){
 
 	m.primitive(Graphics::TRIANGLES);
+	/* 0 1      t  b
+	   2 3      | /
+	4 5       l +--r
+	6 7       f b       */
 
-	// This generates a cube with face-oriented normals and unit texture
-	// coordinates per face. It should be rendered using a quad primitive.
-	if(withNormalsAndTexcoords){
+	int Nv = 8;
+	m.vertex(-l, l,-l);	m.vertex( l, l,-l);
+	m.vertex(-l,-l,-l);	m.vertex( l,-l,-l);
+	m.vertex(-l, l, l);	m.vertex( l, l, l);
+	m.vertex(-l,-l, l);	m.vertex( l,-l, l);
 
-		// All six faces will have the same tex coords
-		for(int i=0;i<6;++i){
-			m.texCoord( 0, 0);
-			m.texCoord( 1, 0);
-			m.texCoord( 1, 1);
-			m.texCoord( 0, 1);
-		}
+	static const int indices[] = {
+		6,5,4, 6,7,5, // front
+		7,1,5, 7,3,1, // right
+		3,0,1, 3,2,0, // back
+		2,4,0, 2,6,4, // left
+		4,1,0, 4,5,1, // top
+		2,3,6, 3,7,6  // bottom
+	};
 
-		// +x face
-		for(int i=0;i<4;++i) m.normal( 1, 0, 0);
-		m.vertex( l,-l, l);
-		m.vertex( l,-l,-l);
-		m.vertex( l, l,-l);
-		m.vertex( l, l, l);
+	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
-		// -x face
-		for(int i=0;i<4;++i) m.normal(-1, 0, 0);
-		m.vertex(-l, l, l);
-		m.vertex(-l, l,-l);
-		m.vertex(-l,-l,-l);
-		m.vertex(-l,-l, l);
-
-		// +y face
-		for(int i=0;i<4;++i) m.normal( 0, 1, 0);
-		m.vertex(-l, l, l);
-		m.vertex( l, l, l);
-		m.vertex( l, l,-l);
-		m.vertex(-l, l,-l);
-
-		// -y face
-		for(int i=0;i<4;++i) m.normal( 0,-1, 0);
-		m.vertex(-l,-l,-l);
-		m.vertex( l,-l,-l);
-		m.vertex( l,-l, l);
-		m.vertex(-l,-l, l);
-
-		// +z face
-		for(int i=0;i<4;++i) m.normal( 0, 0, 1);
-		m.vertex(-l,-l, l);
-		m.vertex( l,-l, l);
-		m.vertex( l, l, l);
-		m.vertex(-l, l, l);
-
-		// -z face
-		for(int i=0;i<4;++i) m.normal( 0, 0,-1);
-		m.vertex(-l, l,-l);
-		m.vertex( l, l,-l);
-		m.vertex( l,-l,-l);
-		m.vertex(-l,-l,-l);
-
-		return 6*4;
-	}
-	else{
-		/*
-				0	1
-
-				2	3
-		4	5
-
-		6	7
-
-			t	b
-			| /
-		l --+--	r
-		  /	|
-		f	b
-
-		*/
-
-		int Nv = 8;
-		m.vertex(-l, l,-l);	m.vertex( l, l,-l);
-		m.vertex(-l,-l,-l);	m.vertex( l,-l,-l);
-		m.vertex(-l, l, l);	m.vertex( l, l, l);
-		m.vertex(-l,-l, l);	m.vertex( l,-l, l);
-
-		static const int indices[] = {
-			6,5,4, 6,7,5, 7,1,5, 7,3,1,
-			3,0,1, 3,2,0, 2,4,0, 2,6,4,
-			4,1,0, 4,5,1, 2,3,6, 3,7,6
-		};
-
-		m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
-
-		return Nv;
-	}
+	return Nv;
 }
 
 
