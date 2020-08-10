@@ -44,7 +44,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include <cmath> // abs
+#include <cmath> // abs, cos, sin, acos, sqrt, pow
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Vec.hpp"
@@ -202,7 +202,7 @@ public:
 	Quat inverse() const { return sgn().conj(); }
 
 	/// Get magnitude
-	T mag() const { return (T)sqrt(magSqr()); }
+	T mag() const { return (T)std::sqrt(magSqr()); }
 
 	/// Get magnitude squared
 	T magSqr() const { return dot(*this); }
@@ -245,19 +245,19 @@ public:
 	/// Set as versor rotated by angle, in radians, around x-axis
 	Quat& fromAxisX(const T& angle) {
 		T t2 = angle * 0.5;
-		return set(cos(t2), sin(t2), T(0), T(0));
+		return set(std::cos(t2), std::sin(t2), T(0), T(0));
 	}
 
 	/// Set as versor rotated by angle, in radians, around y-axis
 	Quat& fromAxisY(const T& angle){
 		T t2 = angle * 0.5;
-		return set(cos(t2), T(0), sin(t2), T(0));
+		return set(std::cos(t2), T(0), std::sin(t2), T(0));
 	}
 
 	/// Set as versor rotated by angle, in radians, around z-axis
 	Quat& fromAxisZ(const T& angle){
 		T t2 = angle * 0.5;
-		return set(cos(t2), T(0), T(0), sin(t2));
+		return set(std::cos(t2), T(0), T(0), std::sin(t2));
 	}
 
 	/// Set as versor rotated by YXZ Euler angles, in radians
@@ -365,7 +365,7 @@ inline Quat<T>& Quat<T> :: normalize() {
 		setIdentity();
 	}
 	else if(unit > accuracyMax() || unit < accuracyMin()){
-		(*this) *= 1./sqrt(unit);
+		(*this) *= 1./std::sqrt(unit);
 	}
 	return *this;
 }
@@ -402,13 +402,13 @@ Quat<T> Quat<T> :: pow(T expo) const {
 	// Is q/|q| close to (±1,0,0,0)?
 	// If so, then quaternion cannot be "rotated", so just scale w component.
 	if(w_m > justUnder1<T>() || w_m < -justUnder1<T>()){
-		return Quat<T>((w>=T(0)?T(1):T(-1)) * ::pow(m, expo), 0, 0, 0);
+		return Quat<T>((w>=T(0)?T(1):T(-1)) * std::pow(m, expo), 0, 0, 0);
 	}
 
-	T theta = ::acos(w_m);
-	auto imag = Vec<3,T>(x,y,z) / (m * ::sin(theta));
-	imag *= ::sin(expo*theta);
-	return Quat(::cos(expo*theta), imag) * ::pow(m, expo);
+	T theta = std::acos(w_m);
+	auto imag = Vec<3,T>(x,y,z) / (m * std::sin(theta));
+	imag *= std::sin(expo*theta);
+	return Quat(std::cos(expo*theta), imag) * std::pow(m, expo);
 }
 
 
@@ -420,8 +420,8 @@ inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const Vec<3,T>& axis) {
 template<typename T>
 Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const T& ux, const T& uy, const T& uz) {
 	T t2 = angle * T(0.5);
-	T sinft2 = sin(t2);
-	w = cos(t2);
+	T sinft2 = std::sin(t2);
+	w = std::cos(t2);
 	x = ux * sinft2;
 	y = uy * sinft2;
 	z = uz * sinft2;
@@ -447,12 +447,12 @@ Quat<T>& Quat<T>::fromEuler(const T& az, const T& el, const T& ba){
 	and the final quaternion, using YXZ ordering, is obtained by (Qy * Qx) * Qz.
 	*/
 
-	T c1 = cos(az * T(0.5));
-	T c2 = cos(el * T(0.5));
-	T c3 = cos(ba * T(0.5));
-	T s1 = sin(az * T(0.5));
-	T s2 = sin(el * T(0.5));
-	T s3 = sin(ba * T(0.5));
+	T c1 = std::cos(az * T(0.5));
+	T c2 = std::cos(el * T(0.5));
+	T c3 = std::cos(ba * T(0.5));
+	T s1 = std::sin(az * T(0.5));
+	T s2 = std::sin(el * T(0.5));
+	T s3 = std::sin(ba * T(0.5));
 
 /*
 	(w,x,y,z) (a,b,c,d)
@@ -494,7 +494,7 @@ Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, co
 	auto trace = ux[0]+uy[1]+uz[2];
 
 	if(trace > T(0)) {
-		w = sqrt(T(1) + trace)*T(0.5);
+		w = std::sqrt(T(1) + trace)*T(0.5);
 		auto c = T(1)/(T(4)*w);
 		x = (uz[1] - uy[2])*c;
 		y = (ux[2] - uz[0])*c;
@@ -503,7 +503,7 @@ Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, co
 	else {
 		if(ux[0] > uy[1] && ux[0] > uz[2]) {
 			// ux[0] is greatest
-			x = sqrt(T(1) + ux[0]-uy[1]-uz[2])*T(0.5);
+			x = std::sqrt(T(1) + ux[0]-uy[1]-uz[2])*T(0.5);
 			auto c = T(1)/(T(4)*x);
 			w = (uz[1] - uy[2])*c;
 			y = (uy[0] + ux[1])*c;
@@ -511,7 +511,7 @@ Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, co
 		}
 		else if(uy[1] > ux[0] && uy[1] > uz[2]) {
 			// ux[1] is greatest
-			y = sqrt(T(1) + uy[1]-ux[0]-uz[2])*T(0.5);
+			y = std::sqrt(T(1) + uy[1]-ux[0]-uz[2])*T(0.5);
 			auto c = T(1)/(T(4)*y);
 			w = (ux[2] - uz[0])*c;
 			x = (uy[0] + ux[1])*c;
@@ -519,7 +519,7 @@ Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, co
 		}
 		else { //if(uz[2] > ux[0] && uz[2] > uy[1]) {
 			// ux[2] is greatest
-			z = sqrt(T(1) + uz[2]-ux[0]-uy[1])*T(0.5);
+			z = std::sqrt(T(1) + uz[2]-ux[0]-uy[1])*T(0.5);
 			auto c = T(1)/(T(4)*z);
 			w = (uy[0] - ux[1])*c;
 			x = (uz[0] + ux[2])*c;
@@ -551,9 +551,9 @@ template<typename T>
 void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
 	T unit = w*w; // cos^2(theta/2)
 	if(unit < accuracyMin()){ // |cos x| must always be less than or equal to 1!
-		T invSinAngle = 1./sqrt(1. - unit); // = 1/sqrt(1 - cos^2(theta/2))
+		T invSinAngle = 1./std::sqrt(1. - unit); // = 1/sqrt(1 - cos^2(theta/2))
 
-		aa = ::acos(w) * T(2);
+		aa = std::acos(w) * T(2);
 		ax = x * invSinAngle;
 		ay = y * invSinAngle;
 		az = z * invSinAngle;
@@ -763,13 +763,13 @@ Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 		bflip = 1;
 	}
 
-	T cos_angle = acos(dot_prod);
+	T cos_angle = std::acos(dot_prod);
 	if(std::abs(cos_angle) > eps()) {
-		T sine = sin(cos_angle);
+		T sine = std::sin(cos_angle);
 		T inv_sine = 1./sine;
 
-		a = sin(cos_angle*(1.-amt)) * inv_sine;
-		b = sin(cos_angle*amt) * inv_sine;
+		a = std::sin(cos_angle*(1.-amt)) * inv_sine;
+		b = std::sin(cos_angle*amt) * inv_sine;
 
 		if (bflip) { b = -b; }
 	} else {
@@ -799,9 +799,9 @@ void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buf
 		RSin(const T& frq=T(0), const T& phs=T(0), const T& amp=T(1))
 		:	val2(0), mul(0){
 			T f=frq, p=phs;
-			mul  = (T)2 * (T)cos(f);
-			val2 = (T)sin(p - f * T(2))*amp;
-			val  = (T)sin(p - f       )*amp;
+			mul  = (T)2 * (T)std::cos(f);
+			val2 = (T)std::sin(p - f * T(2))*amp;
+			val  = (T)std::sin(p - f       )*amp;
 		}
 
 		/// Generate next value.
@@ -829,12 +829,12 @@ void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buf
 		bflip = -1;
 	}
 
-	const T cos_angle = acos(dot_prod);
+	const T cos_angle = std::acos(dot_prod);
 	const T inv_frames = 1./((T)numFrames);
 
 	if(std::abs(cos_angle) > eps())
 	{
-		const T sine = sin(cos_angle);
+		const T sine = std::sin(cos_angle);
 		const T inv_sine = 1./sine;
 		RSin sinA(-cos_angle*inv_frames, cos_angle, inv_sine);
 		RSin sinB(cos_angle*inv_frames, 0, inv_sine * bflip);
@@ -900,7 +900,7 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 			y = uy * sinft2;
 			z = uz * sinft2;
 		*/
-		T s = sqrt((d+1.)*2);
+		T s = std::sqrt((d+1.)*2);
 		T invs = 1./s;
 		Vec<3, T> c = cross(src, dst);
 		q.w = s * 0.5;
@@ -931,7 +931,7 @@ Quat<T> Quat<T> :: getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T
 	T num8 = (m00 + m11) + m22;
 	Quat<T> q;
 	if (num8 > 0){
-		T num = sqrt(num8 + 1);
+		T num = std::sqrt(num8 + 1);
 		q.w = num * 0.5;
 		num = 0.5 / num;
 		q.x = (m12 - m21) * num;
@@ -940,7 +940,7 @@ Quat<T> Quat<T> :: getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T
 		return q;
 	}
 	if ((m00 >= m11) && (m00 >= m22)){
-		T num7 = sqrt(((1 + m00) - m11) - m22);
+		T num7 = std::sqrt(((1 + m00) - m11) - m22);
 		T num4 = 0.5 / num7;
 		q.x = 0.5 * num7;
 		q.y = (m01 + m10) * num4;
@@ -949,7 +949,7 @@ Quat<T> Quat<T> :: getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T
 		return q;
 	}
 	if (m11 > m22){
-		T num6 = sqrt(((1 + m11) - m00) - m22);
+		T num6 = std::sqrt(((1 + m11) - m00) - m22);
 		T num3 = 0.5 / num6;
 		q.x = (m10+ m01) * num3;
 		q.y = 0.5 * num6;
@@ -957,7 +957,7 @@ Quat<T> Quat<T> :: getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T
 		q.w = (m20 - m02) * num3;
 		return q; 
 	}
-	T num5 = sqrt(((1 + m22) - m00) - m11);
+	T num5 = std::sqrt(((1 + m22) - m00) - m11);
 	T num2 = 0.5 / num5;
 	q.x = (m20 + m02) * num2;
 	q.y = (m21 + m12) * num2;
@@ -1004,7 +1004,7 @@ void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T
 	}
 
 	if(along < 0.9995 && axis_mag_sqr > 0.001) {
-		auto theta = std::abs(amt)*acos(along);
+		auto theta = std::abs(amt)*std::acos(along);
 			//printf("theta: %f  amt: %f\n", theta, amt);
 		fromAxisAngle(theta, axis[0], axis[1], axis[2]);
 	}
@@ -1023,12 +1023,12 @@ Quat<T> Quat<T> :: rotor(const Vec<3,T>& v1, const Vec<3,T>& v2) {
 
 	// calculate half the angle between v1 and v2
 	T dotmag = v1.dot(v2);
-	T theta = acos(dotmag)*0.5;
+	T theta = std::acos(dotmag)*0.5;
 
 	// calculate the scaled actual bivector generaed by v1 and v2
-	auto bivec = n*sin(theta);
+	auto bivec = n*std::sin(theta);
 	
-	return Quat<T>(cos(theta), bivec[0], bivec[1], bivec[2]);;
+	return Quat<T>(std::cos(theta), bivec[0], bivec[1], bivec[2]);;
 }
 
 template<typename T>
