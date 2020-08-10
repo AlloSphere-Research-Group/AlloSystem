@@ -59,7 +59,8 @@ int addTetrahedron(Mesh& m, float radius=1);
 /// Add cube as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
-/// @param[in]		radius	Radius of enclosing sphere
+/// @param[in]		radius	Radius of cube (from center to faces);
+///							sqrt(1/3) gives cube inscribed in unit sphere
 /// \returns number of vertices added (8)
 int addCube(Mesh& m, bool withNormalsAndTexcoords = false, float radius=M_SQRT_1_3);
 
