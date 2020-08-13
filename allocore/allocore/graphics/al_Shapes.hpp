@@ -65,6 +65,7 @@ int addTetrahedron(Mesh& m, float radius=1);
 /// \returns number of vertices added (8)
 int addCuboid(Mesh& m, float rx, float ry, float rz);
 inline int addCuboid(Mesh& m, float radius=1){ return addCuboid(m,radius,radius,radius); }
+inline int addCuboid(Mesh& m, const Vec3f& radii){ return addCuboid(m,radii[0],radii[1],radii[2]); }
 
 /// Add cube as indexed triangles
 
