@@ -321,7 +321,7 @@ void Texture :: resetArray(unsigned align) {
 			mArray.header.dimcount = 3;
 			mArray.header.dim[0] = mWidth;
 			mArray.header.dim[1] = mHeight;
-			mArray.header.dim[3] = mDepth;
+			mArray.header.dim[2] = mDepth;
 			mArray.deriveStride(mArray.header, align);
 			break;
 		#endif
