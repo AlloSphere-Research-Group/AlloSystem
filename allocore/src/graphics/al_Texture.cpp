@@ -695,12 +695,13 @@ void Texture::quadViewport(
 
 void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPixel){
 	if(mTarget == TEXTURE_2D){
+		auto& arr = array();
 		for(int j=0; j<height(); ++j){
 			for(int i=0; i<width(); ++i){
 				float rgba[4] = {0.f, 0.f, 0.f, 1.f};
 				onPixel(i,j, rgba);
 				#define SET_PIXEL(type, op){\
-					auto * pixel = data<type>() + (j*height()+i)*numComponents();\
+					auto * pixel = arr.cell<type>(i,j);\
 					switch(mFormat){\
 					case Graphics::RGBA:\
 						pixel[0] = rgba[0] op;\
