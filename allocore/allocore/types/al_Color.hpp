@@ -75,6 +75,7 @@ namespace{
 struct Color{
 
 	typedef float value_type;
+	static constexpr unsigned size(){ return 4; }
 
 	union{
 		struct{
@@ -269,6 +270,9 @@ private:
 /// overloaded assignment (=) operators.
 struct Colori {
 
+	typedef uint8_t value_type;
+	static constexpr unsigned size(){ return 4; }
+
 	union{
 		struct{
 			uint8_t r;			///< Red component in [0, 255]
@@ -420,6 +424,7 @@ private:
 struct HSV{
 
 	typedef float value_type;
+	static constexpr unsigned size(){ return 3; }
 
 	union{
 		struct{
@@ -528,6 +533,7 @@ struct HSV{
 struct RGB{
 
 	typedef float value_type;
+	static constexpr unsigned size(){ return 3; }
 
 	union{
 		struct{
@@ -700,6 +706,10 @@ struct RGB{
 
 /// Color represented in CIE 1931 XYZ color space
 struct CIEXYZ{
+	
+	typedef float value_type;
+	static constexpr unsigned size(){ return 3; }
+	
 	union{
 		struct{
 			float x;			///< CIE X component in [0, 1]
@@ -767,6 +777,10 @@ struct CIEXYZ{
 
 /// Color represented by L* (lightness), a*, b*
 struct Lab{
+	
+	typedef float value_type;
+	static constexpr unsigned size(){ return 3; }
+	
 	union{
 		struct{
 			float l; ///	< Lightness component in [0, 100]
@@ -847,6 +861,10 @@ struct Lab{
 
 /// Color represented by hue, chroma, luminance(ab)
 struct HCLab{
+	
+	typedef float value_type;
+	static constexpr unsigned size(){ return 3; }
+	
 	union{
 		struct{
 			/// ranges normalized to 8-bit RGB gamut using
@@ -934,6 +952,10 @@ struct HCLab{
 
 /// Color represented by L* (lightness), u*, v*
 struct Luv{
+	
+	typedef float value_type;
+	static constexpr unsigned size(){ return 3; }
+	
 	union{
 		struct{
 			float l; ///	< Lightness component in [0, 100]
@@ -1013,6 +1035,9 @@ struct Luv{
 
 /// Color represented by hue, chroma, luminance(uv)
 struct HCLuv{
+
+	typedef float value_type;
+	static constexpr unsigned size(){ return 3; }
 
 	union{
 		struct{
