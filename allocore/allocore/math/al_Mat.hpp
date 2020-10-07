@@ -539,6 +539,13 @@ public:
 	/// Get trace (sum of diagonal elements)
 	T trace() const { return diagonal().sum(); }
 
+	/// Extract rotation part of transformation matrix
+	Mat<N-1,T> rotation() const {
+		auto R = sub<N-1>();
+		for(int i=0; i<N-1; ++i) R.col(i).normalize();
+		return R;
+	}
+
 
 	// Affine transformations
 
