@@ -236,6 +236,9 @@ bool ShaderProgram::compile(
 
 	if(!created()) return false;
 
+	mUniformLocs.clear();
+	mAttribLocs.clear();
+
 	std::string ver = mVersion.empty() ? "" : "#version " + mVersion + "\n";
 	auto pre = ver + mPreamble;
 
