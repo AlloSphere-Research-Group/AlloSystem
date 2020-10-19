@@ -219,13 +219,13 @@ public:
 	Texture& type(DataType v){ return update(v, mType, mShapeUpdated); }
 
 	/// Set width, in pixels
-	Texture& width (unsigned v){ return update(v, mWidth, mShapeUpdated); }
+	Texture& width (unsigned v);
 
 	/// Set height, in pixels
-	Texture& height(unsigned v){ return update(v, mHeight,mShapeUpdated); }
+	Texture& height(unsigned v);
 
 	/// Set depth, in pixels
-	Texture& depth (unsigned v){ return update(v, mDepth ,mShapeUpdated); }
+	Texture& depth (unsigned v);
 
 	/// Resize 1D texture
 	Texture& resize(unsigned w){ return width(w); }

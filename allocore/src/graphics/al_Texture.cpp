@@ -95,6 +95,24 @@ void Texture::onDestroy(){
 }
 
 
+Texture& Texture::width(unsigned v){
+	update(v, mWidth, mShapeUpdated);
+	if(mShapeUpdated) deriveTarget();
+	return *this;
+}
+
+Texture& Texture::height(unsigned v){
+	update(v, mHeight, mShapeUpdated);
+	if(mShapeUpdated) deriveTarget();
+	return *this;
+}
+
+Texture& Texture::depth(unsigned v){
+	update(v, mDepth, mShapeUpdated);
+	if(mShapeUpdated) deriveTarget();
+	return *this;
+}
+
 Texture& Texture::filterMin(Filter v){
 	switch(v){
 	case NEAREST_MIPMAP_NEAREST:
