@@ -136,6 +136,13 @@ public:
 
 	ShaderProgram();
 
+	ShaderProgram(
+		const std::string& preambleCode,
+		const std::string& vertexCode,
+		const std::string& fragmentCode
+	);
+	
+
 	/// Any attached shaders will automatically be detached, but not deleted.
 	virtual ~ShaderProgram();
 

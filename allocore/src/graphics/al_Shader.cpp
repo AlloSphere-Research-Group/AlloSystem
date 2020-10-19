@@ -143,6 +143,16 @@ ShaderProgram::ShaderProgram()
 :	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES)
 {}
 
+ShaderProgram::ShaderProgram(
+	const std::string& preambleCode,
+	const std::string& vertexCode,
+	const std::string& fragmentCode
+) : ShaderProgram()
+{
+	preamble(preambleCode);
+	compile(vertexCode, fragmentCode);
+}
+
 ShaderProgram::~ShaderProgram(){
 	destroy();
 }
