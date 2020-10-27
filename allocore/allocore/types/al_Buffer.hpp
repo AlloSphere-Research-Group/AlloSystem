@@ -292,6 +292,7 @@ public:
 	}
 
 
+	/// Iterator going from older to newer elements (write order)
 	struct iterator {
 		typedef T value_type;
 		typedef T& reference;
