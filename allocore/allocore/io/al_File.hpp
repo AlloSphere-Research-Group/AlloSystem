@@ -360,6 +360,34 @@ public:
 	bool rewind();
 
 
+	struct iterator {
+		typedef FileInfo value_type;
+		typedef const value_type& reference;
+		typedef const value_type* pointer;
+		typedef std::forward_iterator_tag iterator_category;
+		typedef std::ptrdiff_t difference_type;
+
+		iterator(Dir& dir, bool more=true): mDir(dir), mMore(more){
+			if(more){
+				mDir.rewind();
+				++(*this);
+			}
+		}
+		iterator& operator++(){ mMore=mDir.read(); return *this;} //++it
+		iterator operator++(int){ auto t=*this; ++(*this); return t;} // it++
+		bool operator==(iterator other) const { return mMore == other.mMore;}
+		bool operator!=(iterator other) const { return !(*this == other);}
+		reference operator*(){ return mDir.entry(); }
+		pointer operator->(){ return &*(*this); }
+	private:
+		Dir& mDir; // use ref to avoid copy
+		bool mMore;
+	};
+
+	iterator begin(){ return iterator(*this); }
+	iterator end(){ return iterator(*this, false); }
+
+
 	/// Make a directory
 	static bool make(const std::string& path, bool recursive=true);
 
