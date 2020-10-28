@@ -55,11 +55,11 @@ namespace al {
 template<typename T=double>
 class Crossover {
 public:
+	
+	Crossover(T f=(T)600, T fs=(T)44100.) { freq(f, fs); clear(); }
 
 	/// set the cross-over middle frequency
 	void freq(T f, T fs);
-
-	Crossover(T f=(T)600, T fs=(T)44100.) { freq(f, fs); clear(); }
 
 	/// process one sample and return hi/lo shelf
 	void next(const T in, T * lo, T * hi);
@@ -74,69 +74,40 @@ protected:
 };
 
 
-template<>
-void Crossover<double> :: freq(double f, double fs) {
-	double rad = twoPi * f / fs;
-	double cosine = std::cos(rad);
-	double sine = std::sin(rad);
-	if (std::abs(cosine) > 0.0001) {
-		mC0 = (sine - 1.)/cosine;
+template <typename T>
+void Crossover<T> :: freq(T f, T fs) {
+	auto rad = twoPi * f / fs;
+	auto cosine = std::cos(rad);
+	auto sine = std::sin(rad);
+	if (std::abs(cosine) > (T)0.0001) {
+		mC0 = (sine - (T)1.)/cosine;
 	} else {
-		mC0 = cosine * 0.5;
+		mC0 = cosine * (T)0.5;
 	}
-	mC1 = (1. + mC0) * 0.5;
+	mC1 = ((T)1. + mC0) * (T)0.5;
 }
 
-template<>
-inline void Crossover<double> :: next(const double in, double * lo, double * hi) {
-	static const double denorm_offset = DBL_EPSILON*2.;
-
-	const double v0 = in - mC0 * mZ0;
-	const double x0 = mZ0 + mC0 * v0;
-
-	const double v1 = mC1 * (in - mZ1);
-	const double x1 = v1 + mZ1;
-
-	const double v2 = mC1 * (x1 - mZ2);
-	const double x2 = v2 + mZ2;
-
-	mZ0 = v0 + denorm_offset;
-	mZ1 = v1 + x1 + denorm_offset;
-	mZ2 = v2 + x2 + denorm_offset;
-
-	*lo = x2;
-	*hi = x0 - x2;
+namespace{
+	template <typename T> constexpr T denorm_offset();
+	template<> constexpr float denorm_offset<float>(){ return FLT_EPSILON*2.; }
+	template<> constexpr double denorm_offset<double>(){ return DBL_EPSILON*2.; }
 }
 
-template<>
-void Crossover<float> :: freq(float f, float fs) {
-	float rad = twoPi * f / fs;
-	float cosine = std::cos(rad);
-	float sine = std::sin(rad);
-	if (std::abs(cosine) > 0.0001f) {
-		mC0 = (sine - 1.f)/cosine;
-	} else {
-		mC0 = cosine * 0.5f;
-	}
-	mC1 = (1.f + mC0) * 0.5f;
-}
+template <typename T>
+inline void Crossover<T> :: next(const T in, T * lo, T * hi) {
 
-template<>
-inline void Crossover<float> :: next(const float in, float * lo, float * hi) {
-	static const float denorm_offset = FLT_EPSILON*2.;
+	const auto v0 = in - mC0 * mZ0;
+	const auto x0 = mZ0 + mC0 * v0;
 
-	const float v0 = in - mC0 * mZ0;
-	const float x0 = mZ0 + mC0 * v0;
+	const auto v1 = mC1 * (in - mZ1);
+	const auto x1 = v1 + mZ1;
 
-	const float v1 = mC1 * (in - mZ1);
-	const float x1 = v1 + mZ1;
+	const auto v2 = mC1 * (x1 - mZ2);
+	const auto x2 = v2 + mZ2;
 
-	const float v2 = mC1 * (x1 - mZ2);
-	const float x2 = v2 + mZ2;
-
-	mZ0 = v0 + denorm_offset;
-	mZ1 = v1 + x1 + denorm_offset;
-	mZ2 = v2 + x2 + denorm_offset;
+	mZ0 = v0 + denorm_offset<T>();
+	mZ1 = v1 + x1 + denorm_offset<T>();
+	mZ2 = v2 + x2 + denorm_offset<T>();
 
 	*lo = x2;
 	*hi = x0 - x2;
