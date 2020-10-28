@@ -43,12 +43,8 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-/*
-
-*/
-#include <stdio.h>
-#include <float.h>
-#include "allocore/math/al_Constants.hpp"
+#include <cfloat> // FLT_EPSILON, DBL_EPSILON
+#include <cmath>
 
 namespace al {
 
@@ -74,15 +70,16 @@ protected:
 	// coefficients and history
 	T mC0, mC1, mZ0, mZ1, mZ2;
 
+	static constexpr double twoPi = 6.283185307179586476925286766559;
 };
 
 
 template<>
 void Crossover<double> :: freq(double f, double fs) {
-	double rad = M_PI * 2. * f / fs;
-	double cosine = cos(rad);
-	double sine = sin(rad);
-	if (abs(c) > 0.0001) {
+	double rad = twoPi * f / fs;
+	double cosine = std::cos(rad);
+	double sine = std::sin(rad);
+	if (std::abs(cosine) > 0.0001) {
 		mC0 = (sine - 1.)/cosine;
 	} else {
 		mC0 = cosine * 0.5;
@@ -113,15 +110,15 @@ inline void Crossover<double> :: next(const double in, double * lo, double * hi)
 
 template<>
 void Crossover<float> :: freq(float f, float fs) {
-	float rad = M_PI * 2.f * f / fs;
-	float cosine = cosf(rad);
-	float sine = sinf(rad);
-	if (fabs(cosine) > 0.0001f) {
+	float rad = twoPi * f / fs;
+	float cosine = std::cos(rad);
+	float sine = std::sin(rad);
+	if (std::abs(cosine) > 0.0001f) {
 		mC0 = (sine - 1.f)/cosine;
 	} else {
 		mC0 = cosine * 0.5f;
 	}
-	mC1 = (1f + mC0) * 0.5f;
+	mC1 = (1.f + mC0) * 0.5f;
 }
 
 template<>
