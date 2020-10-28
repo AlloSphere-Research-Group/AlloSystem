@@ -48,8 +48,12 @@
 
 namespace al {
 
-///
-///
+
+/// Crossover filter
+
+/// This filter simultaneously computes low- and high-pass outputs. The sum of
+/// the outputs is an all-pass response. The filter is a 2nd-order IIR with
+/// 12 dB/octave cutoff slope.
 ///
 /// @ingroup allocore
 template<typename T=double>
