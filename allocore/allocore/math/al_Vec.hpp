@@ -589,6 +589,16 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 	return r;
 }
 
+template <int N, class T, class V>
+inline Vec<N+1, T> concat(const Vec<N,T>& v, const V& s){
+	return Vec<N+1,T>(v,s);
+}
+
+template <int N, class T, class V>
+inline Vec<N+1, T> concat(const V& s, const Vec<N,T>& v){
+	return Vec<N+1,T>(s,v);
+}
+
 /// Get a subvector
 template <int M, int Begin, int N, class T>
 inline Vec<M,T> sub(const Vec<N,T>& v){
