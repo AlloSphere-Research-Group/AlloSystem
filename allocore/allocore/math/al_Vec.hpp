@@ -439,6 +439,12 @@ public:
 		return r;
 	}
 
+	/// Returns mean (average) of elements
+	T mean() const {
+		static const T invSize = 1./size();
+		return sum()*invSize;
+	}
+
 	/// Linearly interpolate towards some target
 	Vec& lerp(const Vec& target, T amt){
 		return (*this) += (target-(*this))*amt;
