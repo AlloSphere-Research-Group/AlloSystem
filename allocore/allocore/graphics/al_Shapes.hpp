@@ -177,6 +177,9 @@ int addDisc(Mesh& m, float radius=1, unsigned slices=16);
 /// @param[in] height		Total height (along y)
 /// @param[in] x			Position of center along x
 /// @param[in] y			Position of center along y
+///
+/// Vertex order is bottom-left, bottom-right, top-left, top-right.
+///
 /// \returns number of vertices added
 int addRect(Mesh& m, float width=2, float height=2, float x=0, float y=0);
 
