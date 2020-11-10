@@ -711,11 +711,11 @@ void Texture::quadViewport(
 	g.popMatrix(g.MODELVIEW);
 }
 
-void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPixel){
+void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPixel, int xoffset, int yoffset, int w, int h){
 	if(mTarget == TEXTURE_2D){
 		auto& arr = array();
-		for(int j=0; j<height(); ++j){
-			for(int i=0; i<width(); ++i){
+		for(int j=yoffset; j<yoffset+h; ++j){
+			for(int i=xoffset; i<xoffset+w; ++i){
 				float rgba[4] = {0.f, 0.f, 0.f, 1.f};
 				onPixel(i,j, rgba);
 				#define SET_PIXEL(type, op){\
@@ -758,12 +758,20 @@ void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPi
 	}
 }
 
+void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPixel){
+	assign(onPixel, 0,0, width(), height());
+}
+
+void Texture::assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel, int xoffset, int yoffset, int w, int h){
+	const float rw = 1.f/(w-1);
+	const float rh = 1.f/(h-1);
+	assign([&](int i, int j, float * rgba){
+		onPixel(float(i-xoffset)*rw, float(j-yoffset)*rh, rgba);
+	}, xoffset, yoffset, w, h);
+}
+
 void Texture::assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel){
-	const float rw = 1.f/(width()-1);
-	const float rh = 1.f/(height()-1);
-	assign([rw,rh, &onPixel](int i, int j, float * rgba){
-		onPixel(float(i)*rw, float(j)*rh, rgba);
-	});
+	assignFromTexCoord(onPixel, 0,0, width(), height());
 }
 
 void Texture :: print() {

@@ -295,28 +295,55 @@ public:
 	/// rgba should be filled with the desired values. The pixel color array has
 	/// the default value (0,0,0,1).
 	void assign(const std::function<void(int i, int j, float * rgba)>& onPixel);
+	void assign(
+		const std::function<void(int i, int j, float * rgba)>& onPixel,
+		int xoffset, int yoffset, int w, int h
+	);
 
 	template <class Trgba>
-	void assign(const std::function<Trgba (int i, int j)>& onPixel){
+	void assign(
+		const std::function<Trgba (int i, int j)>& onPixel,
+		int xoffset, int yoffset, int w, int h
+	){
 		static_assert(sizeof(Trgba)/sizeof(typename Trgba::value_type)>=4,
 			"Requires 4 element RGBA array");
 		assign([&onPixel](int i, int j, float * rgba){
 			auto trgba = onPixel(i,j);
-			for(int i=0; i<4; ++i) rgba[i] = trgba[i];
-		});
+			for(int k=0; k<4; ++k) rgba[k] = trgba[k];
+		}, xoffset,yoffset, w,h);
+	}
+
+	template <class Trgba>
+	void assign(const std::function<Trgba (int i, int j)>& onPixel){
+		assign<Trgba>(onPixel, 0,0, width(), height());
 	}
 
 	/// Assign pixel values using a visitor function
 	void assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel);
+
+	/// Assign pixel values to subregion using a visitor function
+
+	/// Texture coordinates span [0,1] and are relative to subregion.
+	///
+	void assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel, int xoffset, int yoffset, int w, int h);
 		// Note: Through a C++ quirk, cannot overload on std::function
 
 	template <class Trgba>
+	void assignFromTexCoord(
+		const std::function<Trgba (float s, float t)>& onPixel,
+		int xoffset, int yoffset, int w, int h
+	){
+		static_assert(sizeof(Trgba)/sizeof(typename Trgba::value_type)>=4,
+			"Requires 4 element RGBA array");
+		assignFromTexCoord([&onPixel](float s, float t, float * rgba){
+			auto trgba = onPixel(s,t);
+			for(int k=0; k<4; ++k) rgba[k] = trgba[k];
+		}, xoffset,yoffset, w,h);
+	}
+
+	template <class Trgba>
 	void assignFromTexCoord(const std::function<Trgba (float s, float t)>& onPixel){
-		const auto rw = 1.f/(width()-1);
-		const auto rh = 1.f/(height()-1);
-		assign<Trgba>([rw,rh,&onPixel](int i, int j){
-			return onPixel(float(i)*rw, float(j)*rh);
-		});
+		assignFromTexCoord<Trgba>(onPixel, 0,0, width(), height());
 	}
 
 	/// Flags resubmission of pixel data upon next bind
