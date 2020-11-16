@@ -79,7 +79,7 @@ int main(){
 	server.
 	*/
 	{
-		SocketClient client(80, "www.mat.ucsb.edu", -1, Socket::TCP);
+		SocketClient client(80, "w2.mat.ucsb.edu", -1, Socket::TCP);
 
 		// Always check first that the socket opened okay
 		if(client.opened()){
