@@ -305,7 +305,7 @@ public:
 
 
 	/// Append floating-point color to integer color buffer
-	Mesh& colori(const Color& v) { coloris().append(Colori(v)); return *this; }
+	Mesh& colori(const Colori& v) { coloris().append(v); return *this; }
 
 	/// Append integer colors from flat array
 	template <class T>
@@ -323,6 +323,11 @@ public:
 		return *this;
 	}
 
+	/// Fill any deficit in color buffer with a color
+	Mesh& colorFill(const Color& v);
+
+	/// Fill any deficit in colori buffer with a color
+	Mesh& coloriFill(const Colori& v);
 
 	/// Append normal to normal buffer
 	Mesh& normal(float x, float y, float z=0){ return normal(Normal(x,y,z)); }

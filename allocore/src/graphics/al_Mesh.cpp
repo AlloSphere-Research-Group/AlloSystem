@@ -766,6 +766,18 @@ Mesh& Mesh::toTriangles(){
 	return *this;
 }
 
+Mesh& Mesh::colorFill(const Color& v){
+	int N = vertices().size() - colors().size();
+	for(int i=0; i<N; ++i) color(v);
+	return *this;
+}
+
+Mesh& Mesh::coloriFill(const Colori& v){
+	int N = vertices().size() - coloris().size();
+	for(int i=0; i<N; ++i) colori(v);
+	return *this;
+}
+
 bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) const {
 	int prim = primitive();
 
