@@ -319,31 +319,31 @@ struct Colori {
 
 	/// @param[in] xyz			CIEXYZ color
 	/// @param[in] a			alpha component
-	Colori(const CIEXYZ& xyz, float a =1.f)
+	Colori(const CIEXYZ& xyz, uint8_t a=255)
 	:	a(a)
 	{	*this = xyz; }
 
 	/// @param[in] lab			Lab color
 	/// @param[in] a			alpha component
-	Colori(const Lab& lab, float a =1.f)
+	Colori(const Lab& lab, uint8_t a=255)
 	:	a(a)
 	{	*this = lab; }
 
 	/// @param[in] hclab		HCLab value
 	/// @param[in] a			alpha component
-	Colori(const HCLab& hclab, float a =1.f)
+	Colori(const HCLab& hclab, uint8_t a=255)
 	:	a(a)
 	{	*this = hclab; }
 
 	/// @param[in] luv			Luv value
 	/// @param[in] a			alpha component
-	Colori(const Luv& luv, float a =1.f)
+	Colori(const Luv& luv, uint8_t a=255)
 	:	a(a)
 	{	*this = luv; }
 
 	/// @param[in] hcluv		HCLuv value
 	/// @param[in] a			alpha component
-	Colori(const HCLuv& hcluv, float a =1.f)
+	Colori(const HCLuv& hcluv, uint8_t a=255)
 	:	a(a)
 	{	*this = hcluv; }
 	
