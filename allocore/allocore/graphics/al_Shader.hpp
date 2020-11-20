@@ -347,6 +347,9 @@ public:
 		return attribute(loc, q.x, q.y, q.z, q.w);
 	}
 
+	/// Set whether to print warnings
+	static void warnings(bool v){ warnings() = v; }
+	static bool& warnings(){ static bool v = false; return v; }
 
 	static void use(unsigned programID);
 
