@@ -673,16 +673,15 @@ inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
 	return std::acos(cosAng);
 }
 
-/*! Compute centroid of a triangle defined by three points
-	@param[out] c	Centroid
+/*! Compute centroid of points
 	@param[ in] p1	Point 1
 	@param[ in] p2	Point 2
 	@param[ in] p3	Point 3
+	\returns centroid of points
 */
 template <int N, class T>
-inline void centroid3(Vec<N,T>& c, const Vec<N,T>& p1, const Vec<N,T>& p2, const Vec<N,T>& p3){
-	static const T _1_3 = T(1)/T(3);
-	c = (p1+p2+p3)*_1_3;
+inline Vec<N,T> centroid(const Vec<N,T>& p1, const Vec<N,T>& p2, const Vec<N,T>& p3){
+	return (p1+p2+p3)/T(3);
 }
 
 template <int N, class T, class Tf>
