@@ -169,6 +169,10 @@ public:
 	template <class T>
 	void shuffle(T * arr, uint32_t len);
 
+	template <class Array>
+	void shuffle(Array& a){
+		shuffle(&a[0], sizeof(a)/sizeof(typename Array::value_type));
+	}
 
 	// DEPRECATED:
 	float gaussian(){ return normal(); }
