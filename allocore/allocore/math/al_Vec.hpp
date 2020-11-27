@@ -147,6 +147,20 @@ public:
 	Vec(const T2 * v, int stride=1){ set(v,stride); }
 
 
+	//--------------------------------------------------------------------------
+	// Factory Methods
+
+	/// Get vector filled with linear sequence of values
+
+	/// @param[in] begin	start value
+	/// @param[in] inc		difference between successive elements (slope)
+	static Vec iota(T begin = T(0), T inc = T(1)){
+		Vec r;
+		auto val = begin;
+		for(auto& v : r){ v = val; val+=inc; }
+		return r;
+	}
+
 
 	//--------------------------------------------------------------------------
 	// Memory Operations
