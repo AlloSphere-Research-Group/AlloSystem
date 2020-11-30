@@ -297,25 +297,25 @@ public:
 	void assign(const std::function<void(int i, int j, float * rgba)>& onPixel);
 	void assign(
 		const std::function<void(int i, int j, float * rgba)>& onPixel,
-		int xoffset, int yoffset, int w, int h
+		int w, int h, int xoffset=0, int yoffset=0
 	);
 
 	template <class Trgba>
 	void assign(
 		const std::function<Trgba (int i, int j)>& onPixel,
-		int xoffset, int yoffset, int w, int h
+		int w, int h, int xoffset=0, int yoffset=0
 	){
 		static_assert(sizeof(Trgba)/sizeof(typename Trgba::value_type)>=4,
 			"Requires 4 element RGBA array");
 		assign([&onPixel](int i, int j, float * rgba){
 			auto trgba = onPixel(i,j);
 			for(int k=0; k<4; ++k) rgba[k] = trgba[k];
-		}, xoffset,yoffset, w,h);
+		}, w,h, xoffset,yoffset);
 	}
 
 	template <class Trgba>
 	void assign(const std::function<Trgba (int i, int j)>& onPixel){
-		assign<Trgba>(onPixel, 0,0, width(), height());
+		assign<Trgba>(onPixel, width(), height());
 	}
 
 	/// Assign pixel values using a visitor function
@@ -325,25 +325,25 @@ public:
 
 	/// Texture coordinates span [0,1] and are relative to subregion.
 	///
-	void assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel, int xoffset, int yoffset, int w, int h);
+	void assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel, int w, int h, int xoffset=0, int yoffset=0);
 		// Note: Through a C++ quirk, cannot overload on std::function
 
 	template <class Trgba>
 	void assignFromTexCoord(
 		const std::function<Trgba (float s, float t)>& onPixel,
-		int xoffset, int yoffset, int w, int h
+		int w, int h, int xoffset=0, int yoffset=0
 	){
 		static_assert(sizeof(Trgba)/sizeof(typename Trgba::value_type)>=4,
 			"Requires 4 element RGBA array");
 		assignFromTexCoord([&onPixel](float s, float t, float * rgba){
 			auto trgba = onPixel(s,t);
 			for(int k=0; k<4; ++k) rgba[k] = trgba[k];
-		}, xoffset,yoffset, w,h);
+		}, w,h, xoffset,yoffset);
 	}
 
 	template <class Trgba>
 	void assignFromTexCoord(const std::function<Trgba (float s, float t)>& onPixel){
-		assignFromTexCoord<Trgba>(onPixel, 0,0, width(), height());
+		assignFromTexCoord<Trgba>(onPixel, width(), height());
 	}
 
 	/// Flags resubmission of pixel data upon next bind
