@@ -184,93 +184,93 @@ public:
 
 
 	/// Fill with the same cell value throughout
-	template<typename T> void set1d(T * cell);
-	template<typename T> void set2d(T * cell);
-	template<typename T> void set3d(T * cell);
+	template<class T> void set1d(T * cell);
+	template<class T> void set2d(T * cell);
+	template<class T> void set3d(T * cell);
 
-	template<typename T> void setall(T value);
+	template<class T> void setall(T value);
 
 	/// Use a pure C function to fill an array with data
-	template<typename T> void fill(void (*func)(T * values, double normx));
-	template<typename T> void fill(void (*func)(T * values, double normx, double normy));
-	template<typename T> void fill(void (*func)(T * values, double normx, double normy, double normz));
+	template<class T> void fill(void (*func)(T * values, double normx));
+	template<class T> void fill(void (*func)(T * values, double normx, double normy));
+	template<class T> void fill(void (*func)(T * values, double normx, double normy, double normz));
 
 	// TODO: iterators!
 
 	/// Get the components at a given index in the array (no bounds checking)
-	template<typename T> T * cell(size_t x) const;
-	template<typename T> T * cell(size_t x, size_t y) const;
-	template<typename T> T * cell(size_t x, size_t y, size_t z) const;
+	template<class T> T * cell(size_t x) const;
+	template<class T> T * cell(size_t x, size_t y) const;
+	template<class T> T * cell(size_t x, size_t y, size_t z) const;
 
-	template<typename T, typename TP> T * cell(T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
-	template<typename T, typename TP> T * cell(T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
+	template<class T, class U> T * cell(T* val, Vec<2,U> p) const { return cell(val, p[0], p[1]); }
+	template<class T, class U> T * cell(T* val, Vec<3,U> p) const { return cell(val, p[0], p[1], p[2]); }
 
 	/// Return a particular cell casted to a typed reference (no bounds checking)
-	template<typename T>
-	T& as(int x) { return *cell<T>(x); }
-	template<typename T>
-	T& as(int x, int y) { return *cell<T>(x,y); }
-	template<typename T>
-	T& as(int x, int y, int z) { return *cell<T>(x,y,z); }
+	template<class T> T& as(int x) { return *cell<T>(x); }
+	template<class T> const T& as(int x) const { return *cell<T>(x); }
+	template<class T> T& as(int x, int y) { return *cell<T>(x,y); }
+	template<class T> const T& as(int x, int y) const { return *cell<T>(x,y); }
+	template<class T> T& as(int x, int y, int z) { return *cell<T>(x,y,z); }
+	template<class T> const T& as(int x, int y, int z) const { return *cell<T>(x,y,z); }
 	/// Return casted cell indexed by a vector (no bounds checking)
-	template<typename T, typename TP>
-	T& as(const Vec<2,TP> p) { return *cell<T>(p.x,p.y); }
-	template<typename T, typename TP>
-	T& as(const Vec<3,TP> p) { return *cell<T>(p.x,p.y,p.z); }
+	template<class T, class U> T& as(Vec<2,U> p) { return *cell<T>(p.x,p.y); }
+	template<class T, class U> const T& as(Vec<2,U> p) const { return *cell<T>(p.x,p.y); }
+	template<class T, class U> T& as(Vec<3,U> p) { return *cell<T>(p.x,p.y,p.z); }
+	template<class T, class U> const T& as(Vec<3,U> p) const { return *cell<T>(p.x,p.y,p.z); }
 
 	/// Read the component values from array into val array (no bounds checking)
-	template<typename T> void read(T* val, int x) const;
-	template<typename T> void read(T* val, int x, int y) const;
-	template<typename T> void read(T* val, int x, int y, int z) const;
+	template<class T> void read(T* val, int x) const;
+	template<class T> void read(T* val, int x, int y) const;
+	template<class T> void read(T* val, int x, int y, int z) const;
 
-	template<typename T, typename TP> void read(T* val, const Vec<2,TP> p) const { read(val, p[0], p[1]); }
-	template<typename T, typename TP> void read(T* val, const Vec<3,TP> p) const { read(val, p[0], p[1], p[2]); }
+	template<class T, class U> void read(T* val, Vec<2,U> p) const { read(val, p[0], p[1]); }
+	template<class T, class U> void read(T* val, Vec<3,U> p) const { read(val, p[0], p[1], p[2]); }
 
 	/// Read the component values from array into val array (wraps periodically at bounds)
-	template<typename T> void read_wrap(T* val, int x) const;
-	template<typename T> void read_wrap(T* val, int x, int y) const;
-	template<typename T> void read_wrap(T* val, int x, int y, int z) const;
+	template<class T> void read_wrap(T* val, int x) const;
+	template<class T> void read_wrap(T* val, int x, int y) const;
+	template<class T> void read_wrap(T* val, int x, int y, int z) const;
 
-	template<typename T, typename TP> void read_wrap(T* val, const Vec<2,TP> p) const { read_wrap(val, p[0], p[1]); }
-	template<typename T, typename TP> void read_wrap(T* val, const Vec<3,TP> p) const { read_wrap(val, p[0], p[1], p[2]); }
+	template<class T, class U> void read_wrap(T* val, Vec<2,U> p) const { read_wrap(val, p[0], p[1]); }
+	template<class T, class U> void read_wrap(T* val, Vec<3,U> p) const { read_wrap(val, p[0], p[1], p[2]); }
 
 	/// Linear interpolated lookup (virtual array index)
 
 	/// Reads the linearly interpolated component values into val array
 	///
-	template<typename T> void read_interp(T * val, double x) const;
-	template<typename T> void read_interp(T * val, double x, double y) const;
-	template<typename T> void read_interp(T * val, double x, double y, double z) const;
+	template<class T> void read_interp(T * val, double x) const;
+	template<class T> void read_interp(T * val, double x, double y) const;
+	template<class T> void read_interp(T * val, double x, double y, double z) const;
 
-	template<typename T, typename TP> void read_interp(T* val, const Vec<2,TP> p) const { read_interp(val, p[0], p[1]); }
-	template<typename T, typename TP> void read_interp(T* val, const Vec<3,TP> p) const { read_interp(val, p[0], p[1], p[2]); }
+	template<class T, class U> void read_interp(T* val, Vec<2,U> p) const { read_interp(val, p[0], p[1]); }
+	template<class T, class U> void read_interp(T* val, Vec<3,U> p) const { read_interp(val, p[0], p[1], p[2]); }
 
 	/// Write component values from val array into array (no bounds checking)
-	template<typename T> void write(const T* val, int x);
-	template<typename T> void write(const T* val, int x, int y);
-	template<typename T> void write(const T* val, int x, int y, int z);
+	template<class T> void write(const T* val, int x);
+	template<class T> void write(const T* val, int x, int y);
+	template<class T> void write(const T* val, int x, int y, int z);
 
-	template<typename T, typename TP> void write(const T* val, const Vec<2,TP> p) { write(val, p[0], p[1]); }
-	template<typename T, typename TP> void write(const T* val, const Vec<3,TP> p) { write(val, p[0], p[1], p[2]); }
+	template<class T, class U> void write(const T* val, Vec<2,U> p) { write(val, p[0], p[1]); }
+	template<class T, class U> void write(const T* val, Vec<3,U> p) { write(val, p[0], p[1], p[2]); }
 
 	/// Write plane values from val array into array (wraps periodically at bounds)
-	template<typename T> void write_wrap(const T* val, int x);
-	template<typename T> void write_wrap(const T* val, int x, int y);
-	template<typename T> void write_wrap(const T* val, int x, int y, int z);
+	template<class T> void write_wrap(const T* val, int x);
+	template<class T> void write_wrap(const T* val, int x, int y);
+	template<class T> void write_wrap(const T* val, int x, int y, int z);
 
-	template<typename T, typename TP> void write_wrap(const T* val, const Vec<2,TP> p) { write_wrap(val, p[0], p[1]); }
-	template<typename T, typename TP> void write_wrap(const T* val, const Vec<3,TP> p) { write_wrap(val, p[0], p[1], p[2]); }
+	template<class T, class U> void write_wrap(const T* val, Vec<2,U> p) { write_wrap(val, p[0], p[1]); }
+	template<class T, class U> void write_wrap(const T* val, Vec<3,U> p) { write_wrap(val, p[0], p[1], p[2]); }
 
 	/// Linear interpolated write (virtual array index)
 
 	/// AKA trilinear splat
 	/// writes the linearly interpolated plane values from val array into array
-	template<typename T> void write_interp(const T* val, double x);
-	template<typename T> void write_interp(const T* val, double x, double y);
-	template<typename T> void write_interp(const T* val, double x, double y, double z);
+	template<class T> void write_interp(const T* val, double x);
+	template<class T> void write_interp(const T* val, double x, double y);
+	template<class T> void write_interp(const T* val, double x, double y, double z);
 
-	template<typename T, typename TP> void write_interp(const T* val, const Vec<2,TP> p) { write_interp(val, p[0], p[1]); }
-	template<typename T, typename TP> void write_interp(const T* val, const Vec<3,TP> p) { write_interp(val, p[0], p[1], p[2]); }
+	template<class T, class U> void write_interp(const T* val, Vec<2,U> p) { write_interp(val, p[0], p[1]); }
+	template<class T, class U> void write_interp(const T* val, Vec<3,U> p) { write_interp(val, p[0], p[1], p[2]); }
 
 	/// Print array information
 	void print(FILE * fp = stdout) const;
@@ -281,7 +281,7 @@ public:
 
 	/// E.g., assert(Array::type<float>() == AlloFloat32Ty);
 	///
-	template<typename T> static AlloTy type();
+	template<class T> static AlloTy type();
 
 	///	Derive the appropriate stride values for a given row alignment
 	static void deriveStride(AlloArrayHeader& h, size_t rowAlignSize);
@@ -295,7 +295,7 @@ protected:
 
 	// temporary hack because the one in al_Function gave a bad result
 	// for e.g. wrap<double>(-64.0, -32.0);
-	template<typename T>
+	template<class T>
 	static T wrap(T v, const T hi=T(1.), const T lo=T(0.)){
 		if(lo == hi) return lo;
 		//if(v >= hi){
@@ -346,16 +346,16 @@ template<> constexpr AlloTy Array::type<void *>(){
 	return 0;
 }
 
-template<typename T> inline T * Array::cell(size_t x) const {
+template<class T> inline T * Array::cell(size_t x) const {
 	size_t fieldstride_x = header.stride[0];
 	return (T *)(data.ptr + x*fieldstride_x);
 }
-template<typename T> inline T * Array::cell(size_t x, size_t y) const {
+template<class T> inline T * Array::cell(size_t x, size_t y) const {
 	size_t fieldstride_x = header.stride[0];
 	size_t fieldstride_y = header.stride[1];
 	return (T *)(data.ptr + x*fieldstride_x + y*fieldstride_y);
 }
-template<typename T> inline T * Array::cell(size_t x, size_t y, size_t z) const {
+template<class T> inline T * Array::cell(size_t x, size_t y, size_t z) const {
 	size_t fieldstride_x = header.stride[0];
 	size_t fieldstride_y = header.stride[1];
 	size_t fieldstride_z = header.stride[2];
@@ -364,19 +364,19 @@ template<typename T> inline T * Array::cell(size_t x, size_t y, size_t z) const 
 
 
 // read the plane values from array into val array (no bounds checking)
-template<typename T> inline void Array::read(T* val, int x) const {
+template<class T> inline void Array::read(T* val, int x) const {
 	T * paaa = cell<T>(x);
 	for (uint8_t p=0; p<header.components; p++) {
 		val[p] = paaa[p];
 	}
 }
-template<typename T> inline void Array::read(T* val, int x, int y) const {
+template<class T> inline void Array::read(T* val, int x, int y) const {
 	T * paaa = cell<T>(x, y);
 	for (uint8_t p=0; p<header.components; p++) {
 		val[p] = paaa[p];
 	}
 }
-template<typename T> inline void Array::read(T* val, int x, int y, int z) const {
+template<class T> inline void Array::read(T* val, int x, int y, int z) const {
 	T * paaa = cell<T>(x, y, z);
 	for (uint8_t p=0; p<header.components; p++) {
 		val[p] = paaa[p];
@@ -384,19 +384,19 @@ template<typename T> inline void Array::read(T* val, int x, int y, int z) const 
 }
 
 // read the plane values from array into val array (wraps periodically at bounds)
-template<typename T> inline void Array::read_wrap(T* val, int x) const {
+template<class T> inline void Array::read_wrap(T* val, int x) const {
 	read(val, wrap<int>(x, header.dim[0], 0));
 }
-template<typename T> inline void Array::read_wrap(T* val, int x, int y) const {
+template<class T> inline void Array::read_wrap(T* val, int x, int y) const {
 	read(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0));
 }
-template<typename T> inline void Array::read_wrap(T* val, int x, int y, int z) const {
+template<class T> inline void Array::read_wrap(T* val, int x, int y, int z) const {
 	read(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0), wrap<int>(z, header.dim[2], 0));
 }
 
 // linear interpolated lookup (virtual array index)
 // reads the linearly interpolated plane values into val array
-template<typename T> inline void Array::read_interp(T * val, double x) const {
+template<class T> inline void Array::read_interp(T * val, double x) const {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
@@ -413,7 +413,7 @@ template<typename T> inline void Array::read_interp(T * val, double x) const {
 	}
 }
 
-template<typename T> inline void Array::read_interp(T * val, double x, double y) const {
+template<class T> inline void Array::read_interp(T * val, double x, double y) const {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	y = wrap<double>(y, (double)header.dim[1], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
@@ -445,7 +445,7 @@ template<typename T> inline void Array::read_interp(T * val, double x, double y)
 	}
 }
 
-template<typename T> inline void Array::read_interp(T * val, double x, double y, double z) const {
+template<class T> inline void Array::read_interp(T * val, double x, double y, double z) const {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	y = wrap<double>(y, (double)header.dim[1], 0.);
 	z = wrap<double>(z, (double)header.dim[2], 0.);
@@ -495,19 +495,19 @@ template<typename T> inline void Array::read_interp(T * val, double x, double y,
 }
 
 // write plane values from val array into array (no bounds checking)
-template<typename T> inline void Array::write(const T* val, int x) {
+template<class T> inline void Array::write(const T* val, int x) {
 	T * paaa = cell<T>(x);
 	for (uint8_t p=0; p<header.components; ++p) {
 		paaa[p] = val[p];
 	}
 }
-template<typename T> inline void Array::write(const T* val, int x, int y) {
+template<class T> inline void Array::write(const T* val, int x, int y) {
 	T * paaa = cell<T>(x, y);
 	for (uint8_t p=0; p<header.components; ++p) {
 		paaa[p] = val[p];
 	}
 }
-template<typename T> inline void Array::write(const T* val, int x, int y, int z) {
+template<class T> inline void Array::write(const T* val, int x, int y, int z) {
 	T * paaa = cell<T>(x, y, z);
 	for (uint8_t p=0; p<header.components; ++p) {
 		paaa[p] = val[p];
@@ -515,19 +515,19 @@ template<typename T> inline void Array::write(const T* val, int x, int y, int z)
 }
 
 // write plane values from val array into array (wraps periodically at bounds)
-template<typename T> inline void Array::write_wrap(const T* val, int x) {
+template<class T> inline void Array::write_wrap(const T* val, int x) {
 	write(val, wrap<int>(x, header.dim[0], 0));
 }
-template<typename T> inline void Array::write_wrap(const T* val, int x, int y) {
+template<class T> inline void Array::write_wrap(const T* val, int x, int y) {
 	write(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0));
 }
-template<typename T> inline void Array::write_wrap(const T* val, int x, int y, int z) {
+template<class T> inline void Array::write_wrap(const T* val, int x, int y, int z) {
 	write(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0), wrap<int>(z, header.dim[2], 0));
 }
 
 // linear interpolated write (virtual array index)
 // writes the linearly interpolated plane values from val array into array
-template<typename T> inline void Array::write_interp(const T* val, double x) {
+template<class T> inline void Array::write_interp(const T* val, double x) {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
@@ -546,7 +546,7 @@ template<typename T> inline void Array::write_interp(const T* val, double x) {
 		pbaa[p] += tmp * fbaa;
 	}
 }
-template<typename T> inline void Array::write_interp(const T* val, double x, double y) {
+template<class T> inline void Array::write_interp(const T* val, double x, double y) {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	y = wrap<double>(y, (double)header.dim[1], 0.);
 	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
@@ -577,7 +577,7 @@ template<typename T> inline void Array::write_interp(const T* val, double x, dou
 	}
 }
 
-template<typename T> inline void Array::write_interp(const T* val, double x0, double y0, double z0) {
+template<class T> inline void Array::write_interp(const T* val, double x0, double y0, double z0) {
 	double x = wrap<double>(x0, (double)header.dim[0], 0.);
 	double y = wrap<double>(y0, (double)header.dim[1], 0.);
 	double z = wrap<double>(z0, (double)header.dim[2], 0.);
@@ -626,7 +626,7 @@ template<typename T> inline void Array::write_interp(const T* val, double x0, do
 }
 
 
-template<typename T> void Array::fill(void (*func)(T * values, double normx)) {
+template<class T> void Array::fill(void (*func)(T * values, double normx)) {
 	int d0 = header.dim[0];
 	double inv_d0 = 1.0/(double)d0;
 	int components = header.components;
@@ -638,7 +638,7 @@ template<typename T> void Array::fill(void (*func)(T * values, double normx)) {
 	}
 }
 
-template<typename T> void Array::fill(void (*func)(T * values, double normx, double normy)) {
+template<class T> void Array::fill(void (*func)(T * values, double normx, double normy)) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int s1 = header.stride[1];
@@ -655,7 +655,7 @@ template<typename T> void Array::fill(void (*func)(T * values, double normx, dou
 	}
 }
 
-template<typename T> void Array::fill(void (*func)(T * values, double normx, double normy, double normz)) {
+template<class T> void Array::fill(void (*func)(T * values, double normx, double normy, double normz)) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int d2 = header.dim[2];
@@ -677,7 +677,7 @@ template<typename T> void Array::fill(void (*func)(T * values, double normx, dou
 	}
 }
 
-template<typename T> void Array::setall(T value) {
+template<class T> void Array::setall(T value) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	//int d2 = header.dim[2];
@@ -723,7 +723,7 @@ template<typename T> void Array::setall(T value) {
 
 }
 
-template<typename T> void Array::set1d(T * cell) {
+template<class T> void Array::set1d(T * cell) {
 	int d0 = header.dim[0];
 	int s0 = header.stride[0];
 	int components = header.components;
@@ -736,7 +736,7 @@ template<typename T> void Array::set1d(T * cell) {
 	}
 }
 
-template<typename T> void Array::set2d(T * cell) {
+template<class T> void Array::set2d(T * cell) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int s0 = header.stride[0];
@@ -753,7 +753,7 @@ template<typename T> void Array::set2d(T * cell) {
 	}
 }
 
-template<typename T> void Array::set3d(T * cell) {
+template<class T> void Array::set3d(T * cell) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int d2 = header.dim[2];
