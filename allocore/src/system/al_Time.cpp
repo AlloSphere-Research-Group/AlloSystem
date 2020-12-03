@@ -233,13 +233,26 @@ Date daysToDate(int z){
 	return date;
 }
 
+Timestamp::Timestamp(al_nsec t){
+	auto date = daysToDate(
+		t/(al_nsec(1000000000) * 60 * 60 * 24) // basically for overflow
+	);
+	year = date.year;
+	mon = date.month;
+	day = date.day;
+	hour = t/(al_nsec(1000000000) * 60 * 60) % 24;
+	min  = t/(al_nsec(1000000000) * 60) % 60;
+	sec  = t/(al_nsec(1000000000)) % 60;
+	msec = t/(al_nsec(1000000)) % 1000;
+	usec = t/(al_nsec(1000)) % 1000;
+}
+
+/*static*/ Timestamp Timestamp::now(){
+	return Timestamp(al_system_time_nsec());
+}
+
 std::string toTimecode(al_nsec t, const std::string& format){
-	unsigned day = t/(al_nsec(1000000000) * 60 * 60 * 24); // basically for overflow
-	unsigned hrs = t/(al_nsec(1000000000) * 60 * 60) % 24;
-	unsigned min = t/(al_nsec(1000000000) * 60) % 60;
-	unsigned sec = t/(al_nsec(1000000000)) % 60;
-	unsigned msc = t/(al_nsec(1000000)) % 1000;
-	unsigned usc = t/(al_nsec(1000)) % 1000;
+	Timestamp ts(t);
 
 	std::ostringstream s;
 	s.fill('0');
@@ -247,17 +260,16 @@ std::string toTimecode(al_nsec t, const std::string& format){
 	for(unsigned i=0; i<format.size(); ++i){
 		const auto c = format[i];
 		switch(c){
-		case 'D':{
-			auto date = daysToDate(day);
-			s << std::setw(4) << date.year;
-			s << std::setw(2) << date.month;
-			s << std::setw(2) << date.day;
-		} break;
-		case 'H': s << std::setw(2) << hrs; break;
-		case 'M': s << std::setw(2) << min; break;
-		case 'S': s << std::setw(2) << sec; break;
-		case 'm': s << std::setw(3) << msc; break;
-		case 'u': s << std::setw(3) << usc; break;
+		case 'D':
+			s << std::setw(4) << (unsigned)ts.year;
+			s << std::setw(2) << (unsigned)ts.mon;
+			s << std::setw(2) << (unsigned)ts.day;
+			break;
+		case 'H': s << std::setw(2) << (unsigned)ts.hour; break;
+		case 'M': s << std::setw(2) << (unsigned)ts.min; break;
+		case 'S': s << std::setw(2) << (unsigned)ts.sec; break;
+		case 'm': s << std::setw(3) << (unsigned)ts.msec; break;
+		case 'u': s << std::setw(3) << (unsigned)ts.usec; break;
 		default:  s << c; // delimiter
 		}
 	}
@@ -268,6 +280,7 @@ std::string toTimecode(al_nsec t, const std::string& format){
 std::string timecodeNow(const std::string& format){
 	return toTimecode(al_system_time_nsec(), format);
 }
+
 
 void Timer::print() const {
 	auto dtSec = elapsedSec();

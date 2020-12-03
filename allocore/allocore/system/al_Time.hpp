@@ -61,10 +61,42 @@ inline al_sec walltime(){ return al_time(); }
 inline al_sec timeNow(){ return al_time(); }
 
 /// Convert nanoseconds to timecode string
+
+/// @param[in] t		nanosecond time to convert
+/// @param[in] format	String describing output format.
+/// The following special characters output the following values:
+///		D	date, as yyyynndd
+///		H	hour
+///		M	minute
+///		S	second
+///		m	millisecond
+///		u	microsecond	
+///
+///	All other characters are preserved in the output (as delimiters).
 std::string toTimecode(al_nsec t, const std::string& format="D:H:M:S:m:u");
 
 /// Get timecode of current system time
 std::string timecodeNow(const std::string& format="D:H:M:S:m:u");
+
+struct Timestamp{
+	unsigned year;
+	unsigned char mon;
+	unsigned char day;
+	unsigned char hour;
+	unsigned char min;
+	unsigned char sec;
+	unsigned short msec;
+	unsigned short usec;
+
+	/// No initialization
+	Timestamp(){}
+
+	/// Initialize from nanosecond time
+	Timestamp(al_nsec t);
+
+	/// Get timestamp using current time
+	static Timestamp now();
+};
 
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
