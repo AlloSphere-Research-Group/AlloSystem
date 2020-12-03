@@ -66,6 +66,9 @@ inline al_sec timeNow(){ return al_time(); }
 /// @param[in] format	String describing output format.
 /// The following special characters output the following values:
 ///		D	date, as yyyynndd
+///		y	year
+///		n	month
+///		d	day
 ///		H	hour
 ///		M	minute
 ///		S	second

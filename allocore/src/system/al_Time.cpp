@@ -265,6 +265,9 @@ std::string toTimecode(al_nsec t, const std::string& format){
 			s << std::setw(2) << (unsigned)ts.mon;
 			s << std::setw(2) << (unsigned)ts.day;
 			break;
+		case 'y': s << std::setw(4) << (unsigned)ts.year; break;
+		case 'n': s << std::setw(2) << (unsigned)ts.mon; break;
+		case 'd': s << std::setw(2) << (unsigned)ts.day; break;
 		case 'H': s << std::setw(2) << (unsigned)ts.hour; break;
 		case 'M': s << std::setw(2) << (unsigned)ts.min; break;
 		case 'S': s << std::setw(2) << (unsigned)ts.sec; break;
