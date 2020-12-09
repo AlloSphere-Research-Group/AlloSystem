@@ -200,6 +200,9 @@ public:
 		const std::string& geomMacro = "GEOM_PROG"
 	);
 
+	const std::string& sourceVert() const { return mVertSource; }
+	const std::string& sourceFrag() const { return mFragSource; }
+	const std::string& sourceGeom() const { return mGeomSource; }
 
 	const ShaderProgram& use();
 
