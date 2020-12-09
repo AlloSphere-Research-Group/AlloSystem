@@ -462,13 +462,13 @@ inline void Random<RNG>::cube(T * point){
 //		Box, G. and Muller, M. A note on the generation of normal deviates.
 //		Ann. Math. Slat. 28, (1958).
 //
-// http://en.wikipedia.org/wiki/Box–Muller_transform
+// http://en.wikipedia.org/wiki/Box-Muller_transform
 template <class RNG>
 template <class T> void Random<RNG>::normal(T& y1, T& y2){
 	float x1, x2, w;
 
 	// Search for point within unit circle using sample-reject.
-	// This will pass with probability π/4 = ~0.785.
+	// This will pass with probability pi/4 = ~0.785.
 	do{
 		x1 = uniformS();
 		x2 = uniformS();

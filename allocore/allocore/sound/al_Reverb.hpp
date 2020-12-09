@@ -127,7 +127,7 @@ protected:
 
 /// Design from:
 /// Dattorro, J. (1997). Effect design: Part 1: Reverberator and other filters.
-/// Journal of the Audio Engineering Society, 45(9):660–684.
+/// Journal of the Audio Engineering Society, 45(9):660-684.
 /// https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf
 ///
 /// @ingroup allocore
