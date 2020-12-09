@@ -438,7 +438,7 @@ struct HSV{
 
 	/// @param[in] h			hue
 	/// @param[in] s			saturation
-	/// @param[in] v			value
+	/// @param[in] v			value (brightness)
 	HSV(float h=0, float s=1, float v=1)
 	:	h(h), s(s), v(v){}
 
