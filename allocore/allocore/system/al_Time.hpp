@@ -81,21 +81,29 @@ std::string toTimecode(al_nsec t, const std::string& format="D:H:M:S:m:u");
 /// Get timecode of current system time
 std::string timecodeNow(const std::string& format="D:H:M:S:m:u");
 
+
+/// A Gregorian date and time
 struct Timestamp{
-	unsigned year;
-	unsigned char mon;
-	unsigned char day;
-	unsigned char hour;
-	unsigned char min;
-	unsigned char sec;
-	unsigned short msec;
-	unsigned short usec;
+	unsigned year;			///< Year in Gregorian calendar
+	unsigned char mon;		///< Month in [1,12]
+	unsigned char day;		///< Day of month in [1,31]
+	unsigned char hour;		///< Hour of day in [0,23]
+	unsigned char min;		///< Minute in [0,59]
+	unsigned char sec;		///< Second in [0,59]
+	unsigned short msec;	///< Millsecond in [0,999]
+	unsigned short usec;	///< Microsecond in [0,999]
 
 	/// No initialization
-	Timestamp(){}
+
+	/// Calling valid() on this object will return false.
+	///
+	Timestamp();
 
 	/// Initialize from nanosecond time
 	Timestamp(al_nsec t);
+
+	/// Return whether timestamp is valid
+	bool valid() const;
 
 	/// Get timestamp using current time
 	static Timestamp now();

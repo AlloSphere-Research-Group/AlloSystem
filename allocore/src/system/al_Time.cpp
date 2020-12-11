@@ -233,6 +233,8 @@ Date daysToDate(int z){
 	return date;
 }
 
+Timestamp::Timestamp(): mon(255){}
+
 Timestamp::Timestamp(al_nsec t){
 	auto date = daysToDate(
 		t/(al_nsec(1000000000) * 60 * 60 * 24) // basically for overflow
@@ -247,9 +249,30 @@ Timestamp::Timestamp(al_nsec t){
 	usec = t/(al_nsec(1000)) % 1000;
 }
 
+bool Timestamp::valid() const {
+	if(1<=mon && mon<=12){
+		static unsigned char dpmLUT[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
+		auto dpm = dpmLUT[mon-1];
+		if(2==mon){
+			int leap = 0;
+			if(year%4 == 0){
+				leap = 1;
+				if(year%100 == 0){
+					leap = 0;
+					if(year%400) leap = 1;
+				}
+			}
+			dpm += leap;
+		}
+		return 1<=day && day<=dpm && hour<60 && min<60 && sec<60 && msec<1000 && usec<1000; 
+	}
+	return false;
+}
+
 /*static*/ Timestamp Timestamp::now(){
 	return Timestamp(al_system_time_nsec());
 }
+
 
 std::string toTimecode(al_nsec t, const std::string& format){
 	Timestamp ts(t);
