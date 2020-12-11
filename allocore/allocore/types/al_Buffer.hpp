@@ -227,6 +227,11 @@ public:
 	/// Get fill amount of buffer
 	int fill() const { return mFill; }
 
+	/// Returns whether buffer is full
+	bool full() const { return size() == mFill; }
+
+	/// Returns whether buffer is empty
+	bool empty() const { return 0 == mFill; }
 
 	/// Get element at absolute index
 	T& operator[](int i){ return mElems[i]; }
