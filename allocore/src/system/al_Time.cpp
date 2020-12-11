@@ -235,7 +235,9 @@ Date daysToDate(int z){
 
 Timestamp::Timestamp(): mon(255){}
 
-Timestamp::Timestamp(al_nsec t){
+Timestamp::Timestamp(al_nsec t){ *this = t; }
+
+Timestamp& Timestamp::operator=(al_nsec t){
 	auto date = daysToDate(
 		t/(al_nsec(1000000000) * 60 * 60 * 24) // basically for overflow
 	);
@@ -247,6 +249,7 @@ Timestamp::Timestamp(al_nsec t){
 	sec  = t/(al_nsec(1000000000)) % 60;
 	msec = t/(al_nsec(1000000)) % 1000;
 	usec = t/(al_nsec(1000)) % 1000;
+	return *this;
 }
 
 bool Timestamp::valid() const {

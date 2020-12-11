@@ -102,11 +102,14 @@ struct Timestamp{
 	/// Initialize from nanosecond time
 	Timestamp(al_nsec t);
 
-	/// Return whether timestamp is valid
-	bool valid() const;
-
 	/// Get timestamp using current time
 	static Timestamp now();
+
+	/// Set from nanoseconds
+	Timestamp& operator=(al_nsec t);
+	
+	/// Return whether timestamp is valid
+	bool valid() const;
 };
 
 
