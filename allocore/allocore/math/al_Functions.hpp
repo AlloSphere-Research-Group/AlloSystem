@@ -294,7 +294,9 @@ template<class T> T pow3Abs(const T& v);	///< Returns absolute value to the 3rd 
 template<class T> T pow4(const T& v);		///< Returns value to the 4th power.
 template<class T> T pow5(const T& v);		///< Returns value to the 5th power.
 template<class T> T pow6(const T& v);		///< Returns value to the 6th power.
+template<class T> T pow7(const T& v);		///< Returns value to the 7th power.
 template<class T> T pow8(const T& v);		///< Returns value to the 8th power.
+template<class T> T pow9(const T& v);		///< Returns value to the 9th power.
 template<class T> T pow16(const T& v);		///< Returns value to the 16th power.
 template<class T> T pow64(const T& v);		///< Returns value to the 64th power.
 
@@ -741,7 +743,9 @@ TEM inline T pow3Abs(const T& v){ return al::abs(pow3(v)); }
 TEM inline T pow4 (const T& v){ return pow2(pow2(v)); }
 TEM inline T pow5 (const T& v){ return v * pow4(v); }
 TEM inline T pow6 (const T& v){ return pow3(pow2(v)); }
+TEM inline T pow7 (const T& v){ return v * pow6(v); }
 TEM inline T pow8 (const T& v){ return pow4(pow2(v)); }
+TEM inline T pow9 (const T& v){ return v * pow8(v); }
 TEM inline T pow16(const T& v){ return pow4(pow4(v)); }
 TEM inline T pow64(const T& v){ return pow8(pow8(v)); }
 
@@ -754,9 +758,9 @@ TEM inline T powN(T base, unsigned power){
 		case 4: return pow4(base);
 		case 5: return pow5(base);
 		case 6: return pow6(base);
-		case 7: return pow6(base)*base;
+		case 7: return pow7(base);
 		case 8: return pow8(base);
-		case 9: return pow8(base)*base;
+		case 9: return pow9(base);
 		default:{
 			T r = pow8(base)*pow2(base);
 			for(unsigned i=10; i<power; ++i) r *= base;
