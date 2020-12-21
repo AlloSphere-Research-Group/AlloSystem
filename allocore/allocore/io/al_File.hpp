@@ -289,13 +289,6 @@ public:
 	/// \returns whether the file or directory was found
 	static bool searchBack(std::string& path, int maxDepth=6);
 
-	// TODO: why have these?
-	static al_sec modified(const std::string& path){ return File(path).modified(); }
-	static al_sec accessed(const std::string& path){ return File(path).accessed(); }
-	static al_sec created (const std::string& path){ return File(path).created(); }
-	static size_t sizeFile(const std::string& path){ return File(path).sizeFile(); }
-	static size_t storage (const std::string& path){ return File(path).storage(); }
-
 protected:
 	std::string mPath;
 	std::string mMode;
