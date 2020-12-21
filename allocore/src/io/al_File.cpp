@@ -17,6 +17,7 @@ static std::string stripEndSlash(const std::string& path){
 
 
 #if defined(AL_OSX) || defined(AL_LINUX) || defined(AL_EMSCRIPTEN)
+#include <cstdlib> // getenv
 #include <dirent.h>
 #include <unistd.h> // rmdir, getcwd
 #include <stdlib.h> // realpath
@@ -180,6 +181,22 @@ public:
 	}
 	return "";
 }
+
+static std::string envDir(const char * envVar){
+	char * s = std::getenv(envVar);
+	return s ? std::string(s) + "/" : std::string();
+}
+
+/*static*/ std::string Dir::home(){ return envDir("HOME"); }
+
+#if defined(AL_OSX)
+/*static*/ std::string Dir::appData(){ return "/Library/Application Support/"; }
+/*static*/ std::string Dir::userAppData(){ return home()+"Library/Application Support/"; }
+
+#elif defined(AL_LINUX) || defined(AL_EMSCRIPTEN)
+/*static*/ std::string Dir::appData(){ return "/var/lib/"; }
+/*static*/ std::string Dir::userAppData(){ return home()+".config/"; }
+#endif
 
 // end POSIX
 
@@ -447,9 +464,11 @@ public:
 /*static*/ bool Dir::make(const std::string& path, bool recursive){ return false; }
 /*static*/ bool Dir::remove(const std::string& path){ return false; }
 /*static*/ std::string Dir::cwd(){ return "."; }
+/*static*/ std::string Dir::appData(){ return {}; }
+/*static*/ std::string Dir::userAppData(){ return {}; }
+/*static*/ std::string Dir::home(){ return {}; }
 
 #endif
-
 
 
 // Platform independent code
