@@ -189,8 +189,11 @@ public:
 #define VC_EXTRALEAN
 #include <windows.h>
 #include <Shlwapi.h> // PathFileExists, PathIsDirectory
-
 #pragma comment(lib, "Shlwapi.lib")
+#include <Shlobj.h> // SHGetFolderPath, SHGetKnownFolderPath
+#pragma comment(lib,"Shell32.lib") // SHGetKnownFolderPath 
+#pragma comment(lib,"Ole32.lib") // CoTaskMemFree
+#pragma comment(lib,"uuid.lib") // FOLDERID_ProgramData
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	#include <direct.h>
@@ -386,6 +389,40 @@ private:
 	}
 	return "";
 }
+
+static std::string getKnownDir(REFKNOWNFOLDERID id){
+	PWSTR wdir = nullptr;
+	std::string dir;
+	if(SUCCEEDED(SHGetKnownFolderPath(id, 0, nullptr, &wdir))){
+		char c[4 * MAX_PATH];
+		int len = WideCharToMultiByte(CP_UTF8, 0, wdir, lstrlenW(wdir), c, sizeof(c), nullptr, nullptr);
+		dir = std::string(c, len) + "\\";
+	}
+	CoTaskMemFree(wdir);
+	return dir;
+
+	/*
+	SHFOLDERAPI SHGetFolderPathA(
+	  HWND   hwnd,
+	  int    csidl,
+	  HANDLE hToken,
+	  DWORD  dwFlags,
+	  LPSTR  pszPath
+	);
+	*/
+	/*TCHAR dir[MAX_PATH];
+	if(SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, dir))){
+		//https://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string
+		//using convert_type = std::codecvt_utf8<wchar_t>;
+		//std::wstring_convert<convert_type, wchar_t> converter;
+		//return converter.to_bytes(std::wstring(dir));
+		return std::string(dir);
+	}*/
+}
+
+/*static*/ std::string Dir::appData(){ return getKnownDir(FOLDERID_ProgramData); }
+/*static*/ std::string Dir::userAppData(){ return getKnownDir(FOLDERID_LocalAppData); }
+/*static*/ std::string Dir::home(){ return getKnownDir(FOLDERID_Profile); }
 
 // End Windows
 

@@ -393,6 +393,15 @@ public:
 	/// Get the current working directory
 	static std::string cwd();
 
+	/// Get OS-specific application data directory
+	static std::string appData();
+
+	/// Get OS-specific per-user application data directory
+	static std::string userAppData();
+
+	/// Get current user home directory
+	static std::string home();
+
 private:
 	class Impl; Impl * mImpl;
 	FileInfo mEntry;
