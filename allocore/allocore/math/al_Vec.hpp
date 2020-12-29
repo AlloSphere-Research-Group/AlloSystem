@@ -47,6 +47,7 @@
 #include <cmath>
 #include <initializer_list>
 #include <ostream>
+#include <type_traits> //remove_reference, is_polymorphic
 #include <stdio.h>
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Functions.hpp"
@@ -791,6 +792,18 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 	return r;
 }
 
+/// Pun uniform POD into vector
+template <class T, class UniformPOD>
+auto punToVec(const UniformPOD& v) -> const Vec<sizeof(UniformPOD)/sizeof(T),T>& {
+	static_assert(!std::is_polymorphic<UniformPOD>::value, "Punning polymorphic class disallowed");
+	return std::remove_reference<decltype(punToVec<T>(v))>::type::pun((const T*)&v);
+}
+
+template <class T, class UniformPOD>
+auto punToVec(UniformPOD& v) -> Vec<sizeof(UniformPOD)/sizeof(T),T>& {
+	static_assert(!std::is_polymorphic<UniformPOD>::value, "Punning polymorphic class disallowed");
+	return std::remove_reference<decltype(punToVec<T>(v))>::type::pun((T*)&v);
+}
 
 
 // Implementation --------------------------------------------------------------
