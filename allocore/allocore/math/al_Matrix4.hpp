@@ -347,10 +347,6 @@ public:
 		return *this * vCol;
 	}
 
-	/// Computes product of matrix multiplied by column vector, r = m * vCol
-	Vec<4,T> transform(const Vec<3,T>& vCol) const {
-		return transform(Vec<4,T>(vCol, T(1)));
-	}
 
 	// Deprecated functions
 
