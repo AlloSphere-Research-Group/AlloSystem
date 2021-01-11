@@ -261,6 +261,20 @@ public:
 	/// Get element at row i, column j
 	const T& operator()(int i, int j) const { return (*this)[j*N+i]; }
 
+	template <int Row, int Col>
+	T& at(){
+		static_assert(Row<N && Col<N, "Row or column out of bounds");
+		constexpr auto idx = Col*N+Row;
+		return mElems[idx];
+	}
+
+	template <int Row, int Col>
+	const T& at() const {
+		static_assert(Row<N && Col<N, "Row or column out of bounds");
+		constexpr auto idx = Col*N+Row;
+		return mElems[idx];
+	}
+
 	/// Return column i as vector
 	const Vec<N,T>& col(int i) const { return Vec<N,T>::pun(elems() + i*N); }
 	Vec<N,T>& col(int i){ return Vec<N,T>::pun(elems() + i*N); }
