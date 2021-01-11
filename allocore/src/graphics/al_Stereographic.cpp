@@ -12,7 +12,7 @@ Stereographic::Stereographic()
 
 Vec3d Stereographic::unproject(const Vec3d& screenPos) const {
 	auto invprojview = Matrix4d::inverse(modelViewProjection());
-	auto worldPos4 = invprojview.transform(screenPos);
+	auto worldPos4 = invprojview * Vec4d(screenPos, 1.);
 	return worldPos4.xyz() / worldPos4.w;
 }
 

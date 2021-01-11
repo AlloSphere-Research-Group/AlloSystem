@@ -339,14 +339,6 @@ public:
 		return lookAt(ur, uu, ub, eyePos);
 	}
 
-	/// Computes product of matrix multiplied by column vector, r = m * vCol
-
-	/// This is typically what is required to project a vertex through a transform.
-	/// For a better explanation, @see http://xkcd.com/184/ -g
-	Vec<4,T> transform(const Vec<4,T>& vCol) const {
-		return *this * vCol;
-	}
-
 
 	// Deprecated functions
 
