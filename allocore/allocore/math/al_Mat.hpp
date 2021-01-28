@@ -581,6 +581,12 @@ public:
 		return *this;
 	}
 
+	template <int Dim1, int Dim2>
+	Mat& rotate(double angle){
+		static_assert(Dim1<N-1 && Dim2<N-1, "Dimension out of bounds");
+		return rotate(angle, Dim1, Dim2);
+	}
+
 	/// Rotate submatrix on a global plane (A' = RA)
 	template <int M>
 	Mat& rotateGlobal(double angle, int dim1, int dim2){
