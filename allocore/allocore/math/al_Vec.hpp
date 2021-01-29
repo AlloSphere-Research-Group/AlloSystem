@@ -344,6 +344,13 @@ public:
 	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
 
 
+	/// Apply a function in-place on each element
+	template <class Func>
+	Vec& apply(Func func){
+		for(auto& v : *this) func(v);
+		return *this;
+	}
+
 	/// Clip to range:
 	/// NOTE argument order (max,min)
 	Vec& clip(T max=T(1), T min=T(0)) {
