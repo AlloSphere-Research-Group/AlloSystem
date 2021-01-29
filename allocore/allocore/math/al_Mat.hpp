@@ -569,13 +569,15 @@ public:
 	/// @param[in] dim1		local coordinate frame axis to rotate away from
 	/// @param[in] dim2		local coordinate frame axis to rotate towards
 	Mat& rotate(double angle, int dim1, int dim2){
-		double cs = cos(angle);
-		double sn = sin(angle);
+		return rotate(cos(angle), sin(angle), dim1, dim2);
+	}
+
+	Mat& rotate(double cosAngle, double sinAngle, int dim1, int dim2){
 		for(int R=0; R<N-1; ++R){
 			const T& v1 = (*this)(R, dim1);
 			const T& v2 = (*this)(R, dim2);
-			T t = v1*cs + v2*sn;
-			(*this)(R, dim2) = v2*cs - v1*sn;
+			T t = v1*cosAngle + v2*sinAngle;
+			(*this)(R, dim2) = v2*cosAngle - v1*sinAngle;
 			(*this)(R, dim1) = t;
 		}
 		return *this;
@@ -585,6 +587,11 @@ public:
 	Mat& rotate(double angle){
 		static_assert(Dim1<N-1 && Dim2<N-1, "Dimension out of bounds");
 		return rotate(angle, Dim1, Dim2);
+	}
+
+	template <int Dim1, int Dim2>
+	Mat& rotate(double cosAngle, double sinAngle){
+		return rotate<Dim1,Dim2>(cosAngle, sinAngle);
 	}
 
 	/// Rotate submatrix on a global plane (A' = RA)
