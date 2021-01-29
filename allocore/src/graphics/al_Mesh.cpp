@@ -43,8 +43,10 @@ bool Mesh::isTriangles() const { return primitive() == Graphics::TRIANGLES; }
 bool Mesh::isTriangleStrip() const { return primitive() == Graphics::TRIANGLE_STRIP; }
 
 Mesh& Mesh::decompress(){
-	int Ni = indices().size();
-	if(Ni){
+	if(indices().size()){ // only makes sense for indexed mesh
+		toTriangles();
+		int Ni = indices().size();
+
 		#define DECOMPRESS(buf, Type)\
 		{\
 			int N = buf.size();\
