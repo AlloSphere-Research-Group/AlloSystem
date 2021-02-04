@@ -132,6 +132,13 @@ int utMath(){
 			Vec<3,float> t(s,2);	assert(t[0] == 1 && t[1] == 2 && t[2] == 3);
 		}
 
+		// factories
+		assert(Vec4i::iota(0  ) == Vec4i(0,1,2,3));
+		assert(Vec4i::iota(1  ) == Vec4i(1,2,3,4));
+		assert(Vec4i::iota(0,2) == Vec4i(0,2,4,6));
+		assert(Vec4d::line(0,3) == Vec4d(0,1,2,3));
+		assert(Vec4d::line<false>(0,4) == Vec4d(0,1,2,3));
+
 		// access
 		for(int i=0; i<a.size(); ++i) a[i]=i;
 		assert(a.get(0,1) == Vec2d(0,1));
