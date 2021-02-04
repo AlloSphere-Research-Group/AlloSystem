@@ -276,6 +276,8 @@ bool ShaderProgram::compile(
 	detach(mShaderF);
 	if(bGeom) detach(mShaderG);
 
+	mOnce = true;
+
 	return linked();
 }
 
@@ -330,8 +332,11 @@ bool ShaderProgram::begin(){
 	return false;
 }
 
-void ShaderProgram::end() const {
-	if(active()) glUseProgram(0);
+void ShaderProgram::end(){
+	if(active()){
+		glUseProgram(0);
+		mOnce = false;
+	}
 }
 
 bool ShaderProgram::linked() const {

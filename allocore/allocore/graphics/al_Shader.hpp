@@ -219,7 +219,7 @@ public:
 	bool begin();
 
 	/// End use of shader program
-	void end() const;
+	void end();
 
 
 	/// Returns whether program linked successfully
@@ -227,6 +227,12 @@ public:
 
 	/// Returns whether linked program can execute in current graphics state
 	bool validateProgram(bool printLog=false) const;
+
+	/// Returns true on first call to begin after compile, otherwise false
+
+	/// This is useful for initializing uniforms.
+	///
+	bool once() const { return mOnce; }
 
 
 	/// Set parameters for geometry shader
@@ -366,6 +372,7 @@ protected:
 	std::string mVersion;
 	std::string mPreamble;
 	bool mActive = true;
+	bool mOnce = true;
 
 	std::string idString() const;
 	
