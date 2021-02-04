@@ -162,6 +162,19 @@ public:
 		return r;
 	}
 
+	/// Get vector filled with linear ramp
+
+	/// @param[in] begin	start value
+	/// @param[in] end		end value
+	/// @tparam endInc		whether end value is inclusive
+	template <bool endInc = true>
+	static Vec line(T begin = T(0), T end = T(1)){
+		constexpr auto M = N - int(endInc);
+		static_assert(M>0, "Invalid number of steps");
+		constexpr auto m = 1./M;
+		return iota(begin, (end-begin)*m);
+	}
+
 
 	//--------------------------------------------------------------------------
 	// Memory Operations
