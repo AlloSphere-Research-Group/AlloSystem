@@ -165,9 +165,9 @@ public:
 	/// Get a rotation transform matrix
 
 	/// @param[in] angle	rotation angle in radians
-	/// @param[in] dim1		first basis vector of rotation plane
-	/// @param[in] dim2		second basis vector of rotation plane
-	static Mat rotation(double angle, int dim1, int dim2){
+	/// @param[in] dim1		first ("from") basis vector of rotation plane
+	/// @param[in] dim2		second ("to") basis vector of rotation plane
+	static Mat rotation(double angle, unsigned dim1, unsigned dim2){
 		double cs = cos(angle);
 		double sn = sin(angle);
 		Mat m(T(1));
@@ -176,6 +176,12 @@ public:
 		m(dim2,dim1) = sn;
 		m(dim2,dim2) = cs;
 		return m;
+	}
+
+	template <unsigned Dim1, unsigned Dim2>
+	static Mat rotation(double angle){
+		static_assert(Dim1<N && Dim2<N && Dim1!=Dim2, "Invalid plane dimensions");
+		return rotation(angle, Dim1, Dim2);
 	}
 
 	/// Get a rotation transform matrix
