@@ -89,7 +89,7 @@ public:
 	// Constructors
 
 	/// Default constructor that initializes elements to zero
-	Mat(){ set(T(0)); }
+	Mat(){ set(T()); }
 
 	/// Construct without initializing elements
 	Mat(const MatNoInit& v){}
@@ -240,7 +240,7 @@ public:
 	}
 
 	//--------------------------------------------------------------------------
-	// Memory Operations
+	// Access/Memory Operations
 
 	/// Returns C array type punned into a matrix
 	static Mat& pun(T * src){ return *(Mat*)(src); }
