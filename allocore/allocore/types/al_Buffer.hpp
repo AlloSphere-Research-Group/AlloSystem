@@ -253,7 +253,7 @@ public:
 		return newest();
 	}
 
-	/// Write new element
+	/// Write (push) new element
 	void write(const T& v){
 		Alloc::construct(&next(), v);
 	}
@@ -280,6 +280,14 @@ public:
 	/// \returns reference to oldest (first in) element
 	const T& oldest() const { return read(fill()-1); }
 	T& oldest(){ return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->oldest()); }
+
+	/// Remove newest element from buffer
+	void popNewest(){
+		if(fill()){
+			mPos = wrapOnce(mPos-1, size());
+			--mFill;
+		}
+	}
 
 	/// Set write position to start of array and zero fill amount
 	void reset(){
