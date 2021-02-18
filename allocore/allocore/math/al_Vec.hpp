@@ -436,15 +436,22 @@ public:
 	/// Returns magnitude squared
 	T magSqr() const { return dot(*this); }
 
+	/// Returns vector filled with absolute values of elements
+	Vec absVec() const {
+		using namespace std;
+		Vec res(*this);
+		for(auto& v : res) v=abs(v);
+		return res;
+	}
+
 	/// Returns p-norm of elements
 
 	/// The p-norm is pth root of the sum of the absolute value of the elements
-	/// raised to the pth power, (sum |x_n|^p) ^ (1/p).
+	/// raised to the pth power, (sum |x_n|^p) ^ (1/p). See norm1 and norm2 for
+	/// more efficient specializations.
 	T norm(const T& p) const {
 		using namespace std;
-		T r = pow(abs((*this)[0]), p);
-		for(int i=1; i<N; ++i){ r += pow(abs((*this)[i]), p); }
-		return pow(r, T(1)/p);
+		return pow(pow(absVec(), p).sum(), T(1)/p);
 	}
 
 	/// Return 1-norm of elements (sum of absolute values)
@@ -468,11 +475,7 @@ public:
 	}
 
 	/// Returns sum of absolute value of elements (1-norm)
-	T sumAbs() const {
-		T r = abs((*this)[0]);
-		for(int i=1; i<N; ++i){ r += abs((*this)[i]); }
-		return r;
-	}
+	T sumAbs() const { return absVec().sum(); }
 
 	/// Returns mean (average) of elements
 	T mean() const {

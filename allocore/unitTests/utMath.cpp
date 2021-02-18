@@ -101,10 +101,13 @@ int utMath(){
 
 		a = -1;
 		b = +1;
+		assert(a.absVec() == b);
 		assert(a.dot(b) ==-N);
 		assert(a.dot(a) == N);
+		assert(Vec3i(1,2,-3).product() == -6);
 		assert(a.sum() == -N);
 		assert(a.sumAbs() == N);
+		assert(Vec3f(1,2,3).mean() == 2);
 		assert(a.mag() == sqrt(N));
 		assert(b.mag() == sqrt(N));
 		assert(a.mag() == abs(a));
@@ -112,6 +115,8 @@ int utMath(){
 		assert(b.magSqr() == N);
 		assert(a.norm1() == N);
 		assert(a.norm2() == sqrt(N));
+		assert(a.norm(1) == a.norm1());
+		assert(a.norm(2) == a.norm2());
 
 		(a = 1).negate();		assert(a == -1);
 		(a = 1).normalize();	assert(a == 1./sqrt(N));
