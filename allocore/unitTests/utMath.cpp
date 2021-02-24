@@ -143,12 +143,16 @@ int utMath(){
 		assert(Vec4i::iota(0,2) == Vec4i(0,2,4,6));
 		assert(Vec4d::line(0,3) == Vec4d(0,1,2,3));
 		assert(Vec4d::line<false>(0,4) == Vec4d(0,1,2,3));
+		assert(toVec(1,2,3,4).size() == 4);
+		assert(toVec(1,2,3,4) == Vec4i(1,2,3,4));
 
 		// access
 		for(int i=0; i<a.size(); ++i) a[i]=i;
+		assert(a.at<1>() == 1);
 		assert(a.get(0,1) == Vec2d(0,1));
 		assert(a.get(2,2) == Vec2d(2,2));
 		assert(a.get(2,1,0) == Vec3d(2,1,0));
+		{ bool compileTimeVec_get = a.get<2,1,0>() == Vec3d(2,1,0); assert(compileTimeVec_get); }
 
 		{
 		for(int i=0; i<a.size(); ++i) a[i]=i;

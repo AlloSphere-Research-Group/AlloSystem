@@ -88,6 +88,13 @@ template<class T> struct VecElems<3,T>{
 };
 template<class T> struct VecElems<4,T>{ T x,y,z,w; };
 
+// Base case
+template <class V>
+Vec<1,V> toVec(const V& v);
+
+/// Returns new Vec filled with values
+template <class V, class... Vs>
+Vec<1+sizeof...(Vs),V> toVec(const V& v, Vs... vs);
 
 
 /// Fixed-size n-vector
@@ -216,6 +223,20 @@ public:
 	/// Get element at index with no bounds checking
 	const T& operator[](int i) const { return elems()[i]; }
 
+	/// Set element at index with compile-time bounds checking
+	template <int i>
+	T& at(){
+		static_assert(0<=i && i<N, "Index out of bounds");
+		return (*this)[i];
+	}
+
+	/// Get element at index with compile-time bounds checking
+	template <int i>
+	const T& at() const {
+		static_assert(0<=i && i<N, "Index out of bounds");
+		return (*this)[i];
+	}
+
 	Vec& operator = (const T& v){ IT(N) (*this)[i] = v; return *this; }
 
 	template <int N2, class T2>
@@ -306,6 +327,12 @@ public:
 	/// Get a vector comprised of indexed elements
 	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
 		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
+
+	/// Get a vector comprised of indexed elements (compile-time checked)
+	template <int... Indices>
+	Vec<sizeof...(Indices),T> get(){
+		return toVec(at<Indices>()...);
+	}
 
 	/// Get a subvector
 	template <int M, int Begin=0>
@@ -635,6 +662,15 @@ inline Vec<N+1, T> concat(const Vec<N,T>& v, const V& s){
 template <int N, class T, class V>
 inline Vec<N+1, T> concat(const V& s, const Vec<N,T>& v){
 	return Vec<N+1,T>(s,v);
+}
+
+template <class V>
+Vec<1,V> toVec(const V& v){ return {v}; }
+
+/// Returns new Vec filled with values
+template <class V, class... Vs>
+Vec<1+sizeof...(Vs),V> toVec(const V& v, Vs... vs){
+	return concat(v, toVec(vs...));
 }
 
 /// Get a subvector
