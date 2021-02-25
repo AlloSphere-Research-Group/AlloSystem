@@ -51,7 +51,7 @@
 
 #ifndef AL_ARRAY_DEFAULT_ALIGNMENT
 #define AL_ARRAY_DEFAULT_ALIGNMENT (4)
-#define
+#endif
 
 namespace al {
 
