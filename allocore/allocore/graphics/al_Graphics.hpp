@@ -603,6 +603,12 @@ public:
 	/// Returns number of bytes for given data type
 	static int numBytes(DataType v);
 
+	/// Get Format best matching number of components
+
+	/// For 1, 2, 3, and 4 components, the formats are 
+	/// LUMINANCE, LUMINANCE_ALPHA, RGB, and RGBA.
+	static Format toFormat(int numComps);
+
 	/// Get DataType associated with a basic C type
 	template<typename Type>
 	static DataType toDataType();

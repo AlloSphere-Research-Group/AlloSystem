@@ -1131,6 +1131,12 @@ int Graphics::numBytes(DataType v){
 	#undef CS
 }
 
+Graphics::Format Graphics::toFormat(int n){
+	static const Format f[] = {LUMINANCE, LUMINANCE_ALPHA, RGB, RGBA};
+	n = n<1 ? 1 : n>4 ? 4 : n; // clamp in [1,4]
+	return f[n-1];
+}
+
 template<> Graphics::DataType Graphics::toDataType<char>(){ return BYTE; }
 template<> Graphics::DataType Graphics::toDataType<unsigned char>(){ return UBYTE; }
 template<> Graphics::DataType Graphics::toDataType<short>(){ return SHORT; }
