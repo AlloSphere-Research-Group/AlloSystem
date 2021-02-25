@@ -4,7 +4,8 @@
 
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/system/al_Printing.hpp"
-#include <stdio.h>
+#include <cstdio>
+#include <cstring> // strlen
 #include <map>
 #include <string>
 
