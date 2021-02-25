@@ -49,11 +49,9 @@
 #include "allocore/math/al_Functions.hpp"
 #include "allocore/math/al_Vec.hpp"
 
+#ifndef AL_ARRAY_DEFAULT_ALIGNMENT
 #define AL_ARRAY_DEFAULT_ALIGNMENT (4)
-
-#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
-#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
-#define DOUBLE_FRAC(v) ( ((v)>=0.0) ? (v)-(long)(v) : (-v)-(long)(v) )
+#define
 
 namespace al {
 
@@ -195,8 +193,6 @@ public:
 	template<class T> void fill(void (*func)(T * values, double normx, double normy));
 	template<class T> void fill(void (*func)(T * values, double normx, double normy, double normz));
 
-	// TODO: iterators!
-
 	/// Get the components at a given index in the array (no bounds checking)
 	template<class T> T * cell(size_t x) const;
 	template<class T> T * cell(size_t x, size_t y) const;
@@ -276,7 +272,6 @@ public:
 	void print(FILE * fp = stdout) const;
 
 
-
 	///	Returns the type enumeration ID (AlloTy) for a given type (given as template argument).
 
 	/// E.g., assert(Array::type<float>() == AlloFloat32Ty);
@@ -315,18 +310,9 @@ protected:
 };
 
 
+// ********* INLINE IMPLEMENTATION BELOW ***********
 
-
-/*
- *
- ********* INLINE IMPLEMENTATION BELOW ***********
- *
- */
-#pragma mark --------------------------------------
-
-/*
-	Type traits by partial specialization:
- */
+// Type traits by partial specialization:
 template<> constexpr AlloTy Array::type<uint8_t  >(){ return AlloUInt8Ty; }
 template<> constexpr AlloTy Array::type<uint16_t >(){ return AlloUInt16Ty; }
 template<> constexpr AlloTy Array::type<uint32_t >(){ return AlloUInt32Ty; }
@@ -394,15 +380,18 @@ template<class T> inline void Array::read_wrap(T* val, int x, int y, int z) cons
 	read(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0), wrap<int>(z, header.dim[2], 0));
 }
 
+#define AL_ARRAY_FLOOR(v) ( (long)(v) - ((v)<0. && (v)!=(long)(v)) )
+#define AL_ARRAY_FRAC(v) ( ((v)>=0.) ? (v)-(long)(v) : (-v)-(long)(v) )
+
 // linear interpolated lookup (virtual array index)
 // reads the linearly interpolated plane values into val array
 template<class T> inline void Array::read_interp(T * val, double x) const {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
-	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
+	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
-	double faaa = DOUBLE_FRAC(x);
+	double faaa = AL_ARRAY_FRAC(x);
 	double fbaa = 1.f - faaa;
 	// get the cell addresses for each neighbor:
 	T * paaa = cell<T>(xa);
@@ -417,14 +406,14 @@ template<class T> inline void Array::read_interp(T * val, double x, double y) co
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	y = wrap<double>(y, (double)header.dim[1], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
-	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
-	const unsigned ya = (const unsigned)DOUBLE_FLOOR(y);
+	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
+	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	unsigned yb = ya+1;	if (yb == header.dim[1]) yb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
-	double xbf = DOUBLE_FRAC(x);
+	double xbf = AL_ARRAY_FRAC(x);
 	double xaf = 1.f - xbf;
-	double ybf = DOUBLE_FRAC(y);
+	double ybf = AL_ARRAY_FRAC(y);
 	double yaf = 1.f - ybf;
 	// get the interpolation corner weights:
 	double faaa = xaf * yaf;
@@ -450,18 +439,18 @@ template<class T> inline void Array::read_interp(T * val, double x, double y, do
 	y = wrap<double>(y, (double)header.dim[1], 0.);
 	z = wrap<double>(z, (double)header.dim[2], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
-	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
-	const unsigned ya = (const unsigned)DOUBLE_FLOOR(y);
-	const unsigned za = (const unsigned)DOUBLE_FLOOR(z);
+	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
+	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
+	const unsigned za = (const unsigned)AL_ARRAY_FLOOR(z);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	unsigned yb = ya+1;	if (yb == header.dim[1]) yb = 0;
 	unsigned zb = za+1;	if (zb == header.dim[2]) zb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
-	double xbf = DOUBLE_FRAC(x);
+	double xbf = AL_ARRAY_FRAC(x);
 	double xaf = 1.f - xbf;
-	double ybf = DOUBLE_FRAC(y);
+	double ybf = AL_ARRAY_FRAC(y);
 	double yaf = 1.f - ybf;
-	double zbf = DOUBLE_FRAC(z);
+	double zbf = AL_ARRAY_FRAC(z);
 	double zaf = 1.f - zbf;
 	// get the interpolation corner weights:
 	double faaa = xaf * yaf * zaf;
@@ -529,10 +518,10 @@ template<class T> inline void Array::write_wrap(const T* val, int x, int y, int 
 // writes the linearly interpolated plane values from val array into array
 template<class T> inline void Array::write_interp(const T* val, double x) {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
-	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
+	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
-	double xbf = DOUBLE_FRAC(x);
+	double xbf = AL_ARRAY_FRAC(x);
 	double xaf = 1.f - xbf;
 	// get the interpolation corner weights:
 	double faaa = xaf;
@@ -549,14 +538,14 @@ template<class T> inline void Array::write_interp(const T* val, double x) {
 template<class T> inline void Array::write_interp(const T* val, double x, double y) {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	y = wrap<double>(y, (double)header.dim[1], 0.);
-	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
-	const unsigned ya = (const unsigned)DOUBLE_FLOOR(y);
+	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
+	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	unsigned yb = ya+1;	if (yb == header.dim[1]) yb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
-	double xbf = DOUBLE_FRAC(x);
+	double xbf = AL_ARRAY_FRAC(x);
 	double xaf = 1.f - xbf;
-	double ybf = DOUBLE_FRAC(y);
+	double ybf = AL_ARRAY_FRAC(y);
 	double yaf = 1.f - ybf;
 	// get the interpolation corner weights:
 	double faaa = xaf * yaf;
@@ -581,18 +570,18 @@ template<class T> inline void Array::write_interp(const T* val, double x0, doubl
 	double x = wrap<double>(x0, (double)header.dim[0], 0.);
 	double y = wrap<double>(y0, (double)header.dim[1], 0.);
 	double z = wrap<double>(z0, (double)header.dim[2], 0.);
-	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
-	const unsigned ya = (const unsigned)DOUBLE_FLOOR(y);
-	const unsigned za = (const unsigned)DOUBLE_FLOOR(z);
+	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
+	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
+	const unsigned za = (const unsigned)AL_ARRAY_FLOOR(z);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	unsigned yb = ya+1;	if (yb == header.dim[1]) yb = 0;
 	unsigned zb = za+1;	if (zb == header.dim[2]) zb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
-	double xbf = DOUBLE_FRAC(x);
+	double xbf = AL_ARRAY_FRAC(x);
 	double xaf = 1.f - xbf;
-	double ybf = DOUBLE_FRAC(y);
+	double ybf = AL_ARRAY_FRAC(y);
 	double yaf = 1.f - ybf;
-	double zbf = DOUBLE_FRAC(z);
+	double zbf = AL_ARRAY_FRAC(z);
 	double zaf = 1.f - zbf;
 	// get the interpolation corner weights:
 	double faaa = xaf * yaf * zaf;
@@ -625,6 +614,8 @@ template<class T> inline void Array::write_interp(const T* val, double x0, doubl
 	}
 }
 
+#undef AL_ARRAY_FLOOR
+#undef AL_ARRAY_FRAC
 
 template<class T> void Array::fill(void (*func)(T * values, double normx)) {
 	int d0 = header.dim[0];
@@ -774,10 +765,6 @@ template<class T> void Array::set3d(T * cell) {
 	}
 }
 
-#undef DOUBLE_FLOOR
-#undef DOUBLE_CEIL
-#undef DOUBLE_FRAC
+} // al::
 
-} // ::al::
-
-#endif /* INCLUDE_ALLO_TYPES_CPP_H */
+#endif // include guard
