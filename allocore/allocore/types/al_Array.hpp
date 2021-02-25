@@ -43,6 +43,7 @@
 #ifndef INCLUDE_ALLO_ARRAY_HPP
 #define INCLUDE_ALLO_ARRAY_HPP 1
 
+#include <cmath> // fmod
 #include <cstdio> // FILE
 #include "allocore/types/al_Array.h"
 #include "allocore/math/al_Vec.hpp"
@@ -220,14 +221,6 @@ public:
 	template<class T, class U> void read(T* val, Vec<2,U> p) const { read(val, p[0], p[1]); }
 	template<class T, class U> void read(T* val, Vec<3,U> p) const { read(val, p[0], p[1], p[2]); }
 
-	/// Read the component values from array into val array (wraps periodically at bounds)
-	template<class T> void read_wrap(T* val, int x) const;
-	template<class T> void read_wrap(T* val, int x, int y) const;
-	template<class T> void read_wrap(T* val, int x, int y, int z) const;
-
-	template<class T, class U> void read_wrap(T* val, Vec<2,U> p) const { read_wrap(val, p[0], p[1]); }
-	template<class T, class U> void read_wrap(T* val, Vec<3,U> p) const { read_wrap(val, p[0], p[1], p[2]); }
-
 	/// Linear interpolated lookup (virtual array index)
 
 	/// Reads the linearly interpolated component values into val array
@@ -247,13 +240,6 @@ public:
 	template<class T, class U> void write(const T* val, Vec<2,U> p) { write(val, p[0], p[1]); }
 	template<class T, class U> void write(const T* val, Vec<3,U> p) { write(val, p[0], p[1], p[2]); }
 
-	/// Write plane values from val array into array (wraps periodically at bounds)
-	template<class T> void write_wrap(const T* val, int x);
-	template<class T> void write_wrap(const T* val, int x, int y);
-	template<class T> void write_wrap(const T* val, int x, int y, int z);
-
-	template<class T, class U> void write_wrap(const T* val, Vec<2,U> p) { write_wrap(val, p[0], p[1]); }
-	template<class T, class U> void write_wrap(const T* val, Vec<3,U> p) { write_wrap(val, p[0], p[1], p[2]); }
 
 	/// Linear interpolated write (virtual array index)
 
@@ -281,30 +267,10 @@ public:
 
 protected:
 	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
+
 public:	// temporarily made public, because protected broke some other project code -gw
 	Array(const Array&);
 	Array& operator= (const Array&);
-protected:
-
-	// temporary hack because the one in al_Function gave a bad result
-	// for e.g. wrap<double>(-64.0, -32.0);
-	template<class T>
-	static T wrap(T v, const T hi=T(1.), const T lo=T(0.)){
-		if(lo == hi) return lo;
-		//if(v >= hi){
-		if(!(v < hi)){
-			T diff = hi - lo;
-			v -= diff;
-			if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
-		}
-		else if(v < lo){
-			T diff = hi - lo;
-			v += diff;
-			if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
-			if(v==diff) return lo;
-		}
-		return v;
-	}
 };
 
 
@@ -367,24 +333,13 @@ template<class T> inline void Array::read(T* val, int x, int y, int z) const {
 	}
 }
 
-// read the plane values from array into val array (wraps periodically at bounds)
-template<class T> inline void Array::read_wrap(T* val, int x) const {
-	read(val, wrap<int>(x, header.dim[0], 0));
-}
-template<class T> inline void Array::read_wrap(T* val, int x, int y) const {
-	read(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0));
-}
-template<class T> inline void Array::read_wrap(T* val, int x, int y, int z) const {
-	read(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0), wrap<int>(z, header.dim[2], 0));
-}
-
 #define AL_ARRAY_FLOOR(v) ( (long)(v) - ((v)<0. && (v)!=(long)(v)) )
 #define AL_ARRAY_FRAC(v) ( ((v)>=0.) ? (v)-(long)(v) : (-v)-(long)(v) )
 
 // linear interpolated lookup (virtual array index)
 // reads the linearly interpolated plane values into val array
 template<class T> inline void Array::read_interp(T * val, double x) const {
-	x = wrap<double>(x, (double)header.dim[0], 0.);
+	x = std::fmod<double>(x, header.dim[0]);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
@@ -401,8 +356,8 @@ template<class T> inline void Array::read_interp(T * val, double x) const {
 }
 
 template<class T> inline void Array::read_interp(T * val, double x, double y) const {
-	x = wrap<double>(x, (double)header.dim[0], 0.);
-	y = wrap<double>(y, (double)header.dim[1], 0.);
+	x = std::fmod<double>(x, header.dim[0]);
+	y = std::fmod<double>(y, header.dim[1]);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
 	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
@@ -433,9 +388,9 @@ template<class T> inline void Array::read_interp(T * val, double x, double y) co
 }
 
 template<class T> inline void Array::read_interp(T * val, double x, double y, double z) const {
-	x = wrap<double>(x, (double)header.dim[0], 0.);
-	y = wrap<double>(y, (double)header.dim[1], 0.);
-	z = wrap<double>(z, (double)header.dim[2], 0.);
+	x = std::fmod<double>(x, header.dim[0]);
+	y = std::fmod<double>(y, header.dim[1]);
+	z = std::fmod<double>(z, header.dim[2]);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
 	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
@@ -501,21 +456,10 @@ template<class T> inline void Array::write(const T* val, int x, int y, int z) {
 	}
 }
 
-// write plane values from val array into array (wraps periodically at bounds)
-template<class T> inline void Array::write_wrap(const T* val, int x) {
-	write(val, wrap<int>(x, header.dim[0], 0));
-}
-template<class T> inline void Array::write_wrap(const T* val, int x, int y) {
-	write(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0));
-}
-template<class T> inline void Array::write_wrap(const T* val, int x, int y, int z) {
-	write(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0), wrap<int>(z, header.dim[2], 0));
-}
-
 // linear interpolated write (virtual array index)
 // writes the linearly interpolated plane values from val array into array
 template<class T> inline void Array::write_interp(const T* val, double x) {
-	x = wrap<double>(x, (double)header.dim[0], 0.);
+	x = std::fmod<double>(x, header.dim[0]);
 	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
@@ -534,8 +478,8 @@ template<class T> inline void Array::write_interp(const T* val, double x) {
 	}
 }
 template<class T> inline void Array::write_interp(const T* val, double x, double y) {
-	x = wrap<double>(x, (double)header.dim[0], 0.);
-	y = wrap<double>(y, (double)header.dim[1], 0.);
+	x = std::fmod<double>(x, header.dim[0]);
+	y = std::fmod<double>(y, header.dim[1]);
 	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
 	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
@@ -565,9 +509,9 @@ template<class T> inline void Array::write_interp(const T* val, double x, double
 }
 
 template<class T> inline void Array::write_interp(const T* val, double x0, double y0, double z0) {
-	double x = wrap<double>(x0, (double)header.dim[0], 0.);
-	double y = wrap<double>(y0, (double)header.dim[1], 0.);
-	double z = wrap<double>(z0, (double)header.dim[2], 0.);
+	double x = std::fmod<double>(x0, header.dim[0]);
+	double y = std::fmod<double>(y0, header.dim[1]);
+	double z = std::fmod<double>(z0, header.dim[2]);
 	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
 	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
 	const unsigned za = (const unsigned)AL_ARRAY_FLOOR(z);
