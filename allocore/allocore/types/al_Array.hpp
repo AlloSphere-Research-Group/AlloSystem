@@ -43,10 +43,8 @@
 #ifndef INCLUDE_ALLO_ARRAY_HPP
 #define INCLUDE_ALLO_ARRAY_HPP 1
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio> // FILE
 #include "allocore/types/al_Array.h"
-#include "allocore/math/al_Functions.hpp"
 #include "allocore/math/al_Vec.hpp"
 
 #ifndef AL_ARRAY_DEFAULT_ALIGNMENT

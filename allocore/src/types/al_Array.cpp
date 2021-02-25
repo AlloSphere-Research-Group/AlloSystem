@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <cstring> // memcpy, memset
 #include "allocore/types/al_Array.hpp"
 
 namespace al{
