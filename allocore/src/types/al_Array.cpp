@@ -69,31 +69,41 @@ uint32_t Array::alignment() const {
 	return 8;
 }
 
-bool Array::isFormat(const AlloArrayHeader& h2) const {
-	return allo_array_equal_headers(&header, &h2);
+bool Array::isFormat(const AlloArrayHeader& h) const {
+	return allo_array_equal_headers(&header, &h);
 }
 
-void Array::configure(const AlloArrayHeader& h2) {
-	allo_array_setheader(this, &h2);
+void Array::configure(const AlloArrayHeader& h) {
+	allo_array_setheader(this, &h);
 }
 
-void Array::dataCalloc() { allo_array_allocate(this); }
+void Array::dataCalloc() {
+	allo_array_allocate(this);
+	mIsRef = false;
+}
 
-void Array::dataFree() { allo_array_free(this); }
+void Array::dataFree() {
+	if(!mIsRef){
+		allo_array_free(this);
+	}
+}
 
 void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
 	allo_array_setstride(&h, alignSize);
 }
 
-void Array::format(const AlloArrayHeader& h2) {
-	if(!isFormat(h2)) {
-		if(size() != allo_array_size_from_header(&h2)){
+void Array::format(const AlloArrayHeader& h) {
+	if(!isFormat(h)) {
+		if(mIsRef){
+			configure(h); // just set header, don't mess with memory
+		}
+		else if(size() != allo_array_size_from_header(&h)){
 			dataFree();
-			configure(h2);
+			configure(h);
 			dataCalloc();
 		}
 		else{
-			configure(h2);
+			configure(h);
 			zero();
 		}
 	}
@@ -126,17 +136,21 @@ void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, ui
 	formatAlignedGeneral(comps, ty, dims,3, align);
 }
 
-void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align) {
+AlloArrayHeader Array::getHeader(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align){
 	if(numDims > ALLO_ARRAY_MAX_DIMS) numDims = ALLO_ARRAY_MAX_DIMS;
-	AlloArrayHeader hh;
-	hh.type = ty;
-	hh.components = comps;
-	hh.dimcount = numDims;
+	AlloArrayHeader h;
+	h.type = ty;
+	h.components = comps;
+	h.dimcount = numDims;
 	int i=0;
-	for(; i<numDims; ++i)				hh.dim[i] = dims[i];
-	for(; i<ALLO_ARRAY_MAX_DIMS; ++i)	hh.dim[i] = 0;
-	deriveStride(hh, align);
-	format(hh);
+	for(; i<numDims; ++i)				h.dim[i] = dims[i];
+	for(; i<ALLO_ARRAY_MAX_DIMS; ++i)	h.dim[i] = 0;
+	deriveStride(h, align);
+	return h;
+}
+
+void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align) {
+	format(getHeader(comps, ty, dims,numDims, align));
 }
 
 void Array::zero(){

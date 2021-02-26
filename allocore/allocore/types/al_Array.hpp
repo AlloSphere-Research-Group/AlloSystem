@@ -109,10 +109,10 @@ public:
 	unsigned cells() const { return allo_array_elements(this); }
 
 	/// Change the format without de/re/allocating:
-	void configure(const AlloArrayHeader& h2);
+	void configure(const AlloArrayHeader& h);
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
-	void format(const AlloArrayHeader& h2);
+	void format(const AlloArrayHeader& h);
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(const AlloArray& array) { format(array.header); }
@@ -134,6 +134,35 @@ public:
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align);
+
+	/// Set 1D source array to reference
+	template <class T>
+	void ref(T * src, int comps, uint32_t dimx){
+		uint32_t dims[] = {dimx};
+		ref(src, comps, dims,1);
+	}
+
+	/// Set 2D source array to reference
+	template <class T>
+	void ref(T * src, int comps, uint32_t dimx, uint32_t dimy){
+		uint32_t dims[] = {dimx, dimy};
+		ref(src, comps, dims,2);
+	}
+
+	/// Set 3D source array to reference
+	template <class T>
+	void ref(T * src, int comps, uint32_t dimx, uint32_t dimy, uint32_t dimz){
+		uint32_t dims[] = {dimx, dimy, dimz};
+		ref(src, comps, dims,3);
+	}
+
+	template <class T>
+	void ref(T * src, int comps, uint32_t * dims, int numDims){
+		dataFree();
+		data.ptr = decltype(data.ptr)(src);
+		mIsRef = true;
+		configure(getHeader(comps, type<T>(), dims,numDims, 1));
+	}
 
 	/// Check if this Array conforms to an ArrayHeader format
 	bool isFormat(const AlloArrayHeader& h2) const;
@@ -266,6 +295,10 @@ public:
 	static void deriveStride(AlloArrayHeader& h, size_t rowAlignSize);
 
 protected:
+	bool mIsRef = false;
+
+	AlloArrayHeader getHeader(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
+
 	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
 
 public:	// temporarily made public, because protected broke some other project code -gw
