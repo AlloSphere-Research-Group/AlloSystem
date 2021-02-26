@@ -212,6 +212,13 @@ public:
 	/// Set texel (color) format
 	Texture& texelFormat(int v){ return update(v, mTexelFormat, mShapeUpdated); }
 
+	/// Set texel format to ensure no clamping in [0,1] on GPU
+
+	/// This is essential if you are using the texture as a look-up table for
+	/// generic real-valued data. Relevant only if format is FLOAT.
+	/// \returns true if clamping disabled otherwise false.
+	bool noTexelClamp();
+
 	/// Set target type (e.g., TEXTURE_2D)
 	Texture& target(Target v){ return update(v, mTarget, mShapeUpdated); }
 

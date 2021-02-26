@@ -19,7 +19,7 @@ Texture::Texture()
 }
 
 #ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
-Texture :: Texture(
+Texture::Texture(
 	unsigned width,
 	Graphics::Format format, Graphics::DataType type,
 	bool alloc
@@ -34,7 +34,7 @@ Texture :: Texture(
 }
 #endif
 
-Texture :: Texture(
+Texture::Texture(
 	unsigned width, unsigned height,
 	Graphics::Format format, Graphics::DataType type,
 	bool alloc
@@ -50,7 +50,7 @@ Texture :: Texture(
 }
 
 #ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-Texture :: Texture(
+Texture::Texture(
 	unsigned width, unsigned height, unsigned depth,
 	Graphics::Format format, Graphics::DataType type,
 	bool alloc
@@ -67,13 +67,13 @@ Texture :: Texture(
 }
 #endif
 
-Texture :: Texture(AlloArrayHeader& header)
+Texture::Texture(AlloArrayHeader& header)
 {
 	init();
 	shapeFrom(header, true /*reallocate*/);
 }
 
-Texture :: ~Texture() {
+Texture::~Texture() {
 }
 
 
@@ -151,6 +151,18 @@ Texture& Texture::wrap(Wrap S, Wrap T, Wrap R){
 	return *this;
 }
 
+bool Texture::noTexelClamp(){
+	// TODO: Do run-time check?
+	// Note ES1, ES2 do not support GL_RGBA32F internal format.
+	#ifdef GL_RGBA32F
+	if(type() == al::Graphics::FLOAT){
+		texelFormat(GL_RGBA32F);
+	}
+	return true;
+	#else
+	return false;
+	#endif
+}
 
 void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
 	switch(hdr.dimcount){
