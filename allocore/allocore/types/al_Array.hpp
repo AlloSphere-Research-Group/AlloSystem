@@ -321,13 +321,21 @@ template<> constexpr AlloTy Array::type<int64_t  >(){ return AlloSInt64Ty; }
 template<> constexpr AlloTy Array::type<float    >(){ return AlloFloat32Ty; }
 template<> constexpr AlloTy Array::type<double   >(){ return AlloFloat64Ty; }
 template<> constexpr AlloTy Array::type<AlloArray>(){ return AlloArrayTy; }
-template<> constexpr AlloTy Array::type<void *>(){
+namespace{
+template<int NumBytes> constexpr AlloTy ptrType();
+template<> constexpr AlloTy ptrType<4>(){ return AlloPointer32Ty; }
+template<> constexpr AlloTy ptrType<8>(){ return AlloPointer64Ty; }
+}
+template<> constexpr AlloTy Array::type<void *>(){ return ptrType<sizeof(void*)>(); }
+
+
+/*template<> constexpr AlloTy Array::type<void *>(){
 	switch(sizeof(void *)) {
 		case 4: return AlloPointer32Ty;
 		case 8: return AlloPointer64Ty;
 	}
 	return 0;
-}
+}*/
 
 template<class T> inline T * Array::cell(size_t x) const {
 	size_t fieldstride_x = header.stride[0];
