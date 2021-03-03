@@ -168,6 +168,9 @@ public:
 	/// Get texel (color) format
 	int texelFormat() const { return mTexelFormat; }
 
+	/// Get texel clamp flag
+	bool texelClamp() const { return mTexelClamp; }
+
 	/// Get target type (e.g., TEXTURE_2D)
 	Target target() const { return mTarget; }
 
@@ -212,12 +215,12 @@ public:
 	/// Set texel (color) format
 	Texture& texelFormat(int v){ return update(v, mTexelFormat, mShapeUpdated); }
 
-	/// Set texel format to ensure no clamping in [0,1] on GPU
+	/// Set whether texel values should be clamped into [0,1] on GPU
 
-	/// This is essential if you are using the texture as a look-up table for
-	/// generic real-valued data. Relevant only if format is FLOAT.
-	/// \returns true if clamping disabled otherwise false.
-	bool noTexelClamp();
+	/// This is essential if you are using the texture as a look-up table
+	/// containing (signed) real-valued data. Relevant only if type() is FLOAT.
+	/// Default value is true.
+	Texture& texelClamp(bool whether);
 
 	/// Set target type (e.g., TEXTURE_2D)
 	Texture& target(Target v){ return update(v, mTarget, mShapeUpdated); }
@@ -443,6 +446,7 @@ protected:
 	bool mShapeUpdated=true;	// Flags change in size, format, type, etc.
 	bool mArrayDirty=false;
 	bool mMipmap;
+	bool mTexelClamp=true;
 
 	virtual void onCreate();
 	virtual void onDestroy();

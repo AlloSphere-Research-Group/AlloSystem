@@ -2,6 +2,15 @@
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 
+static int unclampedFloatFormat(){
+	// TODO: run-time check
+	// Note ES1, ES2 do not support GL_RGBA32F internal format.
+	#ifdef GL_RGBA32F
+	return GL_RGBA32F;
+	#endif
+	return 0;
+}
+
 namespace al{
 
 void Texture::init(){
@@ -151,17 +160,12 @@ Texture& Texture::wrap(Wrap S, Wrap T, Wrap R){
 	return *this;
 }
 
-bool Texture::noTexelClamp(){
-	// TODO: Do run-time check?
-	// Note ES1, ES2 do not support GL_RGBA32F internal format.
-	#ifdef GL_RGBA32F
-	if(type() == al::Graphics::FLOAT){
-		texelFormat(GL_RGBA32F);
+Texture& Texture::texelClamp(bool v){
+	if(unclampedFloatFormat()){
+		mTexelClamp = v;
+		mShapeUpdated = true;
 	}
-	return true;
-	#else
-	return false;
-	#endif
+	return *this;
 }
 
 void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
@@ -513,8 +517,12 @@ void Texture::sendShape(bool force){
 	if((mShapeUpdated || force)){
 
 		// Determine texel format (on GPU)
-		// Use specified texel format if defined, otherwise pixel format
+		// Use specified texel format if defined, otherwise pixel (CPU) format
 		int intFmt = mTexelFormat ? mTexelFormat : format();
+
+		if(!mTexelClamp && type() == Graphics::FLOAT && unclampedFloatFormat()){
+			intFmt = unclampedFloatFormat();
+		}
 
 		//printf("Texture::sendShape calling glTexImage\n");
 		switch(target()){
