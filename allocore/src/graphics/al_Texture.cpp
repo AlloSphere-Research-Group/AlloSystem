@@ -85,17 +85,17 @@ Texture::Texture(AlloArrayHeader& header)
 Texture::~Texture() {
 }
 
-
 void Texture::onCreate(){
 	//printf("Texture onCreate\n");
 	glGenTextures(1, (GLuint *)&mID);
+	mFirstBind = true;
 
-	if(tryBind()){
+	tryBind([this](){
 		sendShape();
 		sendParams();
 		sendPixels();
 		glBindTexture(target(), 0);
-	}
+	});
 	AL_GRAPHICS_ERROR("creating texture", id());
 }
 
@@ -266,8 +266,7 @@ void Texture::deriveTarget(){
 	}
 }
 
-bool Texture::tryBind(){
-
+void Texture::tryBind(const std::function<void(void)>& onPostBind){
 	// Sync shape if array is dirty
 	shapeFromArray();
 
@@ -276,9 +275,9 @@ bool Texture::tryBind(){
 
 	if(target() != Texture::NO_TARGET){
 		glBindTexture(target(), id());
-		return true;
+		onPostBind();
+		mFirstBind = false;
 	}
-	return false;
 }
 
 void Texture :: bind(int unit) {
@@ -293,7 +292,7 @@ void Texture :: bind(int unit) {
 		AL_GRAPHICS_ERROR("active texture binding texture", id());
 
 	// Do the actual binding
-	if(tryBind()){
+	tryBind([this](){
 		AL_GRAPHICS_ERROR("binding texture", id());
 
 		#ifdef AL_GRAPHICS_TEXTURE_NEEDS_ENABLE
@@ -310,7 +309,7 @@ void Texture :: bind(int unit) {
 			//AL_GRAPHICS_ERROR("sendparams binding texture", id());
 		sendPixels(false);
 			//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
-	}
+	});
 }
 
 void Texture :: unbind(int unit) {
@@ -442,6 +441,12 @@ void Texture::sendParams(bool force){
 	}
 }
 
+Texture& Texture::updateRows(unsigned offset, unsigned count){
+	mUpdateRows.push({offset, count});
+	mPixelsUpdated = true;
+	return *this;
+}
+
 void Texture::sendPixels(const void * pixels, unsigned align){
 	//printf("Texture::sendPixels:"); print();
 	// Note: pixels cannot be NULL for TexSubImage
@@ -451,51 +456,66 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 		glPixelStorei(GL_UNPACK_ALIGNMENT, align);
 			AL_GRAPHICS_ERROR("Texture::sendPixels (glPixelStorei set)", id());
 
-		auto genMipmap = [this](){
-			#ifdef AL_GRAPHICS_SUPPORTS_MIPMAP
-			if(mMipmap){
-				glGenerateMipmap(target());
-					AL_GRAPHICS_ERROR("Texture::sendPixels (glGenerateMipmap)", id());
+		auto sendSubImage = [&](const Rows& r){
+
+			auto genMipmap = [this](){
+				#ifdef AL_GRAPHICS_SUPPORTS_MIPMAP
+				if(mMipmap){
+					glGenerateMipmap(target());
+						AL_GRAPHICS_ERROR("Texture::sendPixels (glGenerateMipmap)", id());
+				}
+				#endif
+			};
+
+			switch(target()){
+
+				/*void glTexSubImage3D(
+					GLenum target, GLint level,
+					GLint xoffset, GLint yoffset, GLint zoffset,
+					GLsizei width, GLsizei height, GLsizei depth,
+					GLenum format, GLenum type,
+					const GLvoid *pixels
+				);*/
+
+				#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
+				case TEXTURE_1D:
+					glTexSubImage1D(target(), 0, 0, width(), format(), type(), pixels);
+						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
+					genMipmap();
+					break;
+				#endif
+
+				case TEXTURE_2D:{
+					const void * data = (const char *)(pixels) + mArray.stride(1)*r.offset;
+					glTexSubImage2D(target(), 0, 0,r.offset, width(),r.count, format(), type(), data);
+						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
+					genMipmap();
+					} break;
+
+				#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
+				case TEXTURE_3D:
+					glTexSubImage3D(target(), 0, 0,0,0, width(),height(),depth(), format(), type(), pixels);
+						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
+					genMipmap();
+					break;
+				#endif
+
+				case NO_TARGET:;
+					// Unconfigured
+				default:
+					AL_WARN("invalid texture target %d", target());
 			}
-			#endif
+
 		};
 
-		switch(target()){
-
-			/*void glTexSubImage3D(
-				GLenum target, GLint level,
-				GLint xoffset, GLint yoffset, GLint zoffset,
-				GLsizei width, GLsizei height, GLsizei depth,
-				GLenum format, GLenum type,
-				const GLvoid *pixels
-			);*/
-
-			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
-			case TEXTURE_1D:
-				glTexSubImage1D(target(), 0, 0, width(), format(), type(), pixels);
-					AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
-				genMipmap();
-				break;
-			#endif
-
-			case TEXTURE_2D:
-				glTexSubImage2D(target(), 0, 0,0, width(), height(), format(), type(), pixels);
-					AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
-				genMipmap();
-				break;
-
-			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-			case TEXTURE_3D:
-				glTexSubImage3D(target(), 0, 0,0,0, width(), height(), depth(), format(), type(), pixels);
-					AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
-				genMipmap();
-				break;
-			#endif
-
-			case NO_TARGET:;
-				// Unconfigured
-			default:
-				AL_WARN("invalid texture target %d", target());
+		if(mFirstBind || mUpdateRows.empty()){
+			Rows r = {0, (height()?height():1) * (depth()?depth():1)};
+			sendSubImage(r);
+		} else {
+			while(mUpdateRows.size()){
+				sendSubImage(mUpdateRows.top());
+				mUpdateRows.pop();
+			}
 		}
 
 		// Set alignment back to default
@@ -566,7 +586,7 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	glActiveTexture(GL_TEXTURE0);
 		AL_GRAPHICS_ERROR("Texture::submit (glActiveTexture)", id());
 
-	if(tryBind()){
+	tryBind([&](){
 		AL_GRAPHICS_ERROR("Texture::submit (glBindTexture)", id());
 
 		// Sync client state with GPU
@@ -590,7 +610,7 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 		// Unbind texture
 		glBindTexture(target(), 0);
 			AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
-	}
+	});
 }
 
 

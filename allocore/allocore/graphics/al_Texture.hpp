@@ -46,6 +46,7 @@
 
 #include <cstring> // memcpy
 #include <functional>
+#include <stack>
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
@@ -429,9 +430,17 @@ public:
 	/// Print information about texture
 	void print();
 
+	/// Mark a contiguous set of rows to be updated from source array (2D only)
+	Texture& updateRows(unsigned offset, unsigned count=1);
+
 protected:
-	//int mLevel;	// TODO: on a rainy day...
-	//int mBorder;
+
+	struct Rows{
+		unsigned offset=0, count=1;
+	};
+
+	std::stack<Rows> mUpdateRows;
+
 	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc.
 	Format mFormat;				// RGBA, ALPHA, etc.
 	int mTexelFormat=0;			// default is 0 = auto
@@ -439,8 +448,8 @@ protected:
 	Wrap mWrapS, mWrapT, mWrapR;
 	Filter mFilterMin, mFilterMag;
 	unsigned mWidth=0, mHeight=0, mDepth=0;
-
 	Array mArray;				// Array representation of client-side pixel data
+	bool mFirstBind=true;
 	bool mParamsUpdated=true;	// Flags change in texture params (wrap, filter)
 	bool mPixelsUpdated=true;	// Flags change in pixel data
 	bool mShapeUpdated=true;	// Flags change in size, format, type, etc.
@@ -467,7 +476,8 @@ protected:
 	// send any pending shape updates to GPU or do immediately if forced
 	void sendShape(bool force=true);
 
-	bool tryBind();
+	// tries a bind and if successful calls function
+	void tryBind(const std::function<void(void)>& onPostBind);
 
 	// Pattern for setting a variable that when changed sets a notification flag
 	template<class T>
