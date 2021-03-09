@@ -74,7 +74,7 @@ public:
 	~Buffer(){}
 
 
-	int capacity() const { return mElems.size(); }		///< Returns total capacity
+	int capacity() const { return int(mElems.size()); }	///< Returns total capacity
 	int size() const { return mSize; }					///< Returns size
 	bool empty() const { return 0==size(); }			///< Whether buffer is empty
 	const T * elems() const { return &mElems[0]; }		///< Returns C pointer to elements
