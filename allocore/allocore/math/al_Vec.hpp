@@ -880,17 +880,6 @@ Vec<N,T>& Vec<N,T>::mag(T v){
 	return *this;
 }
 
-template <typename T> const char* typeString();
-#define TypeString(A) template <> inline const char* typeString<A>() { return #A; }
-TypeString(char)
-TypeString(unsigned char)
-TypeString(int)
-TypeString(unsigned int)
-TypeString(float)
-TypeString(double)
-TypeString(long double)
-#undef TypeString
-
 template<int N, class T>
 void Vec<N,T>::print(FILE * out) const {
 	fprintf(out, "{");
@@ -902,17 +891,8 @@ void Vec<N,T>::print(FILE * out) const {
 	fprintf(out, "}");
 }
 
-// Pretty-printing by Matt:
-//
 template <int N, class T>
 std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
-//	out << "Vec<" << N << "," << typeString<T>() << "> = {";
-//	if(v.size()){
-//		out << v[0];
-//		for (int i = 1; i < N; ++i)
-//			out << ", " << v[i];
-//	}
-//	out << "}" << std::endl;
 	out << "{";
 	if(v.size()){
 		out << v[0];
