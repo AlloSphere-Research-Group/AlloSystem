@@ -297,7 +297,7 @@ public:
 		if(v.size() == 1){
 			(*this) = v.begin()[0];
 		} else {
-			const int M = N<v.size() ? N : v.size();
+			const int M = N<v.size() ? N : int(v.size());
 			for(int i=0; i<M; ++i) (*this)[i] = v.begin()[i];
 			for(int i=M; i<N; ++i) (*this)[i] = T();
 		}
