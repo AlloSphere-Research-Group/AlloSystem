@@ -397,7 +397,7 @@ struct Colori {
 	Colori& set(uint8_t v){ return set(v,v,v); }
 
 	/// Set from gray value and alpha
-	Colori& set(uint8_t v, uint8_t al){ return set(v,al); }
+	Colori& set(uint8_t v, uint8_t al){ return set(v,v,v,al); }
 
 	template <unsigned HexValue>
 	constexpr Colori& fromHexRGB(){
@@ -1074,7 +1074,7 @@ struct HCLuv{
 	/// @param[in] w			HSV color to convert from
 	HCLuv(const HSV& w){ *this = w; }
 
-	/// @param[in] v			CIEXYZ color to convert from
+	/// @param[in] w			CIEXYZ color to convert from
 	HCLuv(const CIEXYZ& w){ *this = w; }
 
 	/// @param[in] w			Luv color to convert from
