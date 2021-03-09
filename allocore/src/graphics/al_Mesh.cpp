@@ -982,15 +982,6 @@ bool Mesh::save(const std::string& filePath, const std::string& solidName, bool 
 	return false;
 }
 
-bool Mesh::exportSTL(const char * filePath, const char * solidName) const {
-	return saveSTL(filePath, solidName);
-}
-
-bool Mesh::exportPLY(const char * filePath, const char * solidName) const {
-	return savePLY(filePath, solidName);
-}
-
-
 void Mesh::print(FILE * dst) const {
 	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);
 	if(vertices().size())	fprintf(dst, "%8d Vertices\n", vertices().size());

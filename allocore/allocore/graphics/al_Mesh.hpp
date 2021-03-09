@@ -464,12 +464,6 @@ protected:
 
 	int mPrimitive;
 	float mStroke = -1.f;
-
-public:
-	/// \deprecated
-	bool exportSTL(const char * filePath, const char * solidName = "") const;
-	/// \deprecated
-	bool exportPLY(const char * filePath, const char * solidName = "") const;
 };
 
 
