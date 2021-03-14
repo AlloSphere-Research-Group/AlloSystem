@@ -266,11 +266,16 @@ public:
 	Texture& wrap(Wrap S, Wrap T, Wrap R);
 
 
-	/// Bind the texture (to a multitexture unit)
-	void bind(int unit = 0);
+	/// Set texture unit (applied to all bind/unbind calls)
+	Texture& unit(int i){ mTexUnit=i; return *this; }
 
-	/// Unbind the texture (from a multitexture unit)
-	void unbind(int unit = 0);
+	void bind();
+
+	/// Bind the texture and set texture unit
+	void bind(int unit);
+
+	/// Unbind the texture
+	void unbind();
 
 	/// Render the texture onto a quad on the XY plane
 	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0, double z=0);
@@ -442,6 +447,7 @@ protected:
 	std::stack<Rows> mUpdateRows;
 
 	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc.
+	int mTexUnit = 0;			// Texture unit
 	Format mFormat;				// RGBA, ALPHA, etc.
 	int mTexelFormat=0;			// default is 0 = auto
 	DataType mType;				// UBYTE, FLOAT, etc.

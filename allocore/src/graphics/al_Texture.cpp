@@ -280,7 +280,7 @@ void Texture::tryBind(const std::function<void(void)>& onPostBind){
 	}
 }
 
-void Texture :: bind(int unit) {
+void Texture :: bind() {
 	AL_GRAPHICS_ERROR("(before Texture::bind)", id());
 
 	// Ensure texture is created
@@ -288,7 +288,7 @@ void Texture :: bind(int unit) {
 		AL_GRAPHICS_ERROR("validate binding texture", id());
 
 	// Specify multitexturing
-	glActiveTexture(GL_TEXTURE0 + unit);
+	glActiveTexture(GL_TEXTURE0 + mTexUnit);
 		AL_GRAPHICS_ERROR("active texture binding texture", id());
 
 	// Do the actual binding
@@ -312,9 +312,14 @@ void Texture :: bind(int unit) {
 	});
 }
 
-void Texture :: unbind(int unit) {
+void Texture :: bind(int texUnit) {
+	unit(texUnit);
+	bind();
+}
+
+void Texture :: unbind() {
 	// multitexturing:
-	glActiveTexture(GL_TEXTURE0 + unit);
+	glActiveTexture(GL_TEXTURE0 + mTexUnit);
 	glBindTexture(target(), 0);
 	#ifdef AL_GRAPHICS_TEXTURE_NEEDS_ENABLE
 	glDisable(target());

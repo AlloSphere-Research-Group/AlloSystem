@@ -170,9 +170,9 @@ inline void Font :: renderf(Graphics& g, const char * fmt, ...) {
 
 inline void Font :: render(Graphics& g, const std::string& text) {
 	write(mMesh, text);
-	mTex.bind(0);
+	mTex.bind();
 	g.draw(mMesh);
-	mTex.unbind(0);
+	mTex.unbind();
 }
 
 inline float Font :: width(const std::string& text) const {
