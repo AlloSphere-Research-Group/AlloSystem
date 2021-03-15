@@ -217,6 +217,9 @@ public:
 	/// @param[in] weighting	0 = equal weight, 1 = inverse distance weight
 	Mesh& smooth(float amount=1, int weighting=0);
 
+	/// Flip the winding order (of triangles)
+	Mesh& flipWinding();
+
 
 	int primitive() const { return mPrimitive; }
 	float stroke() const { return mStroke; }

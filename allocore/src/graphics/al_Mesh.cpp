@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <utility> // swap
 #include <vector>
 #include <fstream>
 #include "allocore/graphics/al_Mesh.hpp"
@@ -572,6 +573,21 @@ Mesh& Mesh::smooth(float amount, int weighting){
 
 	return *this;
 }
+
+
+Mesh& Mesh::flipWinding(){
+	if(isTriangles()){
+		if(mIndices.size()){
+			for(int i=0; i<mIndices.size(); i+=3)
+				std::swap(mIndices[i], mIndices[i+2]);
+		} else {
+			for(int i=0; i<mVertices.size(); i+=3)
+				std::swap(mVertices[i], mVertices[i+2]);
+		}
+	}
+	return *this;
+}
+
 
 
 Mesh& Mesh::merge(const Mesh& src){
