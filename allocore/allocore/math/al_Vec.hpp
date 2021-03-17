@@ -166,9 +166,7 @@ public:
 
 	/// Get axis aligned vector
 	static Vec aa(int axis, T val = T(1)){
-		Vec v(T(0));
-		v[axis] = val;
-		return v;
+		return Vec().setAA(axis, val);
 	}
 
 	/// Get vector filled with linear sequence of values
@@ -314,6 +312,13 @@ public:
 			for(int i=0; i<M; ++i) (*this)[i] = v.begin()[i];
 			for(int i=M; i<N; ++i) (*this)[i] = T();
 		}
+		return *this;
+	}
+
+	/// Set to axis-aligned vector
+	Vec& setAA(int axis, T val = T(1)){
+		(*this) = T(0);
+		(*this)[axis] = val;
 		return *this;
 	}
 
