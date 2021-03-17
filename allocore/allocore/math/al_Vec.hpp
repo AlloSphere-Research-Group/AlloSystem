@@ -88,6 +88,9 @@ template<class T> struct VecElems<3,T>{
 };
 template<class T> struct VecElems<4,T>{ T x,y,z,w; };
 
+/// Flag type to prevent element initialization
+static struct VecNoInit{} VEC_NO_INIT;
+
 // Base case
 template <class V>
 Vec<1,V> toVec(const V& v);
@@ -153,6 +156,9 @@ public:
 	/// @param[in] stride	stride factor through array
 	template <class T2>
 	Vec(const T2 * v, int stride=1){ set(v,stride); }
+
+	/// Non-initializing constructor
+	Vec(VecNoInit){}
 
 
 	//--------------------------------------------------------------------------
