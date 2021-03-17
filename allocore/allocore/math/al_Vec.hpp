@@ -164,6 +164,13 @@ public:
 	//--------------------------------------------------------------------------
 	// Factory Methods
 
+	/// Get axis aligned vector
+	static Vec aa(int axis, T val = T(1)){
+		Vec v(T(0));
+		v[axis] = val;
+		return v;
+	}
+
 	/// Get vector filled with linear sequence of values
 
 	/// @param[in] begin	start value
