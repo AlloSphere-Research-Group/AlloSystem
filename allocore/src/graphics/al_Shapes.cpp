@@ -631,4 +631,78 @@ int addTorus(
 	return Nv;
 }
 
+
+int addVoxels(
+	Mesh& m, std::function<float(int x, int y, int z)> field,
+	int Nx, int Ny, int Nz, float cellSize
+){
+	int numVertIn = m.vertices().size();
+	m.primitive(Graphics::TRIANGLES);
+	float n = -1.; // 1 normals point out, -1 normals point in
+	for(int k=0; k<Nz+1; ++k){
+	for(int j=0; j<Ny+1; ++j){
+	for(int i=0; i<Nx+1; ++i){
+		bool igood = i<=(Nx-1);
+		bool jgood = j<=(Ny-1);
+		bool kgood = k<=(Nz-1);
+		auto v = igood && jgood && kgood ? field(i,j,k) : 0.f;
+		auto vx = i>0 && jgood && kgood ? field(i-1,j,k) : 0.f;
+		auto vy = j>0 && igood && kgood ? field(i,j-1,k) : 0.f;
+		auto vz = k>0 && igood && jgood ? field(i,j,k-1) : 0.f;
+		Vec3f pos(i,j,k);
+		float ds = cellSize;
+		float scale = 1.;
+		pos = (pos * ds - 1.*0.)*scale;
+		float D = ds*scale;
+		if((v*vx)==0. && v!=vx){
+			int Nv = m.vertices().size();
+			m.vertex(pos.x, pos.y  , pos.z  );
+			m.vertex(pos.x, pos.y+D, pos.z  );
+			m.vertex(pos.x, pos.y  , pos.z+D);
+			m.vertex(pos.x, pos.y+D, pos.z+D);
+			//for(int i=0; i<4; ++i) m.colori(RGB(1.));
+			if(v<vx){
+				for(int i=0; i<4; ++i) m.normal( n, 0., 0.);
+				m.index(Nv, Nv+1, Nv+2, Nv+2, Nv+1, Nv+3);
+			} else {
+				for(int i=0; i<4; ++i) m.normal(-n, 0., 0.);
+				m.index(Nv+2, Nv+1, Nv, Nv+3, Nv+1, Nv+2);
+			}
+		}
+		if((v*vy)==0. && v!=vy){
+			int Nv = m.vertices().size();
+			m.vertex(pos.x  , pos.y, pos.z   );
+			m.vertex(pos.x+D, pos.y, pos.z   );
+			m.vertex(pos.x  , pos.y, pos.z+D);
+			m.vertex(pos.x+D, pos.y, pos.z+D);
+			RGB col = HSV((v+vy-1.)*0.03, cos(v+vy)*0.2+0.8, sin(v+vy)*0.3+0.7);
+			//for(int i=0; i<4; ++i) m.colori(col);
+			if(v<vy){
+				for(int i=0; i<4; ++i) m.normal(0., n, 0.);
+				m.index(Nv+2, Nv+1, Nv, Nv+3, Nv+1, Nv+2);
+			} else {
+				for(int i=0; i<4; ++i) m.normal(0.,-n, 0.);
+				m.index(Nv, Nv+1, Nv+2, Nv+2, Nv+1, Nv+3);
+			}
+		}
+		if((v*vz)==0. && v!=vz){
+			int Nv = m.vertices().size();
+			m.vertex(pos.x  , pos.y  , pos.z);
+			m.vertex(pos.x+D, pos.y  , pos.z);
+			m.vertex(pos.x  , pos.y+D, pos.z);
+			m.vertex(pos.x+D, pos.y+D, pos.z);
+			//for(int i=0; i<4; ++i) m.colori(RGB(1.));
+			if(v<vz){
+				for(int i=0; i<4; ++i) m.normal(0., 0., n);
+				m.index(Nv, Nv+1, Nv+2, Nv+2, Nv+1, Nv+3);
+			} else {
+				for(int i=0; i<4; ++i) m.normal(0., 0.,-n);
+				m.index(Nv+2, Nv+1, Nv, Nv+3, Nv+1, Nv+2);
+			}
+		}
+	}}}
+
+	return m.vertices().size() - numVertIn;
 }
+
+} // al::

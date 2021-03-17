@@ -43,6 +43,7 @@
 */
 
 #include <cmath>
+#include <functional>
 #include "allocore/graphics/al_Mesh.hpp"
 
 namespace al{
@@ -317,6 +318,12 @@ int addSurfaceLoop(
 int addTorus(
 	Mesh& m, double minRadius=0.3, double majRadius=0.7,
 	int Nmin=16, int Nmaj=16, double minPhase=0
+);
+
+
+int addVoxels(
+	Mesh& m, std::function<float(int x, int y, int z)> field,
+	int Nx, int Ny, int Nz, float cellSize = 0.1
 );
 
 
