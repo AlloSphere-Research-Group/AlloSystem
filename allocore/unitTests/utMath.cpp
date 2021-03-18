@@ -44,6 +44,47 @@ int utMath(){
 
 		Vec<N,double> a, b, c;	assert(a.size() == N);
 
+		// constructors
+		{ decltype(a) t(a);			assert(t == a); }
+		{ Vec<3,float> t(1);		assert(t[0] == 1 && t[1] == 1 && t[2] == 1); }
+		{ Vec<3,float> t(1,2);		assert(t[0] == 1 && t[1] == 2 && t[2] == 0); }
+		{ Vec<3,float> t(1,2,3);	assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
+		{ Vec<3,float> t({1,2,3});	assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
+		{ Vec<3,float> t(Vec<2,float>(1,2), 3); assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
+		{ Vec<3,float> t(Vec<2,float>(1,2)); assert(t[0] == 1 && t[1] == 2 && t[2] == 0); }
+		{	float s[] = {1,10,2,20,3,30};
+			assert(Vec3f(s) == Vec3f(1,10,2));
+			assert(Vec3f(s,2) == Vec3f(1,2,3));
+		}
+
+		// factories
+		assert(Vec3f::aa(0, 1.f) == Vec3f(1,0,0));
+		assert(Vec4i::iota(0  ) == Vec4i(0,1,2,3));
+		assert(Vec4i::iota(1  ) == Vec4i(1,2,3,4));
+		assert(Vec4i::iota(0,2) == Vec4i(0,2,4,6));
+		assert(Vec4d::line(0,3) == Vec4d(0,1,2,3));
+		assert(Vec4d::line<false>(0,4) == Vec4d(0,1,2,3));
+		assert(toVec(1,2,3,4).size() == 4);
+		assert(toVec(1,2,3,4) == Vec4i(1,2,3,4));
+
+		// access
+		for(int i=0; i<a.size(); ++i) a[i]=i;
+		assert(a.at<1>() == 1);
+		assert(a.get(0,1) == Vec2d(0,1));
+		assert(a.get(2,2) == Vec2d(2,2));
+		assert(a.get(2,1,0) == Vec3d(2,1,0));
+		{ bool compileTimeVec_get = a.get<2,1,0>() == Vec3d(2,1,0); assert(compileTimeVec_get); }
+
+		{
+		for(int i=0; i<a.size(); ++i) a[i]=i;
+
+		Vec<2, double> t;
+		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
+		t = a.sub<2,2>();		assert(t[0] == 2 && t[1] == 3);
+			// verify in-place operations
+		a.sub<2>() += 10;		assert(a[0] == 10 && a[1] == 11);
+		}
+
 		a[0] = 0;				assert(a[0] == 0);
 								assert(a.elems()[0] == 0);
 
@@ -73,6 +114,8 @@ int utMath(){
 		a.set(Vec<N-1,int>(1,2,3), 4);
 								assert(a[0] == 1 && a[1] == 2 && a[2] == 3 && a[3] == 4);
 		}
+
+		assert(Vec3i().setAA(1, 10) == Vec3i(0,10,0));
 
 		a = 3;
 		b = 3;
@@ -122,47 +165,8 @@ int utMath(){
 		(a = 1).normalize();	assert(a == 1./sqrt(N));
 		assert(a == (b = 10).normalized());
 
-		// constructors
-		{ decltype(a) t(a);			assert(t == a); }
-		{ Vec<3,float> t(1);		assert(t[0] == 1 && t[1] == 1 && t[2] == 1); }
-		{ Vec<3,float> t(1,2);		assert(t[0] == 1 && t[1] == 2 && t[2] == 0); }
-		{ Vec<3,float> t(1,2,3);	assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
-		{ Vec<3,float> t({1,2,3});	assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
-		{ Vec<3,float> t(Vec<2,float>(1,2), 3); assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
-		{ Vec<3,float> t(Vec<2,float>(1,2)); assert(t[0] == 1 && t[1] == 2 && t[2] == 0); }
-		{	float s[] = {1,2,3};
-			Vec<3,float> t(s);		assert(t[0] == 1 && t[1] == 2 && t[2] == 3);
-		}
-		{	float s[] = {1,10,2,20,3,30};
-			Vec<3,float> t(s,2);	assert(t[0] == 1 && t[1] == 2 && t[2] == 3);
-		}
-
-		// factories
-		assert(Vec4i::iota(0  ) == Vec4i(0,1,2,3));
-		assert(Vec4i::iota(1  ) == Vec4i(1,2,3,4));
-		assert(Vec4i::iota(0,2) == Vec4i(0,2,4,6));
-		assert(Vec4d::line(0,3) == Vec4d(0,1,2,3));
-		assert(Vec4d::line<false>(0,4) == Vec4d(0,1,2,3));
-		assert(toVec(1,2,3,4).size() == 4);
-		assert(toVec(1,2,3,4) == Vec4i(1,2,3,4));
-
-		// access
-		for(int i=0; i<a.size(); ++i) a[i]=i;
-		assert(a.at<1>() == 1);
-		assert(a.get(0,1) == Vec2d(0,1));
-		assert(a.get(2,2) == Vec2d(2,2));
-		assert(a.get(2,1,0) == Vec3d(2,1,0));
-		{ bool compileTimeVec_get = a.get<2,1,0>() == Vec3d(2,1,0); assert(compileTimeVec_get); }
-
-		{
-		for(int i=0; i<a.size(); ++i) a[i]=i;
-
-		Vec<2, double> t;
-		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
-		t = a.sub<2,2>();		assert(t[0] == 2 && t[1] == 3);
-			// verify in-place operations
-		a.sub<2>() += 10;		assert(a[0] == 10 && a[1] == 11);
-		}
+		assert(Vec4i(-10,1,4,100).indexOfMax() == 3);
+		assert(Vec4i(-10,1,4,100).indexOfMin() == 0);
 
 		// Vec-Vec ops
 		b = a = 1;
