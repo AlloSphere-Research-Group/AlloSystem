@@ -826,6 +826,10 @@ inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
 template <int N, class T>
 inline T length(const Vec<N,T>& v){ return v.mag(); }
 
+/// Return normalized vector
+template <int N, class T>
+inline Vec<N,T> normalize(const Vec<N,T>& v){ return v.normalized(); }
+
 template <int N, class T>
 inline Vec<N,T> lerp(const Vec<N,T>& input, const Vec<N,T>& target, T amt){
 	return Vec<N,T>(input).lerp(target, amt);
