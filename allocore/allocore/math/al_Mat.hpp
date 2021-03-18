@@ -400,7 +400,7 @@ public:
 
 	/// Transform a point by this matrix treated as a homogenous transform
 	template <class U>
-	Vec<N-1,U> transformPoint(const Vec<N-1,U>& v){
+	Vec<N-1,U> transformPoint(const Vec<N-1,U>& v) const {
 		Vec<N-1,U> r;
 		IT(N-1){
 			auto mrow = row(i);
@@ -411,7 +411,7 @@ public:
 
 	/// Transform a vector by this matrix treated as a homogenous transform
 	template <class U>
-	Vec<N-1,U> transformVector(const Vec<N-1,U>& v){
+	Vec<N-1,U> transformVector(const Vec<N-1,U>& v) const {
 		Vec<N-1,U> r;
 		IT(N-1){ r[i] = row(i).template sub<N-1>().dot(v); }
 		return r;
