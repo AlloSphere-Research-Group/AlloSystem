@@ -640,7 +640,7 @@ int addVoxels(
 ){
 	int numVertIn = m.vertices().size();
 	m.primitive(Graphics::TRIANGLES);
-	float n = -1.; // 1 normals point out, -1 normals point in
+	float n = 1.; // 1 normals point out, -1 normals point in
 	for(int k=0; k<Nz+1; ++k){
 	for(int j=0; j<Ny+1; ++j){
 	for(int i=0; i<Nx+1; ++i){
@@ -654,7 +654,7 @@ int addVoxels(
 		Vec3f pos(i,j,k);
 		pos = pos * cellSize;
 		float D = cellSize;
-		if((v*vx)==0. && v!=vx){
+		if((v*vx)==0. && v!=vx){ // one value zero and the other non-zero
 			int Nv = m.vertices().size();
 			m.vertex(pos.x, pos.y  , pos.z  );
 			m.vertex(pos.x, pos.y+D, pos.z  );
