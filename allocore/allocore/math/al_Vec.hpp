@@ -609,6 +609,15 @@ public:
 		return swap(dim1, dim2);
 	}
 
+	/// Get index of minimum value
+	int indexOfMin() const {
+		int j = 0;
+		for(int i=1; i<N; ++i){
+			if((*this)[i] < (*this)[j]) j=i;
+		}
+		return j;
+	}
+
 	/// Get index of maximum value
 	int indexOfMax() const {
 		int j = 0;
@@ -618,14 +627,12 @@ public:
 		return j;
 	}
 
-	/// Get index of minimum value
-	int indexOfMin() const {
-		int j = 0;
-		for(int i=1; i<N; ++i){
-			if((*this)[i] < (*this)[j]) j=i;
-		}
-		return j;
-	}
+	/// Get minimum value
+	const T& min() const { return (*this)[indexOfMin()]; }
+
+	/// Get maximum value
+	const T& max() const { return (*this)[indexOfMax()]; }
+
 
 	/// debug printing
 	void print(FILE * out=stdout) const;
