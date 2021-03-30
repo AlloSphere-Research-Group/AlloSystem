@@ -178,7 +178,7 @@ public:
 		return m;
 	}
 
-	template <unsigned Dim1, unsigned Dim2>
+	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat rotation(double angle){
 		static_assert(Dim1<N && Dim2<N && Dim1!=Dim2, "Invalid plane dimensions");
 		return rotation(angle, Dim1, Dim2);
