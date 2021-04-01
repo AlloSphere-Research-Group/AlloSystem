@@ -60,8 +60,14 @@ public:
 		if(n.mParent != self()){
 			n.removeFromParent();
 			n.mParent = self();
-			if(mChild) lastChild().mSibling = &n;
-			else mChild = &n;
+
+			// insert front
+			//if(mChild) lastChild().mSibling = &n;
+			//else mChild = &n;
+
+			// insert back (faster)
+			if(mChild) n.mSibling = &mChild;
+			mChild = &n;
 		}
 		return *self();
 	}
