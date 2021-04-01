@@ -52,11 +52,17 @@ class TreeNode {
 public:
 
 	/// Add child to this node
+
+	/// If the node to be added already has a parent it will be detached from 
+	/// its existing parent. The node will not be added if it is already a child
+	/// of this node.
 	Node& addChild(Node& n){
-		n.removeFromParent();
-		n.mParent = self();
-		if(mChild) lastChild().mSibling = &n;
-		else mChild = &n;
+		if(n.mParent != self()){
+			n.removeFromParent();
+			n.mParent = self();
+			if(mChild) lastChild().mSibling = &n;
+			else mChild = &n;
+		}
 		return *self();
 	}
 
@@ -113,6 +119,25 @@ public:
 			}
 		}
 	}
+
+	void traverse(const std::function<void(Node&)>& onNode){
+		traverseDepth([&onNode](Node& n, int){ onNode(n); });
+	}
+
+	bool isLeaf() const { return mChild == nullptr; }
+
+	bool hasParent(const Node& n) const { return mParent == &n; }
+	bool hasParent() const { return mParent != nullptr; }
+	const Node& parent() const { return *mParent; }
+	Node& parent(){ return *mParent; }
+
+	bool hasSibling() const { return mSibling != nullptr; }
+	const Node& sibling() const { return *mSibling; }
+	Node& sibling(){ return *mSibling; }
+
+	bool hasChild() const { return mChild != nullptr; }
+	const Node& child() const { return *mChild; }
+	Node& child(){ return *mChild; }
 
 private:
 	Node * mParent = nullptr;
