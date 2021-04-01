@@ -66,7 +66,7 @@ public:
 			//else mChild = &n;
 
 			// insert back (faster)
-			if(mChild) n.mSibling = &mChild;
+			if(mChild) n.mSibling = mChild;
 			mChild = &n;
 		}
 		return *self();
@@ -100,11 +100,19 @@ public:
 	/// Perform depth-first traversal
 
 	/// Walks the tree starting at this node and visiting children first, then 
-	/// siblings.
+	/// siblings of all descendants. The siblings of this node are not visited.
 	void traverseDepth(const std::function<void(Node&, int depth)>& onNode){
 		auto * const root = self();
 		auto * n = root;
 		int depth = 0;
+
+		// Early exit if node has no children
+		if(n->isLeaf()){
+			onNode(*n, depth);
+			return;
+		}
+
+		// Only valid if node has children
 		while(n){
 			onNode(*n, depth);
 			if(n->mChild){			/* Down to child */
