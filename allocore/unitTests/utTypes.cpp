@@ -2,6 +2,7 @@
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/types/al_Conversion.hpp"
+#include "allocore/types/al_Node.hpp"
 
 typedef double data_t;
 
@@ -308,7 +309,123 @@ int utTypes(){
 	}
 
 	{
+		struct Node : public TreeNode<Node>{};
 
+		auto isSingular = [](const Node& n){
+			return !(n.hasParent() || n.hasChild() || n.hasSibling());
+		};
+
+		auto numChildren = [](const Node& n){
+			if(!n.hasChild()) return 0;
+			int count = 1;
+			auto * node = &n.child();
+			while(node->hasSibling()){
+				++count;
+				node = &node->sibling();
+			}
+			return count;
+		};
+
+		{ // Two-level tree
+			Node a, b, c;
+				assert(!a.hasParent());
+				assert(!a.hasChild());
+				assert(!a.hasSibling());
+				assert(a.isLeaf());
+
+			a.addChild(b);
+				assert(!a.hasParent());
+				assert(a.hasChild());
+				assert(&a.child() == &b);
+				assert(!a.hasSibling());
+				assert(numChildren(a) == 1);
+				assert(b.hasParent());
+				assert(b.hasParent(a));
+				assert(!b.hasChild());
+				assert(!b.hasSibling());
+
+			a.addChild(c);
+				assert(!a.hasParent());
+				assert(a.hasChild());
+				assert(!a.hasSibling());
+				assert(numChildren(a) == 2);
+				assert(b.hasParent(a));
+				assert(!b.hasChild());
+				assert(c.hasParent(a));
+				assert(!c.hasChild());
+				assert(b.hasSibling() ^ c.hasSibling());
+
+			c.removeFromParent();
+				assert(!a.hasParent());
+				assert(a.hasChild());
+				assert(!a.hasSibling());
+				assert(b.hasParent(a));
+				assert(!b.hasChild());
+				assert(isSingular(c));
+
+			b.removeFromParent();
+				assert(isSingular(a));
+				assert(isSingular(b));
+
+			a.removeFromParent();
+				assert(isSingular(a));
+		}
+
+		{ // Three-level tree
+			Node a, b, c;
+			a.addChild(b);
+			b.addChild(c);
+				assert(b.hasParent(a));
+				assert(!b.hasSibling());
+				assert(b.hasChild());
+
+			a.addChild(b); // should be no-op
+				assert(&a.child() == &b);
+				assert(!b.hasSibling());
+				assert(numChildren(a) == 1);
+		}
+
+		{ // Moving a child node
+			Node a, b, c;
+			a.addChild(b);
+			b.addChild(c);
+			a.addChild(c);
+				assert(numChildren(a) == 2);
+				assert(!b.hasChild());
+				assert(c.hasParent(a));
+				assert(b.hasSibling() ^ c.hasSibling());
+		}
+
+		{ // Traversal
+			Node a,b,c;
+			a.traverseDepth([&](Node& n, int depth){
+				assert(&n == &a);
+				assert(0 == depth);
+			});
+
+			a.addChild(b);
+			b.addChild(c);
+			a.traverseDepth([&](Node& n, int depth){
+				if(&n == &a) assert(0 == depth);
+				if(&n == &b) assert(1 == depth);
+				if(&n == &c) assert(2 == depth);
+			});
+
+			// Subtree traversal
+			b.traverseDepth([&](Node& n, int depth){
+				assert(&n != &a);
+				if(&n == &b) assert(0 == depth);
+				if(&n == &c) assert(1 == depth);
+			});
+
+			// Test traversal when root has sibling
+			a.addChild(c);
+			c.traverseDepth([&](Node& n, int depth){
+				assert(&n != &a);
+				assert(&n != &b);
+				assert(0 == depth);
+			});
+		}
 	}
 
 	return 0;
