@@ -97,7 +97,7 @@ public:
 		return *self();
 	}
 
-	/// Perform depth-first traversal
+	/// Perform pre-order, depth-first traversal
 
 	/// Walks the tree starting at this node and visiting children first, then 
 	/// siblings of all descendants. The siblings of this node are not visited.
