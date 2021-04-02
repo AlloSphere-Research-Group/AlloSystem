@@ -44,7 +44,7 @@
 */
 
 
-#include <cmath>
+#include <cmath> // pow
 #include <initializer_list>
 #include <ostream>
 #include <type_traits> //remove_reference, is_polymorphic
@@ -495,8 +495,7 @@ public:
 	/// raised to the pth power, (sum |x_n|^p) ^ (1/p). See norm1 and norm2 for
 	/// more efficient specializations.
 	T norm(const T& p) const {
-		using namespace std;
-		return pow(pow(absVec(), p).sum(), T(1)/p);
+		return std::pow(pow(absVec(), p).sum(), T(1)/p);
 	}
 
 	/// Return 1-norm of elements (sum of absolute values)
