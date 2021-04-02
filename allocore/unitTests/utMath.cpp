@@ -1,5 +1,14 @@
-#include <math.h>
+#include <cmath>
 #include "utAllocore.h"
+#include "allocore/math/al_Complex.hpp"
+#include "allocore/math/al_Frustum.hpp"
+#include "allocore/math/al_Interval.hpp"
+#include "allocore/math/al_Mat.hpp"
+#include "allocore/math/al_Plane.hpp"
+#include "allocore/math/al_Random.hpp"
+#include "allocore/math/al_Quat.hpp"
+#include "allocore/math/al_Vec.hpp"
+using namespace al;
 
 template <class T>
 inline bool eq(T x, T y, T eps=0.000001){

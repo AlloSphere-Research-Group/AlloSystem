@@ -1,4 +1,7 @@
 #include "utAllocore.h"
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/io/al_Window.hpp"
+using namespace al;
 
 static Graphics gl;
 

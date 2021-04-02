@@ -1,4 +1,7 @@
+#include <cstring> // strlen
 #include "utAllocore.h"
+#include "allocore/protocol/al_OSC.hpp"
+#include "allocore/system/al_Time.h" // al_sleep
 
 struct PacketData{
 	PacketData(): i(0x12345678), f(1), d(1), c(1){}
@@ -14,6 +17,7 @@ struct PacketData{
 
 int utProtocolOSC(){
 
+	using namespace al;
 	using namespace al::osc;
 
 	Packet p;

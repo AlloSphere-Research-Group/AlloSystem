@@ -1,7 +1,7 @@
-
-#include <cstdlib>
-
+#include <cstdlib> // memset
 #include "utAllocore.h"
+#include "allocore/sound/al_Ambisonics.hpp"
+using namespace al;
 
 void testFirstOrder2D() {
 	const int bufferSize = 16;

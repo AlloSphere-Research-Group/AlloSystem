@@ -1,17 +1,8 @@
+#include <cstdio>
+#include <cstring> // strlen
 #include "utAllocore.h"
 
-
-SearchPaths searchpaths;
-SearchPaths& getSearchPaths() { return searchpaths; }
-
-bool almostEqual(float v1, float v2) {
-	return abs(v1 -v2) < 0.00001;
-}
-
 int main (int argc, char * const argv[]) {
-	searchpaths.addAppPaths(argc, argv);
-	searchpaths.addSearchPath(searchpaths.appPath() + "../share");
-
 	// Logical tests; leave uncommented
 	// These tests are purely logical, they should not print anything out to
 	// the console (as it interferes with assertion error messages) or start any
@@ -56,8 +47,7 @@ int main (int argc, char * const argv[]) {
 	// Empirical tests; leave commented
 	// These are tests that require some kind of observation to validate.
 
-//	utAsset();
-//	utGraphicsDraw();
+	//utGraphicsDraw();
 
 	return 0;
 }

@@ -1,6 +1,8 @@
 #include "utAllocore.h"
+#include "allocore/types/al_Conversion.hpp"
 
 int utTypesConversion(){
+	using namespace al;
 
 	assert(base10To36( 0) == '0');
 	assert(base10To36( 9) == '9');

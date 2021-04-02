@@ -1,6 +1,8 @@
 #include "utAllocore.h"
+#include "allocore/spatial/al_Pose.hpp"
 
 int utSpatial(){
+	using namespace al;
 
 	{
 		Pose a;

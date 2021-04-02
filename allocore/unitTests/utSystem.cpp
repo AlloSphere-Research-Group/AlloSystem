@@ -1,9 +1,11 @@
 #include "utAllocore.h"
+#include "allocore/system/al_Time.hpp"
 
 template <class T>
 bool aboutEqual(T v, T to, T r){ return v<(to+r) && v>(to-r); }
 
 int utSystem(){
+	using namespace al;
 
 	// Timing
 //	UT_PRINTF("system: timing\n");

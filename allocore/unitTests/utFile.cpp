@@ -1,6 +1,9 @@
+#include <string.h>
 #include "utAllocore.h"
+#include "allocore/io/al_File.hpp"
 
 int utFile() {
+	using namespace al;
 
 	#define DELIM AL_FILE_DELIMITER_STR
 

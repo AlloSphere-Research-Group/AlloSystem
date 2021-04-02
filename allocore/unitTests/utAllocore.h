@@ -3,11 +3,6 @@
 
 #undef NDEBUG
 #include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "allocore/al_Allocore.hpp"
 
 #ifdef AL_UT_NOPRINT	/* disable printing to stdout */
 	#define UT_PRINTF	//
@@ -15,7 +10,9 @@
 	#define UT_PRINTF	printf
 #endif
 
-using namespace al;
+inline bool almostEqual(float v1, float v2) {
+	return abs(v1 -v2) < 0.00001;
+}
 
 int utAudioScene();
 int utIOAudioIO();
@@ -34,9 +31,5 @@ int utThread();
 int utFile();
 int utAsset();
 int utAmbisonics();
-
-SearchPaths& getSearchPaths();
-
-bool almostEqual(float v1, float v2);
 
 #endif

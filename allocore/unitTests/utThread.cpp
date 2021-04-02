@@ -1,6 +1,8 @@
 #include "utAllocore.h"
+#include "allocore/system/al_Thread.hpp"
 
 int utThread() {
+	using namespace al;
 
 	//UT_PRINTF("system: thread\n");
 

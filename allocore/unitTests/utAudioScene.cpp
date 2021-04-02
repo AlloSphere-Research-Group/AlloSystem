@@ -1,5 +1,9 @@
 #include "utAllocore.h"
-
+#include "allocore/sound/al_Ambisonics.hpp"
+#include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/sound/al_StereoPanner.hpp"
+#include "allocore/sound/al_Vbap.hpp"
+using namespace al;
 
 void testBasicStereo() {
 	SpeakerLayout speakerLayout = HeadsetSpeakerLayout();

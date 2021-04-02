@@ -1,8 +1,12 @@
 #include "utAllocore.h"
+#include "allocore/types/al_Array.hpp"
+#include "allocore/types/al_Buffer.hpp"
+#include "allocore/types/al_Conversion.hpp"
 
 typedef double data_t;
 
 int utTypes(){
+	using namespace al;
 
 	// Conversion
 	{ auto s = toString(0.3f); assert("0.3"==s);}
@@ -301,6 +305,10 @@ int utTypes(){
 
 		a.reset();
 		assert(a.fill() == 0);
+	}
+
+	{
+
 	}
 
 	return 0;

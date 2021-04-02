@@ -1,6 +1,9 @@
+#include <string.h> // strcmp
 #include "utAllocore.h"
+#include "allocore/io/al_Socket.hpp"
 
 int utIOSocket(){
+	using namespace al;
 
 	{
 		SocketClient s;

@@ -1,6 +1,8 @@
 #include "utAllocore.h"
+#include "allocore/graphics/al_Mesh.hpp"
 
 int utGraphicsMesh(){
+	using namespace al;
 
 	{
 		const int N = 3;

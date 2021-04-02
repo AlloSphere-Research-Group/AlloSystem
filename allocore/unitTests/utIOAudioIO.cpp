@@ -1,4 +1,7 @@
+#include <cmath>
 #include "utAllocore.h"
+#include "allocore/io/al_AudioIO.hpp"
+using namespace al;
 
 struct LowPass{
 	LowPass(): p(0){}
@@ -8,7 +11,7 @@ struct LowPass{
 
 struct SineWave{
 	SineWave(float freq): p(0), f(freq){}
-	float operator()(){ p+=f; p=p>1?p-1:(p<0?p+1:p); return sin(p*M_2PI); }
+	float operator()(){ p+=f; p=p>1?p-1:(p<0?p+1:p); return std::sin(p*6.2831853); }
 	float p,f;
 } sine(440./44100.);
 
@@ -39,7 +42,6 @@ void audioCB(AudioIOData& io){
 
 
 int utIOAudioIO(){
-
 	//AudioDevice::printAll();
 	AudioIO audioIO(256, 44100, audioCB, 0, 1, 1);
 
