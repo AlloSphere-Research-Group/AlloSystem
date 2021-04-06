@@ -432,18 +432,15 @@ void RenderToDisk::saveImage(
 	}
 }
 
+RenderToDisk& RenderToDisk::ffmpegPath(const std::string& path){
+	mFFMPEGPath = File::conformDirectory(path);
+	return *this;
+}
+
 void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
 
 	// Nothing to do without image sequence
 	if(!mWroteImages) return;
-
-	std::string prog;
-	#ifdef AL_WINDOWS
-		// Note: path must be DOS style for std::system
-		prog = "c:\\Program Files\\ffmpeg\\bin\\ffmpeg";
-	#else
-		prog = "ffmpeg";
-	#endif
 
 	std::string args;
 	args += " -r " + al::toString(1./mFrameDur);
@@ -459,7 +456,7 @@ void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
 	args += " -preset " + speedStrings[videoEncodeSpeed];
 	args += " " + path() + "/movie.mp4";
 
-	std::string cmd = "\"" + prog + "\"" + args;
+	std::string cmd = "\"" + mFFMPEGPath + "ffmpeg" + "\"" + args;
 	//printf("%s\n", cmd.c_str());
 
 	// TODO: thread this; std::system blocks until the command finishes

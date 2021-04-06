@@ -42,6 +42,7 @@
 */
 
 #include <fstream>
+#include <string>
 #include <vector>
 #include "allocore/system/al_Thread.hpp"
 #include "allocore/graphics/al_Image.hpp"
@@ -141,6 +142,13 @@ public:
 	/// Save a screenshot of a window to disk
 	void saveScreenshot(al::Window& win);
 
+	/// Set path to FFMPEG (used for video creation)
+
+	/// Usually this does not need to be set as ffmpeg will be in the system
+	/// path. You can test by opening a terminal and simply running "ffmpeg".
+	/// Otherwise, on Windows it might be "c:\\Program Files\\ffmpeg\\bin\\".
+	RenderToDisk& ffmpegPath(const std::string& path);
+
 	/// Create a video from last captured image frames and audio
 	///
 	/// @param[in] videoCompress		video compression amount in [0,51];
@@ -180,7 +188,7 @@ private:
 	};
 
 	Mode mMode;
-	std::string mUserPath, mPath;
+	std::string mUserPath, mPath, mFFMPEGPath;
 	unsigned mFrameNumber = 0;
 	double mElapsedSec = 0.;
 
