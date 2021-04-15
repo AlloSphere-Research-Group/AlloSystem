@@ -259,27 +259,27 @@ public:
 	}
 
 	/// Get reference to element relative to newest element
-	const T& read(int i) const { return readFrom(pos(), i); }
-	T& read(int i){ return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->read(i)); }
+	const T& read(int i) const { return const_cast<RingBuffer*>(this)->read(i); }
+	T& read(int i){ return readFrom(pos(), i); }
 
 	/// Get reference to older element relative to some newer element 
 
 	/// @param[in] from		absolute index the read is relative to
 	/// @param[in] dist		distance into past relative to 'from' of the returned element
 	const T& readFrom(int from, int dist) const {
-		return mElems[wrapOnce(from-dist, size())];
+		return const_cast<RingBuffer*>(this)->readFrom(from,dist);
 	}
 	T& readFrom(int from, int dist){
-		return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->readFrom(from,dist));
+		return mElems[wrapOnce(from-dist, size())];
 	}
 
 	/// \returns reference to newest (last in) element
-	const T& newest() const { return mElems[pos()]; }
-	T& newest(){ return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->newest()); }
+	const T& newest() const { return const_cast<RingBuffer*>(this)->newest(); }
+	T& newest(){ return mElems[pos()]; }
 
 	/// \returns reference to oldest (first in) element
-	const T& oldest() const { return read(fill()-1); }
-	T& oldest(){ return const_cast<T&>(const_cast<const RingBuffer<T,Alloc>*>(this)->oldest()); }
+	const T& oldest() const { return const_cast<RingBuffer*>(this)->oldest(); }
+	T& oldest(){ return read(fill()-1); }
 
 	/// Remove newest element from buffer
 	void popNewest(){
