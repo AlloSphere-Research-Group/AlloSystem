@@ -140,7 +140,7 @@ struct MyWindow : Window{
 		Graphics::error("tex0");
 			tex.bind(1);
 				scene_list.draw();
-			tex.unbind(1);
+			tex.unbind();
 		shaderprogram.end();
 
 		gl.popMatrix();
