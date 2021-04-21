@@ -1,6 +1,7 @@
 #include <math.h>
 #include "allocore/graphics/al_Isosurface.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/types/al_Voxels.hpp"
 
 namespace al{
 
@@ -622,6 +623,11 @@ bool Isosurface::volumeLengths(double& volLengthX, double& volLengthY, double& v
 		return true;
 	}
 	return false;
+}
+
+void Isosurface::generate(const Voxels& voxels, float glUnitLength) {
+	generate((float*)voxels.data.ptr, voxels.dim(0), voxels.dim(1), voxels.dim(2),
+		voxels.getVoxWidth(0)/glUnitLength, voxels.getVoxWidth(1)/glUnitLength, voxels.getVoxWidth(2)/glUnitLength);
 }
 
 } // al::

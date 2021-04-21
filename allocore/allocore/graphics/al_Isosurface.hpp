@@ -66,10 +66,10 @@
 #include <vector>
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
-#include "allocore/types/al_Voxels.hpp"
 
 namespace al{
 
+class Voxels;
 
 /// Isosurface generated using marching cubes
 /// @ingroup allocore
@@ -212,10 +212,7 @@ public:
 	}
 
 	// support for building isosurface from al::Voxels class
-	void generate(const Voxels& voxels, float glUnitLength) {
-		generate((float*)voxels.data.ptr, voxels.dim(0), voxels.dim(1), voxels.dim(2),
-			voxels.getVoxWidth(0)/glUnitLength, voxels.getVoxWidth(1)/glUnitLength, voxels.getVoxWidth(2)/glUnitLength);
-	}
+	void generate(const Voxels& voxels, float glUnitLength);
 
 	void vertexAction(VertexAction& a){ mVertexAction = &a; }
 
