@@ -28,7 +28,7 @@ public:
 				FT_Error err = FT_Init_FreeType(&front_freetype_library);
 				if(err) {
 					AL_WARN("error initializing FreeType library");
-					return 0;
+					return nullptr;
 				}
 			}
 			initialized = true;
@@ -182,12 +182,13 @@ Font::Font(const std::string& filename, int fontSize, bool antialias)
 	if(mImpl){
 		if(!load(filename, fontSize, antialias)){
 			delete mImpl;
+			mImpl = nullptr;
 		}
 	}
 }
 
 Font::~Font() {
-	delete mImpl;
+	if(mImpl) delete mImpl;
 }
 
 bool Font::load(const std::string& filename, int fontSize, bool antialias){

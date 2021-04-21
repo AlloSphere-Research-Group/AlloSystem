@@ -113,7 +113,7 @@ public:
 
 	/*! Render text geometry
 		Render text into geometry for drawing a string of text using the bitmap
-		returned by ascii_chars.  Render expects the vertex and texcoord buffers
+		returned by ascii_chars. Render expects the vertex and texcoord buffers
 		to be at least as big as the text length * 4 since each character is
 		rendered by a quad.
 
@@ -145,7 +145,7 @@ protected:
 	void ensureTexture(Graphics& g);
 
 	class Impl;
-	Impl * mImpl;
+	Impl * mImpl = nullptr;
 
 	Texture mTex; //Bitmap of the font's ASCII characters in a 16x16 grid
 	Mesh mMesh;
