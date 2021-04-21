@@ -10,29 +10,39 @@ Lance Putnam, Sept. 2013
 */
 
 #include "allocore/io/al_App.hpp"
+#include "allocore/io/al_File.hpp"
 #include "allocore/graphics/al_Font.hpp"
 using namespace al;
 
 class MyApp : public App{
 public:
+	Font font1, font2, font3;
 
-	Font font1;
-	Font font2;
-	Font font3;
+	MyApp(){
+		std::string fontDir = "allocore/share/fonts/";
+		if(!File::searchBack(fontDir)){
+			printf("Error: Failed to find font directory\n");
+			exit(-1);
+		}
 
-	MyApp()
-	:	font1("../../share/fonts/VeraMoIt.ttf", 20),
-		font2("../../share/fonts/VeraMoBd.ttf", 14),
-		font3("../../share/fonts/VeraMono.ttf", 10)
-	{
+		// Args: font path, font size, anti-alias (default: true)
+		bool good = true;
+		good &= font1.load(fontDir + "VeraMdoIt.ttf", 20);
+		good &= font2.load(fontDir + "VeraMoBd.ttf", 14);
+		good &= font3.load(fontDir + "VeraMono.ttf", 10);
+		if(!good){
+			printf("Error: Failed to load font face\n");
+			exit(-1);
+		}
+
 		initWindow(Window::Dim(400,200));
 	}
 
-	void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g) override {
 
-		// Get the viewport dimensions, in pixels, for positioning the text
-		float W = v.viewport().w;
-		float H = v.viewport().h;
+		// Get window dimensions, in pixels, for positioning the text
+		float W = window().width();
+		float H = window().height();
 
 		// Setup our matrices for 2D pixel space
 		g.pushMatrix(Graphics::PROJECTION);
