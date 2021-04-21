@@ -315,18 +315,17 @@ MRCHeader& mrcParse(const char * data, Array& array) {
 
 int main(){
 
-	SearchPaths paths;
-	paths.addAppPaths();
-	paths.addSearchPath(paths.appPath() + "../../", true);
-	paths.print();
-	std::string mrcpath = paths.find("golgi.mrc").filepath();
-	//std::string mrcpath = paths.find("g-actin.mrc").filepath();
-	//std::string mrcpath = paths.find("arp23_cf26.map").filepath();
-	File f(mrcpath, "rb");
+	std::string dataDir = "allocore/share/imod_data/";
+	if(!File::searchBack(dataDir)){
+		printf("Error: Failed to find data directory\n");
+		exit(-1);
+	}
+
+	File f(dataDir + "golgi.mrc", "rb");
 
 	if(!f.open()){
-		AL_WARN("Cannot open MRC file.", mrcpath.c_str());
-		exit(EXIT_FAILURE);
+		printf("Error: Failed to open data file\n");
+		exit(-1);
 	}
 
 	MyWindow win;
