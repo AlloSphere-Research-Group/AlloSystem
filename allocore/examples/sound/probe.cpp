@@ -8,7 +8,10 @@ Author:
 Graham Wakefield, 2011
 */
 
-#include "allocore/al_Allocore.hpp"
+#include <cstdio>
+#include <cmath>
+#include "allocore/io/al_AudioIO.hpp"
+#include "allocore/math/al_Random.hpp"
 using namespace al;
 
 int channels;
@@ -36,9 +39,9 @@ void audioCB(AudioIOData& io){
 	}
 
 	while(io()){
-		float t1 = 1.f - fmod(count / sr, 1.);	// time in seconds
+		float t1 = 1.f - std::fmod(count / sr, 1.);	// time in seconds
 		for (int i=0; i<channels; i++) {
-			float t2 = fmod(t1 * (i+1), 1.);
+			float t2 = std::fmod(t1 * (i+1), 1.);
 			io.out(i) = rng.uniformS() * gains[i] * amp * t2 * t1;
 		}
 		count++;

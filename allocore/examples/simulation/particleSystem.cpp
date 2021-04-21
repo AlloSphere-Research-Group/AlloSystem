@@ -9,7 +9,7 @@ Author(s):
 Lance Putnam, 4/25/2011
 */
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_App.hpp"
 using namespace al;
 
 struct Particle{
@@ -74,14 +74,14 @@ public:
 		initWindow();
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 		em1.update<40>();
 
 		mesh.reset();
 		mesh.primitive(Graphics::POINTS);
 
 		for(int i=0; i<em1.size(); ++i){
-			Particle& p = em1.particles[i];
+			auto& p = em1.particles[i];
 			float age = float(p.age) / em1.size();
 
 			mesh.vertex(p.pos);
@@ -89,7 +89,7 @@ public:
 		}
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		g.blendAdd();
 		g.nicest();
 		g.pointSize(6);

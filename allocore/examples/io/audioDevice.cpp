@@ -10,7 +10,7 @@ Lance Putnam, 4/25/2011
 */
 
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 using namespace al;
 
 // A user defined class that can be accessed from the audio callback

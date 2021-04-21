@@ -11,7 +11,8 @@ Lance Putnam, 4/25/2011
 
 #include <assert.h>
 #include <stdio.h>
-#include "allocore/al_Allocore.hpp"
+#include "allocore/protocol/al_OSC.hpp"
+#include "allocore/system/al_Time.hpp"
 using namespace al;
 
 

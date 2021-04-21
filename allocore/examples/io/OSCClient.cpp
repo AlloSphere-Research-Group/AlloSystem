@@ -13,7 +13,8 @@ Lance Putnam, Oct. 2014
 
 #include <iostream>
 #include <string>
-#include "allocore/al_Allocore.hpp"
+#include "allocore/protocol/al_OSC.hpp"
+#include "allocore/system/al_Time.hpp"
 using namespace al;
 
 int main(){

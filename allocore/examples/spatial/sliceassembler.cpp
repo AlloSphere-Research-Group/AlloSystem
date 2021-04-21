@@ -48,6 +48,7 @@
 //#include "allocore/al_Allocore.hpp"
 #include "allocore/io/al_App.hpp"
 #include "allocore/types/al_Voxels.hpp"
+#include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"
 // #include <conio.h>
 

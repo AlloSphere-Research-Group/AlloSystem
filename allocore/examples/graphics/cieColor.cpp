@@ -9,8 +9,9 @@
   Adapted from Lance Putnam's 2D Drawing example code
 */
 
+#include <iostream>
 #include "allocore/io/al_App.hpp"
-//#include "al_Color_ogc.hpp"
+
 using namespace al;
 using namespace std;
 

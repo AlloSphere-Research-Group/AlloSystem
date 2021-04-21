@@ -9,6 +9,10 @@ Lance Putnam, 1/2012 (putnam.lance at gmail dot com)
 */
 
 #include "allocore/io/al_App.hpp"
+#include "allocore/graphics/al_DisplayList.hpp"
+#include "allocore/graphics/al_Light.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/graphics/al_Shapes.hpp"
 
 using namespace al;
 

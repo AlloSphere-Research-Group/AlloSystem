@@ -9,24 +9,17 @@ Graham Wakefield 2011
 */
 
 
-#include "allocore/al_Allocore.hpp"
-#include "allocore/graphics/al_Shader.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/io/al_File.hpp"
+#include "allocore/system/al_MainLoop.hpp"
+#include "allocore/types/al_Conversion.hpp" // swapBytes
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/graphics/al_Shader.hpp"
+#include "allocore/graphics/al_Texture.hpp"
 
 using namespace al;
-
-// As a 3D Texture:
-Texture tex(32, 32, 32, Graphics::LUMINANCE);
-
-float amean;
-
-// As an Isosurface:
-Isosurface iso;
-
-Graphics gl;
-Mesh mesh;
-ShaderProgram shaderP;
-Shader shaderV, shaderF;
 
 static const char * vField = AL_STRINGIFY(
 varying vec3 texcoord0;
@@ -50,19 +43,24 @@ void main() {
 
 struct MyWindow : public Window {
 
-	bool onCreate(){
+	// As a 3D Texture:
+	Texture tex{32, 32, 32, Graphics::LUMINANCE};
 
+	// As an Isosurface:
+	Isosurface iso;
+
+	Graphics gl;
+	Mesh mesh;
+	ShaderProgram shader;
+
+	float amean;
+
+	bool onCreate(){
 		// reconfigure textures based on arrays:
 		tex.submit(tex.array(), true);
 
-
 		// shader method:
-		shaderV.source(vField, Shader::VERTEX).compile();
-		shaderF.source(fField, Shader::FRAGMENT).compile();
-		shaderP.attach(shaderV).attach(shaderF).link();
-		shaderV.printLog();
-		shaderF.printLog();
-		shaderP.printLog();
+		shader.compile(vField, fField);
 
 		// create rendering mesh:
 		mesh.reset();
@@ -73,7 +71,6 @@ struct MyWindow : public Window {
 			mesh.texCoord(x/32., y/32., z/32.);
 			mesh.vertex(x, y, z);
 		}}}
-
 
 		return true;
 	}
@@ -108,12 +105,12 @@ struct MyWindow : public Window {
 		gl.blending(true);
 		gl.blendModeAdd();
 
-		shaderP.begin();
-		shaderP.uniform("tex", 0);
+		shader.begin();
+		shader.uniform("tex", 0);
 		tex.bind();
 		//gl.draw(mesh);
 		tex.unbind();
-		shaderP.end();
+		shader.end();
 
 		gl.polygonMode(gl.FILL);
 		gl.color(1, 1, 1, 0.3);
@@ -136,9 +133,6 @@ struct MyWindow : public Window {
 		return true;
 	}
 };
-
-MyWindow win;
-
 
 enum MRCMode {
 	MRC_IMAGE_SINT8 = 0,		//image : signed 8-bit bytes range -128 to 127
@@ -335,15 +329,15 @@ int main(){
 		exit(EXIT_FAILURE);
 	}
 
-	Array& array = tex.array();
+	MyWindow win;
+
+	Array& array = win.tex.array();
 	MRCHeader& header = mrcParse(f.readAll(), array);
 
-	amean = header.amean;
+	win.amean = header.amean;
 
 	win.append(*new StandardWindowKeyControls);
 	win.create(Window::Dim(640, 480));
-
-	iso.primitive(Graphics::TRIANGLES);
 
 	MainLoop::start();
 }

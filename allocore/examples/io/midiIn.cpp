@@ -9,8 +9,7 @@ Author:
 Lance Putnam, 12/2012
 */
 
-#include <stdio.h>
-#include "allocore/al_Allocore.hpp"
+#include <cstdio>
 #include "allocore/io/al_MIDI.hpp"
 using namespace al;
 

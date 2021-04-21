@@ -10,7 +10,7 @@ For more information about the DeviceServer, please see: http://www.allosphere.u
 
 #include <assert.h>
 #include <stdio.h>
-#include "allocore/al_Allocore.hpp"
+#include "allocore/protocol/al_OSC.hpp"
 using namespace al;
 
 #define DEVICE_SERVER_RECEIVE_PORT 12000

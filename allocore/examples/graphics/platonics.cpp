@@ -16,17 +16,16 @@ Author:
 Lance Putnam, 12/8/2010 (putnam.lance at gmail dot com)
 */
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_App.hpp"
 using namespace al;
 
 class MyApp : public App{
 public:
 	Mesh solids[5];
 	Light light;
-	double angle1, angle2;
+	double angle1=0, angle2=0;
 
 	MyApp(){
-		angle1 = angle2 = 0;
 		int Nv;
 
 		Nv = addTetrahedron(solids[0]);
@@ -75,7 +74,7 @@ public:
 	}
 
 	void onDraw(Graphics& g){
-		light();
+		g.light().pos(100, 1000, 500);
 
 		float angPos = 2*M_PI/5;
 		float R = 3;

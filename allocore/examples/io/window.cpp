@@ -9,7 +9,8 @@ Lance Putnam, 4/25/2011
 */
 
 #include <stdio.h>
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/system/al_MainLoop.hpp"
 using namespace al;
 
 struct MyWindow : Window {

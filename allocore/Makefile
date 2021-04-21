@@ -114,7 +114,7 @@ include ../Makefile.buildandrun
 install: $(LIB_PATH)
 
 ## 	Copy library header files to build directory
-	@for v in `cd $(INC_DIR)/$(LIB_NAME) && find * -type d ! -path '*.*'` .; do\
+	@for v in `cd $(INC_DIR)/$(LIB_NAME) && find * -type d ! -path '*.*'`; do\
 		$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)/$$v;\
 		$(INSTALL) -m 644 $(INC_DIR)/$(LIB_NAME)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
 	done
@@ -126,23 +126,10 @@ install: $(LIB_PATH)
 		$(INSTALL) -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
 	fi;
 
-##	Install header files from local build directory into DESTDIR
-#	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
-#		$(INSTALL) -d $(DESTDIR)/include/$$v; \
-#		$(INSTALL) -C -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
-#	done
-
-## 	Install library files from local build directory into DESTDIR
-#	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'` .; do \
-#		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
-#		$(INSTALL) -C -m 644 $(BUILD_DIR)/lib/$$v/*.a $(DESTDIR)/lib/$$v; \
-#	done
-
-
-#
-buildtest: test
+# Do a thorough build of unit tests and examples
+buildtest:
 	@for v in graphics io simulation sound spatial system; do \
-		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
+		$(MAKE) --no-print-directory examples/$$v/*.cpp RUN_DIRS=examples/$$v/ AUTORUN=0; \
 	done
 
 # Build unit tests

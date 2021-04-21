@@ -9,12 +9,8 @@ Matt Wright, April 2015, matt@create.ucsb.edu
 
 */
 
-#include "allocore/types/al_Voxels.hpp"
-//#include "al_Allocore.hpp"
-//#include "al_Voxels.hpp"
-
 #include <iostream>
-
+#include "allocore/types/al_Voxels.hpp"
 
 // function used to initialize array data (from allocore/examples/graphics/texture3d.cpp)
 
@@ -37,7 +33,7 @@ int main() {
   //  loading voxel from image collection
   //  al::Voxels v("../../spherical_harmonic_generator/sample10_a");
   
-  al::Voxels v(AlloFloat32Ty, 32, 32, 32, 0.1234, 0.1234, 8.5, NANOMETERS);
+  al::Voxels v(AlloFloat32Ty, 32, 32, 32, 0.1234, 0.1234, 8.5, al::VOX_NANOMETERS);
 
 
   // fill array:

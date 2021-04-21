@@ -48,8 +48,13 @@ Not sure if v should be normalized or not, or whether this makes any difference 
 
 */
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/system/al_MainLoop.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Light.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Shader.hpp"
+#include "allocore/graphics/al_Shapes.hpp"
 
 using namespace al;
 
@@ -220,9 +225,9 @@ struct MyWindow : Window{
 
 };
 
-MyWindow win1;
-
 int main(){
+
+	MyWindow win1;
 	win1.add(new StandardWindowKeyControls);
 	win1.create(Window::Dim(800, 600));
 

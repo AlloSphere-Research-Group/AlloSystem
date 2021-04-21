@@ -8,14 +8,9 @@ Author:
 Graham Wakefield, 2012
 */
 
-#include "allocore/al_Allocore.hpp"
 #include "allocore/protocol/al_Zeroconf.hpp"
-
+#include "allocore/io/al_Socket.hpp"
 using namespace al;
-
-//std::string type("_http._tcp");
-//std::string type("_ssh._tcp");
-std::string type("_osc._udp");
 
 class ZeroconfNotifier : public zero::Client {
 public:
@@ -44,15 +39,18 @@ public:
 };
 
 
-// a Client can browse and report available services on the network for a given service type:
-ZeroconfNotifier z(type);
-
-// a Service can publish a service on this machine:
-zero::Service zservice("allocore:" + Socket::hostName(), 4110, type);
-
-Window win;
-
 int main() {
+	//std::string type("_http._tcp");
+	//std::string type("_ssh._tcp");
+	std::string type("_osc._udp");
+
+	// a Client can browse and report available services on the network for a given service type:
+	ZeroconfNotifier z(type);
+
+	// a Service can publish a service on this machine:
+	zero::Service zservice("allocore:" + Socket::hostName(), 4110, type);
+
+	//Window win;
 	//win.create();
 	//MainLoop::start();
 

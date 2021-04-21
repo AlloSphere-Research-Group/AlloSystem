@@ -1,4 +1,14 @@
+/*
+Allocore Example: Reading CSV File
 
+Description:
+Reading data from a CSV (comma separated values) file.
+
+Author:
+Lance Putnam
+*/
+
+#include <iostream>
 #include "allocore/io/al_CSVReader.hpp"
 
 typedef struct {

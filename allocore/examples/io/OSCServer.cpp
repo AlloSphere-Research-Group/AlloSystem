@@ -14,6 +14,7 @@ Lance Putnam, Oct. 2014
 #include <iostream>
 #include <string>
 #include "allocore/io/al_App.hpp"
+#include "allocore/protocol/al_OSC.hpp"
 using namespace al;
 
 class MyApp : public App, public osc::PacketHandler{

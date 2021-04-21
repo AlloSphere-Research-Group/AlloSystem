@@ -9,8 +9,16 @@ Ritesh Lala, 4/20/2011
 Modified by Lance Putnam, 4/25/2011
 */
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_Window.hpp"
 #include "allocore/io/al_ControlNav.hpp"
+#include "allocore/system/al_MainLoop.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Lens.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/graphics/al_Shapes.hpp"
+#include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/spatial/al_Pose.hpp"
+#include "allocore/math/al_Random.hpp"
 
 using namespace al;
 
@@ -79,10 +87,9 @@ struct MyWindow : public Window, public Drawable {
 	Mesh shapes;
 };
 
-MyWindow win1;
 
 int main(){
-
+	MyWindow win1;
     win1.create(Window::Dim(800, 600), "Allocore Example: Camera");
 
 	MainLoop::start();

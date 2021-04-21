@@ -1,5 +1,5 @@
 #include <iostream>
-#include "allocore/al_Allocore.hpp"
+#include "allocore/math/al_Vec.hpp"
 using namespace al;
 
 int main() {

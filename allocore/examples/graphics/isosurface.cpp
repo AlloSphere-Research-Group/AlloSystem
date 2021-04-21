@@ -10,7 +10,7 @@ Author:
 Lance Putnam, March 2015
 */
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_App.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"
 using namespace al;
 
@@ -20,23 +20,19 @@ public:
 	static const int N = 32;
 	float volData[N*N*N];
 	Isosurface iso;
-	double phase;
-	bool evolve, wireframe;
+	double phase = 0;
+	bool evolve = true, wireframe = false;
 
 	Light light;
 	Material mtrl1, mtrl2;
 
 	MyApp(){
-		phase = 0;
-		evolve = true;
-		wireframe = false;
-
 		nav().pullBack(6);
 		nav().faceToward(Vec3f(-0.5,-1,-1));
 		initWindow(Window::Dim(800,600), "Isosurface Example");
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 
 		if(evolve){
 			if((phase += 0.0002) > 2*M_PI) phase -= 2*M_PI;
@@ -58,7 +54,7 @@ public:
 		}
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		// Set colors of front- and back-facing surfaces
 		mtrl1.face(Graphics::FRONT);
@@ -86,7 +82,7 @@ public:
 		g.popMatrix();
 	}
 
-	void onKeyDown(const Keyboard& k){
+	void onKeyDown(const Keyboard& k) override {
 		switch(k.key()){
 		case 'f': wireframe^=1; break;
 		case ' ': evolve^=1; break;

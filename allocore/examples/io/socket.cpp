@@ -8,8 +8,8 @@ Author:
 Lance Putnam, April 2014
 */
 
-#include <stdio.h>
-#include "allocore/al_Allocore.hpp"
+#include <cstdio>
+#include "allocore/io/al_Socket.hpp"
 using namespace al;
 
 

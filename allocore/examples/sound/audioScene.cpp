@@ -8,7 +8,7 @@
  *
  */
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Vbap.hpp"
 #include "allocore/sound/al_Dbap.hpp"
 #include "allocore/sound/al_Ambisonics.hpp"

@@ -10,7 +10,7 @@ Author(s):
 Lance Putnam, 2011, 2015
 */
 
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_App.hpp"
 using namespace al;
 
 class MyApp : public App {
@@ -18,14 +18,12 @@ public:
 
 	static const int Nm = 9;
 	Mesh meshes[Nm];
-	double angle;
-	float mx, my;
-	bool wireframe;
-	bool vertexLight;
+	double angle=0;
+	float mx=0.5, my=0.5;
+	bool wireframe = false;
+	bool vertexLight = false;
 
-    MyApp()
-	:	angle(0), mx(0.5), my(0.5), wireframe(false), vertexLight(false)
-	{
+    MyApp(){
 		nav().pullBack(5.5);
 		initWindow(Window::Dim(600,600), "Shape Gallery");
 	}
@@ -123,7 +121,7 @@ public:
 
 			int Nv = meshes[i].vertices().size();
 			for(int k=0; k<Nv; ++k){
-				meshes[i].color(HSV(float(k)/Nv, 0.3, 1));
+				meshes[i].color(HSV(float(k)/Nv, 0.7, 1));
 			}
 
 			if(!vertexLight && meshes[i].primitive() == Graphics::TRIANGLES){
@@ -135,8 +133,7 @@ public:
 
 	void onDraw(Graphics& g){
 		g.polygonMode(wireframe ? Graphics::LINE : Graphics::FILL);
-		static Light light;
-		light.pos(1,4,1)();
+		g.light().pos(1,4,1);
 
 		for(int i=0; i<Nm; ++i){
 			g.pushMatrix();
