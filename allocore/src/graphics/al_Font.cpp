@@ -1,3 +1,4 @@
+#include <cstdarg>
 #include "allocore/graphics/al_Font.hpp"
 
 #include <ft2build.h>
@@ -167,7 +168,6 @@ Font::Font()
 	mTex(0, 0, Graphics::LUMINANCE, Graphics::UBYTE)
 {
 	align(0,0);
-	// TODO: if this fails (mImpl == NULL), fall back to native options (e.g. Cocoa)?
 	mImpl = Impl::create();
 }
 
@@ -178,7 +178,6 @@ Font::Font(const std::string& filename, int fontSize, bool antialias)
 	mTex(0, 0, Graphics::LUMINANCE, Graphics::UBYTE)
 {
 	align(0,0);
-	// TODO: if this fails (mImpl == NULL), fall back to native options (e.g. Cocoa)?
 	mImpl = Impl::create();
 	if(mImpl){
 		if(!load(filename, fontSize, antialias)){
@@ -264,6 +263,30 @@ void Font::write(Mesh& mesh, const std::string& text) {
 
 		pos[0] += (float)c.width;
 	}
+}
+
+void Font::render(Graphics& g, const std::string& text) {
+	write(mMesh, text);
+	mTex.bind();
+	g.draw(mMesh);
+	mTex.unbind();
+}
+
+void Font::renderf(Graphics& g, const char * fmt, ...) {
+	static char line[1024];
+	va_list args;
+	va_start(args, fmt);
+	AL_VSNPRINTF(line, 1024, fmt, args);
+	va_end(args);
+	render(g, line);
+}
+
+float Font::width(const std::string& text) const {
+	float total = 0.f;
+	for (unsigned i=0; i < text.size(); i++) {
+		total += mChars[ (int)text[i] ].width;
+	}
+	return total;
 }
 
 } // al::

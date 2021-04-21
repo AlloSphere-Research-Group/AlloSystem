@@ -43,7 +43,6 @@
 */
 
 #include <string>
-#include <stdarg.h>
 #include "allocore/graphics/al_Texture.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -138,9 +137,6 @@ public:
 	void render(Graphics& g, const std::string& text);
 	void renderf(Graphics& g, const char * fmt, ...);
 
-	// TODO:
-	//int outline(int idx, Array *vertex, Array *index);
-
 	// accessor so that the font texture can be bound separately:
 	Texture& texture() { return mTex; }
 
@@ -158,30 +154,6 @@ protected:
 	float mAlign[2];
 	bool mAntiAliased;
 };
-
-inline void Font :: renderf(Graphics& g, const char * fmt, ...) {
-	static char line[1024];
-	va_list args;
-	va_start(args, fmt);
-	AL_VSNPRINTF(line, 1024, fmt, args);
-	va_end(args);
-	render(g, line);
-}
-
-inline void Font :: render(Graphics& g, const std::string& text) {
-	write(mMesh, text);
-	mTex.bind();
-	g.draw(mMesh);
-	mTex.unbind();
-}
-
-inline float Font :: width(const std::string& text) const {
-	float total = 0.f;
-	for (unsigned i=0; i < text.size(); i++) {
-		total += mChars[ (int)text[i] ].width;
-	}
-	return total;
-}
 
 } // al::
 
