@@ -111,11 +111,7 @@ public:
 	void align(float xfrac, float yfrac);
 
 
-	/*! Render text geometry
-		Render text into geometry for drawing a string of text using the bitmap
-		returned by ascii_chars. Render expects the vertex and texcoord buffers
-		to be at least as big as the text length * 4 since each character is
-		rendered by a quad.
+	/*! Write text geometry to mesh
 
 		Example usage:
 		<pre>
