@@ -51,7 +51,7 @@ ifeq ($(PLATFORM), linux)
 endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
-$(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_PATH="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
+$(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_DIR="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
 	$(CXX) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
