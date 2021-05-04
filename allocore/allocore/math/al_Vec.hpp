@@ -489,6 +489,16 @@ public:
 		return res;
 	}
 
+	/// Returns component-wise signum function
+	Vec sgn(T mag=T(1)) const {
+		Vec s;
+		for(int i=0; i<N; ++i){
+			const auto& v = (*this)[i];
+			s[i] = v<T(0) ? -mag : v>T(0) ? mag : T(0);
+		}
+		return s;
+	}
+
 	/// Returns p-norm of elements
 
 	/// The p-norm is pth root of the sum of the absolute value of the elements
