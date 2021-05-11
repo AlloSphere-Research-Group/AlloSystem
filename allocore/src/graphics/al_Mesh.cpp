@@ -797,12 +797,13 @@ Mesh& Mesh::coloriFill(const Colori& v){
 }
 
 bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) const {
-	int prim = primitive();
 
-	if(!isTriangles() || !isTriangleStrip()){
+	if(!(isTriangles() || isTriangleStrip())){
 		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
 		return false;
 	}
+
+	if(!vertices().size()) return false;
 
 	// Create a copy since we must convert to non-indexed triangles
 	Mesh m(*this);
@@ -840,11 +841,8 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 }
 
 bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bool binary) const {
-	// Ref: http://paulbourke.net/dataformats/ply/
 
-	int prim = primitive();
-
-	if(!isTriangles() || !isTriangleStrip()){
+	if(!(isTriangles() || isTriangleStrip())){
 		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
 		return false;
 	}
@@ -867,6 +865,8 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	const unsigned Ni = m.indices().size();
 	//const unsigned Bi = Nv<=65536 ? 2 : 4; // max bytes/index
 	const unsigned Bi = Nv<=32768 ? 2 : 4; // changed since assimp import not working with full ushort range up to 65536
+
+	// Ref: http://paulbourke.net/dataformats/ply/
 
 	int bigEndian = 1;
 	if(1 == *(char *)&bigEndian) bigEndian = 0;
