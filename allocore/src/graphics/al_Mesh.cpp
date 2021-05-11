@@ -911,6 +911,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 
 	if(Ni){
 		s << "element face " << Ni/3 << "\n";
+		// Annoyingly, some software like MeshLab does not support unsigned int, short, etc.
 		s << "property list uchar " << (Bi==4?"uint":"ushort") << " vertex_indices\n";
 	}
 
