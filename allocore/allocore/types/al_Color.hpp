@@ -157,6 +157,11 @@ struct Color{
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
 
+	value_type * begin(){ return components; }
+	const value_type * begin() const { return components; }
+	value_type * end(){ return components + size(); }
+	const value_type * end() const { return components + size(); }
+
 	RGB& rgb(){ return *(RGB*)(components); }
 	const RGB& rgb() const { return *(const RGB*)(components); }
 
@@ -353,6 +358,11 @@ struct Colori {
 
 	/// Get color component at index with no bounds checking
 	const uint8_t& operator[](int i) const { return components[i]; }
+
+	value_type * begin(){ return components; }
+	const value_type * begin() const { return components; }
+	value_type * end(){ return components + size(); }
+	const value_type * end() const { return components + size(); }
 
 	/// Set from floating-point color
 	Colori& operator= (const Color& v){
@@ -590,6 +600,11 @@ struct RGB{
 
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
+
+	value_type * begin(){ return components; }
+	const value_type * begin() const { return components; }
+	value_type * end(){ return components + size(); }
+	const value_type * end() const { return components + size(); }
 
 
 	/// Set from another RGB
