@@ -639,7 +639,7 @@ std::string File::baseName(const std::string& path, const std::string& suffix){
 }
 
 std::string File::directory(const std::string& path){
-	size_t pos = path.find_last_of(AL_FILE_DELIMITER);
+	size_t pos = path.find_last_of("/\\");
 	if(std::string::npos != pos){
 		return path.substr(0, pos+1);
 	}
