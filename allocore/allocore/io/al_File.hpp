@@ -255,6 +255,12 @@ public:
 	/// If there is no period, an empty string is returned.
 	static std::string extension(const std::string& path);
 
+	/// Returns string with extension replaced
+
+	/// @param[in] path		File path
+	/// @param[in] ext		New file extension with or without a leading '.'
+	static std::string replaceExtension(const std::string& path, const std::string& ext);
+
 
 	/// Returns whether a file or directory exists
 	static bool exists(const std::string& path);

@@ -654,6 +654,15 @@ std::string File::extension(const std::string& path){
 	return "";
 }
 
+std::string File::replaceExtension(const std::string& path, const std::string& ext){
+	if(ext.empty()){
+		return path.substr(path.find_last_of("."));
+	}
+	auto e = ext;
+	if('.' != e[0]) e = '.' + e;
+	return directory(path) + baseName(path, extension(path)) + e;
+}
+
 bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
 	auto pre = prefixPath;
 	if(pre[0]) pre = conformDirectory(pre);
