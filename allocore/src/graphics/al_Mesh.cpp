@@ -796,7 +796,7 @@ Mesh& Mesh::coloriFill(const Colori& v){
 	return *this;
 }
 
-bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) const {
+bool Mesh::saveFBX(const std::string& filePath, const std::string& solidName) const {
 
 	if(!(isTriangles() || isTriangleStrip())){
 		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
@@ -805,37 +805,163 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 
 	if(!vertices().size()) return false;
 
-	// Create a copy since we must convert to non-indexed triangles
-	Mesh m(*this);
+	const bool binary = false;
+	std::ofstream fs;
+	fs.open(filePath, binary ? (std::ios::out | std::ios::binary) : std::ios::out);
+	if(fs.fail()) return false;
 
-	// Convert mesh to non-indexed triangles
-	m.toTriangles();
-	m.decompress();
-	m.generateNormals();
-
-	// STL vertices must be in positive octant
-	Vec3f vmin, vmax;
-	m.getBounds(vmin, vmax);
-
-	std::ofstream s(filePath);
-	if(s.fail()) return false;
-	s.flags(std::ios::scientific);
-
-	s << "solid " << solidName << "\n";
-	for(int i=0; i<m.vertices().size(); i+=3){
-		s << "facet normal";
-		for(int j=0; j<3; j++) s << " " << m.normals()[i][j];
-		s << "\n";
-		s << "outer loop\n";
-		for(int j=0; j<3; ++j){
-			s << "vertex";
-			for(int k=0; k<3; k++) s << " " << m.vertices()[i+j][k] - vmin[k];
-			s << "\n";
-		}
-		s << "endloop\n";
-		s << "endfacet\n";
+	Mesh copy;
+	if(isTriangleStrip()){
+		copy = *this;
+		copy.toTriangles();
 	}
-	s << "endsolid " << solidName;
+
+	const auto& m = isTriangleStrip() ? copy : *this;
+
+	const auto Nv = m.vertices().size();
+	const auto Nc = m.colors().size();
+	const auto Nci = m.coloris().size();
+
+	fs <<
+R"(; FBX 7.4.0 project file
+FBXHeaderExtension: {
+	FBXHeaderVersion: 1003
+	FBXVersion: 7400
+	Creator: "AlloSystem"
+}
+Definitions: {
+	Version: 100
+	Count: 3
+	ObjectType: "GlobalSettings" {
+		Count: 1
+	}
+	ObjectType: "Model" {
+		Count: 1
+	}
+	ObjectType: "Geometry" {
+		Count: 1
+	}
+}
+GlobalSettings:  {
+	Version: 100
+	Properties70:  {
+		P: "UpAxis", "int", "Integer", "",1
+		P: "UpAxisSign", "int", "Integer", "",1
+		P: "FrontAxis", "int", "Integer", "",2
+		P: "FrontAxisSign", "int", "Integer", "",1
+		P: "CoordAxis", "int", "Integer", "",0
+		P: "CoordAxisSign", "int", "Integer", "",1
+	}
+}
+Objects: {
+	Model: 75, "Model::model", "Mesh" {
+		Version: 232
+		Properties70: {
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+		}
+	}
+	Geometry: 50, "Geometry::", "Mesh" {
+)";
+	auto writeFloat = [&](float v, int precision=6){
+		fs.precision(precision);
+		if(std::abs(v) < 1e-7) v=0;
+		fs << v << ',';
+	};
+
+	fs << "\t\tVertices: *" << Nv*3 << " {\n";
+	fs << "\t\t\ta: ";
+	for(auto& p : m.vertices()){
+		writeFloat(p[0]);
+		writeFloat(p[1]);
+		writeFloat(p[2]);
+	}
+	fs.seekp(-1, std::ios::cur); // erase last comma
+	fs << "\n\t\t}\n";
+
+	if(m.indices().size()){
+		fs << "\t\tPolygonVertexIndex: *" << m.indices().size() << " {\n\t\t\ta: ";
+		for(int i=0; i<m.indices().size(); i+=3){
+			fs << (int)(m.indices()[i  ]) << ',';
+			fs << (int)(m.indices()[i+1]) << ',';
+			fs <<-(int)(m.indices()[i+2]+1) << ','; // negate to close polygon (yes, needs +1!!!)
+		}
+		fs.seekp(-1, std::ios::cur); // erase last comma
+		fs << "\n\t\t}\n";
+	}
+
+	fs << "\t\tGeometryVersion: 100\n";
+
+	bool hasNormals = m.normals().size()>=Nv;
+	bool hasColors = m.colors().size()>=Nv || m.coloris().size()>=Nv;
+
+	if(hasNormals){
+		fs << R"(
+		LayerElementNormal: 0 {
+			Version: 100
+			Name: ""
+			MappingInformationType: "ByVertice"
+			ReferenceInformationType: "Direct"
+			Normals: *)" << m.normals().size()*3 << " {\n\t\t\t\ta: ";
+		for(auto& n : m.normals()){
+			writeFloat(n[0], 4);
+			writeFloat(n[1], 4);
+			writeFloat(n[2], 4);
+		}
+		fs.seekp(-1, std::ios::cur); // erase last comma
+		fs << "\n\t\t\t}\n\t\t}\n";
+	}
+
+	if(hasColors){
+		auto Nc = m.colors().size();
+		auto Nci = m.coloris().size();
+		fs << R"(
+		LayerElementColor: 0 {
+			Version: 100
+			Name: ""
+			MappingInformationType: "ByVertice"
+			ReferenceInformationType: "Direct"
+			Colors: *)" << (Nc?m.colors().size():m.coloris().size())*4 << " {\n\t\t\t\ta: ";
+		for(int i=0; i<Nv; ++i){
+			auto col = Nc ? Color(m.colors()[i]) : Color(m.coloris()[i]);
+			writeFloat(col.r, 4);
+			writeFloat(col.g, 4);
+			writeFloat(col.b, 4);
+			writeFloat(col.a, 4);
+		}
+		fs.seekp(-1, std::ios::cur); // erase last comma
+		fs << "\n\t\t\t}\n\t\t}\n";
+	}
+
+	if(hasNormals || hasColors){
+		fs << R"(
+		Layer: 0 {
+			Version: 100)";
+
+		if(hasNormals){
+			fs << R"(
+			LayerElement: {
+				Type: "LayerElementNormal"
+				TypedIndex: 0
+			})";
+		}
+		if(hasColors){
+			fs << R"(
+			LayerElement: {
+				Type: "LayerElementColor"
+				TypedIndex: 0
+			})";
+		}
+
+		fs << "\n\t\t}";
+	}
+
+	fs << R"(
+	}
+}
+Connections: {
+	C: "OO",50,75
+	C: "OO",75,0
+})";
 
 	return true;
 }
@@ -982,6 +1108,50 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	return true;
 }
 
+bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) const {
+
+	if(!(isTriangles() || isTriangleStrip())){
+		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
+		return false;
+	}
+
+	if(!vertices().size()) return false;
+
+	// Create a copy since we must convert to non-indexed triangles
+	Mesh m(*this);
+
+	// Convert mesh to non-indexed triangles
+	m.toTriangles();
+	m.decompress();
+	m.generateNormals();
+
+	// STL vertices must be in positive octant
+	Vec3f vmin, vmax;
+	m.getBounds(vmin, vmax);
+
+	std::ofstream s(filePath);
+	if(s.fail()) return false;
+	s.flags(std::ios::scientific);
+
+	s << "solid " << solidName << "\n";
+	for(int i=0; i<m.vertices().size(); i+=3){
+		s << "facet normal";
+		for(int j=0; j<3; j++) s << " " << m.normals()[i][j];
+		s << "\n";
+		s << "outer loop\n";
+		for(int j=0; j<3; ++j){
+			s << "vertex";
+			for(int k=0; k<3; k++) s << " " << m.vertices()[i+j][k] - vmin[k];
+			s << "\n";
+		}
+		s << "endloop\n";
+		s << "endfacet\n";
+	}
+	s << "endsolid " << solidName;
+
+	return true;
+}
+
 bool Mesh::save(const std::string& filePath, const std::string& solidName, bool binary) const {
 
 	auto pos = filePath.find_last_of(".");
@@ -989,10 +1159,11 @@ bool Mesh::save(const std::string& filePath, const std::string& solidName, bool 
 	auto ext = filePath.substr(pos+1);
 	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-	if("ply" == ext){
+	if("fbx" == ext){
+		return saveFBX(filePath, solidName);
+	} else if("ply" == ext){
 		return savePLY(filePath, solidName, binary);
-	}
-	else if("stl" == ext){
+	} else if("stl" == ext){
 		return saveSTL(filePath, solidName);
 	}
 

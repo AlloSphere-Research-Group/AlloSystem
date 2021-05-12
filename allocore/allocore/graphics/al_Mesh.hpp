@@ -413,7 +413,7 @@ public:
 
 	/// Save mesh to file
 
-	/// Currently supported are STL and PLY files.
+	/// Currently supported file formats are FBX, PLY and STL.
 	///
 	/// @param[in] filePath		path of file to save to
 	/// @param[in] solidName	solid name defined within the file (optional)
@@ -421,7 +421,20 @@ public:
 	/// \returns true on successful save, otherwise false
 	bool save(const std::string& filePath, const std::string& solidName = "", bool binary=true) const;
 
-	/// Save mesh to an STL file
+	/// Save mesh to FBX file
+	bool saveFBX(const std::string& filePath, const std::string& solidName = "") const;
+
+	/// Save mesh to PLY file
+
+	/// This implementation saves an ASCII (as opposed to binary) PLY file.
+	///
+	/// @param[in] filePath		path of file to save to
+	/// @param[in] solidName	solid name defined within the file (optional)
+	/// @param[in] binary		write data in binary form as opposed to ASCII
+	/// \returns true on successful save, otherwise false
+	bool savePLY(const std::string& filePath, const std::string& solidName = "", bool binary=true) const;
+
+	/// Save mesh to STL file
 
 	/// STL (STereoLithography) is a file format used widely for
 	/// rapid prototyping. It contains only surface geometry (vertices and
@@ -432,17 +445,6 @@ public:
 	/// @param[in] solidName	solid name defined within the file (optional)
 	/// \returns true on successful save, otherwise false
 	bool saveSTL(const std::string& filePath, const std::string& solidName = "") const;
-
-	/// Save mesh to a PLY file
-
-	/// This implementation saves an ASCII (as opposed to binary) PLY file.
-	///
-	/// @param[in] filePath		path of file to save to
-	/// @param[in] solidName	solid name defined within the file (optional)
-	/// @param[in] binary		write data in binary form as opposed to ASCII
-	/// \returns true on successful save, otherwise false
-	bool savePLY(const std::string& filePath, const std::string& solidName = "", bool binary=true) const;
-
 
 	/// Print information about Mesh
 	void print(FILE * dst = stderr) const;
