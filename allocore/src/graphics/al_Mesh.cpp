@@ -810,12 +810,12 @@ bool Mesh::saveFBX(const std::string& filePath, const std::string& solidName) co
 	fs.open(filePath, binary ? (std::ios::out | std::ios::binary) : std::ios::out);
 	if(fs.fail()) return false;
 
+	// Use a copy to handle triangle strip
 	Mesh copy;
 	if(isTriangleStrip()){
 		copy = *this;
 		copy.toTriangles();
 	}
-
 	const auto& m = isTriangleStrip() ? copy : *this;
 
 	const auto Nv = m.vertices().size();
@@ -979,10 +979,13 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	s.open(filePath, binary ? (std::ios::out | std::ios::binary) : std::ios::out);
 	if(s.fail()) return false;
 
-	// Use a copy to handle triangle strip;
-	// not ideal if already triangles!
-	Mesh m(*this);
-	m.toTriangles();
+	// Use a copy to handle triangle strip
+	Mesh copy;
+	if(isTriangleStrip()){
+		copy = *this;
+		copy.toTriangles();
+	}
+	const auto& m = isTriangleStrip() ? copy : *this;
 
 	const unsigned Nv = m.vertices().size();
 	const unsigned Nn = m.normals().size();
