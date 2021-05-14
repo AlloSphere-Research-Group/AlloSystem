@@ -114,6 +114,11 @@ public:
 	/// Append buffers from another mesh:
 	Mesh& merge(const Mesh& src);
 
+	template <class T>
+	Mesh& merge(const Mesh& src, const Mat<4,T>& xfm){
+		return merge(src).transform(xfm, -src.vertices().size());
+	}
+
 	/// Convert triangle strip to triangles
 	Mesh& toTriangles();
 

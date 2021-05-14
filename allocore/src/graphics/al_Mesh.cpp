@@ -591,19 +591,15 @@ Mesh& Mesh::flipWinding(){
 
 
 Mesh& Mesh::merge(const Mesh& src){
-//	if (indices().size() || src.indices().size()) {
-//		fprintf(stderr, "error: Mesh merging with indexed meshes not yet supported\n");
-//		return *this;
-//	}
-
 	// TODO: only do merge if source and dest are well-formed
 	// TODO: what to do when mixing float and integer colors? promote or demote?
 
-	// TODO: indices are more complex, since the offsets may have changed.
-	// we'd have to add indices.size() to all of the src.indices before adding.
-	// also, both src & dst should either use or not use indices
-	// tricky if src is empty...
-	//indices().append(src.indices());
+	if(src.vertices().empty()) return *this;
+
+	// Inherit primitive if no verts yet
+	if(vertices().empty()){
+		primitive(src.primitive());
+	}
 
 	// Source has indices, and I either do or don't.
 	// After this block, I will have indices.
@@ -624,7 +620,7 @@ Mesh& Mesh::merge(const Mesh& src){
 		for(int i=Nv; i<Nv+src.vertices().size(); ++i) index(i);
 	}
 
-	// From here, the game is indice invariant
+	// From here, everything is indice invariant
 
 	//equalizeBuffers(); << TODO: must do this if we are using indices.
 	vertices().append(src.vertices());
