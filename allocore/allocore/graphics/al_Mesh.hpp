@@ -487,15 +487,10 @@ Mesh& Mesh::transform(const Mat<4,T>& m, int begin, int end){
 		vertices()[i] = m * Vec<4,T>(vertices()[i], T(1));
 	}
 	if(normals().size() >= vertices().size()){
-		auto invT = Mat<3,T>(m); // normal matrix, (m^-1)^T
-		if(invert(invT)){
-			invT.transpose();
-			// Remove scaling beforehand to avoid renormalizing every normal
-			//for(int c=0; c<3; ++c) sub<3>(invT.col(c)).normalize();
-			for(int i=begin; i<end; ++i){
-				normals()[i] = invT * normals()[i];
-				normals()[i].normalize(); // since m may have scaling
-			}
+		auto nmat = normalMatrix(m);
+		for(int i=begin; i<end; ++i){
+			normals()[i] = nmat * normals()[i];
+			normals()[i].normalize(); // since xfm may have scaling
 		}
 	}
 	return *this;
