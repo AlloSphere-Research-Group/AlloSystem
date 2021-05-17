@@ -168,6 +168,10 @@ public:
 	static Vec aa(int axis, T val = T(1)){
 		return Vec().setAA(axis, val);
 	}
+	template <int Axis>
+	static Vec aa(T val = T(1)){
+		return Vec().setAA<Axis>(val);
+	}
 
 	/// Get vector filled with linear sequence of values
 
@@ -320,6 +324,11 @@ public:
 		(*this) = T(0);
 		(*this)[axis] = val;
 		return *this;
+	}
+	template <int Axis>
+	Vec& setAA(T val = T(1)){
+		static_assert(0<=Axis && Axis<N, "Axis out of range");
+		return setAA(Axis, val);
 	}
 
 	/// Return true if objects are element-wise equal, false otherwise
