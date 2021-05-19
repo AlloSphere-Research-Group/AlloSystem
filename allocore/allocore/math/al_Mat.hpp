@@ -600,6 +600,20 @@ public:
 		return rotate<Dim1,Dim2>(cosAngle, sinAngle);
 	}
 
+	Mat& rotate90(int dim1, int dim2){
+		auto& col1 = col(dim1).template sub<N-1>();
+		auto& col2 = col(dim2).template sub<N-1>();
+		std::swap(col1, col2);
+		col2 = -col2;
+		return *this;
+	}
+
+	template <int Dim1, int Dim2>
+	Mat& rotate90(){
+		static_assert(Dim1<N-1 && Dim2<N-1, "Dimension out of bounds");
+		return rotate90(Dim1, Dim2);
+	}
+
 	/// Rotate submatrix on a global plane (A' = RA)
 	template <int M>
 	Mat& rotateGlobal(double angle, int dim1, int dim2){
