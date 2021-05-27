@@ -3,15 +3,14 @@
 # Build and run source file in browser using Emscripten
 # Note that the first time running this may take some time as Emscripten configures its libraries.
 
-if [[ `echo $EMSCRIPTEN_ROOT` ]]; then
+if [[ `echo $EM_CONFIG` ]]; then
+	# Assume PATH already configured via emsdk_env.sh
+	EM_DIR=
+else
 	# EM_DIR will be something like */emsdk/emscripten/1.37.34
 	EM_DIR=`grep EMSCRIPTEN_ROOT ~/.emscripten | cut -d "=" -f 2 | sed -e s/^..// -e s/.$//`
 	EM_DIR+=/
-else
-	EM_DIR=
 fi
-
-#EM_DIR=`grep EMSCRIPTEN_ROOT ~/.emscripten | cut -d "=" -f 2 | sed -e s/^..// -e s/.$//`
 
 #BROWSER=chrome
 #BROWSER=firefox
@@ -39,6 +38,8 @@ EMFLAGS+=" -s USE_SDL=2"
 EMFLAGS+=" -s FULL_ES2=1" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
 EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
 #EMFLAGS+=" --cpuprofiler" # adds profiler to generated page
+#EMFLAGS+=" -lwebsocket.js" #WebSockets API
+#EMFLAGS+=" -lwebsocket.js -s PROXY_POSIX_SOCKETS=1 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1" #full POSIX socket emulation over WebSockets
 
 mkdir -p $OUTPUT_DIR
 
