@@ -60,7 +60,7 @@ public:
 // Windows and POSIX socket code match very closely, so we will just conform
 // the differences with some new types.
 
-#if defined(AL_WINDOWS)
+#if defined(AL_WINDOWS) && !defined(AL_SOCKET_POSIX)
 #include <Winsock2.h>
 #include <Ws2tcpip.h>
 #include <string.h> // memset
@@ -364,7 +364,7 @@ private:
 	int i=0;
 	while(host->h_addr_list[i] != 0){
 		struct in_addr addr;
-		addr.s_addr = *(u_long *)host->h_addr_list[i++];
+		addr.s_addr = *(decltype(addr.s_addr) *)host->h_addr_list[i++];
 		return inet_ntoa(addr);
 	}
 	return "";
