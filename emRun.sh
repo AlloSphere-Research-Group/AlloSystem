@@ -3,8 +3,15 @@
 # Build and run source file in browser using Emscripten
 # Note that the first time running this may take some time as Emscripten configures its libraries.
 
-# EM_DIR will be something like */emsdk/emscripten/1.37.34
-EM_DIR=`grep EMSCRIPTEN_ROOT ~/.emscripten | cut -d "=" -f 2 | sed -e s/^..// -e s/.$//`
+if [[ `echo $EMSCRIPTEN_ROOT` ]]; then
+	# EM_DIR will be something like */emsdk/emscripten/1.37.34
+	EM_DIR=`grep EMSCRIPTEN_ROOT ~/.emscripten | cut -d "=" -f 2 | sed -e s/^..// -e s/.$//`
+	EM_DIR+=/
+else
+	EM_DIR=
+fi
+
+#EM_DIR=`grep EMSCRIPTEN_ROOT ~/.emscripten | cut -d "=" -f 2 | sed -e s/^..// -e s/.$//`
 
 #BROWSER=chrome
 #BROWSER=firefox
@@ -12,7 +19,7 @@ if [[ $BROWSER ]]; then BROWSER="--browser $BROWSER"; fi
 
 # If passed a .html, just emrun it
 if [ "${1##*.}" == "html" ]; then
-	$EM_DIR/emrun --no_emrun_detect $BROWSER "$1"
+	${EM_DIR}emrun --no_emrun_detect $BROWSER "$1"
 	exit
 fi
 
@@ -35,18 +42,19 @@ EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
 
 mkdir -p $OUTPUT_DIR
 
-#$EM_DIR/emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.html
-$EM_DIR/emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js
+#${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.html
+${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js
 
 # Exit if compilation errors...
 if [[ $? != 0 ]]; then exit $?; fi
 
+# Create a minimal HTML page
 sed s/PROJ_NAME/$PROJ_NAME/g emMain.html > $OUTPUT_DIR/$PROJ_NAME.html
 
 # Run HTML
 # You cannot simply double-click the .html since you need a local server.
 # Note that this blocks in terminal even after page close!
-$EM_DIR/emrun --no_emrun_detect $BROWSER $OUTPUT_DIR/$PROJ_NAME.html
+${EM_DIR}emrun --no_emrun_detect $BROWSER $OUTPUT_DIR/$PROJ_NAME.html
 
 # Run local server
 #python -m SimpleHTTPServer 8888
