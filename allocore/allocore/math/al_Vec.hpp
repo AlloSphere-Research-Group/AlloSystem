@@ -622,9 +622,15 @@ public:
 	/// @param[in] dim1		dimension to rotate from
 	/// @param[in] dim2		dimension to rotate towards
 	/// To rotate -90 degrees, swap the two dimensions.
-	Vec& rotate90(int dim1=0, int dim2=1){
+	Vec& rotate90(int dim1, int dim2){
 		(*this)[dim2] = -(*this)[dim2];
 		return swap(dim1, dim2);
+	}
+
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	Vec& rotate90(){
+		static_assert(Dim1<N && Dim2<N && Dim1!=Dim2, "Invalid dimension(s)");
+		return rotate90(Dim1,Dim2);
 	}
 
 	/// Get index of minimum value
