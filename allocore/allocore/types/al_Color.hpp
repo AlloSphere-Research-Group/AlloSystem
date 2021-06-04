@@ -711,10 +711,30 @@ struct RGB{
 		return (v-*this)*amt + *this;
 	}
 
+	/// Returns maximum component value (HSV value)
+	float& max(){ return r>g ? (r>b?r:b) : (g>b?g:b); }
+	float max() const { return const_cast<RGB*>(this)->max(); }
+
+	/// Returns minimum component value
+	float& min(){ return r<g ? (r<b?r:b) : (g<b?g:b); }
+	float min() const { return const_cast<RGB*>(this)->min(); }
+
 	/// Set value of color in HSV space (leaving hue and saturation unchanged)
 	RGB& value(float v){
-		auto mx = r>g ? (r>b?r:b) : (g>b?g:b);
-		return mx > 0. ? *this *= v/mx : *this = v;
+		auto mx = max();
+		return mx > 0.f ? *this *= v/mx : *this = v;
+	}
+
+	/// Get saturation of color in HSV space
+	float saturation() const {
+		auto mx = max();
+		return mx > 0.f ? (mx-min())/mx : 0.f;
+	}
+
+	/// Set saturation of color in HSV space (leaving hue and value unchanged)
+	RGB& saturation(float s){
+		min() = 0.f;
+		return *this = RGB(max()).mix(*this, s);
 	}
 };
 
