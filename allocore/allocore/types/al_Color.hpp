@@ -620,6 +620,13 @@ struct RGB{
 	template <class T>
 	RGB& set(const T* rgb){ return set(rgb[0],rgb[1],rgb[2]); }
 
+	template <class V>
+	V& as(){
+		static_assert(sizeof(V)==sizeof(components), "Size mismatch");
+		return *(V*)(components);
+	}
+
+
 	template <unsigned HexValue>
 	constexpr RGB& fromHex(){
 		auto ci = Colori().fromHexRGB<HexValue>();
