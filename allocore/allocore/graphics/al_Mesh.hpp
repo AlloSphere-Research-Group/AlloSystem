@@ -45,6 +45,7 @@
 */
 
 #include <stdio.h>
+#include <functional>
 #include <string>
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Mat.hpp"
@@ -414,6 +415,10 @@ public:
 	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
 	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
 	Indices& indices(){ return mIndices; }
+
+
+	/// Call function for each face in mesh
+	Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace);
 
 
 	/// Save mesh to file

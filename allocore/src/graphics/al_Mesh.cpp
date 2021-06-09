@@ -792,6 +792,33 @@ Mesh& Mesh::coloriFill(const Colori& v){
 	return *this;
 }
 
+Mesh& Mesh::forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace){
+	if(mIndices.size()){
+		if(isTriangles()){
+			for(int i=2; i<mIndices.size(); i+=3){
+				onFace(mIndices[i-2], mIndices[i-1], mIndices[i]);
+			}
+		} else if(isTriangleStrip()){
+			for(int i=0; i<mIndices.size()-2; i++){
+				int w = i&1; // winding: 0=ccw, 1=cw
+				onFace(mIndices[i+w], mIndices[i+1-w], mIndices[i+2]);
+			}
+		}
+	} else {
+		if(isTriangles()){
+			for(int i=2; i<mVertices.size(); i+=3){
+				onFace(i-2, i-1, i);
+			}
+		} else if(isTriangleStrip()){
+			for(int i=0; i<mVertices.size()-2; i++){
+				int w = i&1; // winding: 0=ccw, 1=cw
+				onFace(i+w, i+1-w, i+2);
+			}
+		}
+	}
+	return *this;
+}
+
 bool Mesh::saveFBX(const std::string& filePath, const std::string& solidName) const {
 
 	if(!(isTriangles() || isTriangleStrip())){
