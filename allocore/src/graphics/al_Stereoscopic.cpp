@@ -1,22 +1,22 @@
-#include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/graphics/al_Stereoscopic.hpp"
 #include "allocore/graphics/al_Graphics.hpp"	/* << need the OpenGL headers */
 
 namespace al{
 
-Stereographic::Stereographic()
+Stereoscopic::Stereoscopic()
 :	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)),
 	mSlices(24), mOmniFov(360),
 	mEyeNumber(0),
 	mStereo(false), mOmni(false)
 {}
 
-Vec3d Stereographic::unproject(const Vec3d& screenPos) const {
+Vec3d Stereoscopic::unproject(const Vec3d& screenPos) const {
 	auto invprojview = Matrix4d::inverse(modelViewProjection());
 	auto worldPos4 = invprojview * Vec4d(screenPos, 1.);
 	return worldPos4.xyz() / worldPos4.w;
 }
 
-void Stereographic::pushDrawPop(Graphics& g, Drawable& draw){
+void Stereoscopic::pushDrawPop(Graphics& g, Drawable& draw){
 	g.pushMatrix(g.PROJECTION);
 	g.loadMatrix(projection());
 	g.pushMatrix(g.MODELVIEW);
@@ -26,19 +26,19 @@ void Stereographic::pushDrawPop(Graphics& g, Drawable& draw){
 	g.popMatrix(g.MODELVIEW);
 }
 
-void Stereographic::sendViewport(Graphics& g, const Viewport& vp){
+void Stereoscopic::sendViewport(Graphics& g, const Viewport& vp){
 	glScissor(vp.l, vp.b, vp.w, vp.h);
 	g.viewport(vp.l, vp.b, vp.w, vp.h);
 	mVP = vp;
 }
 
-void Stereographic::sendClear(Graphics& g){
+void Stereoscopic::sendClear(Graphics& g){
 	g.depthMask(true); // ensure writing to depth buffer is enabled
 	g.clearColor(mClearColor);
 	g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
 }
 
-void Stereographic :: draw(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
+void Stereoscopic :: draw(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
 	//printf("%d, %d\n", mStereo, mMode);
 	if(mStereo){
 		switch(mMode){
@@ -54,7 +54,7 @@ void Stereographic :: draw(Graphics& g, const Lens& lens, const Pose& pose, cons
 	}
 }
 
-void Stereographic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	const Vec3d& pos = pose.pos();
 
@@ -119,7 +119,7 @@ appropriate draw buffer. Thus, to draw the right eye:
 	g.drawBuffer(Graphics::BACK);
 	g.scissorTest(false);
 */
-void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect){
+void Stereoscopic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect){
 
 	const auto near = lens.near();
 	const auto far = lens.far();
@@ -184,7 +184,7 @@ void Stereographic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const
 }
 
 
-void Stereographic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	g.scissorTest(true);
 
@@ -232,7 +232,7 @@ void Stereographic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& po
 
 
 
-void Stereographic :: drawActive(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic :: drawActive(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	#ifdef AL_GRAPHICS_SUPPORTS_LR_BUFFERS
 		g.scissorTest(true);
@@ -252,14 +252,14 @@ void Stereographic :: drawActive(Graphics& g, const Lens& lens, const Pose& pose
 }
 
 
-void Stereographic :: drawLeft(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic :: drawLeft(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	g.scissorTest(true);
 	drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
 	g.scissorTest(false);
 }
 
-void Stereographic :: drawRight(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic :: drawRight(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	g.scissorTest(true);
 	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
@@ -267,7 +267,7 @@ void Stereographic :: drawRight(Graphics& g, const Lens& lens, const Pose& pose,
 }
 
 
-void Stereographic :: drawDual(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic :: drawDual(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	g.scissorTest(true);
 
@@ -291,7 +291,7 @@ void Stereographic :: drawDual(Graphics& g, const Lens& lens, const Pose& pose, 
 
 /// blue line sync for active stereo
 /// @see http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/GLUTStereo/glutStereo.cpp
-void Stereographic :: drawBlueLine(double window_width, double window_height){
+void Stereoscopic :: drawBlueLine(double window_width, double window_height){
 // FIXME: This will not compile with OpenGL ES
 #if defined(AL_GRAPHICS_USE_OPENGL)
 	GLint i;

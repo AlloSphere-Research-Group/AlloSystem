@@ -96,7 +96,7 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
-Stereographic stereo;
+Stereoscopic stereo;
 #define AUDIO_BLOCK_SIZE 256
 
 #ifdef ALLOSPHERE

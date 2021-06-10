@@ -167,7 +167,7 @@ namespace al {
         al::Lens lens;
 
         //Renderer
-        Stereographic stereo;
+        Stereoscopic stereo;
 
         //al::Window has a mouse too so i call mine "imouse". . .
         MouseData& imouse() { return interface.mouse; }

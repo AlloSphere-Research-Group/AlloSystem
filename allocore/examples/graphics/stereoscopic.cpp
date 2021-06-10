@@ -4,7 +4,7 @@ using namespace al;
 
 static Graphics gl;
 static Mesh mesh;
-static Stereographic stereo;
+static Stereoscopic stereo;
 static Lens lens;
 Nav nav;
 
@@ -16,11 +16,11 @@ struct MyWindow : Window, public Drawable{
 			case '-': lens.eyeSep(lens.eyeSep() - 0.01); break;
 			case '+': lens.eyeSep(lens.eyeSep() + 0.01); break;
 			case Keyboard::TAB: stereo.stereo(!stereo.stereo()); return false;
-			case '1': stereo.mode(Stereographic::ANAGLYPH); return false;
-			case '2': stereo.mode(Stereographic::ACTIVE); return false;
-			case '3': stereo.mode(Stereographic::DUAL); return false;
-			case '4': stereo.mode(Stereographic::LEFT_EYE); return false;
-			case '5': stereo.mode(Stereographic::RIGHT_EYE); return false;
+			case '1': stereo.mode(Stereoscopic::ANAGLYPH); return false;
+			case '2': stereo.mode(Stereoscopic::ACTIVE); return false;
+			case '3': stereo.mode(Stereoscopic::DUAL); return false;
+			case '4': stereo.mode(Stereoscopic::LEFT_EYE); return false;
+			case '5': stereo.mode(Stereoscopic::RIGHT_EYE); return false;
 			default:;
 		}
 		return true;
@@ -50,7 +50,7 @@ int main(){
 	lens.near(1).far(100).focalLength(1).fovy(45);
 	lens.eyeSep(lens.eyeSepAuto());
 	stereo.stereo(true);
-	stereo.mode(Stereographic::ACTIVE);
+	stereo.mode(Stereoscopic::ACTIVE);
 
 
 	// set up mesh:
@@ -68,9 +68,9 @@ int main(){
 		}
 	}
 
-	win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60, Window::DEFAULT_BUF | Window::STEREO_BUF);
+	win.create(Window::Dim(100, 0, 640, 480), "Stereoscopic Example", 60, Window::DEFAULT_BUF | Window::STEREO_BUF);
 
-	//win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60);
+	//win.create(Window::Dim(100, 0, 640, 480), "Stereoscopic Example", 60);
 	//win.displayMode(win.displayMode() | Window::STEREO_BUF);
 
 	win.append(*new StandardWindowKeyControls);

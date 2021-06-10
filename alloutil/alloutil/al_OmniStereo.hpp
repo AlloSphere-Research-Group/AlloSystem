@@ -133,7 +133,7 @@ public:
 		float * v;
 	};
 
-	/// Stereographic mode
+	/// Stereoscopic mode
 	enum StereoMode {
 		MONO = 0,
 		SEQUENTIAL,		/**< Alternate left/right eye frames */

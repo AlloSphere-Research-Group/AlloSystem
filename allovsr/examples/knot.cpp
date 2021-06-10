@@ -244,7 +244,7 @@ class MyApp : public al::VsrApp {
 
         if (ALLOSPHERE){
             stereo.stereo(true);
-            stereo.mode( Stereographic::ACTIVE );
+            stereo.mode( Stereoscopic::ACTIVE );
 
             lens.fovy(45);
             lens.eyeSep(lens.eyeSepAuto() *-1);

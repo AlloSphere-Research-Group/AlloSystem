@@ -16,7 +16,7 @@ Modified by Lance Putnam, 4/25/2011
 #include "allocore/graphics/al_Lens.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Shapes.hpp"
-#include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/graphics/al_Stereoscopic.hpp"
 #include "allocore/spatial/al_Pose.hpp"
 #include "allocore/math/al_Random.hpp"
 
@@ -76,7 +76,7 @@ struct MyWindow : public Window, public Drawable {
     Graphics gl;
 	Lens lens;
 	Nav nav;
-	Stereographic stereo;
+	Stereoscopic stereo;
 	Mesh shapes;
 };
 

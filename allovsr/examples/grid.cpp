@@ -45,7 +45,7 @@ struct MyApp : public al::VsrApp {
     MyApp() : al::VsrApp() {
 
         // stereo.stereo(true);
-        // stereo.mode( Stereographic::DUAL );
+        // stereo.mode( Stereoscopic::DUAL );
 
     }
 

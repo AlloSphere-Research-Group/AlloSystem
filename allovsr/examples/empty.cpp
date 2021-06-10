@@ -44,7 +44,7 @@ struct MyApp : public al::VsrApp {
     MyApp() : al::VsrApp() {
 
         stereo.stereo(true);
-        stereo.mode( Stereographic::DUAL );
+        stereo.mode( Stereoscopic::DUAL );
 
     }
 
@@ -57,7 +57,7 @@ struct MyApp : public al::VsrApp {
         //YOUR CODE HERE
         Frame f; DRAW(f);
         //if (stereo.omni()) printf("omni");
-        //if (stereo.mode() == Stereographic::DUAL ) printf("dual\n");
+        //if (stereo.mode() == Stereoscopic::DUAL ) printf("dual\n");
     }
 
 

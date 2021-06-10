@@ -53,10 +53,10 @@ namespace al{
 ///	Higher-level utility class to manage various stereo rendering techniques
 ///
 /// @ingroup allocore
-class Stereographic {
+class Stereoscopic {
 public:
 
-	/// Stereographic mode
+	/// Stereoscopic mode
 	enum StereoMode{
 		ANAGLYPH=0,		/**< Red (left eye) / cyan (right eye) stereo */
 		ACTIVE,			/**< Active quad-buffered stereo */
@@ -76,7 +76,7 @@ public:
 	};
 
 
-	Stereographic();
+	Stereoscopic();
 
 
 	/// Draw the scene according to the stored stereographic mode
@@ -116,26 +116,26 @@ public:
 
 
 	/// Set background clear color
-	Stereographic& clearColor(const Color& v){ mClearColor=v; return *this; }
+	Stereoscopic& clearColor(const Color& v){ mClearColor=v; return *this; }
 
 	/// Set stereographic mode
-	Stereographic& mode(StereoMode v){ mMode=v; return *this; }
+	Stereoscopic& mode(StereoMode v){ mMode=v; return *this; }
 
 	/// Set stereographic active
-	Stereographic& stereo(bool v){ mStereo=v; return *this; }
+	Stereoscopic& stereo(bool v){ mStereo=v; return *this; }
 
 	/// Set anaglyph mode
-	Stereographic& anaglyphMode(AnaglyphMode v){ mAnaglyphMode=v; return *this; }
+	Stereoscopic& anaglyphMode(AnaglyphMode v){ mAnaglyphMode=v; return *this; }
 
 	/// Set omnigraphic mode
 	/// slices: sets number of sub-viewport slices to render
 	/// fov (degrees) sets field of view (horizontal)
 	/// NOTE: cam.fovy will be ignored in omni mode
-	Stereographic& omni(bool enable) { mOmni = enable; return *this; }
-	Stereographic& omni(bool enable, unsigned slices, double fov=360){
+	Stereoscopic& omni(bool enable) { mOmni = enable; return *this; }
+	Stereoscopic& omni(bool enable, unsigned slices, double fov=360){
 		mOmni = enable; mSlices = slices; mOmniFov = fov; return *this; }
-	Stereographic& omniFov( double fov ) { mOmniFov = fov; return *this; }
-	Stereographic& omniSlices( int slices ) { mSlices = slices; return *this; }
+	Stereoscopic& omniFov( double fov ) { mOmniFov = fov; return *this; }
+	Stereoscopic& omniSlices( int slices ) { mSlices = slices; return *this; }
 
 
 	/// Get background clear color
@@ -241,7 +241,7 @@ public:
 
 
 template <class T>
-Vec3d Stereographic::pixelToWorld(const Vec<2,T>& p) const {
+Vec3d Stereoscopic::pixelToWorld(const Vec<2,T>& p) const {
 	Vec3d ndc;
 	ndc.x = (p.x / mVP.w) * 2. - 1.;
 	ndc.y = (p.y / mVP.h) *-2. + 1.;
@@ -250,25 +250,25 @@ Vec3d Stereographic::pixelToWorld(const Vec<2,T>& p) const {
 }
 
 template <class T>
-inline Vec4d Stereographic::toClipSpace(const Vec<4,T>& v) const {
+inline Vec4d Stereoscopic::toClipSpace(const Vec<4,T>& v) const {
 	return modelViewProjection() * v;
 }
 
-inline Vec4d Stereographic::toClipSpace() const {
+inline Vec4d Stereoscopic::toClipSpace() const {
 	return modelViewProjection().col(3);
 }
 
 template <class T>
-inline Vec3d Stereographic::toNDCSpace(const Vec<4,T>& v) const {
+inline Vec3d Stereoscopic::toNDCSpace(const Vec<4,T>& v) const {
 	auto clipSpace = toClipSpace(v);
 	return clipSpace.get(0,1,2) / clipSpace[3];
 }
 template <class T>
-inline Vec3d Stereographic::toNDCSpace(const Vec<3,T>& v) const {
+inline Vec3d Stereoscopic::toNDCSpace(const Vec<3,T>& v) const {
 	return toNDCSpace(Vec<4,T>(v, T(1)));
 }
 
-inline Vec3d Stereographic::toNDCSpace() const {
+inline Vec3d Stereoscopic::toNDCSpace() const {
 	Vec4d clipSpace = toClipSpace();
 	return clipSpace.get(0,1,2) / clipSpace[3];
 }

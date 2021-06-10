@@ -165,8 +165,8 @@ bool SceneWindowHandler::onFrame(){
 
 		// if no camera, set to default scene camera
 		if(!vp.hasLens()) vp.lens(app.lens());
-		const Lens& lens = vp.lens();
-		Stereographic& stereo = app.stereo();
+		const auto& lens = vp.lens();
+		auto& stereo = app.stereo();
 
 		Color defaultClearColor = stereo.clearColor();
 		if(!vp.hasClearColor()){

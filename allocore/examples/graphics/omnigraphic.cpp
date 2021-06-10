@@ -103,7 +103,7 @@ using namespace al;
 
 static Graphics gl;
 static Mesh mesh, grid;
-static Stereographic stereo;
+static Stereoscopic stereo;
 static Lens lens;
 Nav nav;
 bool useShader = false;
@@ -124,7 +124,7 @@ bool useShader = false;
 		version of the ModelViewProjection matrix (instead of e.g. fttransform())
 
 		The modelview/projection matrices can be calculated in the same way as
-		the Stereographic class (perspectiveLeft/Right, lookatLeft/Right)
+		the Stereoscopic class (perspectiveLeft/Right, lookatLeft/Right)
 
 	The advantage would be full spherical omnistereo, and hopefully cheaper.
 */
@@ -137,11 +137,11 @@ struct MyWindow : Window, public Drawable{
 			case 'o': stereo.omni(!stereo.omni()); return false;
 			case 's': useShader = !useShader; return false;
 			case Keyboard::TAB: stereo.stereo(!stereo.stereo()); return false;
-			case '1': stereo.mode(Stereographic::ANAGLYPH); return false;
-			case '2': stereo.mode(Stereographic::ACTIVE); return false;
-			case '3': stereo.mode(Stereographic::DUAL); return false;
-			case '4': stereo.mode(Stereographic::LEFT_EYE); return false;
-			case '5': stereo.mode(Stereographic::RIGHT_EYE); return false;
+			case '1': stereo.mode(Stereoscopic::ANAGLYPH); return false;
+			case '2': stereo.mode(Stereoscopic::ACTIVE); return false;
+			case '3': stereo.mode(Stereoscopic::DUAL); return false;
+			case '4': stereo.mode(Stereoscopic::LEFT_EYE); return false;
+			case '5': stereo.mode(Stereoscopic::RIGHT_EYE); return false;
 			default: return true;
 		}
 	}
@@ -259,7 +259,7 @@ int main(){
 	lens.eyeSep(-lens.eyeSepAuto());
 	stereo.omni(true, 24, 120);
 	stereo.stereo(false);
-	stereo.mode(Stereographic::ANAGLYPH);
+	stereo.mode(Stereoscopic::ANAGLYPH);
 
 	// set up mesh:
 	mesh.primitive(Graphics::TRIANGLES);

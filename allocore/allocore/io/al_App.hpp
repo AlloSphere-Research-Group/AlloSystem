@@ -48,7 +48,7 @@
 // essential includes
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Lens.hpp"
-#include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/graphics/al_Stereoscopic.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/io/al_Window.hpp"
 #include "allocore/io/al_ControlNav.hpp"
@@ -339,8 +339,8 @@ public:
 	const Graphics& graphics() const { return mGraphics; }
 
 	/// Get 3D rendering state
-	Stereographic& stereo(){ return mStereo; }
-	const Stereographic& stereo() const { return mStereo; }
+	Stereoscopic& stereo(){ return mStereo; }
+	const Stereoscopic& stereo() const { return mStereo; }
 
 	/// Get (camera) lens
 	Lens& lens(){ return mLens; }
@@ -391,7 +391,7 @@ private:
 	// graphics
 	Windows mWindows;
 	Lens mLens;
-	Stereographic mStereo;
+	Stereoscopic mStereo;
 	Graphics mGraphics;
 
 	// sound
