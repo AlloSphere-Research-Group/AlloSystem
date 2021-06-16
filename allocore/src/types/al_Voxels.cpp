@@ -1,6 +1,7 @@
 //#include <cassert>
 #include <algorithm> // min,max
 #include <cmath> //pow
+#include <cstring> //memcpy
 #include <fstream>
 #include <sstream>
 #include "allocore/types/al_Voxels.hpp"
