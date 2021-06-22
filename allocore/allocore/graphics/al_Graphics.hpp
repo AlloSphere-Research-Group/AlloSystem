@@ -44,6 +44,7 @@
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
+#include <functional>
 #include <string>
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Quat.hpp"
@@ -433,6 +434,16 @@ public:
 
 	/// Pop designated matrix stack
 	void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
+
+	/// Push specified matrix, call function, then pop
+	void matrixScope(MatrixMode mmode, std::function<void(void)> f){
+		pushMatrix(mmode); f(); popMatrix();
+	}
+
+	/// Push current matrix, call function, then pop
+	void matrixScope(std::function<void(void)> f){
+		pushMatrix(); f(); popMatrix();
+	}
 
 	/// Set current matrix to identity
 	void loadIdentity();
