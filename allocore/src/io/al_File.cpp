@@ -593,10 +593,19 @@ bool File::copy(const std::string &srcPath, const std::string &dstPath, unsigned
 	return true;
 }
 
+static char getDelimiter(const std::string& path){
+	auto pos = path.find_first_of("\\/");
+	if(pos != std::string::npos){
+		return path[pos];
+	}
+	return AL_FILE_DELIMITER;
+}
+
 std::string File::conformDirectory(const std::string& path){
-	if(path[0]){
-		if(AL_FILE_DELIMITER != path[path.size()-1]){
-			return path + AL_FILE_DELIMITER;
+	if(path.size()){
+		auto delim = getDelimiter(path);
+		if(delim != path[path.size()-1]){
+			return path + delim;
 		}
 		return path;
 	}
