@@ -364,8 +364,7 @@ public:
 	/// Get a subvector
 	template <int M, int Begin=0>
 	const Vec<M,T>& sub() const {
-		static_assert((Begin+M)<=N, "Invalid subvector range");
-		return Vec<M,T>::pun(elems()+Begin);
+		return const_cast<Vec*>(this)->sub<M,Begin>();
 	}
 	template <int M, int Begin=0>
 	Vec<M,T>& sub(){
