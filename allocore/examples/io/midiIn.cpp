@@ -61,12 +61,13 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *msg, void *userD
 		printf("\n");
 
 
-
 		printf("\tBytes = ");
 		for(unsigned i=0; i<numBytes; ++i){
 			printf("%3u ", (int)msg->at(i));
 		}
 		printf(", stamp = %g\n", deltaTime);
+
+		fflush(stdout);
 	}
 }
 
@@ -83,7 +84,6 @@ int main(){
 	}
 
 	try {
-
 		// Print out names of available input ports
 		for(unsigned i=0; i<numPorts; ++i){
 			printf("Port %u: %s\n", i, midiIn.getPortName(i).c_str());
@@ -106,5 +106,6 @@ int main(){
 	midiIn.ignoreTypes(false, false, false);
 
 	printf("\nReading MIDI input ... press <enter> to quit.\n");
+	fflush(stdout);
 	getchar();
 }
