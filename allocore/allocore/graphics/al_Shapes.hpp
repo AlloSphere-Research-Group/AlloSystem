@@ -325,7 +325,7 @@ int addTorus(
 
 /// Inside of voxels have positive, non-zero values while outside have the
 /// value of zero. Generated normals point from inside to outside.
-/// The span of the voxel geometry is (0,0,0) to (Nx,Ny,Nz)*cellSze.
+/// The span of the voxel geometry is (0,0,0) to (Nx,Ny,Nz)*cellSize.
 ///
 /// @param[in,out] m		Mesh to add vertices and indices to
 /// @param[in] getVoxel		Function that returns voxel value at index
