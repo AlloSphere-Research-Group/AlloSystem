@@ -711,6 +711,17 @@ inline Vec<N,U> operator* (const Vec<N,U>& vRow, const Mat<N,T>& m){
 	Vec<N,U> r; return Mat<N,T>::multiply(r, vRow,m);
 }
 
+/// Get vector transform of row vector v by matrix A
+
+/// This function can be used as a fast inverse transform A^-1 v if A consists
+/// only of a rotation and translation, e.g. if A is a pose.
+template <int N, class T, class U>
+Vec<N-1,U> transformVector(const Vec<N-1,U>& v, const Mat<N,T>& A){
+	Vec<N-1,U> r;
+	IT(N-1){ r[i] = v.dot(A.col(i).template sub<N-1>()); }
+	return r;
+}
+
 /// Get determinant
 
 /// This computes the determinant using cofactor (or Laplace) expansion.
