@@ -40,6 +40,15 @@ Mesh& Mesh::reset() {
 	return *this;
 }
 
+Mesh& Mesh::points(){ return primitive(Graphics::POINTS); }
+Mesh& Mesh::points(float stroke){ return points().stroke(stroke); }
+Mesh& Mesh::lines(){ return primitive(Graphics::LINES); }
+Mesh& Mesh::lines(float stroke){ return lines().stroke(stroke); }
+Mesh& Mesh::lineStrip(){ return primitive(Graphics::LINE_STRIP); }
+Mesh& Mesh::lineStrip(float stroke){ return lineStrip().stroke(stroke); }
+Mesh& Mesh::triangles(){ return primitive(Graphics::TRIANGLES); }
+Mesh& Mesh::triangleStrip(){ return primitive(Graphics::TRIANGLE_STRIP); }
+
 bool Mesh::isTriangles() const { return primitive() == Graphics::TRIANGLES; }
 bool Mesh::isTriangleStrip() const { return primitive() == Graphics::TRIANGLE_STRIP; }
 

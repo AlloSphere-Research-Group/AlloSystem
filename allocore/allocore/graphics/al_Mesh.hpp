@@ -243,6 +243,14 @@ public:
 
 	/// Set geometric primitive
 	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
+	Mesh& points();
+	Mesh& points(float stroke);
+	Mesh& lines();
+	Mesh& lines(float stroke);
+	Mesh& lineStrip();
+	Mesh& lineStrip(float stroke);
+	Mesh& triangles();
+	Mesh& triangleStrip();
 
 	bool isTriangles() const;
 	bool isTriangleStrip() const;
