@@ -139,7 +139,7 @@ void Stereoscopic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const 
 
 	auto setView = [this](const Pose& pose, double eyeShift){
 		mView = pose.matrix(); // head pose
-		mView.Mat4d::translate(pose.ux()*eyeShift); // translate head to eye
+		mView.Mat4d::translateGlobal(pose.ux()*eyeShift); // translate head to eye
 		mEye = mView.col(3); // eye pos
 		invertRigid(mView); // convert eye pose to view
 	};

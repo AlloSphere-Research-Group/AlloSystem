@@ -663,11 +663,11 @@ public:
 		return *this;
 	}
 
-	/// Translate transformation matrix
+	/// Translate transformation matrix in local coordinates
 	template<class V>
 	Mat& translate(const Vec<N-1,V>& amount){
 		for(int R=0; R<N-1; ++R){
-			(*this)(R, N-1) += amount[R];
+			(*this)(R,N-1) += this->row(R).template sub<N-1>().dot(amount);
 		}
 		return *this;
 	}
@@ -679,6 +679,16 @@ public:
 	/// Translate transformation matrix
 	template<typename... Vals>
 	Mat& translate(Vals... vals){ return translate(Vec<(sizeof...(Vals)),T>(vals...)); }
+
+	/// Translate transformation matrix in global coordinate
+	template<class V>
+	Mat& translateGlobal(const Vec<N-1,V>& amount){
+		for(int R=0; R<N-1; ++R){
+			(*this)(R, N-1) += amount[R];
+		}
+		return *this;
+	}
+
 
 	/// Print to file (stream)
 	void print(FILE * file = stderr) const;
