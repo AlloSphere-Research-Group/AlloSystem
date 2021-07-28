@@ -319,6 +319,15 @@ public:
 		return *this;
 	}
 
+	/// Fill subrange of elements with value
+	Vec& fill(const T& v, int count, int begin=0){
+		for(int i=begin; i<begin+count; ++i) (*this)[i] = v;
+		return *this;
+	}
+
+	/// Fill last 'count' elements with value
+	Vec& fillLast(const T& v, int count){ return fill(v, count, N-count); }
+
 	/// Set to axis-aligned vector
 	Vec& setAA(int axis, T val = T(1)){
 		(*this) = T(0);
