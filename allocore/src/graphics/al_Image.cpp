@@ -215,6 +215,11 @@ public:
 		return true;
 	}
 
+	// TODO
+	bool load(const unsigned char * src, int len, Array& arr){
+		return false;
+	}
+
 
 	void resize(int w, int h, int bpp){
 		if(NULL != mFIBitmap){ // already allocated image?
@@ -498,15 +503,13 @@ namespace al{
 
 class Image::Impl {
 public:
-	Impl(){}
 
-	~Impl(){}
-
-	bool load(const std::string& filename, Array& arr){
+	template <class Func, class... Args>
+	bool loadData(Array& arr, Func loadFunc, Args... args){
 		stbi_set_flip_vertically_on_load(1); // rows go bottom to top
 		int w,h,n;
 		// components always uint8_t
-		unsigned char * data = stbi_load(filename.c_str(), &w, &h, &n, 0);
+		unsigned char * data = loadFunc(args..., &w, &h, &n, 0);
 		if(data){
 			arr.formatAligned(n, AlloUInt8Ty, w,h, 1);
 			memcpy(arr.data.ptr, data, w*h*n);
@@ -514,6 +517,14 @@ public:
 			return true;
 		}
 		return false;
+	}
+
+	bool load(const std::string& filename, Array& arr){
+		return loadData(arr, stbi_load, filename.c_str());
+	}
+
+	bool load(const unsigned char * src, int len, Array& arr){
+		return loadData(arr, stbi_load_from_memory, src, len);
 	}
 
 	bool save(const std::string& filename, const Array& arr, int compressFlags, int paletteSize){
@@ -572,10 +583,9 @@ public:
 
 namespace al{
 
-Image :: Image(){
-}
+Image::Image(){}
 
-Image :: Image(const std::string& filename){
+Image::Image(const std::string& filename){
 	load(filename);
 }
 
@@ -583,10 +593,16 @@ Image::~Image() {
 	if(mImpl) delete mImpl;
 }
 
-bool Image::load(const std::string& filename) {
+bool Image::load(const std::string& filename){
 	if(!mImpl) mImpl = new Impl();
 	mLoaded = mImpl->load(filename, mArray);
 	if(mLoaded) mFilename = filename;
+	return mLoaded;
+}
+
+bool Image::load(const unsigned char * src, int len){
+	if(!mImpl) mImpl = new Impl();
+	mLoaded = mImpl->load(src, len, mArray);
 	return mLoaded;
 }
 
@@ -621,7 +637,7 @@ Image::Format Image::format() const {
 	return getFormat(array().components());
 }
 
-Image::Format Image :: getFormat(int planes) {
+Image::Format Image::getFormat(int planes){
 	switch(planes) {
 		case 1:		return LUMINANCE;
 		case 2:		return LUMALPHA;

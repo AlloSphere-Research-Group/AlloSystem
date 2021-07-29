@@ -85,6 +85,14 @@ public:
     /// \returns true for success or print error message and return false
 	bool load(const std::string& filePath);
 
+	/// Load image from memory source
+
+	/// @param[in] src		Source array
+	/// @param[in] len		Number of bytes
+    /// \returns true for success or print error message and return false
+	bool load(const unsigned char * src, int len);
+
+
 	/// Save image to disk
 
 	/// @param[in] filePath		File to save. Image type determined by file 
