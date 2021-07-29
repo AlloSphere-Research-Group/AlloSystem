@@ -262,7 +262,7 @@ elif uname -o | grep -q "Msys"; then
 	else
 		echo 'Found MinGW-w64 / MSYS2'
 		ARCH="mingw-w64-"$(uname -m)
-		LIBS="gcc portaudio glew freeglut freetype assimp libusb"
+		LIBS="gcc gdb portaudio glew freeglut freetype assimp libusb"
 		PKGS=
 		for L in $LIBS
 		do
