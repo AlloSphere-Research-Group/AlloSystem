@@ -566,6 +566,17 @@ public:
 		return R;
 	}
 
+	/// Get Euler angle around local X axis (YXZ/AEB order), in radians
+	T eulerX() const { return std::asin(-at<1,2>()); }
+
+	/// Get Euler angle around local Y axis (YXZ/AEB order), in radians
+	T eulerY() const { return std::atan2(at<0,2>(), at<2,2>()); }
+
+	/// Get Euler angle around local Z axis (YXZ/AEB order), in radians
+	T eulerZ() const { return std::atan2(at<1,0>(), at<1,1>()); }
+
+	// Ref: https://www.geometrictools.com/Documentation/EulerAngles.pdf
+
 
 	// Affine transformations
 
