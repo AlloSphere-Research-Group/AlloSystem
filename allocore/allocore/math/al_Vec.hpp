@@ -837,6 +837,12 @@ inline Vec<N,T> centroid(const Vec<N,T>& p1, const Vec<N,T>& p2, const Vec<N,T>&
 	return (p1+p2+p3)/T(3);
 }
 
+/// Get closest point on a line to a point p
+template <int N, class T>
+Vec<N,T> closestPointOnLine(const Vec<N,T>& linePnt, const Vec<N,T>& lineDir, const Vec<N,T>& p){
+	return linePnt + (p-linePnt).projection(lineDir);
+}
+
 template <int N, class T, class Tf>
 Vec<N,T> closestPointOnLineSegment(Tf& frac, const Vec<N,T>& a, const Vec<N,T>& b, const Vec<N,T>& p){
 	auto ab = b - a;
