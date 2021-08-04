@@ -136,6 +136,28 @@ public:
 
 	ShaderProgram();
 
+	/** Construct with shader code
+	
+	Example pass-thru GLSL shader:
+
+		\code{.cpp}
+		ShaderProgram shader{
+		R"(
+			varying vec3 vcol;
+		)", R"(
+			uniform mat4 MVP;
+			void main(){
+				vcol = gl_Color.rgb;
+				gl_Position = MVP * gl_Vertex;
+			}
+		)", R"(
+			void main(){
+				vec3 col = vcol;
+				gl_FragColor = vec4(col, 1.);
+			}
+		)"};
+		\endcode
+	*/
 	ShaderProgram(
 		const std::string& preambleCode,
 		const std::string& vertexCode,
