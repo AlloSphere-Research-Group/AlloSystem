@@ -152,6 +152,13 @@ private:
 				//ctx->done = true;
 				break;
 
+			case SDL_DROPFILE:{
+				std::vector<const char *> p;
+				p.push_back(ev.drop.file);
+				win->callHandlersOnDrop(p);
+				SDL_free(ev.drop.file);
+				} break;
+
 			case SDL_WINDOWEVENT:
 				if(ev.window.windowID == ID()){
 					switch(ev.window.event){
