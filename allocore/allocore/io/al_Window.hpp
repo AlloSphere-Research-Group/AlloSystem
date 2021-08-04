@@ -476,7 +476,7 @@ protected:
 			if(false == handler->func) break;\
 		}\
 	}
- 
+
 	void callHandlersOnMouseDown(){ CALL(onMouseDown(mMouse)); }
 	void callHandlersOnMouseDrag(){ CALL(onMouseDrag(mMouse)); }
 	void callHandlersOnMouseMove(){ CALL(onMouseMove(mMouse)); }
