@@ -241,7 +241,7 @@ public:
 	virtual bool onVisibility(bool v){ return true; }
 
 	/// Called when file(s) dropped on window
-	virtual bool onDrop(const std::vector<const char*>& paths){ return true; }
+	virtual bool onDrop(const std::vector<std::string>& paths){ return true; }
 
 
 	/// Return self
@@ -502,7 +502,7 @@ protected:
 	}
 	void callHandlersOnResize(int dw, int dh){ CALL(onResize(dw, dh)); }
 	void callHandlersOnVisibility(bool v){ CALL(onVisibility(v)); }
-	void callHandlersOnDrop(const std::vector<const char*>& paths){ CALL(onDrop(paths)); }
+	void callHandlersOnDrop(const std::vector<std::string>& paths){ CALL(onDrop(paths)); }
 
 	#undef CALL
 

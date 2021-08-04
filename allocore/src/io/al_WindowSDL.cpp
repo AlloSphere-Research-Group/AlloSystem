@@ -120,6 +120,8 @@ private:
 		SDL_Event ev;
 		//ev.key.repeat == 0 // key was not repeated
 
+		std::vector<std::string> dropPaths;
+
 		auto setModifiers = [this](SDL_Event ev){
 			auto& k = mWindow->mKeyboard;
 			k.alt  (ev.key.keysym.mod & KMOD_ALT);
@@ -152,12 +154,10 @@ private:
 				//ctx->done = true;
 				break;
 
-			case SDL_DROPFILE:{
-				std::vector<const char *> p;
-				p.push_back(ev.drop.file);
-				win->callHandlersOnDrop(p);
+			case SDL_DROPFILE: // called multiple times per frame if multi-file drop
+				dropPaths.emplace_back(ev.drop.file);
 				SDL_free(ev.drop.file);
-				} break;
+				break;
 
 			case SDL_WINDOWEVENT:
 				if(ev.window.windowID == ID()){
@@ -280,6 +280,9 @@ private:
 			default:;
 			}
 		}
+
+		if(dropPaths.size())
+			win->callHandlersOnDrop(dropPaths);
 	}
 
 	void onFrame(){
