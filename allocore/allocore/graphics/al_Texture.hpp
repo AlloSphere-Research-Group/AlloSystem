@@ -187,6 +187,9 @@ public:
 	/// Get depth, in pixels
 	unsigned depth() const { return mDepth; }
 
+	/// Get aspect correct height from a given width
+	float heightFromWidth(float w) const { return height() * w/width(); }
+
 	/// Whether the dimensions, format, or type have changed
 	bool shapeUpdated() const { return mShapeUpdated; }
 
