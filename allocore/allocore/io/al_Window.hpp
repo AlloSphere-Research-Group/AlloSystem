@@ -240,6 +240,9 @@ public:
 	/// Called when window changes from hidden to shown and vice versa
 	virtual bool onVisibility(bool v){ return true; }
 
+	/// Called when file(s) dropped on window
+	virtual bool onDrop(const std::vector<const char*>& paths){ return true; }
+
 
 	/// Return self
 	WindowEventHandler& windowEventHandler(){ return *this; }
@@ -473,7 +476,7 @@ protected:
 			if(false == handler->func) break;\
 		}\
 	}
-
+ 
 	void callHandlersOnMouseDown(){ CALL(onMouseDown(mMouse)); }
 	void callHandlersOnMouseDrag(){ CALL(onMouseDrag(mMouse)); }
 	void callHandlersOnMouseMove(){ CALL(onMouseMove(mMouse)); }
@@ -497,8 +500,10 @@ protected:
 		CALL(onDestroy());
 		contextDestroy();
 	}
-	void callHandlersOnResize(int w, int h){ CALL(onResize(w, h)); }
+	void callHandlersOnResize(int dw, int dh){ CALL(onResize(dw, dh)); }
 	void callHandlersOnVisibility(bool v){ CALL(onVisibility(v)); }
+	void callHandlersOnDrop(const std::vector<const char*>& paths){ CALL(onDrop(paths)); }
+
 	#undef CALL
 
 public:
