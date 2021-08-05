@@ -768,7 +768,11 @@ public:
 	void disable(Capability v){
 		switch(v){
 		case FOG:				glDisable(GL_FOG); break;
-		case LIGHTING:			glDisable(GL_LIGHTING); break;
+		case LIGHTING:
+			glDisable(GL_LIGHTING);
+			// cancel updates to prevent Light from enabling GL_LIGHTING again
+			for(auto& l : mGraphics.mLights) l.handleUpdate();
+			break;
 		case COLOR_MATERIAL:	glDisable(GL_COLOR_MATERIAL); break;
 		default:				glDisable(v);
 		}
@@ -833,6 +837,7 @@ public:
 
 		// Note: Nothing submitted to GPU if light strength zero
 		bool loadedViewMatrix = false;
+
 		for(int i=0; i<AL_MAX_LIGHTS; ++i){
 			const auto& l = mLights[i].get();
 			auto glID = l.id();
