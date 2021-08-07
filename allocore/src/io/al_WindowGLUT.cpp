@@ -39,10 +39,8 @@ void mainInitGLUT(){
 	char name[] = {'a','l','l','o','\0'};
 	char * argv[] = {name};
 	glutInit(&argc,argv);
-	static auto atExitFunc = [](){
-		Main::get().exit(); // call any exit handlers
-	};
-	atexit(atExitFunc);
+	// Have ::exit call any exit handlers
+	atexit([](){ Main::get().exit(); });
 }
 
 void mainAttachGLUT(al_sec interval){}
