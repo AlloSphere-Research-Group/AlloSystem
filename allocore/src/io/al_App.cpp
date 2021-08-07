@@ -125,7 +125,7 @@ struct SceneWindowHandler : public WindowEventHandler{
 		return true;
 	}
 	bool onDestroy(){ app.onDestroy(win); return true; }
-	bool onResize(int dw, int dh){ app.onResize(win, dw,dh); return true; }
+	bool onResize(int w, int h){ app.onResize(win, w,h); return true; }
 
 	virtual bool onFrame();
 };

@@ -175,7 +175,7 @@ protected:
 	Viewpoints mViewpoints;
 	std::vector<std::function<void(void)>> mDrawCalls;
 
-	virtual bool onResize(int dw, int dh);
+	virtual bool onResize(int w, int h);
 
 private:
 	friend class SceneWindowHandler;

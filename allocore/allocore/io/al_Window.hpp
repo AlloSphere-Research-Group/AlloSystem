@@ -236,7 +236,7 @@ public:
 	virtual bool onFrame(){ return true; }
 
 	/// Called whenever window dimensions change
-	virtual bool onResize(int dw, int dh){ return true; }
+	virtual bool onResize(int w, int h){ return true; }
 
 	/// Called when window changes from hidden to shown and vice versa
 	virtual bool onVisibility(bool v){ return true; }
@@ -501,7 +501,7 @@ protected:
 		CALL(onDestroy());
 		contextDestroy();
 	}
-	void callHandlersOnResize(int dw, int dh){ CALL(onResize(dw, dh)); }
+	void callHandlersOnResize(int w, int h){ CALL(onResize(w, h)); }
 	void callHandlersOnVisibility(bool v){ CALL(onVisibility(v)); }
 	void callHandlersOnDrop(const std::vector<std::string>& paths){ CALL(onDrop(paths)); }
 
