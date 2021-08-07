@@ -11,12 +11,15 @@ Lance Putnam, 4/25/2011
 #include <stdio.h>
 #include "allocore/io/al_Window.hpp"
 #include "allocore/system/al_MainLoop.hpp"
+#include "allocore/graphics/al_OpenGL.hpp"
 using namespace al;
 
 struct MyWindow : Window {
 
 	bool onFrame(){
 		// This is where your drawing code goes ...
+		glClearColor(1,0,0,1);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		return true;
 	}
