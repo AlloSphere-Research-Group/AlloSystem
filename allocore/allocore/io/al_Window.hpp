@@ -149,6 +149,7 @@ public:
 	bool left() const;			///< Get whether left button is down
 	bool middle() const;		///< Get whether middle button is down
 	bool right() const;			///< Get whether right button is down
+	bool any() const;			///< Get whether any button is down
 
 protected:
 	friend class WindowImpl;

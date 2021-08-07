@@ -59,6 +59,11 @@ bool Mouse::left() const { return mB[LEFT]; }
 bool Mouse::middle() const { return mB[MIDDLE]; }
 bool Mouse::right() const { return mB[RIGHT]; }
 
+bool Mouse::any() const {
+	for(auto b : mB){ if(b) return true; }
+	return false;
+}
+
 void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=mY; } }
 void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 
