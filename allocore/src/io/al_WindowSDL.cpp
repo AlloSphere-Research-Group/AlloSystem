@@ -235,10 +235,8 @@ private:
 
 			case SDL_MOUSEMOTION: //printf("Mouse motion: %d %d\n", ev.motion.x, ev.motion.y);
 			{	if(!mUsingTouch) win->mMouse.position(ev.motion.x, ev.motion.y);
-				bool anyButtonDown = false;
-				for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i) anyButtonDown |= win->mMouse.down(i);
-				if(anyButtonDown)	win->callHandlersOnMouseDrag();
-				else				win->callHandlersOnMouseMove();
+				if(win->mMouse.any())	win->callHandlersOnMouseDrag();
+				else					win->callHandlersOnMouseMove();
 			}	break;
 
 			// For a single finger swipe, we get: SDL_MOUSEBUTTONDOWN, SDL_FINGERDOWN, SDL_FINGERMOTION, SDL_MOUSEBUTTONUP, SDL_FINGERUP. For multi-gesture, we get SDL_FINGERMOTION followed by SDL_MULTIGESTURE for each finger.
