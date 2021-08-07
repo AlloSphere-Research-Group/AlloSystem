@@ -71,8 +71,8 @@ public:
 	enum Driver {
 		DEFAULT = 0,///< Use an appropriate default driver (usually SLEEP)
 		SLEEP,		///< Uses platform-specific sleep function
-		GLUT,		///< GLUT (forced by Window using GLUT backend)
 		NATIVE,		///< Use platform specific run loop
+		USER,		///< Use user-defined functions
 		NUM_DRIVERS
 	};
 
@@ -132,17 +132,22 @@ public:
 
 	// INTERNAL USE:
 
-	// trigger a mainloop step (typically for implementation use only)
+	// Trigger a mainloop step (typically for implementation use only)
 	void tick();
 
-	// calls any registerd Handlers' onExit() methods
+	// Calls any registerd Handlers' onExit() methods
 	void exit();
 
-	// used to switch the driver
-	// typically not called by user code
-	// but e.g. creating a GLUT window will switch to GLUT mode
-	// or creating a Native window will switch to NATIVE mode
+	// Switch backend driver
+	// Typically not called by user code
+	// but e.g. creating a Native window will switch to NATIVE mode
 	Main& driver(Driver v);
+
+	// Must set before calling driver(Main::USER)
+	void (* userInit)() = nullptr;
+	void (* userAttach)(al_sec interval) = nullptr;
+	void (* userEnter)(al_sec interval) = nullptr;
+	void (* userStop)() = nullptr;
 
 private:
 	// private constructor for singleton pattern
@@ -154,10 +159,10 @@ private:
 	al_sec mLogicalTime;
 	double mCPU;
 
-	/// timing driver; initially SLEEP
+	// timing driver
 	Driver mDriver;
 
-	/// functor scheduler attached to the main loop
+	// functor scheduler attached to the main loop
 	MsgQueue mQueue;
 
 	std::vector<Handler *> mHandlers;

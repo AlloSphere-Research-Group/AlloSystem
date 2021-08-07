@@ -48,84 +48,6 @@ extern "C" void al_main_native_stop();
 #endif
 
 
-////////////////////////////////////////////////////////////////
-// GLUT impl:
-extern "C" void al_main_glut_init();
-extern "C" void al_main_glut_attach(al_sec interval);
-extern "C" void al_main_glut_enter(al_sec interval);
-extern "C" void al_main_glut_stop();
-
-#ifdef AL_MAINLOOP_NO_GLUT
-	extern "C" void al_main_glut_init(){
-		AL_WARN("GLUT loop not available");
-	}
-	extern "C" void al_main_glut_attach(al_sec interval){}
-	extern "C" void al_main_glut_enter(al_sec interval){}
-	extern "C" void al_main_glut_stop(){}
-#else
-
-// BEGIN al_MainLoopGLUT.cpp
-#include "allocore/system/al_MainLoop.hpp"
-#include "allocore/system/al_Config.h"
-
-#if defined AL_OSX
-	#include <OpenGL/OpenGL.h>
-	#include <GLUT/glut.h>
-
-#elif defined AL_LINUX
-	#include <GL/glew.h> // Needed since GLUT includes GL
-	#include <GL/glut.h>
-
-#elif defined AL_WINDOWS
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h> // Prevents GLUT from redefining APIENTRY
-	#include <GL/glew.h> // Needed since GLUT includes GL
-	#include <GL/glut.h>
-#endif
-
-static void mainGLUTExitFunc(){
-	// call any exit handlers:
-	al::Main::get().exit();
-}
-
-static void mainGLUTTimerFunc(int id) {
-	//printf("mainGLUTTimerFunc\n");
-	al::Main& M = al::Main::get();
-	M.tick();
-	if (M.isRunning()) {
-        // schedule another tick:
-        glutTimerFunc((unsigned int)(1000.0*M.interval()), mainGLUTTimerFunc, 0);
-    }
-}
-
-extern "C" void al_main_glut_init(){
-	int argc = 1;
-	char name[] = {'a','l','l','o','\0'};
-	char * argv[] = {name};
-	glutInit(&argc,argv);
-	atexit(mainGLUTExitFunc);
-}
-
-extern "C" void al_main_glut_attach(al_sec interval){
-}
-
-extern "C" void al_main_glut_enter(al_sec interval){
-	// start periodic timer
-	glutTimerFunc(0 /*msec*/, mainGLUTTimerFunc, 0);
-
-	// start the GLUT mainloop
-	glutMainLoop();
-}
-
-extern "C" void al_main_glut_stop(){
-	// GLUT can't be stopped; the only option is a hard exit.
-	::exit(0); // Note: this will call our function registered with atexit()
-}
-// END al_MainLoopGLUT.cpp
-
-#endif
-
-
 namespace al {
 
 ////////////////////////////////////////////////////////////////
@@ -163,7 +85,6 @@ Main::~Main() {
 }
 
 Main& Main::driver(Driver v) {
-	//if (mDriver != GLUT) mDriver = v;
 
 	if(v == Main::DEFAULT){
 		#ifdef __EMSCRIPTEN__
@@ -174,12 +95,16 @@ Main& Main::driver(Driver v) {
 	}
 
 	if(!mInited[v]){
+		bool inited = true;
 		switch(v){
-			case GLUT: al_main_glut_init(); break;
 			case NATIVE: al_main_native_init(); break;
+			case USER:
+				if(userInit) userInit();
+				else inited = false;
+				break;
 			default:;
 		}
-		mInited[v] = true;
+		mInited[v] = inited;
 	}
 
 	mDriver = v;
@@ -221,8 +146,8 @@ void Main::start() {
 
 		// Here we enter the main loop which will block until stopped
 		switch (mDriver) {
-			case Main::GLUT: al_main_glut_enter(interval()); break;
 			case Main::NATIVE: al_main_native_enter(interval()); break;
+			case Main::USER: if(userEnter) userEnter(interval()); break;
 			default:
 				// default sleep version
 				while (mActive) {
@@ -243,8 +168,8 @@ void Main::stop() {
 		mActive = false;
 
 		switch(mDriver){
-			case GLUT: al_main_glut_stop(); break;
 			case NATIVE: al_main_native_stop(); break;
+			case USER: if(userStop) userStop(); break;
 			default:; // Here, mActive==false stops the loop
 		}
 	}

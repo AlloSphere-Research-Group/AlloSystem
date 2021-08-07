@@ -22,6 +22,46 @@
 
 namespace al{
 
+// Functions needed to configure al::Main:
+
+void mainTimerFuncGLUT(int id) {
+	//printf("mainTimerFuncGLUT\n");
+	auto& M = al::Main::get();
+	M.tick();
+	if(M.isRunning()){
+        // schedule another tick:
+        glutTimerFunc((unsigned int)(1000.0*M.interval()), mainTimerFuncGLUT, 0);
+    }
+}
+
+void mainInitGLUT(){
+	int argc = 1;
+	char name[] = {'a','l','l','o','\0'};
+	char * argv[] = {name};
+	glutInit(&argc,argv);
+	static auto atExitFunc = [](){
+		Main::get().exit(); // call any exit handlers
+	};
+	atexit(atExitFunc);
+}
+
+void mainAttachGLUT(al_sec interval){}
+
+void mainEnterGLUT(al_sec interval){
+	// start periodic timer
+	//glutTimerFunc(msec, function, id)
+	glutTimerFunc(0, mainTimerFuncGLUT, 0);
+
+	// start the GLUT mainloop
+	glutMainLoop();
+}
+
+void mainStopGLUT(){
+	// GLUT can't be stopped; the only option is a hard exit.
+	::exit(0); // Note: this will call our function registered with atexit()
+}
+
+
 class WindowImpl{
 public:
 
@@ -456,6 +496,8 @@ private:
 		const int current = glutGetWindow();
 		if(winID != current) glutSetWindow(winID);
 		mWindow->callHandlersOnFrame();
+		//auto& mouse = mWindow->mMouse;
+		//mouse.position(mouse.x(), mouse.y()); // zeros dx, dy
 		const char * err = errorString(true);
 		if(err[0]){
 			AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", winID, err);
@@ -573,8 +615,15 @@ void Window::implDestroy(){
 bool Window::implCreate(){
 	//printf("Window::create called (in al_WindowGLUT.cpp)\n");
 
-	// switch mainloop to GLUT mode:
-	Main::get().driver(Main::GLUT);
+	// switch mainloop to custom GLUT mode:
+	{
+		auto& M = Main::get();
+		M.userInit = mainInitGLUT;
+		M.userAttach = mainAttachGLUT;
+		M.userEnter = mainEnterGLUT;
+		M.userStop = mainStopGLUT;
+		M.driver(Main::USER);
+	}
 
 	mImpl->mDimPrev.set(0,0,0,0);
 
