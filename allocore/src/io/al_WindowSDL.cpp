@@ -87,31 +87,6 @@ public:
 	}
 
 private:
-	static const char * errorString(bool verbose){
-		GLenum err = glGetError();
-		#define CS(GL_ERR, desc) case GL_ERR: return verbose ? #GL_ERR ", " desc : #GL_ERR;
-		switch(err){
-			case GL_NO_ERROR: return "";
-			CS(GL_INVALID_ENUM, "An unacceptable value is specified for an enumerated argument.")
-			CS(GL_INVALID_VALUE, "A numeric argument is out of range.")
-			CS(GL_INVALID_OPERATION, "The specified operation is not allowed in the current state.")
-		#ifdef GL_INVALID_FRAMEBUFFER_OPERATION
-			CS(GL_INVALID_FRAMEBUFFER_OPERATION, "The framebuffer object is not complete.")
-		#endif
-			CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
-		#ifdef GL_STACK_OVERFLOW
-			CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
-		#endif
-		#ifdef GL_STACK_UNDERFLOW
-			CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
-		#endif
-		#ifdef GL_TABLE_TOO_LARGE
-			CS(GL_TABLE_TOO_LARGE, "The specified table exceeds the implementation's maximum supported table size.")
-		#endif
-			default: return "Unknown error code.";
-		}
-		#undef CS
-	}
 
 	void handleEvents(){
 		if(!mWindow) return;
@@ -287,7 +262,7 @@ private:
 		mWindow->updateFrameTime(); // Compute actual frame interval
 		handleEvents();
 		mWindow->callHandlersOnFrame();
-		const char * err = errorString(true);
+		const char * err = glGetErrorString();
 		if(err[0]){
 			AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", ID(), err);
 		}
