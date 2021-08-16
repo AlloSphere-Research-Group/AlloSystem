@@ -18,11 +18,11 @@ public:
 	int mWindowedW = 100, mWindowedH = 100;
 
 	WindowImpl(Window * win): mWindow(win){
-		if(!glfwInit()){
-			// something is wrong!
-		} else {
+		if(glfwInit()){
 			// Use native sleep functions for timing
 			Main::get().driver(Main::SLEEP);
+		} else {
+			// something is wrong!
 		}
 	}
 
@@ -153,7 +153,6 @@ public:
 					m.button(b, false);
 					win.callHandlersOnMouseUp();
 				}
-
 			}
 		);
 
@@ -169,7 +168,10 @@ public:
 
 		glfwSetDropCallback(mGLFWWindow,
 			[](GLFWwindow* glfwWin, int count, const char** paths){
-				//for(int i=0; i<count; ++i) printf("Dropped file %s\n", paths[i]);
+				DECL_REFS(glfwWin)
+				std::vector<std::string> dropPaths;
+				for(int i=0; i<count; ++i) dropPaths.emplace_back(paths[i]);
+				win.callHandlersOnDrop(dropPaths);
 			}
 		);
 	}
@@ -271,8 +273,7 @@ void Window::implSetFPS(){
 
 void Window::implSetFullScreen(){
 	if(mFullScreen){
-		//auto * mon = glfwGetPrimaryMonitor();
-		auto * mon = glfwGetWindowMonitor(mImpl->mGLFWWindow);
+		auto * mon = glfwGetPrimaryMonitor();
 		const auto * mode = glfwGetVideoMode(mon);
 		mImpl->mWindowedW = mDim.w;
 		mImpl->mWindowedH = mDim.h;
