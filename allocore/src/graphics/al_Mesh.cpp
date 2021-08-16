@@ -1205,28 +1205,46 @@ bool Mesh::save(const std::string& filePath, const std::string& solidName, bool 
 	return false;
 }
 
-void Mesh::print(FILE * dst) const {
-	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);
-	if(vertices().size())	fprintf(dst, "%8d Vertices\n", vertices().size());
-	if(colors().size())		fprintf(dst, "%8d Colors\n", colors().size());
-	if(coloris().size())	fprintf(dst, "%8d Coloris\n", coloris().size());
-	if(normals().size())	fprintf(dst, "%8d Normals\n", normals().size());
-	if(texCoord1s().size())	fprintf(dst, "%8d TexCoord1s\n", texCoord1s().size());
-	if(texCoord2s().size())	fprintf(dst, "%8d TexCoord2s\n", texCoord2s().size());
-	if(texCoord3s().size())	fprintf(dst, "%8d TexCoord3s\n", texCoord3s().size());
-	if(indices().size())	fprintf(dst, "%8d Indices\n", indices().size());
 
-	unsigned bytes
-		= vertices().size()*sizeof(Vertex)
-		+ colors().size()*sizeof(Color)
-		+ coloris().size()*sizeof(Colori)
-		+ normals().size()*sizeof(Normal)
-		+ texCoord1s().size()*sizeof(TexCoord1)
-		+ texCoord2s().size()*sizeof(TexCoord2)
-		+ texCoord3s().size()*sizeof(TexCoord3)
-		+ indices().size()*sizeof(Index)
-		;
-	fprintf(dst, "%8d bytes (%.1f kB)\n", bytes, double(bytes)/1000);
+template <class Array>
+int sizeBytes(const Array& a){
+	return a.size() * sizeof(typename Array::value_type);
+}
+
+void Mesh::print(FILE * dst) const {
+
+	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);
+
+	auto niceByteString = [](unsigned bytes, double& printVal){
+		if(bytes <    1000){ printVal=bytes; return "B"; }
+		if(bytes < 1000000){ printVal=bytes*1e-3; return "kB"; }
+		else               { printVal=bytes*1e-6; return "MB"; }
+	};
+
+	#define QUERY_ATTRIB(attrib, name)\
+	if(attrib.size()){\
+		auto B = sizeBytes(attrib);\
+		Btot += B;\
+		double byteVal;\
+		const char * byteUnits = niceByteString(B, byteVal);\
+		fprintf(dst, "%8d " #name " (%.1f %s)\n", attrib.size(), byteVal, byteUnits);\
+	}
+
+	unsigned Btot = 0;
+	QUERY_ATTRIB(mVertices, Vertices)
+	QUERY_ATTRIB(mColors, Colors)
+	QUERY_ATTRIB(mColoris, Coloris)
+	QUERY_ATTRIB(mNormals, Normals)
+	QUERY_ATTRIB(mTexCoord1s, TexCoord1s)
+	QUERY_ATTRIB(mTexCoord2s, TexCoord2s)
+	QUERY_ATTRIB(mTexCoord3s, TexCoord3s)
+	QUERY_ATTRIB(mIndices, Indices)
+
+	{
+		double byteVal;
+		const char * byteUnits = niceByteString(Btot, byteVal);
+		fprintf(dst, "%8d bytes (%.1f %s)\n", Btot, byteVal, byteUnits);
+	}
 }
 
 bool Mesh::debug(FILE * dst) const {
