@@ -17,7 +17,7 @@ LIBS=
 COPY="cp -u"
 
 # Build executable first as we may need it to check for library dependencies
-./run.sh $1 AUTORUN=0
+./run.sh $* AUTORUN=0
 
 # Check if executable built
 files_exist ${BUILDEXEBASE}* || {
