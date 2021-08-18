@@ -641,7 +641,12 @@ std::string File::baseName(const std::string& path, const std::string& suffix){
 	auto posSlash = path.find_last_of("/\\"); // handle '/' or '\' path delimiters
 	if(path.npos == posSlash) posSlash=0; // no slash
 	else ++posSlash;
-	auto posSuffix = suffix.empty() ? path.npos : path.find(suffix, posSlash);
+	//auto posSuffix = suffix.empty() ? path.npos : path.find(suffix, posSlash);
+	auto posSuffix = path.npos;
+	if(suffix.size()){
+		auto wildPos = suffix.find('*');
+		posSuffix = path.find(suffix.substr(0, wildPos), posSlash);
+	}
 	auto len = path.npos;
 	if(path.npos != posSuffix) len = posSuffix - posSlash;
 	return path.substr(posSlash, len);
