@@ -1,67 +1,64 @@
-OpenGL ES 2.0:
-Not supported:
-The type double and all double-precision commands are eliminated (uses only the suffixes ’f ’, and ’i’).
-Pre-defined vertex data arrays such as vertex, color, normal, texture coord arrays are not supported.
-The commands for directly specifying rectangles are not supported.
-The fixed function transformation pipeline is no longer supported.
-The fixed function lighting model is no longer supported.
-Supports aliased point sprites only. The POINT_SPRITE default state is always TRUE.
-Anti-aliased lines and line stippling are not supported.
-Bitmap images are not supported.
-Feedback is not supported.
-Display lists are not supported.
+Not supported under OpenGL ES 2.0:
+  - The type double and all double-precision commands (uses only the suffixes ’f ’, and ’i’).
+  - Pre-defined vertex data arrays such as vertex, color, normal, texture coord arrays
+  - The commands for directly specifying rectangles
+  - The fixed function transformation pipeline
+  - The fixed function lighting model
+  - Anti-aliased lines and line stippling
+  - Supports aliased point sprites only. The POINT_SPRITE default state is always TRUE.
+  - Bitmap images
+  - Feedback 
+  - Display lists
 
-Supported:
+					ES1.1	ES2		GL3
+Shader				-		X		X
+  VertexAttrib		-		X		X
+Fixed Pipeline [1]	X		-		X
+  gl*Pointer		X		-		X
+AlphaFunc			X		-		X
+TexImage2D [2]		X		X		X
+  TexParameter [3]	X		X		X
+  CubeMap			-		X		X
+Texture 1D			-		-		X
+Texture 3D			-		-		X
+VBO					-		X		X
+FBO					-		X		X
+DrawArrays			X		X		X
+DrawElements [4]	X 		X		X
+PointSize			X		-		X
+  PointParameterf	X		-		X
+LineWidth			X		X		X
+GL_DOUBLE			-		-		-
+
+Supported on all:
+Depth, Stencil, Scissor, Viewport, ColorMask, Blend, CullFace, Texture 2D
 POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, and TRIANGLE_FAN
-BYTE, UNSIGNED_BYTE, SHORT, UNSIGNED_SHORT, FLOAT, FIXED
-TEXTURE_2D, TEXTURE_CUBE_MAP, TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T
-VertexAttrib{1234}f[v]
-VertexAttribPointer
-EnableVertexAttribArray
-DisableVertexAttribArray
-BindBuffer, DeleteBuffers, GenBuffers, BufferData, BufferSubData
-DrawArrays, DrawElements
-DepthRangef
-Viewport
-LineWidth
-CullFace
-TexImage2D, TexSubImage2D, CopyTexImage2D, CopyTexSubImage2D, CompressedTexImage2D,
-	CompressedTexSubImage2D,  TexParameter{if}[v]
-DeleteTextures, GenTextures
-Scissor
-DepthFunc
-BlendFunc, BlendEquation, BlendColor
-ColorMask
-Clear, ClearColor
-DepthMask, ClearDepthf
-Flush
-Finish
 
-OpenGL ES 1.1:
-Supports:
-OpenGL ES 2.0
-Normal3f
-Color4f
-VertexPointer
-NormalPointer
-ColorPointer
-TexCoordPointer
+[1] Fixed pipeline includes:
+Normal3f, Color4f
+VertexPointer, NormalPointer, ColorPointer, TexCoordPointer
 EnableClientState, DisableClientState
 	TEXTURE_COORD_ARRAY, COLOR_ARRAY, NORMAL_ARRAY, VERTEX_ARRAY
 MatrixMode
 	MODELVIEW, PROJECTION, TEXTURE
 LoadMatrixf
 LoadIdentity
-Rotatef
-Scalef
-Translatef
-Frustum
-Ortho
 PushMatrix
 	TEXTURE and PROJECTION (2 deep)
 	MODELVIEW (16 deep)
 PopMatrix
+Frustum
+Ortho
+Rotatef, Scalef, Translatef
 PointSize
-PointParameterf[v]
-LineWidth
-AlphaFunc
+
+[2] TexImage2D
+ES1.1 and ES2 support only ALPHA, RGB, RGBA, LUMINANCE and LUMINANCE_ALPHA
+ES1.1 and ES2 support only UNSIGNED_BYTE, UNSIGNED_SHORT_5_6_5, UNSIGNED_SHORT_4_4_4_4 and UNSIGNED_SHORT_5_5_5_1.
+ES1.1 dimensions must be power of two.
+
+[3] TexParameter
+ES1.1 and ES2 support only TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, EXTURE_WRAP_S, and TEXTURE_WRAP_T.
+
+[4] DrawElements
+ES1.1 and ES2 support only UNSIGNED_BYTE or UNSIGNED_SHORT for index type.
