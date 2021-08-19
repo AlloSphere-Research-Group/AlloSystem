@@ -269,25 +269,28 @@ public:
 	/// Set from coordinate frame unit vectors
 	Quat& fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz);
 
-	/// Set as versor from column-major 4-by-4 projective space transformation matrix
+	/// Set as versor from column-major 4x4 projective space transformation matrix
 	Quat& fromMatrix(const T * matrix);
 
-	/// Set as versor from column-major 4-by-4 projective space transformation matrix
+	/// Set as versor from column-major 4x4 projective space transformation matrix
 	Quat& fromMatrix(const Mat<4,T>& v){ return fromMatrix(&v[0]); }
 
-	/// Set as versor from row-major 4-by-4 projective space transformation matrix
+	/// Set as versor from row-major 4x4 projective space transformation matrix
 	Quat& fromMatrixTransposed(const T * matrix);
 
-	/// Set as versor from row-major 4-by-4 projective space transformation matrix
+	/// Set as versor from row-major 4x4 projective space transformation matrix
 	Quat& fromMatrixTransposed(const Mat<4,T>& v){ return fromMatrixTransposed(&v[0]); }
 
 	/// Convert to coordinate frame unit vectors
 	void toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const;
 
-	/// Convert to column-major 4-by-4 projective space transformation matrix
+	/// Convert to column-major 4x4 projective space transformation matrix
 	void toMatrix(T * matrix) const;
 
-	/// Convert to row-major 4-by-4 projective space transformation matrix
+	/// Convert to column-major 4x4 projective space transformation matrix
+	Mat<4,T> toMatrix() const;
+
+	/// Convert to row-major 4x4 projective space transformation matrix
 	void toMatrixTransposed(T * matrix) const;
 
 	/// Convert to axis-angle form, in radians
@@ -358,7 +361,7 @@ template<class T> Quat<T> operator / (T r, const Quat<T>& q){ return  q.conjugat
 /// Implementation
 
 template<typename T>
-inline Quat<T>& Quat<T> :: normalize() {
+inline Quat<T>& Quat<T>::normalize() {
 	T unit = magSqr();
 	if(unit*unit < eps()){
 		// unit too close to epsilon, set to default transform
@@ -372,7 +375,7 @@ inline Quat<T>& Quat<T> :: normalize() {
 
 // assumes both are already normalized!
 template<typename T>
-inline Quat<T> Quat<T> :: multiply(const Quat<T>& q) const {
+inline Quat<T> Quat<T>::multiply(const Quat<T>& q) const {
 	return Quat(
 		w*q.w - x*q.x - y*q.y - z*q.z,
 		w*q.x + x*q.w + y*q.z - z*q.y,
@@ -382,7 +385,7 @@ inline Quat<T> Quat<T> :: multiply(const Quat<T>& q) const {
 }
 
 template<typename T>
-inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q) const {
+inline Quat<T> Quat<T>::reverseMultiply(const Quat<T> & q) const {
 	return q * (*this);
 }
 
@@ -395,7 +398,7 @@ namespace{
 }
 
 template<typename T>
-Quat<T> Quat<T> :: pow(T expo) const {
+Quat<T> Quat<T>::pow(T expo) const {
 	T m = mag();
 	T w_m = w / m;
 
@@ -413,12 +416,12 @@ Quat<T> Quat<T> :: pow(T expo) const {
 
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const Vec<3,T>& axis) {
+inline Quat<T>& Quat<T>::fromAxisAngle(const T& angle, const Vec<3,T>& axis) {
 	return fromAxisAngle(angle, axis[0],axis[1],axis[2]);
 }
 
 template<typename T>
-Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const T& ux, const T& uy, const T& uz) {
+Quat<T>& Quat<T>::fromAxisAngle(const T& angle, const T& ux, const T& uy, const T& uz) {
 	T t2 = angle * T(0.5);
 	T sinft2 = std::sin(t2);
 	w = std::cos(t2);
@@ -530,7 +533,7 @@ Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, co
 }
 
 template<typename T>
-Quat<T>& Quat<T> :: fromMatrix(const T * m) {
+Quat<T>& Quat<T>::fromMatrix(const T * m) {
 	return fromCoordinateFrame(
 		Vec<3,T>::pun(m  ),
 		Vec<3,T>::pun(m+4),
@@ -539,7 +542,7 @@ Quat<T>& Quat<T> :: fromMatrix(const T * m) {
 }
 
 template<typename T>
-Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
+Quat<T>& Quat<T>::fromMatrixTransposed(const T * m) {
 	return fromCoordinateFrame(
 		Vec<3,T>(m[0],m[4],m[ 8]),
 		Vec<3,T>(m[1],m[5],m[ 9]),
@@ -548,7 +551,7 @@ Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
 }
 
 template<typename T>
-void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
+void Quat<T>::toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
 	T unit = w*w; // cos^2(theta/2)
 	if(unit < accuracyMin()){ // |cos x| must always be less than or equal to 1!
 		T invSinAngle = 1./std::sqrt(1. - unit); // = 1/sqrt(1 - cos^2(theta/2))
@@ -578,7 +581,7 @@ void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
 }
 
 template<typename T>
-inline void Quat<T> :: toEuler(T& az, T& el, T& ba) const {
+inline void Quat<T>::toEuler(T& az, T& el, T& ba) const {
 	/* Adapted from M. Baker:
 	http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
 	To make these equations work, 'e' had to be flipped in sign. */
@@ -639,7 +642,7 @@ where s=2/|q|^2 for |q|!=0 and s=0 for |q|=0. For a unit quaternion, s=2.
 */
 
 template<typename T>
-inline void Quat<T> :: toVectorX(T& ax, T& ay, T& az) const {
+inline void Quat<T>::toVectorX(T& ax, T& ay, T& az) const {
 	const T s = T(2); // divide by magSqr() to generalize to any quat
 	ax = T(1) - s*(y*y + z*z);
 	ay = s*(x*y + z*w);
@@ -647,7 +650,7 @@ inline void Quat<T> :: toVectorX(T& ax, T& ay, T& az) const {
 }
 
 template<typename T>
-inline void Quat<T> :: toVectorY(T& ax, T& ay, T& az) const {
+inline void Quat<T>::toVectorY(T& ax, T& ay, T& az) const {
 	const T s = T(2); // divide by magSqr() to generalize to any quat
 	ax = s*(x*y - z*w);
 	ay = T(1) - s*(x*x + z*z);
@@ -655,7 +658,7 @@ inline void Quat<T> :: toVectorY(T& ax, T& ay, T& az) const {
 }
 
 template<typename T>
-inline void Quat<T> :: toVectorZ(T& ax, T& ay, T& az) const {
+inline void Quat<T>::toVectorZ(T& ax, T& ay, T& az) const {
 	const T s = T(2); // divide by magSqr() to generalize to any quat
 	ax = s*(x*z + y*w);
 	ay = s*(y*z - x*w);
@@ -686,7 +689,7 @@ void Quat<T>::toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const 
 }
 
 template<typename T>
-void Quat<T> :: toMatrix(T * m) const {
+void Quat<T>::toMatrix(T * m) const {
 	auto& ux = Vec<3,T>::pun(m  );
 	auto& uy = Vec<3,T>::pun(m+4);
 	auto& uz = Vec<3,T>::pun(m+8);
@@ -695,9 +698,16 @@ void Quat<T> :: toMatrix(T * m) const {
 	m[15] = T(1);
 }
 
+template<typename T>
+Mat<4,T> Quat<T>::toMatrix() const {
+	Mat<4,T> m(MAT_NO_INIT);
+	toMatrix(&m[0]);
+	return m;
+}
+
 // Note: same as toMatrix, but with matrix indices transposed
 template<typename T>
-void Quat<T> :: toMatrixTransposed(T * m) const {
+void Quat<T>::toMatrixTransposed(T * m) const {
 	Vec<3,T> ux,uy,uz;
 	toCoordinateFrame(ux,uy,uz);
 
@@ -713,7 +723,7 @@ void Quat<T> :: toMatrixTransposed(T * m) const {
 	Where v is a 'pure quaternion' derived from the vector, i.e. w = 0.
 */
 template<typename T>
-inline Vec<3,T> Quat<T> :: rotate(const Vec<3,T>& v) const {
+inline Vec<3,T> Quat<T>::rotate(const Vec<3,T>& v) const {
 	// dst = ((q * quat(v)) * q^-1)
 	// faster & simpler:
 	// we know quat(v).w == 0
@@ -736,12 +746,12 @@ inline Vec<3,T> Quat<T> :: rotate(const Vec<3,T>& v) const {
 }
 
 template<typename T>
-inline Vec<3,T> Quat<T> :: rotateTransposed(const Vec<3,T>& v) const {
+inline Vec<3,T> Quat<T>::rotateTransposed(const Vec<3,T>& v) const {
 	return Quat(*this).conj().rotate(v);
 }
 
 template<typename T>
-Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
+Quat<T> Quat<T>::slerp(const Quat& input, const Quat& target, T amt){
 	Quat<T> result;
 
 	if (amt==T(0)) {
@@ -750,28 +760,23 @@ Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 		return target;
 	}
 
-	int bflip = 0;
+	T bflip = 1.;
 	T dot_prod = input.dot(target);
-	T a, b;
-
 	//clamp
 	dot_prod = (dot_prod < -1) ? -1 : ((dot_prod > 1) ? 1 : dot_prod);
 
 	// if B is on opposite hemisphere from A, use -B instead
 	if (dot_prod < 0.0) {
 		dot_prod = -dot_prod;
-		bflip = 1;
+		bflip = -1.;
 	}
 
-	T cos_angle = std::acos(dot_prod);
-	if(std::abs(cos_angle) > eps()) {
-		T sine = std::sin(cos_angle);
-		T inv_sine = 1./sine;
-
-		a = std::sin(cos_angle*(1.-amt)) * inv_sine;
-		b = std::sin(cos_angle*amt) * inv_sine;
-
-		if (bflip) { b = -b; }
+	T a, b;
+	T angle = std::acos(dot_prod);
+	if(std::abs(angle) > eps()) {
+		T inv_sine = 1./std::sin(angle);
+		a = std::sin(angle*(1.-amt)) * inv_sine;
+		b = std::sin(angle*    amt ) * inv_sine * bflip;
 	} else {
 		// nearly the same;
 		// approximate without trigonometry
@@ -789,35 +794,28 @@ Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 }
 
 template<typename T>
-void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buffer, int numFrames){
+void Quat<T>::slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buffer, int numFrames){
 
 
-	/// Sinusoidal generator based on recursive formula x0 = c x1 - x2
+	// Sinusoidal generator based on recursive formula x0 = c x1 - x2
 	struct RSin {
-
-		/// Constructor
-		RSin(const T& frq=T(0), const T& phs=T(0), const T& amp=T(1))
-		:	val2(0), mul(0){
-			T f=frq, p=phs;
-			mul  = (T)2 * (T)std::cos(f);
-			val2 = (T)std::sin(p - f * T(2))*amp;
-			val  = (T)std::sin(p - f       )*amp;
+		RSin(const T& frq=T(0), const T& phs=T(0), const T& amp=T(1)){
+			mul  = (T)2 * (T)std::cos(frq);
+			val2 = (T)std::sin(phs - frq * T(2))*amp;
+			val  = (T)std::sin(phs - frq       )*amp;
 		}
 
-		/// Generate next value.
-		T operator()() const {
+		T operator()(){
 			T v0 = mul * val - val2;
 			val2 = val;
 			return val = v0;
 		}
 
-		mutable T val;
-		mutable T val2;
-		T mul;			///< Multiplication factor. [-2, 2] range gives stable sinusoids.
+		T val, val2, mul;
 	};
 
 
-	int bflip = 1;
+	T bflip = 1.;
 	T dot_prod = input.dot(target);
 
 	//clamp
@@ -826,18 +824,17 @@ void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buf
 	// if B is on opposite hemisphere from A, use -B instead
 	if (dot_prod < 0.0) {
 		dot_prod = -dot_prod;
-		bflip = -1;
+		bflip = -1.;
 	}
 
-	const T cos_angle = std::acos(dot_prod);
+	const T angle = std::acos(dot_prod);
 	const T inv_frames = 1./((T)numFrames);
 
-	if(std::abs(cos_angle) > eps())
+	if(std::abs(angle) > eps())
 	{
-		const T sine = std::sin(cos_angle);
-		const T inv_sine = 1./sine;
-		RSin sinA(-cos_angle*inv_frames, cos_angle, inv_sine);
-		RSin sinB(cos_angle*inv_frames, 0, inv_sine * bflip);
+		const T inv_sine = 1./std::sin(angle);
+		RSin sinA(-angle*inv_frames, angle, inv_sine);
+		RSin sinB( angle*inv_frames, 0, inv_sine * bflip);
 
 		for (int i=0; i<numFrames; i++) {
 			//T amt = i*inv_frames;
@@ -865,7 +862,7 @@ void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buf
 }
 
 template<typename T>
-Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
+Quat<T> Quat<T>::getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 	// a . b = |a| |b| cos t
 	// Since |a| = |b| = 1, then
 	// a . b = cos t
@@ -913,7 +910,7 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 
 
 template<typename T>
-Quat<T> Quat<T> :: getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T>& up) {
+Quat<T> Quat<T>::getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T>& up) {
 
 	auto vector = forward;
 	auto vector2 = cross(up, vector).normalize();
@@ -970,7 +967,7 @@ Quat<T> Quat<T> :: getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T
 	Get the quaternion from a given point and quaterion toward another point
 */
 template<typename T>
-void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T>& v, float amt) {
+void Quat<T>::towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T>& v, float amt) {
 	Vec<3,T> diff, axis;
 	diff = v-pos;
 	diff.normalize();
@@ -1016,7 +1013,7 @@ void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T
 // v1 and v2 must be normalized
 // alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a)))
 template<typename T>
-Quat<T> Quat<T> :: rotor(const Vec<3,T>& v1, const Vec<3,T>& v2) {
+Quat<T> Quat<T>::rotor(const Vec<3,T>& v1, const Vec<3,T>& v2) {
 	// get the normal to the plane (i.e. the unit bivector containing the v1 and v2)
 	auto n = cross(v1, v2);
 	n.normalize();	// normalize because the cross product can get slightly denormalized
