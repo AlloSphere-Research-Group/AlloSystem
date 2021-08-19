@@ -141,9 +141,7 @@ public:
 	/// Get world space unit vectors
 	template <class T>
 	void unitVectors(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {
-		mQuat.toVectorX(ux);
-		mQuat.toVectorY(uy);
-		mQuat.toVectorZ(uz);
+		mQuat.toCoordinateFrame(ux, uy, uz);
 	}
 
 	/// Get local right, up, and forward unit vectors
@@ -419,13 +417,6 @@ protected:
 	double mPullBack0, mPullBack1;
 	Pose mTransformed;
 };
-
-
-
-
-// Implementation --------------------------------------------------------------
-
-
 
 } // al::
 

@@ -12,9 +12,8 @@ Pose::Pose(const Pose& p){
 
 void Pose::faceToward(const Vec3d& point, double amt){
 
-	Vec3d target(point - pos());
-	target.normalize();
-	Quatd rot = Quatd::getRotationTo(uf(), target);
+	auto target = (point - pos()).normalize();
+	auto rot = Quatd::getRotationTo(uf(), target);
 
 	// We must pre-multiply the Pose quaternion with our rotation since
 	// it was computed in world space.
@@ -37,24 +36,20 @@ void Pose::faceToward(const Vec3d& point, double amt){
 }
 
 void Pose::faceToward(const Vec3d& point, const Vec3d& up, double amt){
-	Vec3d target(point - pos());
-	target.normalize();
-  Quatd rot = Quatd::getBillboardRotation(-target, up);
-  quat().slerpTo(rot,amt);
+	auto target = (point - pos()).normalize(-1);
+	auto rot = Quatd::getBillboardRotation(target, up);
+	quat().slerpTo(rot, amt);
 }
 
 Mat4d Pose::matrix() const {
-	Mat4d m;
-	quat().toMatrix(&m[0]);
-	m.set(&vec()[0], 3, 12);
+	auto m = quat().toMatrix();
+	m.col<3>().xyz() = vec();
 	return m;
 }
 
 Mat4d Pose::directionMatrix() const {
-	Mat4d m = matrix();
-	m(0,2) = -m(0,2);
-	m(1,2) = -m(1,2);
-	m(2,2) = -m(2,2);
+	auto m = matrix();
+	m.col<2>().xyz().negate(); // flip forward vector
 	return m;
 }
 
@@ -67,22 +62,19 @@ Pose Pose::lerp(const Pose& target, double amt) const {
 
 void Pose::toAED(const Vec3d& to, double& az, double& el, double& dist) const {
 
-	Vec3d rel = to - vec();
+	auto rel = to - vec();
 	dist = rel.mag();
 
-	if(dist > quat().eps()*2){
+	if(dist > quat().eps()*2.){
 		rel.normalize();
 
 		Vec3d ux, uy, uz;
-
-		quat().toVectorX(ux);
-		quat().toVectorY(uy);
-		quat().toVectorZ(uz);
+		quat().toCoordinateFrame(ux, uy, uz);
 
 		// dot product of A & B vectors is the similarity or cosine:
-		double xness = rel.dot(ux);
-		double yness = rel.dot(uy);
-		double zness = rel.dot(uz);
+		auto xness = rel.dot(ux);
+		auto yness = rel.dot(uy);
+		auto zness = rel.dot(uz);
 
 		az = -atan2(xness, zness);
 		el = asin(yness);
