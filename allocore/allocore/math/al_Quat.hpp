@@ -1033,6 +1033,12 @@ void Quat<T>::print(FILE * out) const {
 	fprintf(out, "Quat(% f, % f, % f, % f)\n", w, x, y, z);
 }
 
+/// Get vector rotated by quat
+template <class T, class U>
+inline Vec<3,U> operator * (const Quat<T>& q, const Vec<3,U>& v){
+	return q.rotate(v);
+}
+
 } // namespace
 
 #endif /* include guard */
