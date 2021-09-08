@@ -670,7 +670,7 @@ std::string File::extension(const std::string& path){
 
 std::string File::replaceExtension(const std::string& path, const std::string& ext){
 	if(ext.empty()){
-		return path.substr(path.find_last_of("."));
+		return path.substr(0, path.find_last_of("."));
 	}
 	auto e = ext;
 	if('.' != e[0]) e = '.' + e;
