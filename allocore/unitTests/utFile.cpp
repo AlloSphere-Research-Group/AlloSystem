@@ -39,6 +39,26 @@ int utFile() {
 		== ".." DELIM ".." DELIM
 	);
 
+	assert(File::baseName("/usr/local/") == "");
+	assert(File::baseName("/usr/local/foo") == "foo");
+	assert(File::baseName("/usr/local/foo.txt", ".txt") == "foo");
+	assert(File::baseName("/usr/local/foo.txt", ".*") == "foo");
+
+	assert(File::directory("/") == "/");
+	assert(File::directory("/usr/local/") == "/usr/local/");
+	assert(File::directory("/usr/local/foo") == "/usr/local/");
+	assert(File::directory("/usr/local/foo.txt") == "/usr/local/");
+
+	assert(File::extension("/usr/foo.txt") == ".txt");
+	assert(File::extension("/usr/foo.png.csv") == ".csv");
+	assert(File::extension("/usr/foo") == "");
+	assert(File::extension("/usr/foo/") == "");
+
+	assert(File::replaceExtension("/usr/foo.txt", ".ini") == "/usr/foo.ini");
+	assert(File::replaceExtension("/usr/foo.txt", "ini") == "/usr/foo.ini");
+	assert(File::replaceExtension("/usr/foo.txt", "") == "/usr/foo");
+	assert(File::replaceExtension("/usr/foo.txt", ".") == "/usr/foo.");
+
 	// simple file/directory searching
 	{
 		std::string dir;
