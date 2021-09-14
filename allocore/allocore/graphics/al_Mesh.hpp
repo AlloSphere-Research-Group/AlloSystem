@@ -133,6 +133,8 @@ public:
 	/// Scales and translates vertices to lie in cube
 	Mesh& fitToCube(float radius=1, bool proportional=true);
 
+	Mesh& fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius=1, bool proportional=true);
+
 	/// Scales and translates vertices to lie in cube with extrema [-1,1]
 	Mesh& unitize(bool proportional=true);
 

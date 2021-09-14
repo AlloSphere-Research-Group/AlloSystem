@@ -678,25 +678,27 @@ Mesh& Mesh::fitToSphere(float radius){
 	return *this;
 }
 
-Mesh& Mesh::fitToCube(float radius, bool proportional){
+Mesh& Mesh::fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius, bool proportional){
 	Vertex min(0), max(0);
 	getBounds(min, max);
 	// span of each axis:
 	auto span = max-min;	// positive only
 	// center of each axis:
-	auto mid = min + (span * 0.5);
+	center = min + (span * 0.5);
 	// axis scalar:
-	auto scale = (2.f*radius)/span; // positive only
+	scale = (2.f*radius)/span; // positive only
 
 	// adjust to use scale of largest axis:
-	if (proportional) {
+	if(proportional){
 		scale = al::min(scale.x, scale.y, scale.z);
 	}
+	return *this;
+}
 
-	for (auto& v : mVertices) {
-		v = (v-mid)*scale;
-	}
-
+Mesh& Mesh::fitToCube(float radius, bool proportional){
+	Vec3f center, scale;
+	fitToCubeTransform(center, scale, radius, proportional);
+	for(auto& v : mVertices) v = (v-center)*scale;
 	return *this;
 }
 
