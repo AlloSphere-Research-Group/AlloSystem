@@ -145,7 +145,7 @@ public:
 
 	/// This must be called if any of the corners change value.
 	///	The plane normals are computed assuming a right-hand coordinate system.
-	void computePlanes();
+	Frustum& computePlanes();
 
 private:
 	template <class Tf, class Tv>
@@ -164,8 +164,7 @@ Frustum<T>& Frustum<T>::fromCorners(const Vec * corners){
 			corner(i)[k] = corners[i][k];
 		}
 	}
-	computePlanes();
-	return *this;
+	return computePlanes();
 }
 
 template <class T>
@@ -175,12 +174,11 @@ Frustum<T>& Frustum<T>::fromInverseMVP(const Mat4& invMVP){
 		{-1.f, 1.f,-1.f, 1.f}, { 1.f, 1.f,-1.f, 1.f}, {-1.f,-1.f,-1.f, 1.f}, { 1.f,-1.f,-1.f, 1.f},
 		{-1.f, 1.f, 1.f, 1.f}, { 1.f, 1.f, 1.f, 1.f}, {-1.f,-1.f, 1.f, 1.f}, { 1.f,-1.f, 1.f, 1.f}
 	};
-	Vec<3,T> corners[8];
 	for(unsigned i=0; i<8; ++i){
 		auto c = invMVP * bb[i];
-		corners[i] = sub<3>(c) / c.w;
+		corner(i) = c.xyz() / c.w;
 	}
-	return fromCorners(corners);
+	return computePlanes();
 }
 
 template <class T>
@@ -200,13 +198,14 @@ void Frustum<T>::boundingBox(Vec3& xyz, Vec3& dim) const {
 }
 
 template <class T>
-void Frustum<T>::computePlanes(){
+Frustum<T>& Frustum<T>::computePlanes(){
 	pl[TOP   ].from3Points(ntr,ntl,ftl);
 	pl[BOTTOM].from3Points(nbl,nbr,fbr);
 	pl[LEFT  ].from3Points(ntl,nbl,fbl);
 	pl[RIGHT ].from3Points(nbr,ntr,fbr);
 	pl[NEARP ].from3Points(ntl,ntr,nbr);
 	pl[FARP  ].from3Points(ftr,ftl,fbl);
+	return *this;
 }
 
 template <class T>
