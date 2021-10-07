@@ -59,9 +59,9 @@ public:
 
 	virtual ~NavInputControl(){}
 
-	virtual bool onKeyDown(const Keyboard& k);
-	virtual bool onKeyUp(const Keyboard& k);
-	virtual bool onMouseDrag(const Mouse& m);
+	virtual bool onKeyDown(const Keyboard& k) override;
+	virtual bool onKeyUp(const Keyboard& k) override;
+	virtual bool onMouseDrag(const Mouse& m) override;
 
 	Nav& nav(){ return *mNav; }
 	const Nav& nav() const { return *mNav; }
@@ -72,7 +72,10 @@ public:
 	float mouseSens() const { return mMouseSens; }
 
 	/// Whether to use mouse control
-	void useMouse(bool use){ mUseMouse = use; }
+	NavInputControl& useMouse(bool use){ mUseMouse = use; return *this; }
+
+	/// Whether to use mouse control
+	NavInputControl& useKeyboard(bool use){ mUseKeyboard = use; return *this; }
 
 	NavInputControl& vscale(float v) { mVScale=v; return *this; }
 	float vscale() const { return mVScale; }
@@ -83,19 +86,16 @@ public:
 protected:
 	Nav * mNav;
 	float mVScale, mTScale, mMouseSens;
-	bool mUseMouse;
+	bool mUseMouse = true;
+	bool mUseKeyboard = true;
 };
 
 
 class NavInputControlCosm : public NavInputControl {
 public:
-	NavInputControlCosm(Nav& nav, double vscale = 0.125, double tscale = 2.);
-
-	virtual ~NavInputControlCosm() {}
-
-	virtual bool onKeyDown(const Keyboard& k);
-	virtual bool onKeyUp(const Keyboard& k);
-	virtual bool onMouseDrag(const Mouse& m);
+	virtual bool onKeyDown(const Keyboard& k) override;
+	virtual bool onKeyUp(const Keyboard& k) override;
+	virtual bool onMouseDrag(const Mouse& m) override;
 };
 
 } // al::
