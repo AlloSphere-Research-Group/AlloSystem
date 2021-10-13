@@ -35,7 +35,7 @@
 
 
 	File description:
-	Zip file reader
+	Zip file reader/writer
 
 	File author(s):
 	Lance Putnam, 2021, putnam.lance@gmail.com
@@ -81,6 +81,43 @@ private:
 	Impl * mImpl;
 
 	std::vector<std::string> mFilePaths;
+};
+
+
+class ZipWriter {
+public:
+
+	ZipWriter();
+	~ZipWriter();
+
+	/// Open archive file
+	bool open(const std::string& path);
+
+	/// Finalize and close the archive
+	void close();
+
+	/// Add file to archive
+
+	/// @param[in] filePath		Path of file on disk
+	/// @param[in] zipPath		Destination file path in archive
+	bool addFile(const std::string& filePath, const std::string& zipPath="");
+
+	/// Add directory to archive
+	bool addDir(const std::string& zipDir);
+
+	/// Add memory buffer to archive
+	bool addMem(const void * buf, int bytes, const std::string& zipPath="");
+
+	/// Set compression level, in 0-10
+
+	/// A value of 0 means no compression (fastest), a value of 10 means max 
+	/// compression (slowest) and a value of -1 means default compression.
+	ZipWriter& compression(int level = -1);
+
+private:
+	class Impl;
+	Impl * mImpl;
+	int mCompression = -1;
 };
 
 } // al::

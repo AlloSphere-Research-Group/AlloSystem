@@ -16,8 +16,7 @@ struct ZipReader::Impl{
 	}
 };
 
-ZipReader::ZipReader(){
-	mImpl = new Impl;
+ZipReader::ZipReader(): mImpl(new Impl){
 }
 
 ZipReader::~ZipReader(){
@@ -62,6 +61,55 @@ bool ZipReader::extract(
 ){
 	ZipReader zip;
 	return zip.open(zipPath) && zip.extract(fileName, onData);
+}
+
+
+
+
+struct ZipWriter::Impl{
+	mz_zip_archive zip;
+
+	Impl(){
+		mz_zip_zero_struct(&zip);
+	}
+
+	~Impl(){
+	}
+};
+
+
+ZipWriter::ZipWriter(): mImpl(new Impl){
+}
+
+ZipWriter::~ZipWriter(){
+	close();
+	delete mImpl;
+}
+
+bool ZipWriter::open(const std::string& path){
+	return mz_zip_writer_init_file(&mImpl->zip, path.c_str(), 0);
+}
+
+void ZipWriter::close(){
+	mz_zip_writer_finalize_archive(&mImpl->zip);
+	mz_zip_writer_end(&mImpl->zip);
+}
+
+ZipWriter& ZipWriter::compression(int level){
+	mCompression = level;
+	return *this;
+}
+
+bool ZipWriter::addFile(const std::string& filePath, const std::string& zipPath){
+	return mz_zip_writer_add_file(&mImpl->zip, zipPath.c_str(), filePath.c_str(), "",0, mCompression);
+}
+
+bool ZipWriter::addDir(const std::string& dirPath){
+	return mz_zip_writer_add_mem(&mImpl->zip, dirPath.c_str(), nullptr, 0, 0);
+}
+
+bool ZipWriter::addMem(const void * buf, int bytes, const std::string& zipPath){
+	return mz_zip_writer_add_mem(&mImpl->zip, zipPath.c_str(), buf, bytes, mCompression);
 }
 
 } // al::
