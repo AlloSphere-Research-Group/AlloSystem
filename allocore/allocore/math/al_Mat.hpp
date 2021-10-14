@@ -346,6 +346,13 @@ public:
 		return res;
 	}
 
+	/// Returns inverse of matrix
+	Mat<N,T> inverse() const {
+		auto inv = *this;
+		invert(inv);
+		return inv;
+	}
+
 	/// Return matrix punned as a vector
 	Vec<N*N,T>& vec(){ return *(Vec<N*N,T>*)(this); }
 

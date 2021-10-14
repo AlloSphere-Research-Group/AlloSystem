@@ -11,7 +11,7 @@ Stereoscopic::Stereoscopic()
 {}
 
 Vec3d Stereoscopic::unproject(const Vec3d& screenPos) const {
-	auto invprojview = Matrix4d::inverse(modelViewProjection());
+	auto invprojview = modelViewProjection().inverse();
 	auto worldPos4 = invprojview * Vec4d(screenPos, 1.);
 	return worldPos4.xyz() / worldPos4.w;
 }

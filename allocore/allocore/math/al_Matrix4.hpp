@@ -377,12 +377,6 @@ public:
 	static Matrix4 lookAtOffAxis(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeShift){
 		return lookAt(ux, uy, uz, pos + (ux * eyeShift));
 	}
-	/// \deprecated Use al::invert
-	static Matrix4 inverse(const Mat<4,T>& m) {
-		Matrix4 res(m);
-		invert(res);
-		return res;
-	}
 };
 
 
