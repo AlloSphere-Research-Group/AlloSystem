@@ -55,6 +55,7 @@ class Plane{
 public:
 
 	typedef al::Vec<3,T> Vec3;
+	typedef al::Vec<4,T> Vec4;
 
 	Plane(): mNormal(1,0,0), mD(0){}
 	Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3);
@@ -64,6 +65,9 @@ public:
 
 	/// Get scalar component of plane equation
 	T d() const { return mD; }
+
+	/// Get plane as 4-vector (Nx, Ny, Nz, d)
+	Vec4 vec() const { return {mNormal, mD}; }
 
 	/// Returns distance from plane to point (measured relative to plane normal)
 	T distance(const Vec3& p) const { return (mD + mNormal.dot(p)); }
