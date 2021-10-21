@@ -63,18 +63,6 @@ public:
 	static void notify(std::string resourcename, std::string eventname);
 };
 
-
 } //al::
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
