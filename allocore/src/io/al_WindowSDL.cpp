@@ -261,12 +261,14 @@ private:
 	void onFrame(){
 		mWindow->updateFrameTime(); // Compute actual frame interval
 		handleEvents();
-		mWindow->callHandlersOnFrame();
-		const char * err = glGetErrorString();
-		if(err[0]){
-			AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", ID(), err);
+		if(created()){
+			mWindow->callHandlersOnFrame();
+			const char * err = glGetErrorString();
+			if(err[0]){
+				AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", ID(), err);
+			}
+			SDL_GL_SwapWindow(mSDLWindow);
 		}
-		SDL_GL_SwapWindow(mSDLWindow);
 	}
 
 

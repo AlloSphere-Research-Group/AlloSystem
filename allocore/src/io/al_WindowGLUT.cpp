@@ -459,8 +459,8 @@ public:
 		if (!mScheduled) {
 			mScheduled = true;
 			//printf("window id: %d\n", id());
-			Main::get().queue().send(0, scheduleDrawStatic, id());
-			//scheduleDrawStaticGLUT(id());
+			//Main::get().queue().send(0, scheduleDrawStatic, id());
+			scheduleDrawStaticGLUT(id());
 		}
 	}
 
@@ -471,14 +471,16 @@ private:
 		const int winID = id();
 		const int current = glutGetWindow();
 		if(winID != current) glutSetWindow(winID);
-		mWindow->callHandlersOnFrame();
-		//auto& mouse = mWindow->mMouse;
-		//mouse.position(mouse.x(), mouse.y()); // zeros dx, dy
-		const char * err = glGetErrorString();
-		if(err[0]){
-			AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", winID, err);
+		if(created()){
+			mWindow->callHandlersOnFrame();
+			//auto& mouse = mWindow->mMouse;
+			//mouse.position(mouse.x(), mouse.y()); // zeros dx, dy
+			const char * err = glGetErrorString();
+			if(err[0]){
+				AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", winID, err);
+			}
+			glutSwapBuffers();
 		}
-		glutSwapBuffers();
 	}
 
 
