@@ -137,6 +137,10 @@ private:
 			case SDL_WINDOWEVENT:
 				if(ev.window.windowID == ID()){
 					switch(ev.window.event){
+					case SDL_WINDOWEVENT_CLOSE:
+						win->destroyAll();
+						Main::get().stop();
+						return;
 					case SDL_WINDOWEVENT_SHOWN:
 						//printf("Window %d shown\n", ID());
 						win->mVisible = true;
