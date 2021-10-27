@@ -459,8 +459,11 @@ public:
 		if (!mScheduled) {
 			mScheduled = true;
 			//printf("window id: %d\n", id());
-			Main::get().queue().send(0, scheduleDrawStatic, id());
-			//scheduleDrawStaticGLUT(id());
+			// Adding to Main queue rather than firing immediately since the
+			// main loop needs to be started first.
+			Main::get().queue().send<int>(0, [](al_sec t, int winID){
+				scheduleDrawStatic(winID);
+			}, id());
 		}
 	}
 
@@ -483,18 +486,7 @@ private:
 		}
 	}
 
-
-	// schedule draws of a specific window
-	static void scheduleDrawStatic(al_sec t, int winID) {
-		/* Note: This function used to use the Main scheduler queue, however,
-		the Main scheduler uses a fixed-interval polling mechanism with too
-		course of a timing granularity to obtain a precise enough frame rate
-		for smooth animation. Instead, we call glutTimerFunc directly using an
-		estimated delta time. */
-		scheduleDrawStaticGLUT(winID);
-	}
-
-	static void scheduleDrawStaticGLUT(int winID){
+	static void scheduleDrawStatic(int winID){
 
 		WindowImpl *impl = getWindowImpl(winID);
 
@@ -543,7 +535,7 @@ private:
 						// Passing 0 ms wait to glutTimerFunc may cause lockup on Windows
 						if(0==waitMsec) waitMsec=1;
 					#endif
-					glutTimerFunc(waitMsec, scheduleDrawStaticGLUT, winID);
+					glutTimerFunc(waitMsec, scheduleDrawStatic, winID);
 				}
 				else {
 					impl->mScheduled = false;
