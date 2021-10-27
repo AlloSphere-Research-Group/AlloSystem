@@ -459,8 +459,8 @@ public:
 		if (!mScheduled) {
 			mScheduled = true;
 			//printf("window id: %d\n", id());
-			//Main::get().queue().send(0, scheduleDrawStatic, id());
-			scheduleDrawStaticGLUT(id());
+			Main::get().queue().send(0, scheduleDrawStatic, id());
+			//scheduleDrawStaticGLUT(id());
 		}
 	}
 
