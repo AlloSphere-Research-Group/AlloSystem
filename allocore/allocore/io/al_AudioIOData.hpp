@@ -207,14 +207,7 @@ public:
 	float mGain, mGainPrev;
 };
 
-/// Interface for objects which can be registered with an audio IO stream
-///
-/// @ingroup allocore
-class AudioCallback {
-public:
-	virtual ~AudioCallback() {}
-	virtual void onAudioCB(AudioIOData& io) = 0;  ///< Callback
-};
+
 
 //==============================================================================
 inline float& AudioIOData::bus(int c, int f) const {

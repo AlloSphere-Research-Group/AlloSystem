@@ -1028,13 +1028,24 @@ void AudioDevice::setImpl(int deviceNum) {
 
 //==============================================================================
 
+AudioIO::AudioIO(
+	int framesPerBuf, double framesPerSec,
+	AudioCallback callback, void *userData,
+	int outChans, int inChans
+)
+:	AudioIOData(nullptr)
+{
+	mBackend = std::make_shared<AudioBackend>();
+	init(framesPerBuf, framesPerSec, callback, userData, outChans, inChans);
+}
+
 AudioIO::~AudioIO(){
 	close();
 }
 
 void AudioIO::init(
 	int framesPerBuf, double framesPerSec,
-	audioCallback callbackA, void * userData,
+	AudioCallback callbackA, void * userData,
 	int outChansA, int inChansA
 ){
 	callback = callbackA;
@@ -1049,7 +1060,7 @@ void AudioIO::init(
 }
 
 void AudioIO::initWithDefaults(
-	audioCallback callbackA, void * userData,
+	AudioCallback callbackA, void * userData,
 	bool use_out, bool use_in,
 	int framesPerBuffer  // default 256
 ){
@@ -1091,43 +1102,23 @@ void AudioIO::initWithDefaults(
 	     out_channels, in_channels);
 }
 
-AudioIO &AudioIO::append(AudioCallback &v) {
-	mAudioCallbacks.push_back(&v);
+AudioIO& AudioIO::append(AudioCallback v){
+	mAudioCallbacks.push_back(v);
 	return *this;
 }
 
-AudioIO &AudioIO::prepend(AudioCallback &v) {
-	mAudioCallbacks.insert(mAudioCallbacks.begin(), &v);
+AudioIO& AudioIO::prepend(AudioCallback v){
+	mAudioCallbacks.insert(mAudioCallbacks.begin(), v);
 	return *this;
 }
 
-AudioIO &AudioIO::insertBefore(AudioCallback &v) {
-	std::vector<AudioCallback *>::iterator pos =
-	        std::find(mAudioCallbacks.begin(), mAudioCallbacks.end(), &v);
-	if (pos == mAudioCallbacks.begin()) {
-		prepend(v);
-	} else {
-		mAudioCallbacks.insert(--pos, 1, &v);
+AudioIO& AudioIO::remove(AudioCallback v){
+	for(auto it = mAudioCallbacks.begin(); it != mAudioCallbacks.end(); ++it){
+		if(it->target_type() == v.target_type()){
+			mAudioCallbacks.erase(it);
+			break;
+		}
 	}
-	return *this;
-}
-
-AudioIO &AudioIO::insertAfter(AudioCallback &v) {
-	std::vector<AudioCallback *>::iterator pos =
-	        std::find(mAudioCallbacks.begin(), mAudioCallbacks.end(), &v);
-	if (pos == mAudioCallbacks.end()) {
-		append(v);
-	} else {
-		mAudioCallbacks.insert(pos, 1, &v);
-	}
-	return *this;
-}
-
-AudioIO &AudioIO::remove(AudioCallback &v) {
-	// the proper way to do it:
-	mAudioCallbacks.erase(
-	            std::remove(mAudioCallbacks.begin(), mAudioCallbacks.end(), &v),
-	            mAudioCallbacks.end());
 	return *this;
 }
 
@@ -1298,9 +1289,9 @@ void AudioIO::processAudio() {
 	frame(0);
 	if(callback != nullptr) callback(*this);
 
-	for(auto * cb : mAudioCallbacks){
+	for(auto& cb : mAudioCallbacks){
 		frame(0);
-		cb->onAudioCB(*this);
+		cb(*this);
 	}
 
 	// Apply smoothly-ramped gain to all output channels
