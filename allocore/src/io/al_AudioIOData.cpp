@@ -25,13 +25,13 @@ int AudioDeviceInfo::channelsInMax() const { return mChannelsInMax; }
 int AudioDeviceInfo::channelsOutMax() const { return mChannelsOutMax; }
 double AudioDeviceInfo::defaultSampleRate() const { return mDefaultSampleRate; }
 
-void AudioDeviceInfo::setName(const std::string& name) {
+void AudioDeviceInfo::setName(const std::string& name){
 	mName = name;
 }
-void AudioDeviceInfo::setID(int iD) { mID = iD; }
-void AudioDeviceInfo::setChannelsInMax(int num) { mChannelsInMax = num; }
-void AudioDeviceInfo::setChannelsOutMax(int num) { mChannelsOutMax = num; }
-void AudioDeviceInfo::setDefaultSampleRate(double rate) {
+void AudioDeviceInfo::setID(int iD){ mID = iD; }
+void AudioDeviceInfo::setChannelsInMax(int num){ mChannelsInMax = num; }
+void AudioDeviceInfo::setChannelsOutMax(int num){ mChannelsOutMax = num; }
+void AudioDeviceInfo::setDefaultSampleRate(double rate){
 	mDefaultSampleRate = rate;
 }
 
@@ -40,17 +40,17 @@ void AudioDeviceInfo::setDefaultSampleRate(double rate) {
 AudioIOData::AudioIOData(void *userData)
     : mUser(userData), mFrame(0), mFramesPerBuffer(0), mFramesPerSecond(0),
       mBufI(nullptr), mBufO(nullptr), mBufB(nullptr), mBufT(nullptr), mNumI(0),
-      mNumO(0), mNumB(0), mGain(1), mGainPrev(1) {}
+      mNumO(0), mNumB(0), mGain(1), mGainPrev(1){}
 
-AudioIOData::~AudioIOData() {
+AudioIOData::~AudioIOData(){
 	deleteBuf(mBufI);
 	deleteBuf(mBufO);
 	deleteBuf(mBufB);
 	deleteBuf(mBufT);
 }
 
-void AudioIOData::zeroBus() { zero(mBufB, framesPerBuffer() * mNumB); }
-void AudioIOData::zeroOut() { zero(mBufO, channelsOut() * framesPerBuffer()); }
+void AudioIOData::zeroBus(){ zero(mBufB, framesPerBuffer() * mNumB); }
+void AudioIOData::zeroOut(){ zero(mBufO, channelsOut() * framesPerBuffer()); }
 
 int AudioIOData::channelsIn() const { return mNumI; }
 int AudioIOData::channelsOut() const { return mNumO; }

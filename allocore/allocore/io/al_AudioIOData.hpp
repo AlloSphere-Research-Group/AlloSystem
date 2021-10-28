@@ -70,7 +70,7 @@ public:
 	//	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream =
 	// StreamMode(INPUT | OUTPUT)) : mID(-1) {}
 
-	virtual ~AudioDeviceInfo() {}
+	virtual ~AudioDeviceInfo(){}
 
 	virtual bool valid() const;					///< Returns whether device is valid
 	virtual int id() const;						///< Get device unique ID
@@ -182,27 +182,27 @@ public:
 	double fps() const { return framesPerSecond(); }
 	double secondsPerBuffer() const;  ///< Get seconds/buffer of audio I/O stream
 
-	void user(void* v) { mUser = v; }      ///< Set user data
-	void frame(int v) { mFrame = v - 1; }  ///< Set frame count for next iteration
+	void user(void* v){ mUser = v; }      ///< Set user data
+	void frame(int v){ mFrame = v - 1; }  ///< Set frame count for next iteration
 	void zeroBus();                        ///< Zeros all the bus buffers
 	void zeroOut();  ///< Zeros all the internal output buffers
 
-	AudioIOData& gain(float v) {
+	AudioIOData& gain(float v){
 		mGain = v;
 		return *this;
 	}
 	bool usingGain() const { return mGain != 1.f || mGainPrev != 1.f; }
 
 protected:
-	void* mUser;  // User specified data
+	void * mUser;  // User specified data
 	mutable int mFrame;
 	int mFramesPerBuffer;
 	double mFramesPerSecond;
-	float *mBufI, *mBufO, *mBufB;  // input, output, and aux buffers
-	float* mBufT;                  // temporary one channel buffer
-	int mNumI, mNumO, mNumB;       // input, output, and aux channels
+	float * mBufI, * mBufO, * mBufB;	// input, output, and aux buffers
+	float * mBufT;						// temporary one channel buffer
+	int mNumI, mNumO, mNumB;			// input, output, and aux channels
 private:
-	void operator=(const AudioIOData&);  // Disallow copy
+	void operator=(const AudioIOData&);	// disallow copy
 public:
 	float mGain, mGainPrev;
 };
