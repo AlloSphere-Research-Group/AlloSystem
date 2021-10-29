@@ -16,6 +16,7 @@ ThreadPool::ThreadPool(int numThreads){
 				{
 					std::unique_lock<std::mutex> lock(mTasksMutex);
 					mCondition.wait(lock, [this](){
+						// block until something in queue or terminate called
 						return !mTasks.empty() || mTerminate;
 					});
 					if(mTerminate && mTasks.empty()) return; // exit condition
