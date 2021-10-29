@@ -54,7 +54,7 @@ namespace al{
 /// Renders sound and/or graphics to disk
 ///
 /// @ingroup allocore
-class RenderToDisk : public AudioCallback, public WindowEventHandler{
+class RenderToDisk : public WindowEventHandler{
 public:
 
 	/// Rendering modes
@@ -210,6 +210,7 @@ private:
 	int mImagePaletteSize = -1;
 
 	al::AudioIO * mAudioIO = NULL;
+	AudioCallback mAudioCB;
 	//std::vector<char> mAudioBuf;
 	AudioRing mAudioRing;
 	std::ofstream mSoundFile;
@@ -218,7 +219,6 @@ private:
 	bool mActive = false;
 	bool mWroteImages = false, mWroteAudio = false;
 
-	virtual void onAudioCB(AudioIOData& io);
 	virtual bool onFrame();
 	void makePath();
 	bool start(al::AudioIO * aio, al::Window * win, double fps=-1);

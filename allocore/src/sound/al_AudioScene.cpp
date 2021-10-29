@@ -1,7 +1,6 @@
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/math/al_Constants.hpp"
-
-
+#include <cassert>
 #include <iostream>
 
 namespace al{
