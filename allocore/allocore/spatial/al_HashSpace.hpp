@@ -54,6 +54,7 @@
 	http://nicolas.brodu.numerimoire.net/common/recherche/publications/QuerySphereIndexing.pdf
 */
 
+#include <cmath> // fmod
 #include <cstdint>
 #include <vector>
 #include "allocore/math/al_Vec.hpp"
@@ -271,6 +272,16 @@ protected:
 		return x*x+y*y+z*z;
 	}
 
+	// safe floating-point wrapping
+	static double wrap(double x, double mod){
+		if(0. <= x && x < mod) return x; // short circuit mod calc
+		//return x - (long(x/mod) - long(x<0.)); // nah, just use fmod...
+		return std::fmod(x, mod);
+	}
+	static double wrap(double x, double lo, double hi){
+		return lo + wrap(x-lo, hi-lo);
+	}
+
 	// convert x,y,z in range [0..DIM) to unsigned hash:
 	// this is also the valid mVoxels index for the corresponding voxel:
 	inline uint32_t hash(unsigned x, unsigned y, unsigned z) const {
@@ -301,14 +312,6 @@ protected:
 	inline uint32_t unhashy(uint32_t h) const { return (h>>mShift) & mWrap; }
 	inline uint32_t unhashz(uint32_t h) const { return (h>>mShift2) & mWrap; }
 
-
-
-	// safe floating-point wrapping
-	static double wrap(double x, double mod);
-	static double wrap(double x, double lo, double hi){
-		return lo + wrap(x-lo, hi-lo);
-	}
-
 	uint32_t mShift, mShift2, mDim, mDim2, mDim3, mWrap, mWrap3;
 	int mDimHalf;	// the valid maximum radius for queries
 	uint32_t mMaxD2, mMaxHalfD2;
@@ -325,47 +328,6 @@ protected:
 	std::vector<uint32_t> mDistanceToVoxelIndices;
 	std::vector<uint32_t> mVoxelIndicesToDistance;
 };
-
-
-// wrapping floating point numbers is surprisingly complex
-// because of rounding errors, behavior when near zero
-// and other oddities
-inline double HashSpace :: wrap(double x, double mod) {
-	if (mod != 0.) {
-		if (x > mod) {
-			// shift down
-			if (x > (mod*2.)) {
-				// multiple wraps:
-				double div = x / mod;
-				// get fract:
-				double divl = (long)div;
-				double fract = div - (double)divl;
-				return fract * mod;
-			} else {
-				// single wrap:
-				return x - mod;
-			}
-		} else if (x < 0.) {
-			// negative x, shift up
-			if (x < -mod) {
-				// multiple wraps:
-				double div = x / mod;
-				// get fract:
-				double divl = (long)div;
-				double fract = div - (double)divl;
-				double x1 = fract * mod;
-				return (x1 < 0.) ? x1 + mod : x1;
-			} else {
-				// single wrap:
-				return x + mod;
-			}
-		} else {
-			return x;
-		}
-	} else {
-		return 0.;	// avoid divide by zero
-	}
-}
 
 } // al::
 
