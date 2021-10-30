@@ -1,15 +1,6 @@
-#include <algorithm>
 #include <cassert>
-#include <cmath>
-#include <cstdint>
 #include <cstdio>
-#include <cstdlib>
-#include <cstring> /* memset() */
-#include <cstring>
-#include <iostream>
-#include <string>
-
-#include "allocore/system/al_Printing.hpp"
+#include "allocore/system/al_Printing.hpp" // AL_WARN
 #include "allocore/io/al_AudioIO.hpp"
 
 #if defined(AL_AUDIO_PORTAUDIO)
@@ -447,13 +438,12 @@ bool AudioBackend::supportsFPS(double fps){
 	auto const &supported = data->audio.getDeviceInfo(po->deviceId).sampleRates;
 	for(auto const &r : supported){
 		if(r == f){
-			// std::cout << "RtAudioBackend::supportsFPS, rate " << f << "
-			// supported" << std::endl;
+			//printf("RtAudioBackend::supportsFPS, rate %d supported\n", f);
 			return true;
 		}
 	}
 
-	// std::cout << "rate " << f << " not supported" << std::endl;
+	//printf("rate %d not supported\n", f);
 	return false;
 
 	//    mErrNum = Pa_IsFormatSupported(pi, po, fps);
@@ -588,7 +578,7 @@ static int rtaudioCallback(void *output, void *input, unsigned int frameCount,
                            double streamTime, RtAudioStreamStatus status,
                            void *userData){
 	if(status){
-		std::cout << "Stream underflow detected!" << std::endl;
+		printf("Stream underflow detected!\n");
 	}
 
 	AudioIO &io = *(AudioIO *)userData;
@@ -659,7 +649,7 @@ void AudioBackend::channels(int num, bool forOutput){
 		if(num >= 128) num = 2;
 #endif
 	} else {
-		num = std::min(num, maxChans);
+		if(num > maxChans) num = maxChans;
 	}
 
 	params->nChannels = num;
@@ -1078,28 +1068,30 @@ void AudioIO::initWithDefaults(
 	double sampling_rate = 0;
 	if(use_both){
 		if(out_sampling_rate != in_sampling_rate){
-			std::cout
-					<< "default sampling rate different for in device and out device\n"
-					<< "using only out device" << std::endl;
+			printf(
+				"default sampling rate different for in device and out device\n"
+				"using only out device\n"
+			);
 			in_channels = 0;
 		}
 		sampling_rate = out_sampling_rate;
 	} else if(use_either){
 		sampling_rate = use_out ? out_sampling_rate : in_sampling_rate;
 	} else {
-		std::cout << "not initializing any audio device" << std::endl;
+		printf("not initializing any audio device\n");
 		return;
 	}
 
-	std::cout	<< "AudioIO: using default with\n"
-				<< "in : [" << default_in.id() << "] " << in_channels
-				<< " channels \n"
-				<< "out: [" << default_out.id() << "] " << out_channels
-				<< " channels \n"
-				<< "buffer size: " << framesPerBuffer
-				<< ", sampling rate: " << sampling_rate << std::endl;
-	init(framesPerBuffer, sampling_rate, callbackA, userData,
-	     out_channels, in_channels);
+	printf(
+		"AudioIO: using default with\n"
+		"in : [%d] %d channels\n"
+		"out: [%d] %d channels\n"
+		"buffer size: %d, sampling rate: %g\n",
+		default_in.id(), in_channels, default_out.id(), out_channels,
+		framesPerBuffer, sampling_rate
+	);
+
+	init(framesPerBuffer, sampling_rate, callbackA, userData, out_channels, in_channels);
 }
 
 AudioIO& AudioIO::append(AudioCallback v){
