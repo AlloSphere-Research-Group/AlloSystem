@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <cmath> // pow
 #include "allocore/io/al_App.hpp"
+#include "allocore/math/al_Frustum.hpp"
 #include "allocore/math/al_Ray.hpp"
 #include "allocore/protocol/al_OSC.hpp"
 #include "allocore/system/al_MainLoop.hpp"

@@ -47,7 +47,10 @@
 	Florian Hollerweger
 */
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstring> // memset
+#include <vector>
+#include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_AudioScene.hpp"
 
 //#define MAX_ORDER 3
@@ -94,6 +97,8 @@
 
 
 namespace al{
+
+class AudioIOData;
 
 /// Ambisonic base class
 ///
@@ -304,7 +309,7 @@ public:
 class AmbisonicsSpatializer : public Spatializer {
 public:
 
-	AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
+	AmbisonicsSpatializer(SpeakerLayout& sl, int dim, int order, int flavor=1);
 
 	virtual void compile(Listener& l) override;
 

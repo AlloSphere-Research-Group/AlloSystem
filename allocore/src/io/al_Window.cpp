@@ -1,6 +1,8 @@
+#include <algorithm> // find
+#include <cstdio>
 #include "allocore/io/al_Window.hpp"
 #include "allocore/system/al_MainLoop.hpp"
-#include <stdio.h>
+#include "allocore/system/al_Time.h" // al_steady_time
 
 namespace al{
 

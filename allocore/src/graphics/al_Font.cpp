@@ -1,4 +1,5 @@
 #include <cstdarg>
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Font.hpp"
 
 #include <ft2build.h>

@@ -42,11 +42,10 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include "allocore/system/al_Time.h"
+#include "allocore/system/al_Config.h" // al_sec
 #include "allocore/types/al_SingleRWRingBuffer.hpp"
-#include <string.h>
+#include <cstring> // memcpy
 #include <queue>
-#include <cstring>
 
 #define AL_MSGTUBE_DEFAULT_SIZE_BITS (14) // 16384 bytes
 

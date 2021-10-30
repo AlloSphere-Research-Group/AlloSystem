@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_PANNING_VBAP
-#define INCLUDE_AL_PANNING_VBAP
+#ifndef INCLUDE_AL_VBAP_HPP
+#define INCLUDE_AL_VBAP_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
@@ -43,7 +43,6 @@
 */
 
 #include <map>
-
 #include "allocore/sound/al_AudioScene.hpp"
 
 #define MAX_NUM_VBAP_TRIPLETS 512
@@ -53,6 +52,8 @@
 #define MIN_LENGTH 0.00001
 
 namespace al{
+
+class AudioIOData;
 
 /// A triplet of speakers
 struct SpeakerTriple{

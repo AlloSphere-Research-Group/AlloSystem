@@ -1,12 +1,6 @@
 #ifndef INCLUDE_AL_HASHSPACE_HPP
 #define INCLUDE_AL_HASHSPACE_HPP
 
-#include "allocore/math/al_Vec.hpp"
-#include "allocore/types/al_Array.hpp"
-
-#include <vector>
-
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 
@@ -59,6 +53,10 @@
 	Inspired by this paper:
 	http://nicolas.brodu.numerimoire.net/common/recherche/publications/QuerySphereIndexing.pdf
 */
+
+#include <cstdint>
+#include <vector>
+#include "allocore/math/al_Vec.hpp"
 
 namespace al {
 

@@ -42,10 +42,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include <string.h>
-#include <list>
-
-#include "allocore/system/al_Config.h"
+#include "allocore/system/al_Config.h" // al_sec
 
 namespace al {
 

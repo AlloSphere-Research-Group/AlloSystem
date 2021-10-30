@@ -43,11 +43,10 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#include <stdio.h>
-#include <string>
+#include <cstdio>
 #include <list>
+#include <string>
 #include <vector>
-#include <algorithm>
 #include "allocore/system/al_Config.h"
 
 #ifndef AL_FILE_DELIMITER_STR
@@ -486,7 +485,7 @@ public:
 	iterator end() { return mFiles.end(); }
 
 	void add(const FilePath& fp){ mFiles.push_back(fp); }
-	void sort(bool (*f)(FilePath,FilePath)){ std::sort(begin(),end(),f); }
+	void sort(bool (*f)(FilePath,FilePath));
 
 protected:
 	int indx;

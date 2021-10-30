@@ -52,21 +52,22 @@
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/io/al_Window.hpp"
 #include "allocore/io/al_ControlNav.hpp"
-#include "allocore/math/al_Ray.hpp"
 #include "allocore/spatial/al_Pose.hpp"
-#include "allocore/types/al_Color.hpp"
 // helper includes (keep minimal)
 #include "allocore/graphics/al_Shapes.hpp"
 #include "allocore/math/al_Random.hpp"
 
 namespace al{
 
+template <class T> class Frustum;
+template <class T> class Ray;
+class Color;
+class SceneWindowHandler;
+
 namespace osc{
 	class Recv;
 	class Send;
 }
-class SceneWindowHandler;
-
 
 /// Viewpoint within a scene
 
@@ -124,7 +125,7 @@ public:
 	Viewport& viewport(){ return mViewport; }
 
 	/// Get calculated viewing frustum
-	Frustumd frustum() const;
+	Frustum<double> frustum() const;
 
 	/// Call to update viewport using stretch/anchor amounts when parent dimensions change
 	void onParentResize(int w, int h);
@@ -376,7 +377,7 @@ public:
 
 	/// Get a pick ray from screen space coordinates
 	 // i.e. use mouse xy
-	Rayd getPickRay(const ViewpointWindow& w, int screenX, int screenY);
+	Ray<double> getPickRay(const ViewpointWindow& w, int screenX, int screenY);
 
 private:
 

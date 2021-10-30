@@ -44,9 +44,11 @@
 
 #include <cmath>
 #include <functional>
-#include "allocore/graphics/al_Mesh.hpp"
 
 namespace al{
+
+class Mesh;
+
 /// @addtogroup allocore
 /// @{
 

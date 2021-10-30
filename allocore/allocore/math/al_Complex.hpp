@@ -44,7 +44,6 @@
 
 #include <cmath>
 #include <utility> // swap
-#include "allocore/math/al_Constants.hpp"
 
 namespace al {
 
@@ -170,7 +169,7 @@ public:
 	C operator / (T v) const { return C(*this) /= v; }
 
 	T arg() const { return atan2(i, r); }					///< Returns argument in [-pi, pi]
-	T argUnit() const { T r=arg()/(2*M_PI); return r>0 ? r : r+1; }	///< Return argument in unit interval [0, 1)
+	T argUnit() const { T r=arg()/(6.28318530717959); return r>0 ? r : r+1; }	///< Return argument in unit interval [0, 1)
 	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
 	C exp() const { return Polar<T>(::exp(r), i); }			///< Returns e^z

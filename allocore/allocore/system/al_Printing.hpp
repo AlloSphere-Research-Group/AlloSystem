@@ -42,7 +42,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#include <stdio.h>
+#include <cstdio>
 #include "allocore/system/al_Config.h"
 
 namespace al{

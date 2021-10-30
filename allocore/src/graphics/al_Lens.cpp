@@ -1,5 +1,7 @@
-#include <math.h>
+#include <cmath>
 #include "allocore/math/al_Constants.hpp"
+#include "allocore/math/al_Frustum.hpp"
+#include "allocore/spatial/al_Pose.hpp"
 #include "allocore/graphics/al_Lens.hpp"
 
 namespace al{

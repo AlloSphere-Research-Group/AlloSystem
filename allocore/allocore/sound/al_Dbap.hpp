@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_PANNING_DBAP
-#define INCLUDE_AL_PANNING_DBAP
+#ifndef INCLUDE_AL_DBAP_HPP
+#define INCLUDE_AL_DBAP_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library

@@ -33,9 +33,8 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include <limits>
 #include "allocore/math/al_Functions.hpp"
-
-#include<limits>
 
 namespace al {
 

@@ -43,12 +43,16 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#include "allocore/graphics/al_Graphics.hpp"
-#include "allocore/graphics/al_Lens.hpp"
-#include "allocore/spatial/al_Pose.hpp"
+#include "allocore/math/al_Mat.hpp"
+#include "allocore/math/al_Matrix4.hpp"
+#include "allocore/math/al_Vec.hpp"
 #include "allocore/types/al_Color.hpp"
 
 namespace al{
+
+class Graphics;
+class Lens;
+class Pose;
 
 ///	Higher-level utility class to manage various stereo rendering techniques
 ///

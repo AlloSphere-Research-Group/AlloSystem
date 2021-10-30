@@ -45,7 +45,7 @@
 
 
 #include <cmath>
-#include <stdio.h>
+#include <cstdio>
 #include "allocore/math/al_Vec.hpp"
 
 namespace al {

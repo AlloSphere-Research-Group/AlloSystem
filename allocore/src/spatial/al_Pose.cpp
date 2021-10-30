@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "allocore/spatial/al_Pose.hpp"
 
 namespace al{

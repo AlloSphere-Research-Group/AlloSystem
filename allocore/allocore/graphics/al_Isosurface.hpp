@@ -61,7 +61,6 @@
 			This code is public domain.
 */
 
-#include <map>
 #include <unordered_map>
 #include <vector>
 #include "allocore/types/al_Buffer.hpp"

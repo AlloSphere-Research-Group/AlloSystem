@@ -1,5 +1,6 @@
 #include <algorithm> // transform
 #include <cctype> // tolower
+#include <cstdio>
 #include <map>
 #include <set>
 #include <string>

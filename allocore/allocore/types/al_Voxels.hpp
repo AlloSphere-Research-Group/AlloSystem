@@ -1,3 +1,6 @@
+#ifndef INCLUDE_AL_VOXELS_HPP
+#define INCLUDE_AL_VOXELS_HPP
+
 /*	Allocore --
 	Multimedia / virtual environment application class library
 
@@ -44,10 +47,8 @@
         Kon Hyong Kim, 2014, konhyong@gmail.com
 */
 
-#ifndef INCLUDE_ALLO_VOXELS_HPP
-#define INCLUDE_ALLO_VOXELS_HPP
-
-#include <iostream> // FILE
+#include <cstdio> // FILE
+#include <cstdint> // int16_t, int32_t, ...
 #include <string>
 #include <vector>
 #include "allocore/types/al_Array.hpp"

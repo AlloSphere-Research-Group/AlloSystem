@@ -1,7 +1,8 @@
-#include "allocore/sound/al_AudioScene.hpp"
-#include "allocore/math/al_Constants.hpp"
 #include <cassert>
 #include <iostream>
+#include "allocore/io/al_AudioIOData.hpp"
+#include "allocore/math/al_Constants.hpp"
+#include "allocore/sound/al_AudioScene.hpp"
 
 namespace al{
 
@@ -70,6 +71,21 @@ int SoundSource::bufferSize(double samplerate, double speedOfSound, double dista
 	return (int)ceil(samplerate * distance / speedOfSound);
 }
 
+
+void Spatializer::perform(
+	AudioIOData& io, SoundSource& src, Vec3d& reldir, float gain
+){
+	if ((int)mBuffer.size() != io.framesPerBuffer()) {
+		mBuffer.reserve(io.framesPerBuffer());
+	}
+	for(int i = 0; i < io.framesPerBuffer(); i++)
+	{
+		double readIndex = (io.framesPerBuffer() - i - 1);
+		mBuffer[i] = src.readSample(readIndex);
+	}
+	//src.getBuffer()
+	renderBuffer(io, reldir, mBuffer.data(), io.framesPerBuffer());
+}
 
 
 AudioScene::AudioScene(int numFrames_)

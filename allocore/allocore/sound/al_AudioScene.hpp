@@ -52,15 +52,17 @@
 
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/math/al_Interpolation.hpp"
+#include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/spatial/al_DistAtten.hpp"
 #include "allocore/spatial/al_Pose.hpp"
-#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_Reverb.hpp"
 #include "allocore/sound/al_Biquad.hpp"
 
 namespace al{
+
+class AudioIOData;
 
 /*!
 	A note on coordinate conventions
@@ -400,18 +402,7 @@ protected:
 	                     SoundSource& src,
 	                     Vec3d& reldir,
 	                     float gain
-	                     ) {
-		if ((int)mBuffer.size() != io.framesPerBuffer()) {
-			mBuffer.reserve(io.framesPerBuffer());
-		}
-        for(int i = 0; i < io.framesPerBuffer(); i++)
-		{
-			double readIndex = (io.framesPerBuffer() - i - 1);
-			mBuffer[i] = src.readSample(readIndex);
-		}
-//		src.getBuffer()
-		renderBuffer(io, reldir, mBuffer.data(), io.framesPerBuffer());
-	}
+	                     );
 
 	Speakers mSpeakers;
 	bool mEnabled;

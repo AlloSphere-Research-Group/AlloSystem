@@ -1,8 +1,8 @@
-#ifndef INCLUDE_AL_PANNING_STEREO
-#define INCLUDE_AL_PANNING_STEREO
+#ifndef INCLUDE_AL_STEREO_PANNER_HPP
+#define INCLUDE_AL_STEREO_PANNER_HPP
 
+#include <cmath>
 #include <memory>
-
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/math/al_Constants.hpp"
 

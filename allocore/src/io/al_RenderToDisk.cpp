@@ -1,9 +1,9 @@
 #include <cstdlib> // std::system
 #include "allocore/graphics/al_OpenGL.hpp"
-#include "allocore/io/al_RenderToDisk.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Time.hpp"
 #include "allocore/types/al_Conversion.hpp"
+#include "allocore/io/al_RenderToDisk.hpp"
 
 namespace al{
 

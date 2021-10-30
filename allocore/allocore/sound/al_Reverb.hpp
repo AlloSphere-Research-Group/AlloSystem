@@ -42,8 +42,7 @@
 */
 
 #include <cmath>
-#include <stdlib.h>
-#include <string.h>
+#include <cstring> // memset
 
 namespace al{
 

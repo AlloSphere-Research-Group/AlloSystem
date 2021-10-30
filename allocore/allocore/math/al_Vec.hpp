@@ -45,11 +45,10 @@
 
 
 #include <cmath> // pow
+#include <cstdio>
 #include <initializer_list>
 #include <ostream>
 #include <type_traits> //remove_reference, is_polymorphic
-#include <stdio.h>
-#include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Functions.hpp"
 
 namespace al {
@@ -822,7 +821,7 @@ template <int N, class T>
 inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
 	T cosAng = a.dot(b) / sqrt(a.magSqr()*b.magSqr());
 	if(cosAng >= T( 1)){ return T(0); }		else
-	if(cosAng <= T(-1)){ return T(M_PI); }
+	if(cosAng <= T(-1)){ return T(3.141592653589793); }
 	return std::acos(cosAng);
 }
 
