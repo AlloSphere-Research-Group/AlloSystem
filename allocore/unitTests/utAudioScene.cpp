@@ -1,4 +1,5 @@
 #include "utAllocore.h"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Ambisonics.hpp"
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/sound/al_StereoPanner.hpp"
