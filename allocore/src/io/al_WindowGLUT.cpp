@@ -39,8 +39,6 @@ void mainInitGLUT(){
 	char name[] = {'a','l','l','o','\0'};
 	char * argv[] = {name};
 	glutInit(&argc,argv);
-	// Have ::exit call any exit handlers
-	atexit([](){ Main::get().exit(); });
 }
 
 void mainAttachGLUT(al_sec interval){}
@@ -56,7 +54,15 @@ void mainEnterGLUT(al_sec interval){
 
 void mainStopGLUT(){
 	// GLUT can't be stopped; the only option is a hard exit.
-	::exit(0); // Note: this will call our function registered with atexit()
+	// exit() first destroys static objects (but not local objects), then
+	// calls functions registered with atexit. This ordering makes accessing
+	// any static objects in atexit unsafe. Heap allocated singletons
+	// (like Main) will not get deleted.
+	// Note that clicking the 'X' on a GLUT window calls exit(), so there is
+	// no way we can do any proper cleanup.
+
+	Main::get().exit(); // calls any registered handlers' onExit
+	::exit(0); // let app self-destruct
 }
 
 
