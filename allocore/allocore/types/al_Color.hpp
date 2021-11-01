@@ -619,9 +619,6 @@ struct RGB{
 	const value_type * end() const { return components + size(); }
 
 
-	/// Set from another RGB
-	RGB& set(const RGB& v){ return set(v.r,v.g,v.b); }
-
 	/// Set from RGB components
 	RGB& set(float re, float gr, float bl){ r=re; g=gr; b=bl; return *this; }
 
@@ -658,7 +655,7 @@ struct RGB{
 	RGB& operator= (const HSV& v);
 
 	/// Set RGB components from Color
-	RGB& operator= (const Color& v){ return set(v.rgb()); }
+	RGB& operator= (const Color& v){ return (*this) = v.rgb(); }
 
 	/// Set RGB components from Colori
 	RGB& operator= (const Colori& v);
