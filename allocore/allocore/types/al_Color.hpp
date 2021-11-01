@@ -424,8 +424,20 @@ struct Colori {
 	/// Invert RGB components
 	Colori& invert(){ return set(255-r, 255-g, 255-b); }
 
+	/// Returns self linearly mixed with another color (0 = none)
+	Colori mix(const Colori& v, float amt=0.5f) const {
+		Colori res;
+		uint8_t f = toi(amt);
+		for(int i=0; i<size(); ++i){
+			auto a = int((*this)[i]);
+			auto b = int(v[i]);
+			res[i] = ((b-a)*f + (a<<8))>>8;
+		}
+		return res;
+	}
+
 private:
-	uint8_t toi(float v){ return uint8_t(v*255.f); }
+	static uint8_t toi(float v){ return uint8_t(v*255.f); }
 };
 
 
