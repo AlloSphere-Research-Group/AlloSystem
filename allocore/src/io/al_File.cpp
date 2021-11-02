@@ -741,7 +741,7 @@ bool Dir::read(){
 	while(dir.read()) {
 		const auto& entry = dir.entry();
 		if(entry.isDir()){
-			if(!Dir::remove(path + "/" + entry.name())){
+			if(!Dir::removeRecursively(path + "/" + entry.name())){
 				ok = false;
 				break;
 			}
