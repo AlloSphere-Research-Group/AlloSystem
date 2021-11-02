@@ -378,7 +378,10 @@ private:
 	bool mFindNextFile = false;
 };
 
-/*static*/ bool Dir::make(const std::string& path, bool recursive){
+/*static*/ bool Dir::make(const std::string& pathIn, bool recursive){
+
+	std::string path = pathIn.back() != '/' ? pathIn : pathIn.substr(0, pathIn.size()-1);
+
 	if(recursive){
 		// Create all intermediate dirs up to last one
 		for(unsigned i=0; i<path.size(); ++i){
