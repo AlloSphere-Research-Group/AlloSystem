@@ -39,8 +39,6 @@ void mainInitGLUT(){
 	char name[] = {'a','l','l','o','\0'};
 	char * argv[] = {name};
 	glutInit(&argc,argv);
-	// Have ::exit call any exit handlers
-	atexit([](){ Main::get().exit(); });
 }
 
 void mainAttachGLUT(al_sec interval){}
@@ -56,7 +54,15 @@ void mainEnterGLUT(al_sec interval){
 
 void mainStopGLUT(){
 	// GLUT can't be stopped; the only option is a hard exit.
-	::exit(0); // Note: this will call our function registered with atexit()
+	// exit() first destroys static objects (but not local objects), then
+	// calls functions registered with atexit. This ordering makes accessing
+	// any static objects in atexit unsafe. Heap allocated singletons
+	// (like Main) will not get deleted.
+	// Note that clicking the 'X' on a GLUT window calls exit(), so there is
+	// no way we can do any proper cleanup.
+
+	Main::get().exit(); // calls any registered handlers' onExit
+	::exit(0); // let app self-destruct
 }
 
 
@@ -459,8 +465,11 @@ public:
 		if (!mScheduled) {
 			mScheduled = true;
 			//printf("window id: %d\n", id());
-			Main::get().queue().send(0, scheduleDrawStatic, id());
-			//scheduleDrawStaticGLUT(id());
+			// Adding to Main queue rather than firing immediately since the
+			// main loop needs to be started first.
+			Main::get().queue().send<int>(0, [](al_sec t, int winID){
+				scheduleDrawStatic(winID);
+			}, id());
 		}
 	}
 
@@ -471,28 +480,19 @@ private:
 		const int winID = id();
 		const int current = glutGetWindow();
 		if(winID != current) glutSetWindow(winID);
-		mWindow->callHandlersOnFrame();
-		//auto& mouse = mWindow->mMouse;
-		//mouse.position(mouse.x(), mouse.y()); // zeros dx, dy
-		const char * err = glGetErrorString();
-		if(err[0]){
-			AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", winID, err);
+		if(created()){
+			mWindow->callHandlersOnFrame();
+			//auto& mouse = mWindow->mMouse;
+			//mouse.position(mouse.x(), mouse.y()); // zeros dx, dy
+			const char * err = glGetErrorString();
+			if(err[0]){
+				AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", winID, err);
+			}
+			glutSwapBuffers();
 		}
-		glutSwapBuffers();
 	}
 
-
-	// schedule draws of a specific window
-	static void scheduleDrawStatic(al_sec t, int winID) {
-		/* Note: This function used to use the Main scheduler queue, however,
-		the Main scheduler uses a fixed-interval polling mechanism with too
-		course of a timing granularity to obtain a precise enough frame rate
-		for smooth animation. Instead, we call glutTimerFunc directly using an
-		estimated delta time. */
-		scheduleDrawStaticGLUT(winID);
-	}
-
-	static void scheduleDrawStaticGLUT(int winID){
+	static void scheduleDrawStatic(int winID){
 
 		WindowImpl *impl = getWindowImpl(winID);
 
@@ -541,7 +541,7 @@ private:
 						// Passing 0 ms wait to glutTimerFunc may cause lockup on Windows
 						if(0==waitMsec) waitMsec=1;
 					#endif
-					glutTimerFunc(waitMsec, scheduleDrawStaticGLUT, winID);
+					glutTimerFunc(waitMsec, scheduleDrawStatic, winID);
 				}
 				else {
 					impl->mScheduled = false;

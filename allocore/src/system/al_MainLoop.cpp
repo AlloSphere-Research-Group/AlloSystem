@@ -1,9 +1,8 @@
+#include <algorithm>	// std::find
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Printing.hpp"
-
-#include <stdlib.h>		// exit
-#include <algorithm>	// std::find
+#include "allocore/system/al_Time.h" // al_sleep
 
 // native bindings:
 

@@ -137,6 +137,10 @@ private:
 			case SDL_WINDOWEVENT:
 				if(ev.window.windowID == ID()){
 					switch(ev.window.event){
+					case SDL_WINDOWEVENT_CLOSE:
+						win->destroyAll();
+						Main::get().stop();
+						return;
 					case SDL_WINDOWEVENT_SHOWN:
 						//printf("Window %d shown\n", ID());
 						win->mVisible = true;
@@ -261,12 +265,14 @@ private:
 	void onFrame(){
 		mWindow->updateFrameTime(); // Compute actual frame interval
 		handleEvents();
-		mWindow->callHandlersOnFrame();
-		const char * err = glGetErrorString();
-		if(err[0]){
-			AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", ID(), err);
+		if(created()){
+			mWindow->callHandlersOnFrame();
+			const char * err = glGetErrorString();
+			if(err[0]){
+				AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", ID(), err);
+			}
+			SDL_GL_SwapWindow(mSDLWindow);
 		}
-		SDL_GL_SwapWindow(mSDLWindow);
 	}
 
 
@@ -402,6 +408,13 @@ bool Window::implCreate(){
 		printf("SDL ERROR: Could not create window.\n");
 		return false;
 	}
+	
+	int top, left, bottom, right;
+	if(SDL_GetWindowBordersSize(sdlWin, &top, &left, &bottom, &right) == 0) {
+		mDim.l += left;
+		mDim.t += top;
+	}
+	
 	mImpl->mSDLWindow = sdlWin;
 	WindowImpl::windows()[mImpl->ID()] = mImpl;
 

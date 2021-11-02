@@ -42,7 +42,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include <cstdint>
+#include <cstdint> // uint32_t
 #include <cstring> // memcpy
 
 namespace al {

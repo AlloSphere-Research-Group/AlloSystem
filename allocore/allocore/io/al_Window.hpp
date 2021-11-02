@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_WINDOWGL_HPP
-#define INCLUDE_AL_WINDOWGL_HPP
+#ifndef INCLUDE_AL_WINDOW_HPP
+#define INCLUDE_AL_WINDOW_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
@@ -45,10 +45,9 @@
 */
 
 #include "allocore/graphics/al_GPUObject.hpp"
-#include <algorithm>
-#include <vector>
+#include <cstdio>
 #include <string>
-#include <stdio.h>
+#include <vector>
 
 namespace al{
 

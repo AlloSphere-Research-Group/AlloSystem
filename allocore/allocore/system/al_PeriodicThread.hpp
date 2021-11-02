@@ -44,7 +44,7 @@
 
 #include <functional> // std::function
 #include "allocore/system/al_Thread.hpp"
-#include "allocore/system/al_Time.hpp"
+#include "allocore/system/al_Config.h" // al_nsec
 
 namespace al{
 

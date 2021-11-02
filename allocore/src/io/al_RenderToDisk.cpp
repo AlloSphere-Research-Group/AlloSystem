@@ -1,9 +1,9 @@
 #include <cstdlib> // std::system
 #include "allocore/graphics/al_OpenGL.hpp"
-#include "allocore/io/al_RenderToDisk.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Time.hpp"
 #include "allocore/types/al_Conversion.hpp"
+#include "allocore/io/al_RenderToDisk.hpp"
 
 namespace al{
 
@@ -26,6 +26,10 @@ RenderToDisk::RenderToDisk(Mode m)
 {
 	mPBOs[0] = 0;
 	resetPBOQueue();
+
+	mAudioCB = [this](AudioIOData& io){
+		mAudioRing.write(io.outBuffer(0));
+	};
 
 	/*AudioRing ring;
 	ring.resize(2,2,4);
@@ -159,7 +163,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 			mAudioIO->stop();
 		}
 
-		mAudioIO->append(*this);
+		mAudioIO->append(mAudioCB);
 
 		mSoundFileThread.start(
 			[this](){
@@ -236,7 +240,7 @@ void RenderToDisk::stop(){
 
 		mWroteAudio = true;
 
-		mAudioIO->remove(*this);
+		mAudioIO->remove(mAudioCB);
 	
 		if(NON_REAL_TIME == mMode){
 			mAudioIO->start();
@@ -274,10 +278,6 @@ void RenderToDisk::makePath(){
 void RenderToDisk::write(){
 	writeImage();
 	writeAudio();
-}
-
-void RenderToDisk::onAudioCB(AudioIOData& io){
-	mAudioRing.write(io.outBuffer(0));
 }
 
 bool RenderToDisk::onFrame(){

@@ -1,6 +1,7 @@
 #include "utAllocore.h"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Buffer.hpp"
+#include "allocore/types/al_Color.hpp"
 #include "allocore/types/al_Conversion.hpp"
 #include "allocore/types/al_Node.hpp"
 
@@ -426,6 +427,30 @@ int utTypes(){
 				assert(0 == depth);
 			});
 		}
+	}
+
+	{
+		assert(RGB(0.1) == RGB(0.1,0.1,0.1));
+		assert(RGB(0.1) != RGB(0.2));
+		{ auto c = RGB(0.1); assert(c == RGB(0.1)); }
+		{ float c[3]={0.1,0.2,0.3}; assert(RGB(c) == RGB(0.1,0.2,0.3)); }
+		assert(-RGB(0.5) == RGB(-0.5));
+		assert(RGB(0.5) + RGB(0.1,0.2,0.3) == RGB(0.6,0.7,0.8));
+		assert(RGB(5) - RGB(1,2,3) == RGB(4,3,2));
+		assert(RGB(0.5) * RGB(0.1,0.2,0.3) == RGB(0.05,0.1,0.15));
+		assert(RGB(0.5) / RGB(2,4,5) == RGB(0.25,0.125,0.1));
+		assert(RGB(0.1,0.2,0.3) + 0.1 == RGB(0.2,0.3,0.4));
+		assert(RGB(1,2,3) - 1 == RGB(0,1,2));
+		assert(RGB(0.1,0.2,0.3) * 2 == RGB(0.2,0.4,0.6));
+		assert(RGB(0.2,0.4,0.6) / 2 == RGB(0.1,0.2,0.3));
+		assert(RGB(0.3).mix(RGB(0.1), 0.5) == RGB(0.2));
+		assert(RGB(-0.5,0.2,1.2).clamp() == RGB(0,0.2,1));
+		assert(RGB(-0.5,0.2,0.3).max() ==  0.3f);
+		assert(RGB(-0.5,0.2,0.3).min() == -0.5f);
+
+		assert(Colori(10) == Colori(10,10,10));
+		assert(Colori(10).a == 255);
+		assert(Colori(10,20,30).mix(Colori(10,10,10), 0.5) == Colori(10,15,20));
 	}
 
 	return 0;

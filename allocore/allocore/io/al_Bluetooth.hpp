@@ -43,8 +43,8 @@
 */
 
 
-#include <stdio.h>
-#include <memory>
+#include <cstdio>
+#include <memory> // unique_ptr
 #include <string>
 #include <vector>
 

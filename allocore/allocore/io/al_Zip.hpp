@@ -44,6 +44,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include "allocore/system/al_Pimpl.hpp"
 
 namespace al{
 
@@ -51,7 +52,6 @@ class ZipReader {
 public:
 
 	ZipReader();
-	~ZipReader();
 
 	/// Open archive file
 	bool open(const std::string& path);
@@ -78,7 +78,7 @@ public:
 
 private:
 	class Impl;
-	Impl * mImpl;
+	Pimpl<Impl> mImpl;
 
 	std::vector<std::string> mFilePaths;
 };
@@ -116,7 +116,8 @@ public:
 
 private:
 	class Impl;
-	Impl * mImpl;
+	Pimpl<Impl> mImpl;
+
 	int mCompression = -1;
 };
 

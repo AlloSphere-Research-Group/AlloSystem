@@ -2,12 +2,14 @@
 
 #ifdef AL_GRAPHICS_SUPPORTS_SHADER
 
-#include "allocore/graphics/al_Shader.hpp"
-#include "allocore/system/al_Printing.hpp"
 #include <cstdio>
 #include <cstring> // strlen
-#include <map>
-#include <string>
+#include "allocore/math/al_Mat.hpp"
+#include "allocore/math/al_Quat.hpp"
+#include "allocore/math/al_Vec.hpp"
+#include "allocore/types/al_Color.hpp"
+#include "allocore/system/al_Printing.hpp"
+#include "allocore/graphics/al_Shader.hpp"
 
 namespace al{
 

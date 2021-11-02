@@ -42,8 +42,8 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
+#include "allocore/graphics/al_OpenGL.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
 
 namespace al{
 

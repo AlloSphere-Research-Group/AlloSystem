@@ -43,8 +43,6 @@
 	Lance Putnam, 2015, putnam.lance@gmail.com
 */
 
-#include <math.h>
-
 namespace al{
 
 /// Distance to attenuation laws
@@ -153,21 +151,6 @@ protected:
 		return *this;
 	}
 };
-
-/* Other possible attenuation laws where
-
-	dN = (distance-mNearClip) / (mClipRange);
-
-max/cosm:
-	curve = (1.-dN)*(1.-dN);
-hydrogen bond:
-	curve = ((d + C) / (d*d + d + C))^2;	// e.g. C=2
-sigmoid:
-	curve = 1 - tanh(M_PI * dN*dN);
-	
-biasing:
-	mAmpFar + curve*(1.-mAmpFar)
-*/
 
 } // al::
 

@@ -45,10 +45,9 @@
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
+#include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Quat.hpp"
-#include <stdio.h>
-
 
 namespace al {
 

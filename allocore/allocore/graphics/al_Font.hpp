@@ -43,12 +43,14 @@
 */
 
 #include <string>
+#include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Texture.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
 
 #define ASCII_SIZE 256	// number of characters to use
 
 namespace al{
+
+class Graphics;
 
 /// Interface for loading fonts and rendering text
 ///

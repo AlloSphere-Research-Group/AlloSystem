@@ -53,14 +53,13 @@
 #include <unordered_map>
 #include <vector>
 #include "allocore/graphics/al_GPUObject.hpp"
-#include "allocore/math/al_Mat.hpp"
-#include "allocore/math/al_Quat.hpp"
-#include "allocore/math/al_Vec.hpp"
-#include "allocore/types/al_Color.hpp"
 
 #define AL_SHADER_MAX_LOG_SIZE	4096
 
 namespace al{
+
+template <int N, class T> class Vec;
+template <class T> class Quat;
 
 /// Shader abstract base class
 /// @ingroup allocore

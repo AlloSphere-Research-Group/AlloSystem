@@ -424,8 +424,20 @@ struct Colori {
 	/// Invert RGB components
 	Colori& invert(){ return set(255-r, 255-g, 255-b); }
 
+	/// Returns self linearly mixed with another color (0 = none)
+	Colori mix(const Colori& v, float amt=0.5f) const {
+		Colori res;
+		uint8_t f = toi(amt);
+		for(int i=0; i<size(); ++i){
+			auto a = int((*this)[i]);
+			auto b = int(v[i]);
+			res[i] = ((b-a)*f + (a<<8))>>8;
+		}
+		return res;
+	}
+
 private:
-	uint8_t toi(float v){ return uint8_t(v*255.f); }
+	static uint8_t toi(float v){ return uint8_t(v*255.f); }
 };
 
 
@@ -607,9 +619,6 @@ struct RGB{
 	const value_type * end() const { return components + size(); }
 
 
-	/// Set from another RGB
-	RGB& set(const RGB& v){ return set(v.r,v.g,v.b); }
-
 	/// Set from RGB components
 	RGB& set(float re, float gr, float bl){ r=re; g=gr; b=bl; return *this; }
 
@@ -646,7 +655,7 @@ struct RGB{
 	RGB& operator= (const HSV& v);
 
 	/// Set RGB components from Color
-	RGB& operator= (const Color& v){ return set(v.rgb()); }
+	RGB& operator= (const Color& v){ return (*this) = v.rgb(); }
 
 	/// Set RGB components from Colori
 	RGB& operator= (const Colori& v);

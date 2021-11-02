@@ -1,8 +1,10 @@
 #include <map>
-#include <math.h>
+#include <cmath>
+#include <cstdint> // uint64_t
 #include "allocore/math/al_Constants.hpp"
-#include "allocore/graphics/al_Shapes.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/graphics/al_Shapes.hpp"
 
 /*
 Platonic solids code derived from:

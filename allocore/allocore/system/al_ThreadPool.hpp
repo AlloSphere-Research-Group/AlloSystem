@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_DBAP_HPP
-#define INCLUDE_AL_DBAP_HPP
+#ifndef INCLUDE_AL_THREAD_POOL_HPP
+#define INCLUDE_AL_THREAD_POOL_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
@@ -36,53 +36,50 @@
 
 
 	File description:
-	Distance-based amplitude panner (DBAP)
+	Pool of threads to run concurrent tasks
 
 	File author(s):
-	Ryan McGee, 2012, ryanmichaelmcgee@gmail.com
+	Lance Putnam, 2021
 */
 
-#include "allocore/sound/al_AudioScene.hpp"
+#include <condition_variable>
+#include <functional>
+#include <mutex>
+#include <thread>
+#include <queue>
+#include <vector>
 
 namespace al{
 
-#define DBAP_MAX_NUM_SPEAKERS 192
+/// A pool of threads for running concurrent tasks
 
-/// Distance-based amplitude panner
-///
-/// @ingroup allocore
-class Dbap : public Spatializer{
+/// Creating a thread can be more expensive than the task it executes.
+/// A thread pool allows us to create a number of threads once and then simply 
+/// reuse them for arbitrary tasks.
+class ThreadPool{
 public:
 
-	/// @param[in] sl		A speaker layout
-	/// @param[in] focus	Amplitude focus to nearby speakers
-	Dbap(const SpeakerLayout &sl, float focus = 1.f);
+	typedef std::function<void(void)> Task;
 
-	void compile(Listener& listener);
+	/// Construct with a number of threads matching hardware concurrency
+	ThreadPool();
 
-	///Per Sample Processing
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
+	/// Construct with a specific number of threads
+	ThreadPool(int numThreads);
 
-	/// Per Buffer Processing
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
+	/// Joins all threads
+	~ThreadPool();
 
-	/// focus is an exponent determining the amplitude focus to nearby speakers.
-
-	///focus is (0, inf) with usable range typically [0.2, 5]. Default is 1.
-	///A denser speaker layout my benefit from a high focus > 1, and a sparse layout may benefit from focus < 1
-	void setFocus(float focus) { mFocus = focus; }
-
-	void print();
+	/// Push a new task onto the queue; execution begins immediately
+	void push(Task task);
 
 private:
-	Listener * mListener;
-	Vec3f mSpeakerVecs[DBAP_MAX_NUM_SPEAKERS];
-	int mDeviceChannels[DBAP_MAX_NUM_SPEAKERS];
-	int mNumSpeakers;
-	float mFocus;
+	std::vector<std::thread> mThreads;
+	std::queue<Task> mTasks;
+	std::condition_variable mCondition;
+	std::mutex mTasksMutex;
+	bool mTerminate = false;
 };
 
-
-} // al::
-
+} // namespace
 #endif

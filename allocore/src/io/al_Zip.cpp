@@ -16,12 +16,7 @@ struct ZipReader::Impl{
 	}
 };
 
-ZipReader::ZipReader(): mImpl(new Impl){
-}
-
-ZipReader::~ZipReader(){
-	delete mImpl;
-}
+ZipReader::ZipReader(){}
 
 bool ZipReader::open(const std::string& path){
 	auto * zip = &mImpl->zip;
@@ -78,12 +73,10 @@ struct ZipWriter::Impl{
 };
 
 
-ZipWriter::ZipWriter(): mImpl(new Impl){
-}
+ZipWriter::ZipWriter(){}
 
 ZipWriter::~ZipWriter(){
 	close();
-	delete mImpl;
 }
 
 bool ZipWriter::open(const std::string& path){

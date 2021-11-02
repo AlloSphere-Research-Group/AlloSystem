@@ -42,10 +42,9 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include "allocore/system/al_Time.h"
-#include "allocore/types/al_MsgQueue.hpp"
 #include <vector>
-
+#include "allocore/system/al_Config.h" // al_sec
+#include "allocore/types/al_MsgQueue.hpp"
 
 namespace al {
 

@@ -1,7 +1,6 @@
-#include <math.h>
-#include "allocore/graphics/al_Isosurface.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
+#include <cmath>
 #include "allocore/types/al_Voxels.hpp"
+#include "allocore/graphics/al_Isosurface.hpp"
 
 namespace al{
 
@@ -530,7 +529,7 @@ void Isosurface::begin(){
 
 void Isosurface::end(){
 	compressTriangles();
-	primitive(Graphics::TRIANGLES); // must be set for proper normal generation
+	triangles(); // primitive must be set for proper normal generation
 	if(mComputeNormals) generateNormals(mNormalize);
 	mValidSurface = true;
 }

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include "allocore/system/al_Time.h"
 #include "allocore/system/al_PeriodicThread.hpp"
 
 namespace al{

@@ -44,12 +44,11 @@
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
-#include "allocore/math/al_Vec.hpp"
-#include "allocore/math/al_Matrix4.hpp"
-#include "allocore/math/al_Frustum.hpp"
-#include "allocore/spatial/al_Pose.hpp"
 
 namespace al {
+
+template <class T> class Frustum;
+class Pose;
 
 /// Stores optics settings important for rendering
 /// @ingroup allocore
@@ -89,7 +88,7 @@ public:
 	/// @param[in] f			The resulting test frustum
 	/// @param[in] p			A position and orientation in world coordinates
 	/// @param[in] aspect		Aspect ratio (width/height) of viewport
-	void frustum(Frustumd& f, const Pose& p, double aspect) const;
+	void frustum(Frustum<double>& f, const Pose& p, double aspect) const;
 
 	/// Returns half the height of the frustum at a given depth
 
@@ -117,7 +116,6 @@ protected:
 	double mNear, mFar;			// Cutting plane distances
 	double mFocalLength;		// Focal length along vd
 	double mEyeSep;				// Eye separation
-//	Vec3d mStereoOffset;		// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 };
 
 

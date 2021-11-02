@@ -47,15 +47,16 @@
 #include <string>
 #include <vector>
 #include <initializer_list>
-
 #include "allocore/io/al_AudioIOData.hpp"
 
 namespace al {
 
 /// Audio callback type
-typedef std::function<void(AudioIOData& io)> audioCallback;
+typedef std::function<void(AudioIOData& io)> AudioCallback;
+
 
 class AudioDevice;
+
 
 /// Abstract audio backend
 ///
@@ -70,7 +71,7 @@ public:
 	bool isRunning() const;
 	bool error() const;
 
-	void printError(const char *text = "") const;
+	void printError(const char * text = "") const;
 	void printInfo() const;
 
 	bool supportsFPS(double fps);
@@ -117,6 +118,7 @@ protected:
 	}
 };
 
+
 /// Audio device
 ///
 /// @ingroup allocore
@@ -134,24 +136,36 @@ public:
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output
 	/// devices
-	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
+	AudioDevice(
+		const std::string& nameKeyword,
+		StreamMode stream = StreamMode(INPUT | OUTPUT)
+	);
 
 	/// @param[in] nameKeywords	List of keywords to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
-	AudioDevice(std::initializer_list<std::string> nameKeywords, StreamMode stream = StreamMode(INPUT | OUTPUT));
+	AudioDevice(
+		std::initializer_list<std::string> nameKeywords,
+		StreamMode stream = StreamMode(INPUT | OUTPUT)
+	);
 
 
 	/// Find device number of given device name keyword
 	
 	/// \returns device number on success or -1 if there is no match
 	///
-	static int findDeviceNumber(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
+	static int findDeviceNumber(
+		const std::string& nameKeyword,
+		StreamMode stream = StreamMode(INPUT | OUTPUT)
+	);
 
 	/// Find device number from a list of device name keywords
 
 	/// \returns device number of first match in list or -1 if there is no match
 	///
-	static int findDeviceNumber(std::initializer_list<std::string> nameKeywordList, StreamMode stream = StreamMode(INPUT | OUTPUT));
+	static int findDeviceNumber(
+		std::initializer_list<std::string> nameKeywordList,
+		StreamMode stream = StreamMode(INPUT | OUTPUT)
+	);
 	
 
 	virtual bool valid() const { return mValid; }
@@ -174,10 +188,11 @@ protected:
 	static void initDevices();
 };
 
-inline AudioDevice::StreamMode operator|(const AudioDevice::StreamMode &a,
-                                         const AudioDevice::StreamMode &b) {
+inline AudioDevice::StreamMode operator|(const AudioDevice::StreamMode& a,
+                                         const AudioDevice::StreamMode& b) {
 	return static_cast<AudioDevice::StreamMode>(+a | +b);
 }
+
 
 /// Audio input/output streaming
 ///
@@ -185,51 +200,47 @@ inline AudioDevice::StreamMode operator|(const AudioDevice::StreamMode &a,
 class AudioIO : public AudioIOData {
 public:
 
-	/// Creates AudioIO using default I/O devices.
+	/// Construct using default I/O devices
 	AudioIO(
 		int framesPerBuf = 512, double framesPerSec = 44100,
-		audioCallback callback = nullptr, void *userData = nullptr,
+		AudioCallback callback = nullptr, void * userData = nullptr,
 		int outChans = 2, int inChans = 0
-	):
-		AudioIOData(nullptr)
-	{
-		mBackend = std::make_shared<AudioBackend>();
-		init(framesPerBuf, framesPerSec, callback, userData, outChans, inChans);
-	}
+	);
 
 	virtual ~AudioIO();
 
 	/// @param[in] framesPerBuf	Number of sample frames to process per callback
-	/// @param[in] framesPerSec	Frame rate.  Unsupported values will use default
-	/// rate of device.
-	/// @param[in] callback	Audio processing callback (optional)
-	/// @param[in] userData	Pointer to user data accessible within callback (optional)
+	/// @param[in] framesPerSec	Frame rate.
+	///							Unsupported values will use default rate of device.
+	/// @param[in] callback		Audio processing callback (optional)
+	/// @param[in] userData		Pointer to user data accessible within callback (optional)
 	/// @param[in] outChans		Number of output channels to open
 	/// @param[in] inChans		Number of input channels to open
+	///
 	/// If the number of input or output channels is greater than the device
 	/// supports, virtual buffers will be created.
 	void init(
 		int framesPerBuf, double framesPerSec,
-		audioCallback callback, void * userData,
+		AudioCallback callback, void * userData,
 		int outChans = 2, int inChans = 0
 	);
 
-	/// @param[in] callback	Audio processing callback (optional)
-	/// @param[in] userData	Pointer to user data accessible within callback (optional)
+	/// @param[in] callback		Audio processing callback (optional)
+	/// @param[in] userData		Pointer to user data accessible within callback (optional)
 	/// @param[in] use_in		Enable audio input
-	/// @param[in] use_out	Enable audio output
+	/// @param[in] use_out		Enable audio output
 	/// @param[in] devNum		ID of the device to open. -1 Uses default
 	/// device.
 	/// @param[in] framesPerBuf	Number of sample frames to process per callback
 	void initWithDefaults(
-		audioCallback callback, void * userData,
+		AudioCallback callback, void * userData,
 		bool use_out, bool use_in, int framesPerBuffer = 256
 	);
 
-	bool open();			///< Opens audio device.
-	bool close();			///< Closes audio device. Will stop active IO.
-	bool start();			///< Starts the audio IO.  Will open audio device if necessary.
-	bool stop();			///< Stops the audio IO.
+	bool open();			///< Open audio device
+	bool close();			///< Close audio device. Will stop active IO.
+	bool start();			///< Start the audio IO.  Will open audio device if necessary.
+	bool stop();			///< Stop the audio IO
 	void processAudio();	///< Call callback manually
 
 	bool autoZeroOut() const { return mAutoZeroOut; }
@@ -253,27 +264,23 @@ public:
 	void channelsOut(int n);				///< Set number of output channels
 	void channelsBus(int num);				///< Set number of bus channels
 	void clipOut(bool v){ mClipOut = v;	}	///< Set whether to clip output between -1 and 1
-	void device(const AudioDevice &v);		///< Set input/output device (must be duplex)
-	void deviceIn(const AudioDevice &v);	///< Set input device
-	void deviceOut(const AudioDevice &v);	///< Set output device
+	void device(const AudioDevice& v);		///< Set input/output device (must be duplex)
+	void deviceIn(const AudioDevice& v);	///< Set input device
+	void deviceOut(const AudioDevice& v);	///< Set output device
 	void framesPerSecond(double v);			///< Set number of frames per second
 	void framesPerBuffer(int n);			///< Set number of frames per processing buffer
 	void zeroNANs(bool v){ mZeroNANs = v; }	///< Set whether to zero NANs in output buffer going to DAC
 
 	void print() const;  ///< Prints info about current i/o devices to stdout.
-	static const char *errorText(int errNum);  ///< Returns error string.
+	static const char * errorText(int errNum);  ///< Returns error string.
 
 	double time() const;  ///< Get current stream time in seconds
 	double time(int frame) const;  ///< Get current stream time in seconds of frame
 
-	/// Add an AudioCallback handler (internal callback is always called first)
-	AudioIO& append(AudioCallback& v);
-	AudioIO& prepend(AudioCallback& v);
-	AudioIO& insertBefore(AudioCallback& v);
-	AudioIO& insertAfter(AudioCallback& v);
-
-	/// Remove all input event handlers matching argument
-	AudioIO &remove(AudioCallback &v);
+	/// Add additional callbacks (internal callback is always called first)
+	AudioIO& append(AudioCallback v);
+	AudioIO& prepend(AudioCallback v);
+	AudioIO& remove(AudioCallback v);
 
 	using AudioIOData::channelsIn;
 	using AudioIOData::channelsOut;
@@ -281,19 +288,19 @@ public:
 	using AudioIOData::framesPerSecond;
 	using AudioIOData::framesPerBuffer;
 
-	audioCallback callback = nullptr;  ///< User specified callback function.
+	AudioCallback callback = nullptr;  ///< User specified callback function.
 
 private:
 	AudioDevice mInDevice, mOutDevice;
 	bool mZeroNANs = true;     // whether to zero NANs
 	bool mClipOut = true;      // whether to clip output between -1 and 1
 	bool mAutoZeroOut = true;  // whether to automatically zero output buffers each block
-	std::vector<AudioCallback *> mAudioCallbacks;
+	std::vector<AudioCallback> mAudioCallbacks;
 
 	//	void init(int outChannels, int inChannels);			//
 	void reopen();  // reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
-	void operator=(const AudioIO &) = delete;  // Disallow copy
+	void operator=(const AudioIO&) = delete;  // Disallow copy
 
 	std::shared_ptr<AudioBackend> mBackend;
 };

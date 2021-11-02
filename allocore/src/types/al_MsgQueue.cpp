@@ -1,9 +1,7 @@
-#include <algorithm> // std::max
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-
+#include <algorithm> // max
+#include <cassert>
+#include <cstdlib> // malloc
+#include <cstring> // memcpy
 #include "allocore/types/al_MsgQueue.hpp"
 
 namespace al{

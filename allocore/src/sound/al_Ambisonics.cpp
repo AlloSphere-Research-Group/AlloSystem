@@ -1,4 +1,5 @@
-#include <string.h>
+#include <cstring>
+#include "allocore/io/al_AudioIOData.hpp"
 #include "allocore/sound/al_Ambisonics.hpp"
 
 #ifdef USE_GAMMA

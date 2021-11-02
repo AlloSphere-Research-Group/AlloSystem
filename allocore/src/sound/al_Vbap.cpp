@@ -1,3 +1,4 @@
+#include "allocore/io/al_AudioIOData.hpp"
 #include "allocore/sound/al_Vbap.hpp"
 
 namespace al{

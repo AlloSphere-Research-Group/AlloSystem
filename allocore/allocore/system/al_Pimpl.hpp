@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_WATCHER_HPP
-#define INCLUDE_AL_WATCHER_HPP
+#ifndef INCLUDE_AL_PIMPL_HPP
+#define INCLUDE_AL_PIMPL_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
@@ -27,40 +27,49 @@
 
 
 	File description:
-	Utility for registering & recieving notifications
+	Helper class to reduce boiler-plate for Pimpl pattern
 
 	File author(s):
-	Graham Wakefield, 2011, grrrwaaa@gmail.com
+	Lance Putnam, 2021
 */
 
+#include <memory> // unique_ptr
 #include <string>
 
 namespace al {
 
-///! base class for all notifiable objects:
-///	MyWatcher w;
-/// w.watch("foo");
-/// Watcher::notify("foo", "bar");
-///
-/// @ingroup allocore
-class Watcher {
+/// Pimpl (Pointer to implementation) helper class
+
+/// Based on
+/// Sutter (2011). "GotW #101: Compilation Firewalls, Part 2", retrieved from 
+/// https://herbsutter.com/gotw/_101/.
+template<typename T>
+class Pimpl {
 public:
-	/// destructor automatically un-registers:
-	virtual ~Watcher() { unwatch(); }
+	Pimpl()
+	:	m(new T, &defaultDelete){}
 
-	/// get notifications from a named resource
-	void watch(std::string resourcename);
+	template<typename ...Args> Pimpl(Args&& ... args)
+	:	m(new T(std::forward<Args>(args)...), &defaultDelete){}
 
-	/// stop notifications from a named resource
-	void unwatch(std::string resourcename);
-	/// stop all notifications
-	void unwatch();
+	~Pimpl(){}
 
-	/// the notification handler:
-	virtual void onEvent(std::string resourcename, std::string eventname) {}
+	const T* operator->() const { return m.get(); }
+	T* operator->(){ return m.get(); }
+	const T& operator*() const { return *m.get(); }
+	T& operator*(){ return *m.get(); }
 
-	/// trigger a notification for a named resource
-	static void notify(std::string resourcename, std::string eventname);
+private:
+    std::unique_ptr<T, void (*)(T*)> m;
+
+	// Needed to prevent compiler error about missing deleter type for
+	// containing class with undefined destructor.
+	// See http://oliora.github.io/2015/12/29/pimpl-and-rule-of-zero.html
+	static void defaultDelete(T * t){
+		static_assert(sizeof(T) > 0, "cannot delete incomplete type");
+        static_assert(!std::is_void<T>::value, "cannot delete incomplete type");
+		delete t;
+	}
 };
 
 } //al::

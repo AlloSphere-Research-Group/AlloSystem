@@ -1,5 +1,5 @@
 #include "allocore/io/al_Bluetooth.hpp"
-#include <stdio.h>
+#include <cstdio>
 #include <vector>
 
 #define OS_LINUX	(defined(__linux__))

@@ -44,7 +44,6 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include <stdio.h>
 #include <functional>
 #include <string>
 #include "allocore/math/al_Vec.hpp"

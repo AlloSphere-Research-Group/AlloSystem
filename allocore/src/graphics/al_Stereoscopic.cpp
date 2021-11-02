@@ -1,5 +1,7 @@
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Lens.hpp"
+#include "allocore/spatial/al_Pose.hpp"
 #include "allocore/graphics/al_Stereoscopic.hpp"
-#include "allocore/graphics/al_Graphics.hpp"	/* << need the OpenGL headers */
 
 namespace al{
 

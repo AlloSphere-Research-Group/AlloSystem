@@ -1,3 +1,4 @@
+#include <algorithm> // sort
 #include <cstring>
 #include <fstream> // ifstream, ofstream
 #include <memory>
@@ -772,6 +773,10 @@ FilePath::FilePath(const std::string& fullpath) {
 
 }
 
+
+void FileList::sort(bool (*f)(FilePath,FilePath)){
+	std::sort(begin(),end(),f);
+}
 
 void FileList::print() const {
 	printf("FileList:\n");

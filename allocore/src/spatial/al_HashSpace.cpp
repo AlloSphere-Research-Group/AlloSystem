@@ -1,7 +1,107 @@
+#include <cmath>
 #include "allocore/spatial/al_HashSpace.hpp"
-#include "allocore/math/al_Functions.hpp"
 
 using namespace al;
+
+void HashSpace::Voxel :: add(Object * o) {
+	if (mObjects) {
+		// add to tail:
+		Object * last = mObjects->prev;
+		last->next = o;
+		o->prev = last;
+		o->next = mObjects;
+		mObjects->prev = o;
+	} else {
+		// unique:
+		mObjects = o->prev = o->next = o;
+	}
+}
+
+void HashSpace::Voxel :: remove(Object * o) {
+	if (o == o->prev) {	// voxel only has 1 item
+		mObjects = NULL;
+	} else {
+		Object * prev = o->prev;
+		Object * next = o->next;
+		prev->next = next;
+		next->prev = prev;
+		// update head pointer?
+		if (mObjects == o) { mObjects = next; }
+	}
+	// leave the object clean:
+	o->prev = o->next = NULL;
+}
+
+
+
+// of the matches, return the best:
+HashSpace::Object * HashSpace::Query :: nearest(const HashSpace& space, const Object * src) {
+	clear();
+	const Vec3d& center = src->pos;
+	uint32_t results = (*this)(space, src, space.mMaxHalfD2);
+
+	Object * result = 0;
+	double rd2 = space.mMaxHalfD2;
+	for (uint32_t i=0; i<results; i++) {
+		Object * o = mObjects[i].object;
+		Vec3d rel = space.wrapRelative(o->pos - center);
+		double d2 = rel.magSqr();
+		if (d2 < rd2) {
+			rd2 = d2;
+			result = o;
+		}
+	}
+	return result;
+}
+
+// the maximum permissible value of radius is mDimHalf
+// if int(inner^2) == int(outer^2), only 1 shell will be queried.
+// TODO: non-toroidal version.
+int HashSpace::Query :: operator()(const HashSpace& space, const HashSpace::Object * obj, double maxRadius, double minRadius) {
+	unsigned nres = 0;
+	const auto& center = obj->pos;
+	const auto minr2 = minRadius*minRadius;
+	const auto maxr2 = maxRadius*maxRadius;
+	auto iminr2 = std::max<uint32_t>(0, minr2);
+	auto imaxr2 = std::min<uint32_t>(space.mMaxHalfD2, 1. + (maxRadius+1.)*(maxRadius+1.));
+	if (iminr2 < imaxr2) {
+		auto cellstart = space.mDistanceToVoxelIndices[iminr2];
+		auto cellend = space.mDistanceToVoxelIndices[imaxr2];
+		for (auto i = cellstart; i < cellend; i++) {
+			auto index = space.hash(center, space.mVoxelIndices[i]);
+			const auto& voxel = space.mVoxels[index];
+			// now add any objects in this voxel to the result...
+			auto * head = voxel.mObjects;
+			if (head) {
+				auto * o = head;
+				do {
+					if (o != obj) {
+						// final check - float version:
+						auto rel = space.wrapRelative(o->pos - center);
+						auto d2 = rel.magSqr();
+						if (d2 >= minr2 && d2 <= maxr2) {
+							// here we could insert-sort based on distance...
+							mObjects[nres].object = o;
+							mObjects[nres].distanceSquared = d2;
+							nres++;
+						}
+					}
+					o = o->next;
+				} while (o != head && nres < mMaxResults);
+			}
+			if(nres == mMaxResults) break;
+		}
+	}
+	//std::sort(mObjects.begin(), mObjects.end(), Result::compare);
+	return nres;
+}
+
+int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, double maxRadius, double minRadius) {
+	HashSpace::Object obj;
+	obj.pos = center; // only pos used in following function
+	return (*this)(space, &obj, maxRadius, minRadius);
+}
+
 
 // resolution can be 1 to 10; the dim is 2^resolution i.e. 2..1024
 // (the limit is 10 so that the hash can fit inside a uint32_t integer)
@@ -99,3 +199,30 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 
 HashSpace :: ~HashSpace() {}
 
+void HashSpace :: numObjects(int numObjects) {
+	mObjects.clear();
+	mObjects.resize(numObjects);
+	// clear all voxels:
+	for (unsigned i=0; i<mVoxels.size(); i++) {
+		mVoxels[i].mObjects = 0;
+	}
+}
+
+HashSpace& HashSpace :: remove(uint32_t objectId) {
+	Object& o = mObjects[objectId];
+	if (o.hash != invalidHash()) mVoxels[o.hash].remove(&o);
+	o.hash = invalidHash();
+	return *this;
+}
+
+HashSpace& HashSpace :: move(uint32_t objectId, Vec3d pos) {
+	Object& o = mObjects[objectId];
+	o.pos = wrap(pos);
+	uint32_t newhash = hash(o.pos);
+	if (newhash != o.hash) {
+		if (o.hash != invalidHash()) mVoxels[o.hash].remove(&o);
+		o.hash = newhash;
+		mVoxels[newhash].add(&o);
+	}
+	return *this;
+}

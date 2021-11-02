@@ -3,6 +3,7 @@
 #include <cmath> //pow
 #include <cstring> //memcpy
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include "allocore/types/al_Voxels.hpp"
 #include "allocore/graphics/al_Image.hpp"
