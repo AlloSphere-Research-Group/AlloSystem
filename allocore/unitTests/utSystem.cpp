@@ -12,8 +12,6 @@ int utSystem(){
 	{
 		al_nsec slop = 2e7;
 		al_nsec sleepns = 1e8;
-		al_sec sleeps = 0.5;
-		al_sec slops = 0.007;
 
 		assert(al_time_ns2s * 1e9 == 1);
 		assert(al_time_s2ns * 1 == 1e9);
@@ -33,10 +31,13 @@ int utSystem(){
 		}
 
 		{
+			// Note that system time is not as precise as steady time, so our
+			// error threshold is higher.
+			al_sec sleeps = 0.5;
 			auto t = al_system_time();
 			al_sleep_until(t + sleeps);
 			auto dt = al_system_time() - t;
-			assert(aboutEqual(dt, sleeps, slops));
+			assert(aboutEqual(dt, sleeps, 15./1000.));
 		}
 
 		{
