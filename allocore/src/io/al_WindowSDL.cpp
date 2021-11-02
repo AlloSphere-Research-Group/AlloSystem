@@ -410,10 +410,7 @@ bool Window::implCreate(){
 	}
 	
 	int top, left, bottom, right;
-	if(SDL_GetWindowBordersSize(sdlWin, &top, &left, &bottom, &right) != 0){
-		printf("SDL Warning: Could not align window.\n");
-	}
-	else{
+	if(SDL_GetWindowBordersSize(sdlWin, &top, &left, &bottom, &right) == 0) {
 		mDim.l += left;
 		mDim.t += top;
 	}
