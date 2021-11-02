@@ -40,7 +40,7 @@ if uname | grep -q MINGW; then
 		LIBNAMES="`objdump -p $1 | grep "DLL Name"`"
 		LIBNAMES="${LIBNAMES//DLL Name: /}"
 		LIBPATHS=
-		#echo $LIBNAMES
+
 		for dir in $LIBDIRS; do
 			for lib in $LIBNAMES; do
 				DIR_LIB=$dir$lib
