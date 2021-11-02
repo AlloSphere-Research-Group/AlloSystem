@@ -8,6 +8,7 @@ ThreadPool::ThreadPool()
 
 ThreadPool::ThreadPool(int numThreads){
 	//printf("%d threads\n", numThreads);
+	if(numThreads <= 0) numThreads = 1;
 
 	for(int i=0; i<numThreads; ++i){
 		mThreads.emplace_back([this](){
