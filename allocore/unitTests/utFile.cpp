@@ -1,4 +1,4 @@
-#include <string.h>
+#include <string>
 #include "utAllocore.h"
 #include "allocore/io/al_File.hpp"
 
@@ -80,7 +80,7 @@ int utFile() {
 
 	{
 		const char * path = "utFile.txt";
-		const char * text = "This is a test of AlloCore file i/o functionality. You can safely delete this file.";
+		std::string text = "This is a test of AlloCore file i/o functionality. You can safely delete this file.";
 
 		// write data
 		File f(path, "w");
@@ -91,10 +91,10 @@ int utFile() {
 		assert(File::exists(path));
 
 		assert(
-			f.write(text, strlen(text))
+			f.write(text)
 		);
 
-		assert(f.size() == (int)strlen(text));
+		assert(f.size() == text.size());
 
 		f.close();
 		assert(!f.opened());
@@ -107,7 +107,7 @@ int utFile() {
 
 		const char * read = f.readAll();
 
-		assert(f.size() == (int)strlen(text));
+		assert(f.size() == text.size());
 
 		for(int i=0; i<f.size(); ++i){
 			assert(read[i] == text[i]);
@@ -126,8 +126,18 @@ int utFile() {
 
 
 	{
-		assert(Dir::make("utFileTestDir"));
-		assert(Dir::remove("utFileTestDir"));
+		std::string dirPath = "utFileTestDir/";
+		assert(Dir::make(dirPath));
+		assert(Dir::remove(dirPath));
+		assert(!File::exists(dirPath));
+
+		Dir::make(dirPath);
+		Dir::make(dirPath + "1/");
+		Dir::make(dirPath + "1/2/");
+		File file(dirPath + "1/2/test.txt");
+		file.close();
+		assert(Dir::removeRecursively(dirPath));
+		assert(!File::exists(dirPath));
 
 		// For now, just make sure this compiles and doesn't crash. :)
 		Dir dir;
