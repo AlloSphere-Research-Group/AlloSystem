@@ -144,7 +144,7 @@ bool SceneWindowHandler::onFrame(){
 
 	if(app.clockAnimate() == &win){
 		app.mAnimateTime = app.appTime();
-		app.onAnimate(win.spfActual());
+		app.onAnimateWrapper(win.spfActual());
 	}
 
 	// Quatd accumulated rotations are very precise, so we should rarely need
@@ -224,7 +224,7 @@ bool SceneWindowHandler::onFrame(){
 
 			void onDraw(Graphics& g){
 				for(auto& drawCall : win.drawCalls()) drawCall();
-				app.onDraw(g,vp);
+				app.onDrawWrapper(g,vp);
 			}
 		} drawFunc(app, vp, win);
 
@@ -264,11 +264,11 @@ void App::initAudio(
 
 		if(clockAnimate() == &audioIO()){
 			mAnimateTime = appTime();
-			onAnimate(io.secondsPerBuffer());
+			onAnimateWrapper(io.secondsPerBuffer());
 		}
 
 		io.frame(0);
-		onSound(audioIO());
+		onSoundWrapper(audioIO());
 	};
 	mAudioIO.framesPerSecond(audioRate);
 	mAudioIO.framesPerBuffer(audioBlockSize);

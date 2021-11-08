@@ -379,6 +379,11 @@ public:
 	 // i.e. use mouse xy
 	Ray<double> getPickRay(const ViewpointWindow& w, int screenX, int screenY);
 
+protected:
+	virtual void onSoundWrapper(AudioIOData& io){ onSound(io); }
+	virtual void onAnimateWrapper(double dt){ onAnimate(dt); }
+	virtual void onDrawWrapper(Graphics& g, const Viewpoint& v){ onDraw(g,v); }
+
 private:
 
 	typedef std::vector<Viewpoint *> Viewpoints;
