@@ -154,12 +154,13 @@ inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size
 /// @param[in] radius		Radius of base (on xy plane)
 /// @param[in] apex			Position of apex
 /// @param[in] slices		Number of points going around base
+/// @param[in] stacks		Number of rings from apex to base
 /// @param[in] cycles		Number of cycles to go around base
 ///							(should be relatively prime to slices)
 /// \returns number of vertices added
 int addCone(
 	Mesh& m, float radius=1, const Vec3f& apex=Vec3f(0,0,2),
-	unsigned slices=16,
+	unsigned slices=16, unsigned stacks=1,
 	unsigned cycles=1
 );
 
@@ -169,8 +170,9 @@ int addCone(
 /// @param[in,out] m		Mesh to add vertices and indices to
 /// @param[in] radius		Radius of disc (on xy plane)
 /// @param[in] slices		Number of points going around base
+/// @param[in] stacks		Number of rings from origin to outer radius
 /// \returns number of vertices added
-int addDisc(Mesh& m, float radius=1, unsigned slices=16);
+int addDisc(Mesh& m, float radius=1, unsigned slices=16, unsigned stacks=1);
 
 
 /// Add a rectangle as indexed triangles

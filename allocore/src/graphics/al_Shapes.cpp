@@ -419,7 +419,7 @@ int addWireBox(Mesh& m, float w, float h, float d){
 }
 
 
-int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned cycles){
+int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned stacks, unsigned cycles){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -428,25 +428,41 @@ int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned 
 	// Note: leaving base on xy plane makes it easy to construct a bicone
 	m.vertex(apex);
 
-	CSin csin(cycles * 2*M_PI/slices, radius);
-	for(unsigned i=Nv+1; i<=(Nv+slices); ++i){
-		float x = csin.r;
-		float y = csin.i;
-		csin();
-		m.vertex(x,y);
-		m.index(Nv);
-		m.index(i);
-		m.index(i+1);
+	for(unsigned i=0; i<stacks; ++i){
+
+		float h = float(i+1)/stacks;
+
+		CSin csin(cycles * 2*M_PI/slices, h*radius);
+
+		for(unsigned j=0; j<slices; ++j){
+			float x = csin.r;
+			float y = csin.i;
+			csin();
+
+			bool lastSlice = j == (slices - 1);
+
+			if(0 == i){ // first stack
+				m.index(Nv);
+				int v2 = 0;
+				int v3 = 1; if(lastSlice) v3-=slices;
+				m.indexRel(v2, v3);
+			} else {
+				int v1 = -int(slices);
+				int v2 = 0;
+				int v3 = v1+1;
+				int v4 = 1;
+				if(lastSlice){ v3-=slices; v4-=slices; }
+				m.indexRel(v1,v2,v3, v3,v2,v4);
+			}
+			m.vertex(Vec3f(x,y,0.) + apex*(1.-h));
+		}
 	}
 
-	m.indices().last() = Nv+1;
-
-	return 1 + slices;
+	return 1 + slices*stacks;
 }
 
-
-int addDisc(Mesh& m, float radius, unsigned slices){
-	return addCone(m, radius, Vec3f(0,0,0), slices);
+int addDisc(Mesh& m, float radius, unsigned slices, unsigned stacks){
+	return addCone(m, radius, Vec3f(0,0,0), slices, stacks);
 }
 
 int addRect(Mesh& m, float width, float height, float x, float y){

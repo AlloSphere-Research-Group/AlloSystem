@@ -58,13 +58,15 @@ public:
 			1,				// radius
 			Vec3f(0,0,2*my),// apex
 			3 + mx*16,		// slices (number of planes)
+			1,				// stacks (number of rings)
 			1				// cycles
 		);
 
 		// Create a disc/regular polygon
 		addDisc(meshes[S++],
 			1,				// radius
-			3 + mx*16		// slices (polygon order)
+			3 + mx*16,		// slices (polygon order)
+			1				// stacks (number of rings)
 		);
 
 		// Create a prism
