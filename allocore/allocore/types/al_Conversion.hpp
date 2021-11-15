@@ -101,7 +101,7 @@ template <class T> std::string toString(const T& v);
 
 /// Convert array of numerical types to a comma separated string
 template <class T>
-std::string toString(const T * v, int num, int stride);
+std::string toStringArray(const T * v, int num, int stride);
 
 /// Convert string to a typed value
 template <class T>
@@ -167,7 +167,7 @@ void swapBytes(T * data, unsigned count){
 }
 
 template <class T>
-std::string toString(const T * v, int n, int s){
+std::string toStringArray(const T * v, int n, int s){
 	std::string r;
 	for(int i=0; i<n; ++i){
 		r += toString(v[i*s]);
