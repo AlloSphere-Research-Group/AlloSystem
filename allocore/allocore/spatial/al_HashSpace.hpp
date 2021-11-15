@@ -275,8 +275,8 @@ protected:
 	// safe floating-point wrapping
 	static double wrap(double x, double mod){
 		if(0. <= x && x < mod) return x; // short circuit mod calc
-		//return x - (long(x/mod) - long(x<0.)); // nah, just use fmod...
-		return std::fmod(x, mod);
+		//return x - (long(x/mod) - long(x<0.)) * mod; // nah, just use fmod...
+		return std::fmod(x, mod) + (x>0.?0.:mod);
 	}
 	static double wrap(double x, double lo, double hi){
 		return lo + wrap(x-lo, hi-lo);
