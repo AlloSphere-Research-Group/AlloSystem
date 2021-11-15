@@ -365,7 +365,7 @@ void App::start(){
 		#ifdef AL_EMSCRIPTEN
 		Main::get().start();
 		#else
-		printf("\nPress 'enter' to quit...\n"); getchar();
+		printf("\nPress 'enter' to quit...\n"); fflush(stdout); getchar();
 		#endif
 		// ensure exit handler gets called
 		Main::get().exit();
