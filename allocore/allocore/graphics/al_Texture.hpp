@@ -268,6 +268,9 @@ public:
 	/// Set 3D wrapping modes
 	Texture& wrap(Wrap S, Wrap T, Wrap R);
 
+	/// Set to repeat wrapping mode
+	Texture& repeat(){ return wrap(REPEAT); }
+
 
 	/// Set texture unit (applied to all bind/unbind calls)
 	Texture& unit(int i){ mTexUnit=i; return *this; }
