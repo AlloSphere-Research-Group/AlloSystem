@@ -116,50 +116,54 @@ inline int endian(){
 	return *(char *)&x;
 }
 
-// This is used by swapBytes
-template<int NumBytes> void swapBytesN(void * word);
+namespace detail{
 
-template<>
-inline void swapBytesN<1>(void * word){}
+	// This is used by swapBytes
+	template<int NumBytes> void swapBytesN(void * word);
 
-template<>
-inline void swapBytesN<2>(void * word){
-	uint16_t& v = *(uint16_t *)word;
-	v = (v >> 8) | (v << 8);
-}
+	template<>
+	inline void swapBytesN<1>(void * word){}
 
-template<>
-inline void swapBytesN<3>(void * word){
-	uint8_t * v = (uint8_t *)word;
-	v[0] ^= v[2];
-	v[2] ^= v[0];
-	v[0] ^= v[2];
-}
+	template<>
+	inline void swapBytesN<2>(void * word){
+		uint16_t& v = *(uint16_t *)word;
+		v = (v >> 8) | (v << 8);
+	}
 
-template<>
-inline void swapBytesN<4>(void * word){
-	uint32_t& v = *(uint32_t *)word;
-	v	= ((v >> 24))
-		| ((v >>  8) & 0x0000ff00UL)
-		| ((v <<  8) & 0x00ff0000UL)
-		| ((v << 24));
-}
+	template<>
+	inline void swapBytesN<3>(void * word){
+		uint8_t * v = (uint8_t *)word;
+		v[0] ^= v[2];
+		v[2] ^= v[0];
+		v[0] ^= v[2];
+	}
 
-template<>
-inline void swapBytesN<8>(void * word){
-	uint64_t& v = *(uint64_t *)word;
-	v	= ((v >> 56))
-		| ((v >> 40) & 0x000000000000ff00ULL)
-		| ((v >> 24) & 0x0000000000ff0000ULL)
-		| ((v >>  8) & 0x00000000ff000000ULL)
-		| ((v <<  8) & 0x000000ff00000000ULL)
-		| ((v << 24) & 0x0000ff0000000000ULL)
-		| ((v << 40) & 0x00ff000000000000ULL)
-		| ((v << 56));
+	template<>
+	inline void swapBytesN<4>(void * word){
+		uint32_t& v = *(uint32_t *)word;
+		v	= ((v >> 24))
+			| ((v >>  8) & 0x0000ff00UL)
+			| ((v <<  8) & 0x00ff0000UL)
+			| ((v << 24));
+	}
+
+	template<>
+	inline void swapBytesN<8>(void * word){
+		uint64_t& v = *(uint64_t *)word;
+		v	= ((v >> 56))
+			| ((v >> 40) & 0x000000000000ff00ULL)
+			| ((v >> 24) & 0x0000000000ff0000ULL)
+			| ((v >>  8) & 0x00000000ff000000ULL)
+			| ((v <<  8) & 0x000000ff00000000ULL)
+			| ((v << 24) & 0x0000ff0000000000ULL)
+			| ((v << 40) & 0x00ff000000000000ULL)
+			| ((v << 56));
+	}
+
 }
 
 template<typename T>
-inline void swapBytes(T& v){ swapBytesN<sizeof(v)>(&v); }
+inline void swapBytes(T& v){ detail::swapBytesN<sizeof(v)>(&v); }
 
 template<class T>
 void swapBytes(T * data, unsigned count){
