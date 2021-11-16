@@ -160,7 +160,7 @@ public:
 	if(recursive){
 		// Create all intermediate dirs up to last one
 		for(unsigned i=0; i<path.size(); ++i){
-			if(path[i] == '/'){
+			if(path[i] == '/' && i!=(path.size()-1)){
 				if(mkdir(path.substr(0, i+1).c_str(), mode) != 0){
 					if(errno != EEXIST) return false;
 				}
