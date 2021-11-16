@@ -206,12 +206,12 @@ Window::DisplayMode Window::displayMode() const {
 Window& Window::displayMode(DisplayMode v){
 	if(mDisplayMode != v){
 		if(created()){
-			const Cursor cursor_ = cursor();
-			const bool cursorHide_ = cursorHide();
-			const Dim dim_ = dimensions();
-			const bool fullScreen_ = fullScreen();
-			const double fps_ = fps();
-			const std::string& title_ = title();
+			const auto cursor_ = cursor();
+			const auto cursorHide_ = cursorHide();
+			const auto dim_ = dimensions();
+			const auto fullScreen_ = fullScreen();
+			const auto fps_ = fps();
+			const auto& title_ = title();
 
 			destroy();
 			create(dim_, title_, fps_, v);
@@ -315,7 +315,7 @@ void Window::updateFrameTime(){
 
 
 Window& Window::insert(InputEventHandler& v, int i){
-	InputEventHandlers& H = mInputEventHandlers;
+	auto& H = mInputEventHandlers;
 	if(std::find(H.begin(), H.end(), &v) == H.end()){
 		v.removeFromWindow();
 		H.insert(H.begin()+i, &(v.window(this)));
@@ -324,7 +324,7 @@ Window& Window::insert(InputEventHandler& v, int i){
 }
 
 Window& Window::insert(WindowEventHandler& v, int i){
-	WindowEventHandlers& H = mWindowEventHandlers;
+	auto& H = mWindowEventHandlers;
 	if(std::find(H.begin(), H.end(), &v) == H.end()){
 		v.removeFromWindow();
 		H.insert(H.begin()+i, &(v.window(this)));
@@ -350,8 +350,8 @@ Window& Window::prepend(WindowEventHandler& v){ return insert(v,0); }
 
 
 Window& Window::remove(InputEventHandler& v){
-	InputEventHandlers& H = mInputEventHandlers;
-	InputEventHandlers::iterator it = std::find(H.begin(), H.end(), &v);
+	auto& H = mInputEventHandlers;
+	auto it = std::find(H.begin(), H.end(), &v);
 
 	if(it != H.end()){
 		H.erase(it);
@@ -364,8 +364,8 @@ Window& Window::remove(InputEventHandler& v){
 }
 
 Window& Window::remove(WindowEventHandler& v){
-	WindowEventHandlers& H = mWindowEventHandlers;
-	WindowEventHandlers::iterator it = std::find(H.begin(), H.end(), &v);
+	auto& H = mWindowEventHandlers;
+	auto it = std::find(H.begin(), H.end(), &v);
 
 	if(it != H.end()){
 
