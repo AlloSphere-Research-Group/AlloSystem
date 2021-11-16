@@ -3,6 +3,7 @@
 
 #undef NDEBUG
 #include <assert.h>
+#include <cmath>
 
 #ifdef AL_UT_NOPRINT	/* disable printing to stdout */
 	#define UT_PRINTF	//
@@ -11,7 +12,7 @@
 #endif
 
 inline bool almostEqual(float v1, float v2) {
-	return abs(v1 -v2) < 0.00001;
+	return std::abs(v1 -v2) < 0.00001;
 }
 
 int utAudioScene();
