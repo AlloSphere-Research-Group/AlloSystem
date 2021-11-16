@@ -83,7 +83,7 @@ InputEventHandler::~InputEventHandler(){
 }
 
 void InputEventHandler::removeFromWindow(){
-	if(attached()) window().remove(this);
+	if(attached()) window().remove(*this);
 }
 
 
@@ -98,7 +98,7 @@ WindowEventHandler::~WindowEventHandler(){
 
 void WindowEventHandler::removeFromWindow(){
 	if(attached()){
-		window().remove(this); // Window::remove calls onResize
+		window().remove(*this); // Window::remove calls onResize
 	}
 }
 

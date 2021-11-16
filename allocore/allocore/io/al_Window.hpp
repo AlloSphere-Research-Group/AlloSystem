@@ -521,16 +521,6 @@ protected:
 	void callHandlersOnDrop(const std::vector<std::string>& paths){ CALL(onDrop(paths)); }
 
 	#undef CALL
-
-public:
-	// DEPRECATED, do not use!
-	Window& add(InputEventHandler * v){ return append(*v); }
-	Window& add(WindowEventHandler * v){ return append(*v); }
-	Window& prepend(InputEventHandler * v){ return prepend(*v); }
-	Window& prepend(WindowEventHandler * v){ return prepend(*v); }
-	Window& remove(InputEventHandler * v){ return remove(*v); }
-	Window& remove(WindowEventHandler * v){ return remove(*v); }
-	double avgFps() const { return fpsAvg(); }
 };
 
 
