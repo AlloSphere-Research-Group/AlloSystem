@@ -33,7 +33,11 @@ void Keyboard::ctrl (bool state){ setBit(mModifiers, CTRL , state); }
 void Keyboard::meta (bool state){ setBit(mModifiers, META , state); }
 void Keyboard::shift(bool state){ setBit(mModifiers, SHIFT, state); }
 void Keyboard::caps (bool state){ mCaps = state; }
-void Keyboard::setKey(int k, bool v){ mKeycode=k; mDown=v; }
+void Keyboard::setKey(int k, bool v){
+	mKeycode=k; mDown=v;
+	mEvents.push_back({k,v});
+	if(mEvents.size() >= 64) mEvents.pop_front();
+}
 
 void Keyboard::print() const {
 	fprintf(stderr,

@@ -46,6 +46,7 @@
 
 #include "allocore/graphics/al_GPUObject.hpp"
 #include <cstdio>
+#include <deque>
 #include <string>
 #include <vector>
 
@@ -65,6 +66,13 @@ class Window;
 /// @ingroup allocore
 class Keyboard{
 public:
+
+	struct Event{
+		int key;
+		bool state;
+	};
+
+	typedef std::deque<Event> Events;
 
 	/// Non-printable keys
 	enum Key{
@@ -109,11 +117,16 @@ public:
 	void shift(bool state);		///< Set shift key state
 	void caps (bool state);		///< Set capslock key state
 
+	/// Get key events in last polling period
+	const Events& events() const { return mEvents; }
+
 	void print() const;			///< Print keyboard state
 
 protected:
+	friend class Window;
 	friend class WindowImpl;
 
+	Events mEvents;		// event buffer from last poll
 	int	mKeycode;		// last key event key number
 	bool mDown;			// last key event state (pressed or released)
 	bool mCaps;
@@ -491,7 +504,10 @@ protected:
 		}\
 	}
 
-	void callHandlersOnFrame() { CALL(onFrame()); }
+	void callHandlersOnFrame(){
+		CALL(onFrame());
+		mKeyboard.mEvents.clear();
+	}
 	void callHandlersOnCreate(){
 		contextCreate();
 		CALL(onCreate());
