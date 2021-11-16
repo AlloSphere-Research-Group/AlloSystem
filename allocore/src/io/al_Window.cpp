@@ -404,4 +404,31 @@ void Window::stopLoop(){
 }
 
 
+
+bool StandardWindowKeyControls::onKeyDown(const Keyboard& k){
+	if(k.ctrl()){
+		switch(k.key()){
+			case 'q': Window::stopLoop(); return false;
+			//case 'w': window().destroy(); return false;
+			case 'h': window().hide(); return false;
+			case 'm': window().iconify(); return false;
+			case 'c': window().cursorHideToggle(); return false;
+			default:;
+		}
+	}
+	else if(k.alt()){
+		switch(k.key()){
+			case Keyboard::F4: Window::stopLoop(); return false;
+			default:;
+		}
+	}
+	else{
+		switch(k.key()){
+			case Keyboard::ESCAPE: window().fullScreenToggle(); return false;
+			default:;
+		}
+	}
+	return true;
+}
+
 } // al::

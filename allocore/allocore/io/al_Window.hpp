@@ -540,32 +540,8 @@ operator& (const Window::DisplayMode& a, const Window::DisplayMode& b){ return W
 /// Standard key controls for window
 ///
 /// @ingroup allocore
-struct StandardWindowKeyControls : InputEventHandler {
-	bool onKeyDown(const Keyboard& k){
-		if(k.modifiers() == Keyboard::CTRL){
-			switch(k.key()){
-				case 'q': Window::stopLoop(); return false;
-				//case 'w': window().destroy(); return false;
-				case 'h': window().hide(); return false;
-				case 'm': window().iconify(); return false;
-				case 'c': window().cursorHideToggle(); return false;
-				default:;
-			}
-		}
-		else if(k.modifiers() == Keyboard::ALT){
-			switch(k.key()){
-				case Keyboard::F4: Window::stopLoop(); return false;
-				default:;
-			}
-		}
-		else{
-			switch(k.key()){
-				case Keyboard::ESCAPE: window().fullScreenToggle(); return false;
-				default:;
-			}
-		}
-		return true;
-	}
+struct StandardWindowKeyControls : public InputEventHandler {
+	bool onKeyDown(const Keyboard& k) override;
 };
 
 } // al::
