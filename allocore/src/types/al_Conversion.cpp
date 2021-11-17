@@ -59,6 +59,10 @@ std::string toBase64(const void * data, int numBytes){
 	return s;
 }
 
+std::string toBase64(const std::string& s){
+	return toBase64(s.data(), s.size());
+}
+
 void fromBase64(void * dst, const std::string& src, unsigned numDstBytes){
 
     unsigned numSrcBits = src.size()*6;
