@@ -14,6 +14,7 @@
 
 #ifdef AL_EMSCRIPTEN
 	#include <emscripten.h>
+	#include <emscripten/html5.h> // emscripten_request_fullscreen, emscripten_exit_fullscreen
 #endif
 
 namespace al{
@@ -505,7 +506,17 @@ void Window::implSetFPS(){
 
 void Window::implSetFullScreen(){
 	#ifdef AL_EMSCRIPTEN
-		mFullScreen = false; // SDL_WINDOW_FULLSCREEN_DESKTOP not supported
+		if(mFullScreen){
+			EmscriptenFullscreenStrategy s;
+			s.scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_DEFAULT;
+			s.canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_NONE;
+			s.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT;
+			s.canvasResizedCallback = nullptr;
+			s.canvasResizedCallbackUserData = nullptr;
+			emscripten_request_fullscreen_strategy("#canvas", true, &s);
+		}
+		else emscripten_exit_fullscreen();
+
 	#else
 		auto err = SDL_SetWindowFullscreen(
 			mImpl->mSDLWindow,
