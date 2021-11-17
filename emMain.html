@@ -93,6 +93,19 @@
 		font-family: 'Lucida Console', Monaco, monospace;
 		outline: none;
 	}
+
+	/* Make canvas fill whole page (no console though!) */
+	/* https://floooh.github.io/2017/02/22/emsc-html.html */
+	#canvas {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		margin: 0px;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		display: block;
+	}
 </style>
 </head>
 
