@@ -43,8 +43,20 @@ EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
 
 mkdir -p $OUTPUT_DIR
 
+# Parse emcc options from source code
+PRAGMA_KEY="#pragma EM"
+SOURCE_DIR="$(dirname "$1")"
+# strip leading slash
+#SOURCE_DIR="${SOURCE_DIR#/}"
+OPTIONS="$(grep "$PRAGMA_KEY" $1 | grep -v "^[[:blank:]]*//")"
+OPTIONS="${OPTIONS//$PRAGMA_KEY /}"
+OPTIONS="${OPTIONS//RUN_MAIN_SOURCE_DIR/$SOURCE_DIR}"
+OPTIONS="$(echo "$OPTIONS" | sed 's/^[ \t]*//;s/[ \t]*$//' | tr '\n' ' ')"
+#echo "$OPTIONS"
+#exit
+
 #${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.html
-${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js
+${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js $OPTIONS
 
 # Exit if compilation errors...
 if [[ $? != 0 ]]; then exit $?; fi
