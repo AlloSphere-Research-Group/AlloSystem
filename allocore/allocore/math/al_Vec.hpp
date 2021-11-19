@@ -132,7 +132,7 @@ public:
 	/// @param[in] v4		value to initialize fourth element
 	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); reduce<4>(); }
 
-	/// @params[in] v		values to initialize elements to
+	/// @param[in] v		values to initialize elements to
 	/// If the initializer list has one element, then it is assigned to all
 	/// vector components.
 	Vec(std::initializer_list<T> v){ set(v); }
@@ -419,10 +419,35 @@ public:
 
 
 	/// Apply a function in-place on each element
-	template <class Func>
-	Vec& apply(Func func){
-		for(auto& v : *this) func(v);
+	template <class Func, class... Args>
+	Vec& apply(Func func, Args... args){
+		for(auto& v : *this) func(v, args...);
 		return *this;
+	}
+
+	/// Map elements through function into new vector
+
+	/// @param[in] func		Function taking old value and returning new value
+	/// @param[in] args		Extra function arguments
+	template <class Func, class... Args>
+	Vec map(Func func, Args... args) const {
+		Vec<N,T> r(VEC_NO_INIT);
+		for(int i=0; i<size(); ++i)
+			r[i] = func((*this)[i], args...);
+		return r;
+	}
+
+	/// Reduce elements into scalar
+
+	/// @param[in] prev		Initial previous value
+	/// @param[in] func		Function taking previous and current values as first 
+	///						two arguments and returning new value
+	/// @param[in] args		Extra function arguments
+	template <class Func, class... Args>
+	T reduce(const T& prev, Func func, Args... args) const {
+		T r = prev;
+		for(auto& v : *this) r = func(r, v, args...);
+		return r;
 	}
 
 	/// Clip to range:
