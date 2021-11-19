@@ -666,7 +666,8 @@ public:
 
 
 	/// debug printing
-	void print(FILE * out=stdout) const;
+	void print(FILE * out=stdout, const char * append="") const;
+	void println(FILE * out=stdout) const;
 
 private:
 	// set last N-M elements to default value
@@ -969,15 +970,18 @@ Vec<N,T>& Vec<N,T>::mag(T v){
 }
 
 template<int N, class T>
-void Vec<N,T>::print(FILE * out) const {
+void Vec<N,T>::print(FILE * out, const char * append) const {
 	fprintf(out, "{");
 	if(size()){
 		fprintf(out, "%g", (double)((*this)[0]));
 		for (int i=1; i<N; ++i)
 			fprintf(out, ", %g", (double)((*this)[i]));
 	}
-	fprintf(out, "}");
+	fprintf(out, "}%s", append);
 }
+
+template<int N, class T>
+void Vec<N,T>::println(FILE * out) const { print(out, "\n"); }
 
 template <int N, class T>
 std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
