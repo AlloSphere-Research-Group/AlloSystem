@@ -165,14 +165,20 @@ public:
 	/// Returns true with a probability of p
 	bool prob(float p){ return uniform() < p; }
 
-	/// Randomly shuffles elements in array
+	/// Shuffles array elements
 	template <class T>
 	void shuffle(T * arr, uint32_t len);
 
+	/// Shuffle array elements in place
 	template <class Array>
-	void shuffle(Array& a){
+	Array& shuffle(Array& a){
 		shuffle(&a[0], sizeof(a)/sizeof(typename Array::value_type));
+		return a;
 	}
+
+	/// Return shuffled copy of array
+	template <class Array>
+	Array shuffle(const Array& a){ auto t=a; return shuffle(t); }
 
 	// DEPRECATED:
 	float gaussian(){ return normal(); }
@@ -404,6 +410,17 @@ inline float uniformS(){ return global().uniformS(); }
 template <class T>
 inline T uniformS(const T& lim){ return global().uniformS(lim); }
 
+/// Shuffles array elements
+template <class T>
+void shuffle(T * arr, uint32_t len){ global().shuffle(arr,len); }
+
+/// Shuffle array elements in place
+template <class Array>
+Array& shuffle(Array& a){ return global().shuffle(a); }
+
+/// Return shuffled copy of array
+template <class Array>
+Array shuffle(const Array& a){ return global().shuffle(a); }
 
 
 // Implementation_______________________________________________________________
