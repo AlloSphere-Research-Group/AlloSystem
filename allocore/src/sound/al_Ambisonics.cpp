@@ -481,8 +481,7 @@ void AmbisonicsSpatializer::renderSample(AudioIOData& io, const Pose& listeningP
 
 	//Rotate vector according to listener-rotation
 	Quatd srcRot = listeningPose.quat();
-	direction = srcRot.rotate(direction);
-	direction = Vec4d(direction.x, direction.z, direction.y);
+	direction = srcRot.rotate(direction).get<0,2,1>();
 
     //mEncoder.direction(azimuth, elevation);
     //mEncoder.direction(-rf, -rr, ru);

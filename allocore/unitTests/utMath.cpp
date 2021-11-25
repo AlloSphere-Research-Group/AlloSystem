@@ -56,7 +56,6 @@ int utMath(){
 		// constructors
 		{ decltype(a) t(a);			assert(t == a); }
 		{ Vec<3,float> t(1);		assert(t[0] == 1 && t[1] == 1 && t[2] == 1); }
-		{ Vec<3,float> t(1,2);		assert(t[0] == 1 && t[1] == 2 && t[2] == 0); }
 		{ Vec<3,float> t(1,2,3);	assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
 		{ Vec<3,float> t({1,2,3});	assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }
 		{ Vec<3,float> t(Vec<2,float>(1,2), 3); assert(t[0] == 1 && t[1] == 2 && t[2] == 3); }

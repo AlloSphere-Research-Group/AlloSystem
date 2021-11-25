@@ -411,8 +411,7 @@ void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float 
 
 	//Rotate vector according to listener-rotation
 	Quatd srcRot = listeningPose.quat();
-	vec = srcRot.rotate(vec);
-	vec = Vec4d(vec.x, vec.z, vec.y);
+	vec = srcRot.rotate(vec).get<0,2,1>();
 
 	//Silent by default
 	Vec3d gains;
@@ -496,7 +495,7 @@ void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, const float 
 	vec = srcRot.rotate(vec).normalize();
 
 	// now transform to audio positions
-	vec = Vec4d(vec.x, vec.z, vec.y);
+	vec = vec.get<0,2,1>();
 	//Silent by default
 	Vec3d gains;
 //	Vec3d gainsTemp;

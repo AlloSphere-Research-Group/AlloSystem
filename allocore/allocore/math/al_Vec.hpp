@@ -119,18 +119,18 @@ public:
 
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
-	Vec(const T& v1, const T& v2){ set(v1, v2); initTail<2>(); }
+	Vec(const T& v1, const T& v2){ set(v1, v2); }
 
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
 	/// @param[in] v3		value to initialize third element
-	Vec(const T& v1, const T& v2, const T& v3){ set(v1, v2, v3); initTail<3>(); }
+	Vec(const T& v1, const T& v2, const T& v3){ set(v1, v2, v3); }
 
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
 	/// @param[in] v3		value to initialize third element
 	/// @param[in] v4		value to initialize fourth element
-	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); initTail<4>(); }
+	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); }
 
 	/// @param[in] v		values to initialize elements to
 	/// If the initializer list has one element, then it is assigned to all
@@ -269,38 +269,37 @@ public:
 
 	/// Set first 2 elements
 	Vec& set(const T& v1, const T& v2){
-		static_assert(N>=2, "Attempt to set vector elements out of bounds");
-		(*this)[1] = v2;
-		(*this)[0] = v1;
+		static_assert(N==2, "Attempt to set vector with wrong number of elements");
+		at<0>()=v1; at<1>()=v2;
 		return *this;
 	}
 
 	/// Set first 3 elements
 	Vec& set(const T& v1, const T& v2, const T& v3){
-		static_assert(N>=3, "Attempt to set vector elements out of bounds");
-		(*this)[2] = v3;
-		return set(v1,v2);
+		static_assert(N==3, "Attempt to set vector with wrong number of elements");
+		at<0>()=v1; at<1>()=v2; at<2>()=v3;
+		return *this;
 	}
 
 	/// Set first 4 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
-		static_assert(N>=4, "Attempt to set vector elements out of bounds");
-		(*this)[3] = v4;
-		return set(v1,v2,v3);
+		static_assert(N==4, "Attempt to set vector with wrong number of elements");
+		at<0>()=v1; at<1>()=v2; at<2>()=v3; at<3>()=v4;
+		return *this;
 	}
 
 	/// Set first 5 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
-		static_assert(N>=5, "Attempt to set vector elements out of bounds");
-		(*this)[4] = v5;
-		return set(v1,v2,v3,v4);
+		static_assert(N==5, "Attempt to set vector with wrong number of elements");
+		at<0>()=v1; at<1>()=v2; at<2>()=v3; at<3>()=v4; at<4>()=v5;
+		return *this;
 	}
 
 	/// Set first 6 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){
-		static_assert(N>=6, "Attempt to set vector elements out of bounds");
-		(*this)[5] = v6;
-		return set(v1,v2,v3,v4,v5);
+		static_assert(N==6, "Attempt to set vector with wrong number of elements");
+		at<0>()=v1; at<1>()=v2; at<2>()=v3; at<3>()=v4; at<4>()=v5; at<5>()=v6;
+		return *this;
 	}
 
 	/// Set elements from initializer list {a,b,...}
