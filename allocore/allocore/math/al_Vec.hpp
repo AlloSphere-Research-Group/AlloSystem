@@ -108,6 +108,10 @@ Vec<1+sizeof...(Vs),V> toVec(const V& v, Vs... vs);
 /// @ingroup allocore
 template <int N, class T>
 class Vec : public VecElems<N,T>{
+
+	static constexpr int const_abs(int x){ return x>=0 ? x : -x; }
+	static constexpr int const_min(int x, int y){ return x<=y ? x : y; }
+
 public:
 	using VecElems<N,T>::x;
 
@@ -387,6 +391,15 @@ public:
 	Vec<3,T>& xyz(){ return sub<3>(); }
 	const Vec<3,T>& yzw() const { return sub<3,1>(); }
 	Vec<3,T>& yzw(){ return sub<3,1>(); }
+
+	/// Remove leading or trailing elements
+
+	/// \tparam M	Number of elements to drop from head (if positive) or tail
+	///				(if negative).
+	template <int M, int L = N-const_min(const_abs(M), N)>
+	Vec<L,T> drop() const{
+		return sub<L, M<0?0:N-L>();
+	}
 
 	/// Swap elements
 	Vec& swap(int i, int j){ std::swap((*this)[i], (*this)[j]); return *this; }
