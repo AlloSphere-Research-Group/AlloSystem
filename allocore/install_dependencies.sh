@@ -261,12 +261,11 @@ elif uname -o | grep -q "Msys"; then
 	# MSYS2
 	else
 		echo 'Found MinGW-w64 / MSYS2'
-		ARCH="mingw-w64-"$(uname -m)
 		LIBS="gcc gdb portaudio glew freeglut freetype assimp libusb"
 		PKGS=
 		for L in $LIBS
 		do
-			PKGS=$PKGS" $ARCH-$L"
+			PKGS=$PKGS" $MINGW_PACKAGE_PREFIX-$L"
 		done
 
 		# Libs with deps (other then gcc-libs):
