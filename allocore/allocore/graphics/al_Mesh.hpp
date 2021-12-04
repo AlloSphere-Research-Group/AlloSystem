@@ -253,6 +253,9 @@ public:
 	Mesh& triangles();
 	Mesh& triangleStrip();
 
+	bool isPoints() const;
+	bool isLines() const;
+	bool isLineStrip() const;
 	bool isTriangles() const;
 	bool isTriangleStrip() const;
 

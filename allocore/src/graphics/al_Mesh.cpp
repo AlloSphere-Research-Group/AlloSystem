@@ -50,6 +50,9 @@ Mesh& Mesh::lineStrip(float stroke){ return lineStrip().stroke(stroke); }
 Mesh& Mesh::triangles(){ return primitive(Graphics::TRIANGLES); }
 Mesh& Mesh::triangleStrip(){ return primitive(Graphics::TRIANGLE_STRIP); }
 
+bool Mesh::isPoints() const { return primitive() == Graphics::POINTS; }
+bool Mesh::isLines() const { return primitive() == Graphics::LINES; }
+bool Mesh::isLineStrip() const { return primitive() == Graphics::LINE_STRIP; }
 bool Mesh::isTriangles() const { return primitive() == Graphics::TRIANGLES; }
 bool Mesh::isTriangleStrip() const { return primitive() == Graphics::TRIANGLE_STRIP; }
 
