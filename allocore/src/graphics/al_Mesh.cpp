@@ -818,6 +818,14 @@ Mesh& Mesh::forEachFace(const std::function<void(int v1, int v2, int v3)>& onFac
 				int w = i&1; // winding: 0=ccw, 1=cw
 				onFace(mIndices[i+w], mIndices[i+1-w], mIndices[i+2]);
 			}
+		} else if(isLines()){
+			for(int i=1; i<mIndices.size(); i+=2){
+				onFace(mIndices[i-1], mIndices[i], mIndices[i-1]);
+			}
+		} else if(isPoints()){
+			for(int i=0; i<mIndices.size(); i++){
+				onFace(mIndices[i], mIndices[i], mIndices[i]);
+			}
 		}
 	} else {
 		if(isTriangles()){
@@ -829,9 +837,21 @@ Mesh& Mesh::forEachFace(const std::function<void(int v1, int v2, int v3)>& onFac
 				int w = i&1; // winding: 0=ccw, 1=cw
 				onFace(i+w, i+1-w, i+2);
 			}
+		} else if(isLines()){
+			for(int i=1; i<mVertices.size(); i+=2){
+				onFace(i-1, i, i-1);
+			}
+		} else if(isPoints()){
+			for(int i=0; i<mVertices.size(); i++){
+				onFace(i, i, i);
+			}
 		}
 	}
 	return *this;
+}
+
+const Mesh& Mesh::forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace) const {
+	return const_cast<Mesh*>(this)->forEachFace(onFace);
 }
 
 bool Mesh::saveFBX(const std::string& filePath, const std::string& solidName) const {

@@ -430,6 +430,10 @@ public:
 
 
 	/// Call function for each face in mesh
+
+	/// If the primitive is points or lines, then the function is called for
+	/// each point or line segment, respectively.
+	const Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace) const;
 	Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace);
 
 
