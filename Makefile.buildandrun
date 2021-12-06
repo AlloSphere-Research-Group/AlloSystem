@@ -4,7 +4,7 @@
 #RUN_SRC_DIRS	?=
 
 # Include user file, if present
-RUN_DIR = $(dir $(lastword $(MAKECMDGOALS)))
+RUN_DIR ?= $(dir $(lastword $(MAKECMDGOALS)))
 -include $(RUN_DIR)Makefile.user
 
 # Add user specified source dirs to global Make vars
