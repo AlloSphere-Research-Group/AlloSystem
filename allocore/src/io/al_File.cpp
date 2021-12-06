@@ -545,14 +545,17 @@ const char * File::readAll(){
 	return mContent;
 }
 
-std::string File::read(const std::string& path){
+/*static*/ std::vector<char> File::read(const std::string& path){
 	File f(path, "rb");
-	f.open();
-	auto str = f.readAll();
-	return str ? str : "";
+	if(f.open()){
+		std::vector<char> buf(f.size());
+		f.read(buf.data(), buf.size());
+		return buf;
+	}
+	return {};
 }
 
-int File::write(const std::string& path, const void * v, int size, int items){
+/*static*/ int File::write(const std::string& path, const void * v, int size, int items){
 	File f(path, "w");
 	int r = 0;
 	if(f.open()){
@@ -562,11 +565,11 @@ int File::write(const std::string& path, const void * v, int size, int items){
 	return r;
 }
 
-int File::write(const std::string& path, const std::string& data){
+/*static*/ int File::write(const std::string& path, const std::string& data){
 	return File::write(path, &data[0], data.size());
 }
 
-bool File::remove(const std::string &path)
+/*static*/ bool File::remove(const std::string &path)
 {
 	if (!File::isDirectory(path)) {
 		return ::remove(path.c_str()) == 0;
@@ -574,7 +577,7 @@ bool File::remove(const std::string &path)
 	return false;
 }
 
-bool File::copy(const std::string &srcPath, const std::string &dstPath, unsigned int bufferSize)
+/*static*/ bool File::copy(const std::string &srcPath, const std::string &dstPath, unsigned int bufferSize)
 {
 	std::ifstream src(srcPath, std::ios::binary);	
 	if(!src.is_open()){
@@ -605,7 +608,7 @@ static char getDelimiter(const std::string& path){
 	return AL_FILE_DELIMITER;
 }
 
-std::string File::conformDirectory(const std::string& path){
+/*static*/ std::string File::conformDirectory(const std::string& path){
 	if(path.size()){
 		auto delim = getDelimiter(path);
 		if(delim != path[path.size()-1]){
@@ -616,7 +619,7 @@ std::string File::conformDirectory(const std::string& path){
 	return "." AL_FILE_DELIMITER_STR;
 }
 
-std::string File::conformPathToOS(const std::string& path){
+/*static*/ std::string File::conformPathToOS(const std::string& path){
 	std::string res(path);
 
 	#ifdef __MSYS__
@@ -641,7 +644,7 @@ std::string File::conformPathToOS(const std::string& path){
 	return res;
 }
 
-std::string File::baseName(const std::string& path, const std::string& suffix){
+/*static*/ std::string File::baseName(const std::string& path, const std::string& suffix){
 	auto posSlash = path.find_last_of("/\\"); // handle '/' or '\' path delimiters
 	if(path.npos == posSlash) posSlash=0; // no slash
 	else ++posSlash;
@@ -656,7 +659,7 @@ std::string File::baseName(const std::string& path, const std::string& suffix){
 	return path.substr(posSlash, len);
 }
 
-std::string File::directory(const std::string& path){
+/*static*/ std::string File::directory(const std::string& path){
 	size_t pos = path.find_last_of("/\\");
 	if(std::string::npos != pos){
 		return path.substr(0, pos+1);
@@ -664,7 +667,7 @@ std::string File::directory(const std::string& path){
 	return "." AL_FILE_DELIMITER_STR;
 }
 
-std::string File::extension(const std::string& path){
+/*static*/ std::string File::extension(const std::string& path){
 	size_t pos = path.find_last_of('.');
 	if(path.npos != pos){
 		return path.substr(pos);
@@ -672,7 +675,7 @@ std::string File::extension(const std::string& path){
 	return "";
 }
 
-std::string File::replaceExtension(const std::string& path, const std::string& ext){
+/*static*/ std::string File::replaceExtension(const std::string& path, const std::string& ext){
 	if(ext.empty()){
 		return path.substr(0, path.find_last_of("."));
 	}
@@ -681,7 +684,7 @@ std::string File::replaceExtension(const std::string& path, const std::string& e
 	return directory(path) + baseName(path, extension(path)) + e;
 }
 
-bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
+/*static*/ bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
 	auto pre = prefixPath;
 	if(pre[0]) pre = conformDirectory(pre);
 	for(int i=0; i<maxDepth; ++i){
@@ -694,7 +697,7 @@ bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int
 	return false;
 }
 
-bool File::searchBack(std::string& path, int maxDepth){
+/*static*/ bool File::searchBack(std::string& path, int maxDepth){
 	std::string prefix = "";
 	bool r = searchBack(prefix, path);
 	if(r) path = prefix + path;
