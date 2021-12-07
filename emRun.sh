@@ -23,12 +23,13 @@ if [ "${1##*.}" == "html" ]; then
 fi
 
 ALLO_DIR=$PWD
-BUILD_DIR=$ALLO_DIR/build/em
+BUILD_DIR=$ALLO_DIR/build/em/
 PROJ_NAME=$(basename "$1" | cut -d. -f1)
-OUTPUT_DIR="$BUILD_DIR/bin/$PROJ_NAME"
+SOURCE_DIR="$(dirname "$1")/"
+OUTPUT_DIR="${BUILD_DIR}bin/$PROJ_NAME"
 
-OBJS=`ls $BUILD_DIR/obj/*.o`
-CPPFLAGS="-I$BUILD_DIR/include -O2"
+OBJS=`ls ${BUILD_DIR}obj/*.o`
+CPPFLAGS="-I${BUILD_DIR}include -O2"
 CPPFLAGS+=' -DRUN_MAIN_SOURCE_DIR="./"'
 CFLAGS="-O2"
 CXXFLAGS="-std=c++14"
@@ -45,7 +46,6 @@ mkdir -p $OUTPUT_DIR
 
 # Parse emcc options from source code
 PRAGMA_KEY="#pragma EM"
-SOURCE_DIR="$(dirname "$1")"
 # strip leading slash
 #SOURCE_DIR="${SOURCE_DIR#/}"
 OPTIONS="$(grep "$PRAGMA_KEY" $1 | grep -v "^[[:blank:]]*//")"
@@ -54,6 +54,9 @@ OPTIONS="${OPTIONS//RUN_MAIN_SOURCE_DIR/$SOURCE_DIR}"
 OPTIONS="$(echo "$OPTIONS" | sed 's/^[ \t]*//;s/[ \t]*$//' | tr '\n' ' ')"
 #echo "$OPTIONS"
 #exit
+
+# Build objects of any build-and-run sources
+${EM_DIR}emmake make runobjs PLATFORM=em ARCH=none BUILD_DIR=$BUILD_DIR RUN_DIR=$SOURCE_DIR
 
 #${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.html
 ${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js $OPTIONS
