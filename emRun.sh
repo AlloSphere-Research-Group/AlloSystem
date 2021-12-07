@@ -38,6 +38,7 @@ EMFLAGS+=" -s USE_SDL=2"
 #EMFLAGS+=" -s USE_WEBGL2=1" #default, recommended setting
 EMFLAGS+=" -s FULL_ES2=1" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
 EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
+#EMFLAGS+=" -s ASSERTIONS=1" # get more info on runtime errors
 #EMFLAGS+=" --cpuprofiler" # adds profiler to generated page
 #EMFLAGS+=" -lwebsocket.js" #WebSockets API
 #EMFLAGS+=" -lwebsocket.js -s PROXY_POSIX_SOCKETS=1 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1" #full POSIX socket emulation over WebSockets
