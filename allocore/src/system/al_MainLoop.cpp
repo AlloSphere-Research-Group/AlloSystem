@@ -20,9 +20,11 @@ extern "C" void al_main_native_stop();
 		// If fps<=0, uses the browser’s requestAnimationFrame mechanism
 		// to call the function.
 		int fps = int(1./interval);
+		// Let the browser take over the main loop and call our tick
 		emscripten_set_main_loop(
 			[](){ al::Main::get().tick(); },
-			fps, 1
+			fps,
+			1 // infinite loop: will block the calling thread
 		);
 	}
 	extern "C" void al_main_native_stop(){

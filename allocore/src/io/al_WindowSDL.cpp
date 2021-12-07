@@ -49,6 +49,9 @@ public:
 
 	void destroy(){ //printf("destroy: %p\n", this);
 		if(created()){
+			#ifdef AL_EMSCRIPTEN
+			Main::get().remove(mMainHandler);
+			#endif
 			SDL_GL_DeleteContext(mGLContext);
 			mGLContext = NULL;
 			SDL_DestroyWindow(mSDLWindow);
@@ -77,6 +80,11 @@ public:
 	}
 */
 	void scheduleDraw(double deltaTime=0.){
+		#ifdef AL_EMSCRIPTEN
+		// Main will call onFrame via handler's onTick
+		Main::get().add(mMainHandler);
+		Main::get().interval(deltaTime);
+		#else
 		//if(!mScheduled){
 		if(deltaTime == 0){
 			scheduleDrawStatic(Main::get().now(), this);
@@ -85,6 +93,7 @@ public:
 			mScheduled = true;
 			Main::get().queue().send(Main::get().now()+deltaTime, scheduleDrawStatic, this);
 		}
+		#endif
 	}
 
 private:
@@ -350,6 +359,16 @@ private:
 	bool mUsingTouch = false;
 	int mFingersDown = 0;
 
+	#ifdef AL_EMSCRIPTEN
+	struct MainHandler : public Main::Handler {
+		MainHandler(WindowImpl& impl): outer(impl){}
+		WindowImpl& outer;
+		void onTick() override {
+			outer.onFrame();
+		}
+	} mMainHandler{*this};
+	#endif
+
 	friend class Window;
 };
 
@@ -371,9 +390,6 @@ void Window::implDestroy(){
 
 bool Window::implCreate(){
 	//printf("Window::create called (in al_WindowSDL.cpp)\n");
-
-	// switch mainloop to default mode:
-	Main::get().driver(Main::SLEEP);
 
 	/*if(SDL_InitSubSystem(SDL_INIT_TIMER) < 0){
 		printf("SDL ERROR: Failed to init SDL timer subsystem.\n");
@@ -440,14 +456,10 @@ bool Window::implCreate(){
 	}
 
 	#ifdef AL_EMSCRIPTEN
-	{
-		int infiniteLoop = 1;
-		int emFPS = asap() ? -1 : fps();
-		//void loop_handler(void *arg)
-		emscripten_set_main_loop_arg(
-			[](void * user){ decltype(mImpl)(user)->onFrame(); }, mImpl, emFPS, infiniteLoop
-		);
-	}
+		float period = asap() ? -1 : 1./fps();
+		mImpl->scheduleDraw(period);
+		// use requestAnimationFrame
+		//emscripten_set_main_loop_timing(EM_TIMING_RAF, 1);
 	#else
 		mImpl->scheduleDraw();
 	#endif
