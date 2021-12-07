@@ -16,8 +16,10 @@ fi
 #BROWSER=firefox
 if [[ $BROWSER ]]; then BROWSER="--browser $BROWSER"; fi
 
+EXT="${1##*.}"
+
 # If passed a .html, just emrun it
-if [ "${1##*.}" == "html" ]; then
+if [ $EXT == "html" ]; then
 	${EM_DIR}emrun --no_emrun_detect $BROWSER "$1"
 	exit
 fi
@@ -32,7 +34,9 @@ OBJS=`ls ${BUILD_DIR}obj/*.o`
 CPPFLAGS="-I${BUILD_DIR}include -O2"
 CPPFLAGS+=' -DRUN_MAIN_SOURCE_DIR="./"'
 CFLAGS="-O2"
-CXXFLAGS="-std=c++14"
+if [ $EXT != "c" ]; then #since so many C++ extensions
+	CXXFLAGS="-std=c++14"
+fi
 EMFLAGS+=" -s USE_SDL=2"
 #EMFLAGS+=" -s LEGACY_GL_EMULATION=1"
 #EMFLAGS+=" -s USE_WEBGL2=1" #default, recommended setting
