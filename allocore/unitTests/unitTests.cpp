@@ -14,7 +14,8 @@ int main (int argc, char * const argv[]) {
 		printf("%s ", #Name);\
 		ut##Name();\
 		for(size_t i=0; i<32-strlen(#Name); ++i) printf(".");\
-		printf(" pass\n")
+		printf(" pass\n");\
+		fflush(stdout)
 
 	RUNTEST(Math);
 	RUNTEST(MathSpherical);
