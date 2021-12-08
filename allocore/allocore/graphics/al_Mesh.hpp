@@ -273,8 +273,8 @@ public:
 	Mesh& index(unsigned int i){ indices().append(i); return *this; }
 
 	/// Append indices to index buffer
-	template <class Tindex>
-	Mesh& index(const Tindex * buf, int size, Tindex indexOffset=0){
+	template <class Tindex1, class Tindex2 = Index>
+	Mesh& index(const Tindex1 * buf, int size, Tindex2 indexOffset=0){
 		for(int i=0; i<size; ++i) index((Index)(buf[i] + indexOffset));
 		return *this;
 	}
