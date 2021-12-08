@@ -212,6 +212,9 @@ int utTypes(){
 		assert(a.capacity() == 2);
 		//assert(a.fill() == 0);
 
+		a.resize(0);
+		assert(a.size() == 0);
+
 		a.append(1);
 		assert(a[0] == 1);
 		assert(a.size() == 1);
@@ -220,17 +223,42 @@ int utTypes(){
 		a.append(2);
 		a.append(3);
 		assert(a.size() == 3);
-		assert(a.capacity() == 4);
+		assert(a.capacity() >= a.size());
 		assert(a.last() == 3);
 
+		int cap = a.capacity();
 		a.reset();
 		assert(a.size() == 0);
-		assert(a.capacity() == 4);
+		assert(a.capacity() == cap);
 
 		a.append(7);
 		a.repeatLast();
 		assert(a[0] == 7);
 		assert(a[1] == 7);
+
+		a.reset();
+		a.assign(3, 123);
+		assert(a[0] == 123);
+		assert(a[1] == 123);
+		assert(a[2] == 123);
+
+		a.reset();
+		a.append(1);
+		a.append(2);
+		a.append(3);
+		a.expand<2,true>();
+		assert(a[0]==1 && a[1]==1);
+		assert(a[2]==2 && a[3]==2);
+		assert(a[4]==3 && a[5]==3);
+
+		a.reset();
+		a.append(1);
+		a.append(2);
+		a.append(3);
+		a.expand<2,false>();
+		assert(a[0]==1 && a[1]==int());
+		assert(a[2]==2 && a[3]==int());
+		assert(a[4]==3 && a[5]==int());
 
 		// Appending another Buffer
 		{
