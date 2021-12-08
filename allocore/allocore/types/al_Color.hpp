@@ -722,6 +722,9 @@ struct RGB{
 	/// Returns luminance value (following ITU-R BT.601)
 	float luminance() const { return r*0.299f + g*0.587f + b*0.114f; }
 
+	/// Returns grayscale of current color
+	RGB gray() const { return RGB(luminance()); }
+
 	/// Returns self linearly mixed with another color (0 = none)
 	RGB mix(const RGB& v, float amt=0.5f) const {
 		return (v-*this)*amt + *this;
