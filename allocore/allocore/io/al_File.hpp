@@ -204,6 +204,12 @@ public:
 	/// Quick and dirty read of all bytes from file
 	static std::vector<char> read(const std::string& path);
 
+	/// Quick and dirty read of all bytes from text file
+
+	/// The result is valid for text (human-readable) files or files without
+	/// byte values of zero, which will exclude many binary files.
+	static std::string toString(const std::string& path);
+
 	/// Quick and dirty write memory to file
 	static int write(const std::string& path, const void * v, int size, int items=1);
 

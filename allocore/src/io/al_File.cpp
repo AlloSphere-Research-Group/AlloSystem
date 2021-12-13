@@ -555,6 +555,13 @@ const char * File::readAll(){
 	return {};
 }
 
+/*static*/ std::string File::toString(const std::string& path){
+	File f(path, "rb");
+	f.open();
+	auto str = f.readAll();
+	return str ? str : "";
+}
+
 /*static*/ int File::write(const std::string& path, const void * v, int size, int items){
 	File f(path, "w");
 	int r = 0;
