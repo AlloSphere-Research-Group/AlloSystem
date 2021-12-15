@@ -67,7 +67,7 @@ Mesh& Mesh::decompress(){
 			if(N > 1){\
 				std::vector<Type> old(N);\
 				std::copy(&buf[0], (&buf[0]) + N, old.begin());\
-				buf.size(Ni);\
+				buf.resize(Ni);\
 				for(int i=0; i<Ni; ++i)	buf[i] = old[indices()[i]];\
 			}\
 		}
@@ -150,7 +150,7 @@ public:
 void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
 
 	auto initMesh = [](Mesh& m, int n){
-		m.vertices().size(n*2);
+		m.vertices().resize(n*2);
 		m.reset();
 		m.primitive(Graphics::LINES);
 	};
@@ -336,7 +336,7 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 	if(Nv < 3) return *this;
 
 	// make same number of normals as vertices
-	normals().size(Nv);
+	normals().resize(Nv);
 
 	// compute vertex based normals
 	if(indices().size()){
@@ -474,8 +474,8 @@ Mesh& Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 
 	if(0 == N) return *this;
 
-	mVertices.size(N*2);
-	mNormals.size(N*2);
+	mVertices.resize(N*2);
+	mNormals.resize(N*2);
 
 	int in = faceBinormal ? 2 : 1;
 	int ib = faceBinormal ? 1 : 2;
@@ -740,14 +740,14 @@ static void removeDegenerates(Buffer<T>& buf){
 			j+=3;
 		}
 	}
-	buf.size(j);
+	buf.resize(j);
 }
 
 template <class T>
 static void stripToTri(Buffer<T>& buf){
 	int N = buf.size();
 	int Ntri = N-2;
-	buf.size(Ntri*3);
+	buf.resize(Ntri*3);
 
 	// Iterate backwards through elements so we can operate in place
 	// strip (i): 0 1 2 3 4 5 6 7 8 ...

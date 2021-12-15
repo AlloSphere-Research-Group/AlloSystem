@@ -279,7 +279,7 @@ int utTypes(){
 			Buffer<int> b(4);
 			for(int i=0; i<b.size(); ++i) b[i] = i+4;
 
-			a.size(4);
+			a.resize(4);
 			for(int i=0; i<a.size(); ++i) a[i] = i;
 
 			// Append non-zero sized to non-zero sized
@@ -291,7 +291,7 @@ int utTypes(){
 			}
 
 			// Append non-zero sized to zero sized
-			a.size(0);
+			a.resize(0);
 			a.append(b);
 				assert(a.size() == b.size());
 				for(int i=0; i<a.size(); ++i) assert(a[i] == b[i]);
@@ -299,7 +299,7 @@ int utTypes(){
 			// Append zero sized to non-zero sized
 			{
 			int N = a.size();
-			b.size(0);
+			b.resize(0);
 			a.append(b);
 				assert(a.size() == N);
 			}

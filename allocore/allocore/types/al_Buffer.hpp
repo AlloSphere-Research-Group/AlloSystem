@@ -200,12 +200,6 @@ public:
 		}
 	}
 
-	/// Set size of buffer
-
-	/// If the requested size is larger than the current capacity, then the
-	/// buffer will be resized.
-	void size(size_t n){ resize(n); }
-
 	/// Appends element to end of buffer growing its size if necessary
 	void append(const T& v){
 		// Grow array if too small

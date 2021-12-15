@@ -26,9 +26,9 @@ struct MyWindow : public Window, public Freenect::Callback, public ThreadFunctio
 		world_dim(dim),
 		bHideOOB(0)
 	{
-		pointsMesh.vertices().size(640*480);
-		pointsMesh.colors().size(640*480);
-		pointsMesh.texCoord2s().size(640*480);
+		pointsMesh.vertices().resize(640*480);
+		pointsMesh.colors().resize(640*480);
+		pointsMesh.texCoord2s().resize(640*480);
 
 		frameMesh.reset();
 		frameMesh.primitive(gl.LINES);
