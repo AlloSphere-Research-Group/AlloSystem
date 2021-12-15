@@ -44,6 +44,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <cstddef>
 
 namespace al{
 
@@ -54,59 +55,102 @@ namespace al{
 /// deallocations.
 ///
 /// @ingroup allocore
-template <class T, class Alloc=std::allocator<T> >
-class Buffer : protected Alloc{
+template <class T>
+class Buffer{
 public:
-
+	typedef std::size_t size_t;
 	typedef T value_type;
 
 	/// @param[in] size			Initial size
-	explicit Buffer(int size=0)
-	:	mElems(size), mSize(size)
-	{}
+	explicit Buffer(size_t size=0)
+	: Buffer(size,size) { }
 
 	/// @param[in] size			Initial size
 	/// @param[in] capacity		Initial capacity
-	Buffer(int size, int capacity)
-	:	mElems(capacity), mSize(size)
-	{}
+	Buffer(size_t size, size_t capacity)
+	{
+		reserve(capacity);
+		resize(size);
+	}
 
-	~Buffer(){}
+	Buffer(const Buffer& other)
+	{
+		(*this) = other;
+	}
 
+	Buffer& operator=(const Buffer& other){
+		if(this!=(&other)){
+			resize(0);
+			append(other);
+		}
+		return *this;
+	}
 
-	int capacity() const { return int(mElems.size()); }	///< Returns total capacity
-	int size() const { return mSize; }					///< Returns size
-	bool empty() const { return 0==size(); }			///< Whether buffer is empty
-	const T * elems() const { return &mElems[0]; }		///< Returns C pointer to elements
-	T * elems(){ return &mElems[0]; }					///< Returns C pointer to elements
+	~Buffer(){ 
+		delete[] mData;
+		mData = nullptr;
+		mEnd = nullptr;
+		mCapEnd = nullptr;
+	}
 
-	T * begin(){ return elems(); }
-	const T * begin() const { return elems(); }
-	T * end(){ return elems() + size(); }
-	const T * end() const { return elems() + size(); }
+	size_t capacity() const { return mCapEnd-mData; }	///< Returns total capacity
+	size_t size() const { return mEnd-mData; }					///< Returns size
+	bool empty() const { return mData==mEnd; }			///< Whether buffer is empty
+	const T * data() const { return mData; }		///< Returns C pointer to elements
+	T * data(){ return mData; }					///< Returns C pointer to elements
+
+	[[deprecated("elems is deprecated, use data instead")]]
+	const T * elems() const { return mData; }		///< Returns C pointer to elements
+	[[deprecated("elems is deprecated, use data instead")]]
+	T * elems(){ return mData; }					///< Returns C pointer to elements
+
+	T * begin(){ return mData; }
+	const T * begin() const { return mData; }
+	T * end(){ return mEnd; }
+	const T * end() const { return mEnd; }
 
 	/// Get element at index
-	T& operator[](int i){ return mElems[i]; }
+	T& operator[](size_t i){ return mData[i]; }
 
 	/// Get element at index (read-only)
-	const T& operator[](int i) const { return mElems[i]; }
+	const T& operator[](size_t i) const { return mData[i]; }
 
 	/// Assign value to elements
 
 	/// This function fills a Buffer with n copies of the given value. Note that
 	/// the assignment completely changes the buffer and that the resulting size
 	/// is the same as the number of elements assigned. Old data may be lost.
-	void assign(int n, const T& v){
-		mElems.assign(n,v);
-		setSize(n);
+	void assign(size_t n, const T& v){
+		if(n > capacity()){
+			auto oldData = mData;
+			alloc(n);
+			delete[] oldData;
+		}
+		mEnd = mData+n;
+		for(auto& elem : *this){ new(&elem) value_type(v); }
 	}
 
 	/// Get last element
-	T& last(){ return mElems[size()-1]; }
-	const T& last() const { return mElems[size()-1]; }
+	T& last(){ return *(mEnd-1); }
+	const T& last() const { return *(mEnd-1); }
 
 	/// Resets size to zero without deallocating allocated memory
-	void reset(){ mSize=0; }
+	void reset(){ resize(0); }
+
+	/// This will set the capacity of the buffer to the requested size.
+	/// If the number is smaller than the current capacity then nothing happens,
+	/// otherwise the buffer is extended and new elements are default-constructed.
+	void reserve(size_t n){
+		if(n > capacity()){
+			T* oldData = mData;
+			T* oldEnd = mEnd;
+			alloc(n);
+			if(oldData){
+				std::move(oldData, oldEnd, mData);
+				delete[] oldData;
+			}
+		}
+	}
 
 	/// Resize buffer
 
@@ -114,38 +158,68 @@ public:
 	/// size. If the number is smaller than the current size the buffer is
 	/// truncated, otherwise the buffer is extended and new elements are
 	/// default-constructed.
-	void resize(int n){
-		mElems.resize(n);
-		setSize(n);
+	void resize(size_t n){
+		resize(n, value_type());
+	}
+
+	/// This will set both the size and capacity of the buffer to the requested
+	/// size. If the number is smaller than the current size the buffer is
+	/// truncated, otherwise the buffer is extended and new elements are
+	/// copy-constructed from the provided val.
+	void resize(size_t n, const value_type& val){
+		if(size() < n){
+			reserve(n);
+			//When sizing up
+			for (auto it = mEnd; it != mData+n; ++it)
+			{
+				new(it) value_type(val);
+			}
+		}
+		else{
+			//When sizing down
+			for (auto it = mData+n; it != mEnd; ++it)
+			{
+				it->~value_type();
+			}
+		}
+		mEnd = mData+n;
+	}
+
+	/// If the size of the buffer is smaller than its capacity then shrinks the
+	/// capacity of the buffer to match the size.
+	void shrink(){
+		if(size()<capacity()){
+			size_t shrinkTo = size() > 2 ? size() : 2;
+			T* oldData = mData;
+			T* oldEnd = mEnd;
+			alloc(shrinkTo);
+			if(oldData){
+				std::move(oldData, oldEnd, mData);
+				delete[] oldData;
+			}
+		}
 	}
 
 	/// Set size of buffer
 
 	/// If the requested size is larger than the current capacity, then the
 	/// buffer will be resized.
-	void size(int n){
-		if(capacity() < n) resize(n);
-		else setSize(n);
-	}
+	void size(size_t n){ resize(n); }
 
 	/// Appends element to end of buffer growing its size if necessary
-	void append(const T& v, double growFactor=2){
-
+	void append(const T& v){
 		// Grow array if too small
-		if(size() >= capacity()){
+		if(mEnd == mCapEnd){
 			// Copy argument since it may be an element in current memory range
 			// which may become invalid after the resize.
-			const T vsafecopy = v;
-			mElems.resize((size() ? size() : 4)*growFactor);
-			Alloc::construct(elems()+size(), vsafecopy);
+			size_t newCapacity = capacity() > 0 ? capacity() * 2 : 2;
+			reserve(newCapacity);
 		}
-		else{
-			Alloc::construct(elems()+size(), v);
-		}
-		++mSize;
+		new(mEnd) value_type(v);
+		mEnd++;
 	}
 	/// synonym for append():
-	void push_back(const T& v, double growFactor=2) { append(v, growFactor); }
+	void push_back(const T& v) { append(v); }
 
 	/// Append elements of another Buffer
 
@@ -156,10 +230,11 @@ public:
 	}
 
 	/// Append elements of an array
-	void append(const T * src, int len){
-		int oldsize = size();
-		size(size() + len);
-		std::copy(src, src + len, mElems.begin() + oldsize);
+	void append(const T * src, size_t len){
+		size_t newSize = size() + len;
+		reserve(newSize);
+		std::copy(src, src + len, end());
+		mEnd += len;
 	}
 
 	/// Repeat last element
@@ -171,25 +246,60 @@ public:
 	/// @tparam n		Expansion factor; new size is n times old size
 	/// @tparam dup		If true, new elements are duplicates of existing elements.
 	///					If false, new elements are default constructed.
-	template <int n, bool dup>
+	template <size_t n, bool dup>
 	void expand(){
-		size(size()*n);
-		const int Nd = dup ? n : 1;
-		for(int i=size()/n-1; i>=0; --i){
-			const T& v = (*this)[i];
-			for(int j=0; j<Nd; ++j) Alloc::construct(elems()+n*i+j, v);
+		static_assert(n>1, "Invalid expansion factor");
+		if(mData && size()>0){
+			auto newSize = size()*n;
+			if(newSize > capacity()){
+				T* oldData = mData;
+				alloc(newSize);
+				for (size_t i = 0, iExp = 0; i < size(); i++, iExp+=n)
+				{
+					mData[iExp] = std::move(oldData[i]);
+					for (size_t j = 1; j < n; j++)
+					{
+						if(dup){
+							new(mData+(iExp +j)) value_type(mData[iExp]);
+						}
+						else{
+							new(mData+(iExp +j)) value_type();
+						}
+					}
+				}
+				delete[] oldData;
+			}
+			else{
+				for (size_t i = size()-1, iExp = newSize-1; i != static_cast<size_t>(-1); i--)
+				{
+					for (size_t k = 0; k < n; k++, iExp--)
+					{
+						if(k==n-1 || dup){
+							new(mData+iExp) value_type(mData[i]);
+						}
+						else{
+							new(mData+iExp) value_type();
+						}
+					}
+				}
+			}
+			mEnd = mData+newSize;
 		}
 	}
 
 private:
-	std::vector<T, Alloc> mElems;
-	int mSize;		// logical size array
-
-	void setSize(int n){ mSize=n; }
+	T* mData = nullptr;
+	T* mEnd = nullptr;
+	T* mCapEnd = nullptr;
+	void alloc(size_t newCapacity){
+		if(newCapacity<=0){ newCapacity = 2; }
+		auto tmpSize = size();
+		mData = new T[newCapacity];
+		mCapEnd = mData + newCapacity;
+		if(tmpSize >= newCapacity){ mEnd = mCapEnd; }
+		else{ mEnd = mData + tmpSize; }
+	}
 };
-
-
-
 
 /// Ring buffer
 
