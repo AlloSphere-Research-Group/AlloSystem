@@ -207,8 +207,22 @@ int utTypes(){
 
 
 	{
+		{ // default constructor
+			Buffer<int> a;
+			assert(a.size() == 0);
+			assert(a.empty());
+			assert(a.capacity() == 0);
+			assert(a.data() == nullptr);
+			// a[0]; // this will segfault!
+			for(auto v : a){} // should work with empty buffer
+			a.append(4);
+			assert(a.size() == 1);
+			assert(a.capacity() > 0);
+		}
+
 		Buffer<int> a(0,2);
 		assert(a.size() == 0);
+		assert(a.empty());
 		assert(a.capacity() == 2);
 		//assert(a.fill() == 0);
 
