@@ -51,7 +51,7 @@ struct CallOnce{ template <class F> CallOnce(const F& f){ f(); } };
 
 /// Useful for initializing static variables without any overhead of
 /// conditionals.
-#define CALL_ONCE(...){ static detail::CallOnce callOnce([&](){__VA_ARGS__}); }
+#define AL_CALL_ONCE(...){ static detail::CallOnce callOnce([&](){__VA_ARGS__}); }
 
 } // al::
 
