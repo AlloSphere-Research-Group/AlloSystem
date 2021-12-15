@@ -624,7 +624,7 @@ Mesh& Mesh::merge(const Mesh& src){
 			for(Index i=0; i<Nv; ++i) index(i);
 		}
 		// Add source indices offset by my number of vertices
-		index(src.indices().elems(), src.indices().size(), (unsigned int)Nv);
+		index(src.indices().data(), src.indices().size(), (unsigned int)Nv);
 	}
 
 	// Source doesn't have indices, but I do

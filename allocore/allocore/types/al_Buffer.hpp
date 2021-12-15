@@ -226,7 +226,7 @@ public:
 	/// Note: not safe to apply this to itself
 	///
 	void append(const Buffer<T>& src){
-		append(src.elems(), src.size());
+		append(src.data(), src.size());
 	}
 
 	/// Append elements of an array
