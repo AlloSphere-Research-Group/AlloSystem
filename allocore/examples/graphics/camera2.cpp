@@ -29,8 +29,8 @@ struct MyWindow : public Window, public Drawable {
 	{
 		cam.fovy(90);	// set field of view angle
 
-		add(new StandardWindowKeyControls);
-		add(new NavInputControl(nav));
+		append(*new StandardWindowKeyControls);
+		append(*new NavInputControl(nav));
 
 		// create some shapes to draw
 		for(int j=0; j<1000; ++j){

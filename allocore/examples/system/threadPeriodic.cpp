@@ -10,6 +10,7 @@ Lance Putnam, Nov. 2014
 
 #include <stdio.h>
 #include "allocore/system/al_PeriodicThread.hpp"
+#include "allocore/system/al_Time.hpp"
 using namespace al;
 
 int main(){

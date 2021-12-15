@@ -228,7 +228,7 @@ struct MyWindow : Window{
 int main(){
 
 	MyWindow win1;
-	win1.add(new StandardWindowKeyControls);
+	win1.append(*new StandardWindowKeyControls);
 	win1.create(Window::Dim(800, 600));
 
 	MainLoop::start();

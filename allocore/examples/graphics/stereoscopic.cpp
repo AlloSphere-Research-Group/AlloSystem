@@ -1,4 +1,12 @@
-#include "allocore/al_Allocore.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/io/al_ControlNav.hpp"
+#include "allocore/system/al_MainLoop.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Lens.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/graphics/al_Stereoscopic.hpp"
+#include "allocore/spatial/al_Pose.hpp"
+#include "allocore/math/al_Random.hpp"
 
 using namespace al;
 
@@ -29,7 +37,7 @@ struct MyWindow : Window, public Drawable{
 	bool onFrame(){
 		nav.step();
 		stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
-		printf("fps %f\n", avgFps());
+		printf("fps %f\n", fpsAvg());
 		return true;
 	}
 

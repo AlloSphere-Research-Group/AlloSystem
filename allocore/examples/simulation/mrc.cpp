@@ -18,6 +18,7 @@ Graham Wakefield 2011
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/graphics/al_Texture.hpp"
+#include "allocore/system/al_Time.h"
 
 using namespace al;
 
