@@ -78,6 +78,7 @@
 */
 
 #include <string>
+#include <vector>
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/types/al_Color.hpp"
 

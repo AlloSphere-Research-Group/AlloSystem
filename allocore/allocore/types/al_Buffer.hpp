@@ -43,7 +43,6 @@
 */
 
 #include <algorithm>
-#include <vector>
 #include <cstddef>
 
 namespace al{
@@ -301,8 +300,8 @@ private:
 /// moving memory. This is accomplished by use of a moving write tap.
 ///
 /// @ingroup allocore
-template <class T, class Alloc=std::allocator<T> >
-class RingBuffer : protected Alloc {
+template <class T>
+class RingBuffer {
 public:
 
 	typedef T value_type;
@@ -359,7 +358,7 @@ public:
 
 	/// Write (push) new element
 	void write(const T& v){
-		Alloc::construct(&next(), v);
+		new(&next()) T(v);
 	}
 
 	/// Get reference to element relative to newest element
@@ -435,7 +434,7 @@ public:
 	iterator   end(){ return iterator(&mElems[0], mElems.size(), posOldest(), fill()); }
 
 protected:
-	std::vector<T, Alloc> mElems;
+	Buffer<T> mElems;
 	int mPos;
 	int mFill = 0;
 
