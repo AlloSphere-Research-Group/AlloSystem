@@ -437,7 +437,12 @@ struct Colori {
 	}
 
 private:
-	static uint8_t toi(float v){ return uint8_t(v*255.f); }
+	static uint8_t toi(float v){
+		//return uint8_t(v*255.f);
+		if(v>=1.f) return 255;
+		union{ float f; uint32_t i; } u{v+1.f};
+		return uint8_t((u.i & 0x007fffff) >> 15);
+	}
 };
 
 
