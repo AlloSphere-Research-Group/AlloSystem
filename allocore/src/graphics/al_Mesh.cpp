@@ -1253,7 +1253,7 @@ void Mesh::print(FILE * dst) const {
 		Btot += B;\
 		double byteVal;\
 		const char * byteUnits = niceByteString(B, byteVal);\
-		fprintf(dst, "%8d " #name " (%.1f %s)\n", attrib.size(), byteVal, byteUnits);\
+		fprintf(dst, "%8d " #name " (%.1f %s)\n", (int)attrib.size(), byteVal, byteUnits);\
 	}
 
 	unsigned Btot = 0;
@@ -1282,18 +1282,18 @@ bool Mesh::debug(FILE * dst) const {
 	if(!Nv){ DPRINTF("No vertices\n"); ok=false; }
 
 	#define CHECK_ARR(arr, oneOkay)\
-	if(arr().size() && arr().size() != Nv){\
-		if(!oneOkay || arr().size()!=1){\
-			DPRINTF("%d " #arr ", but %d vertices\n", arr().size(), Nv);\
+	if(arr.size() && arr.size() != Nv){\
+		if(!oneOkay || arr.size()!=1){\
+			DPRINTF("%d " #arr ", but %d vertices\n", (int)arr.size(), Nv);\
 			ok=false;\
 		}\
 	}
-	CHECK_ARR(normals, false);
-	CHECK_ARR(colors, true);
-	CHECK_ARR(coloris, true);
-	CHECK_ARR(texCoord1s, false);
-	CHECK_ARR(texCoord2s, false);
-	CHECK_ARR(texCoord3s, false);
+	CHECK_ARR(mNormals, false);
+	CHECK_ARR(mColors, true);
+	CHECK_ARR(mColoris, true);
+	CHECK_ARR(mTexCoord1s, false);
+	CHECK_ARR(mTexCoord2s, false);
+	CHECK_ARR(mTexCoord3s, false);
 	#undef CHECK_ARR
 
 	if(colors().size() && coloris().size()){
