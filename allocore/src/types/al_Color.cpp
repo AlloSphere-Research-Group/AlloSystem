@@ -41,7 +41,7 @@ RGB& RGB::operator= (const HSV& hsv){
 	}//*/
 
 	auto h=hsv.h*6.f;
-										
+
 	auto i = (unsigned int)(h);	// hue sector 0, 1, 2, 3, 4, or 5
 	float f = h - float(i);		// fraction between sectors
 	auto vs = v*s;
