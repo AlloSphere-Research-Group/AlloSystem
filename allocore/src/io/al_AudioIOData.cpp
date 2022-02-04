@@ -43,6 +43,7 @@ void AudioIOData::zeroBus(){ zero(mBufB, framesPerBuffer() * mNumB); }
 void AudioIOData::zeroOut(){ zero(mBufO, channelsOut() * framesPerBuffer()); }
 
 AudioIOData& AudioIOData::gain(float v){ mGain = v; return *this; }
+AudioIOData& AudioIOData::gainMul(float m){ mGain *= m; return *this; }
 
 int AudioIOData::channelsIn() const { return mNumI; }
 int AudioIOData::channelsOut() const { return mNumO; }

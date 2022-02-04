@@ -191,7 +191,8 @@ public:
 	void zeroBus();						///< Zeros all the bus buffers
 	void zeroOut();						///< Zeros all the internal output buffers
 
-	AudioIOData& gain(float v);
+	AudioIOData& gain(float v);			///< Set global gain
+	AudioIOData& gainMul(float m);		///< Multiply gain by factor
 
 	bool usingGain() const { return mGain != 1.f || mGainPrev != 1.f; }
 
