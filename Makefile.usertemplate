@@ -15,6 +15,23 @@
 #LDFLAGS += 
 
 
+# PLATFORM SPECIFIC
+
+# Linux
+ifeq ($(PLATFORM), linux)
+
+# Mac OS
+else ifeq ($(PLATFORM), macosx)
+
+# Windows
+else ifeq ($(PLATFORM), windows)
+
+# Emscripten (is Unix-like)
+else ifeq ($(PLATFORM), em)
+
+endif
+
+
 # BUILD-AND-RUN CONFIGURATION
 
 # Where to search for .cpp files implementing main()
