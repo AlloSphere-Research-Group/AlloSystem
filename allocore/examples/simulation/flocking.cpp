@@ -84,8 +84,8 @@ public:
 				float push = exp(-al::pow2(dist/pushRadius)) * pushStrength;
 
 				auto pushVector = ds.normalized() * push;
-				boids[i].pos += pushVector;
-				boids[j].pos -= pushVector;
+				boids[i].vel += pushVector;
+				boids[j].vel -= pushVector;
 
 				// Velocity matching
 				float matchRadius = 0.125;
