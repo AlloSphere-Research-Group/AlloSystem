@@ -260,6 +260,10 @@ public:
 	template <int N2, class T2>
 	Vec& operator = (const Vec<N2,T2>& v){ IT(N<N2?N:N2) (*this)[i] = T(v[i]); return *this; }
 
+	/// Set element at index (a chainable version of at())
+	template <int i>
+	Vec& set(const T& v){ at<i>()=v; return *this; }
+
 	/// Set elements from another vector and scalar
 	template <class Tv, class Ts>
 	Vec& set(const Vec<N-1, Tv>& v, const Ts& s){ (*this)[N-1]=s; return (*this = v); }
