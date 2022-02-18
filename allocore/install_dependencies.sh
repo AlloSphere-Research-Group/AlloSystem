@@ -11,27 +11,7 @@ files_exist(){
 	ls -u "$@" >/dev/null 2>&1;
 }
 
-# Builds without requiring boost.
-build_and_install_assimp(){
-	DIR="$PWD"
-	cd /tmp
-		#PKG="assimp-3.1.1"
-		#curl -LO http://downloads.sourceforge.net/project/assimp/assimp-3.1/${PKG}_no_test_models.zip
-		PKG="assimp-3.2"
-		curl -LO https://github.com/assimp/assimp/archive/v3.2.zip && mv v3.2.zip ${PKG}.zip
-		unzip -q "${PKG}.zip"
-		cd "$PKG"
-			cmake -DCMAKE_BUILD_TYPE=RELEASE -DASSIMP_ENABLE_BOOST_WORKAROUND=ON -DASSIMP_BUILD_ASSIMP_TOOLS=OFF -DASSIMP_BUILD_SAMPLES=OFF -DASSIMP_BUILD_TESTS=OFF .
-			make
-			sudo make install
-		cd ..
-
-		# Cleanup.
-		#rm -rf /tmp/${PKG}
-		#rm /tmp/${PKG}*.zip
-	cd "$DIR"
-}
-# End helper functions.
+# Find package manager and install dependencies
 
 if binary_exists "apt-get"; then
 	echo 'Found apt-get'
@@ -46,31 +26,6 @@ if binary_exists "apt-get"; then
 		libfreetype6-dev \
 		libxi-dev libxmu-dev
 
-	# Get version of installed assimp
-	assimp_version=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
-
-	# If assimp2 is installed, then prompt to remove it.
-	if dpkg --compare-versions "$assimp_version" lt 3; then
-		echo "assimp version ${assimp_version} detected."
-		echo 'It is recommended that you remove this version to avoid configuration problems with AlloCore.'
-		printf 'Would you like to remove it [Y/n]?'
-		read ANS
-		if [ "$ANS" = 'Y' ] || [ "$ANS" = 'y' ]; then
-			echo "Removing assimp ${assimp_version}"
-			sudo apt-get remove "libassimp-dev=${assimp_version}"
-		fi
-	fi
-
-	# Ensure that assimp3 headers are being installed.
-	available_assimp_version=$(apt-cache madison libassimp-dev | head -1 | cut -f2 -d\|)
-
-	if dpkg --compare-versions "$available_assimp_version" ge 3; then
-		sudo apt-get install libassimp-dev
-	# Otherwise build assimp3 from source and install.
-	else
-		build_and_install_assimp
-	fi
-
 # It's important to check for Homebrew before MacPorts,
 # because Homebrew is the most used among the AlloTeam.
 elif binary_exists "brew"; then
@@ -78,21 +33,10 @@ elif binary_exists "brew"; then
 	brew update
 	brew install portaudio glew freetype
 
-	# Use precompiled library if on Mountain Lion or higher.
-	osx_version="$(sw_vers -productVersion | cut -d . -f 2)"
-	if [ "$osx_version" -ge 8 ]; then
-		brew install assimp
-	# Otherwise build with boost workaround.
-	else
-		brew install assimp --without-boost
-	fi
-
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
 	sudo port install portaudio glew freetype
-
-	build_and_install_assimp
 
 elif uname -o | grep -q "Msys"; then
 
@@ -176,42 +120,6 @@ elif uname -o | grep -q "Msys"; then
 			cd $DIR
 		fi
 
-		# Remove assimp2 if found
-		if [ -e $DESTDIR/include/assimp/assimp.h ]; then
-			echo 'Found AssImp2. This will be removed to update to AssImp3...'
-			rm -rf $DESTDIR/include/assimp
-			rm $DESTDIR/bin/Assimp32.dll
-			rm $DESTDIR/lib/assimp.lib
-		fi
-
-		if files_exist $DESTDIR/lib/assimp*; then
-			echo 'Found AssImp'
-		else
-			PKG=assimp--3.0.1270-full
-			#PKG=assimp-3.1.1-win-binaries
-			DIR=$PWD
-			cd /tmp
-				$DOWNLOAD -nc http://downloads.sourceforge.net/project/assimp/assimp-3.0/$PKG.zip
-				#$DOWNLOAD -nc http://downloads.sourceforge.net/project/assimp/assimp-3.1/$PKG.zip
-				unzip -q $PKG
-
-				# 3.0.1270
-				mv assimp--3.0.1270-sdk $PKG
-				cp -r $PKG/include/* $DESTDIR/include/
-				cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
-				cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
-
-				# 3.1.1
-				#cp -r $PKG/include/* $DESTDIR/include/
-				#cp $PKG/bin32/assimp.dll $DESTDIR/bin/
-				#cp $PKG/lib32/assimp.lib $DESTDIR/lib/
-
-				# Cleanup.
-				rm -rf $PKG
-				rm $PKG.*
-			cd $DIR
-		fi
-
 		if files_exist $DESTDIR/lib/libglew32*; then
 			echo 'Found GLEW'
 		else
@@ -261,7 +169,7 @@ elif uname -o | grep -q "Msys"; then
 	# MSYS2
 	else
 		echo 'Found MinGW-w64 / MSYS2'
-		LIBS="gcc gdb portaudio glew freeglut freetype assimp libusb"
+		LIBS="gcc gdb portaudio glew freeglut freetype libusb"
 		PKGS=
 		for L in $LIBS
 		do
@@ -270,7 +178,6 @@ elif uname -o | grep -q "Msys"; then
 
 		# Libs with deps (other then gcc-libs):
 		# freetype: bzip2 harfbuzz libpng zlib
-		# assimp: minizip zziplib zlib
 
 		#echo $PKGS
 		pacman -Syu
