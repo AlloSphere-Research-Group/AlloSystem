@@ -18,7 +18,6 @@ help:
 	@echo The possible rules are:
 	@echo "    all .............. build all modules found in this directory"
 	@echo "    allocore ......... build allocore"
-	@echo "    alloutil ......... build allocore utilities extension"
 	@echo "    allocv ........... build allocore/OpenCV binding"
 	@echo "    alloGLV .......... build allocore/GLV binding"
 	@echo "    allonect ......... build allocore/freenect binding"
@@ -38,9 +37,6 @@ all:
 allocore: FORCE
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
-alloutil: FORCE allocore
-	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
-
 allocv: FORCE allocore
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
@@ -50,7 +46,7 @@ Gamma GLV: FORCE
 alloGLV: FORCE allocore GLV
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
-allonect: FORCE allocore alloutil
+allonect: FORCE allocore
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
 
 #Default Installs Precompiled Header -- set to 0 to avoid this copy
