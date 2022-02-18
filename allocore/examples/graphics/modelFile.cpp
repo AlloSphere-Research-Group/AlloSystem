@@ -10,7 +10,7 @@ Lance Putnam, April 2021
 
 #include "allocore/io/al_App.hpp"
 #include "allocore/io/al_File.hpp"
-#include "allocore/graphics/al_Asset.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
 using namespace al;
 
 class MyApp : public App{
@@ -25,20 +25,19 @@ public:
 			exit(-1);
 		}
 
-		auto * scene = Scene::import(modelDir + "ant.ply");
-		if(!scene){
+		if(!model.load(modelDir + "ant.ply")){
 			printf("Error: Failed to load model file\n");
 			exit(-1);
 		}
-
-		// Merge all data from model file into mesh
-		scene->meshAll(model);
 
 		// We have no idea what the distance units are, so fit into unit cube
 		model.fitToCube();
 
 		// If you prefer flat shading...
-		//model.decompress().generateNormals();
+		//model.decompress();
+
+		// Generate normals if they weren't in the file
+		if(model.normals().empty()) model.generateNormals();
 
 		nav().pullBack(4);
 		initWindow();

@@ -10,7 +10,7 @@ Lance Putnam, April 2021
 
 #include "allocore/io/al_App.hpp"
 #include "allocore/io/al_File.hpp"
-#include "allocore/graphics/al_Asset.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 using namespace al;
@@ -28,21 +28,21 @@ public:
 			exit(-1);
 		}
 
-		auto * scene = Scene::import(modelDir + "spot.obj");
-		if(!scene){
+		if(!model.load(modelDir + "spot.obj")){
 			printf("Error: Failed to load model file\n");
 			exit(-1);
 		}
-
-		// Merge all data from model file into mesh
-		scene->meshAll(model);
 
 		// We have no idea what the distance units are, so fit into unit cube
 		model.fitToCube();
 
 		// If you prefer flat shading...
-		//model.decompress().generateNormals();
+		//model.decompress();
 
+		// Generate normals if they weren't in the file
+		if(model.normals().empty()) model.generateNormals();
+
+		// Load the texture map
 		Image image;
 		if(image.load(modelDir + "spot.png")){
 			tex.allocate(image.array());
