@@ -472,6 +472,15 @@ public:
 	/// \returns true on successful save, otherwise false
 	bool saveSTL(const std::string& filePath, const std::string& solidName = "") const;
 
+
+	/// Load mesh data from 3D object file
+
+	/// Currently supported file formats are PLY and OBJ.
+	///
+	/// @param[in] filePath		path of object file to load
+	bool load(const std::string& filePath);
+
+
 	/// Print information about Mesh
 	void print(FILE * dst = stderr) const;
 

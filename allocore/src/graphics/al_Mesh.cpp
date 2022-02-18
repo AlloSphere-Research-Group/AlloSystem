@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <sstream> // stringstream
 #include <utility> // swap
 #include <vector>
 #include <fstream>
@@ -1213,21 +1214,439 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 	return true;
 }
 
+std::string extension(const std::string& path){
+	std::string ext;
+	auto pos = path.find_last_of('.');
+	if(pos != std::string::npos){
+		ext = path.substr(pos+1);
+		for(auto& c : ext) c = std::tolower(c);
+	}
+	return ext;
+}
+
 bool Mesh::save(const std::string& filePath, const std::string& solidName, bool binary) const {
+	auto ext = extension(filePath);
+	if("fbx" == ext)		return saveFBX(filePath, solidName);
+	else if("ply" == ext)	return savePLY(filePath, solidName, binary);
+	else if("stl" == ext)	return saveSTL(filePath, solidName);
+	return false;
+}
 
-	auto pos = filePath.find_last_of(".");
-	if(std::string::npos == pos) return false;
-	auto ext = filePath.substr(pos+1);
-	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-	if("fbx" == ext){
-		return saveFBX(filePath, solidName);
-	} else if("ply" == ext){
-		return savePLY(filePath, solidName, binary);
-	} else if("stl" == ext){
-		return saveSTL(filePath, solidName);
+std::string strip(const std::string& s, const char * stripChars="\r"){
+	using namespace std;
+	auto beg = s.find_first_not_of(stripChars);
+	auto end = s.find_last_not_of(stripChars);
+	if(string::npos != beg || string::npos != end){
+		if(string::npos == beg) beg = 0;
+		end = std::string::npos == end ? s.size() : end+1;
+		return s.substr(beg, end-beg);
+		//printf("%s\n", s.c_str());
+	}
+	return s;
+}
+
+// getline that strips given chars from ends of string
+void getLineTrim(std::ifstream& f, std::string& s, const char * stripChars="\r"){
+	getline(f,s);
+	s = strip(s, stripChars);
+}
+
+void getTokens(std::vector<std::string>& tokens, const std::string& src, char delim=' ', bool eraseEmpty=true){
+	tokens.clear();
+	std::stringstream ss(src);
+	std::string token;
+	char delimStr[] = {delim, 0}; 
+	while(getline(ss, token, delim)){
+		//tokens.push_back(strip(token, delimStr));
+		tokens.push_back(token);
+	}
+	if(eraseEmpty){
+		tokens.erase(
+			std::remove_if(tokens.begin(), tokens.end(), [](const std::string& s){ return s.empty(); }),
+			tokens.end()
+		);
+	}
+};
+
+
+bool loadPLY(Mesh& mesh, const std::string& filePath){
+	using namespace std;
+	ifstream f(filePath, ios::in | ios::binary);
+	if(f.fail()) return false;
+
+	string buf;
+
+	getLineTrim(f, buf);
+	//printf("buf: %s\n", buf.c_str());
+	if("ply" != buf) return false; // not a PLY file
+
+	enum Enc{BINARY_LE, BINARY_BE, ASCII, UNKNOWN_ENC};
+	enum Elem{VERTEX, FACE, EDGE, UNKNOWN_ELEM};
+	enum Type{INT8=0, UINT8, INT16, UINT16, INT32, UINT32, FLOAT32, FLOAT64, UNKNOWN_TYPE};
+	enum Attrib{PX,PY,PZ, NX,NY,NZ, CR,CG,CB,CA, TX,TY, UNKNOWN_ATTRIB};
+
+	static int typeSize[] = { 1,1, 2,2, 4,4, 4, 8, 0 };
+
+	static auto str2type = [](const std::string& s){
+		if("char"==s || "int8"==s) return INT8;
+		if("uchar"==s || "uint8"==s) return UINT8;
+		if("short"==s || "int16"==s) return INT16;
+		if("ushort"==s || "uint16"==s) return UINT16;
+		if("int"==s || "int32"==s) return INT32;
+		if("uint"==s || "uint32"==s) return UINT32;
+		if("float"==s || "float32"==s) return FLOAT32;
+		if("double"==s || "float64"==s) return FLOAT64;
+		return UNKNOWN_TYPE;
+	};
+
+	static auto str2attrib = [](const std::string& s){
+		switch(s[0]){
+		case 'x': return PX;
+		case 'y': return PY;
+		case 'z': return PZ;
+		case 's': case 'u': return TX;
+		case 't': case 'v': return TY;
+		default:
+			if("nx"==s) return NX;
+			if("ny"==s) return NY;
+			if("nz"==s) return NZ;
+			if("red"==s) return CR;
+			if("green"==s) return CG;
+			if("blue"==s) return CB;
+			if("alpha"==s) return CA;
+		}
+		return UNKNOWN_ATTRIB;
+	};
+
+	struct AttribDef{
+		Type type;
+		Attrib attrib;
+	};
+
+	struct ListDef{
+		Type countType;
+		Type valueType;
+	};
+
+	struct PropDef{
+		enum PropType{ATTRIB, LIST};
+		union{
+			AttribDef attribDef;
+			ListDef listDef;
+		};
+		PropType type;
+
+		PropDef(const AttribDef& v){ attribDef=v; type=ATTRIB; }
+		PropDef(const ListDef& v){ listDef=v; type=LIST; }
+		unsigned size() const { return type==ATTRIB ? typeSize[attribDef.type] : typeSize[listDef.countType] + typeSize[listDef.valueType]; }
+	};
+
+	struct ElemDef{
+		ElemDef(int cnt=0): count(cnt){}
+		int count;
+		std::vector<PropDef> propDefs;
+
+		unsigned size() const {
+			unsigned n=0;
+			for(const auto& p : propDefs) n += p.size();
+			return n*count;
+		}
+		ElemDef& addAttrib(Type t, Attrib a){ propDefs.push_back(AttribDef{t,a}); return *this; }
+		ElemDef& addAttrib(const std::string& t, const std::string& a){ return addAttrib(str2type(t), str2attrib(a)); }
+		ElemDef& addList(Type c, Type v){ propDefs.push_back(ListDef{c,v}); return *this; }
+		ElemDef& addList(const std::string& c, const std::string& v){ return addList(str2type(c), str2type(v)); }
+	};
+
+	Enc dataEnc = UNKNOWN_ENC;
+	Elem currElem = UNKNOWN_ELEM;
+	ElemDef vertElem;
+	ElemDef faceElem;
+	vector<ElemDef> otherElems; // unsupported data following verts and faces
+
+	vector<string> tokens;
+	auto getLineTokens = [&](){
+		getLineTrim(f, buf);
+		getTokens(tokens, buf);
+	};
+
+	// Get header info
+	while(!f.eof()){
+		getLineTokens();
+
+		const auto& tag = tokens[0];
+		//printf("%s\n", tag.c_str());
+		if("format" == tag && tokens.size()>=2){
+			if("binary_little_endian" == tokens[1]){
+				dataEnc = BINARY_LE;
+			} else if("binary_big_endian" == tokens[1]){
+				dataEnc = BINARY_BE;
+			} else if("ascii" == tokens[1]){
+				dataEnc = ASCII;
+			}
+		} else if("element" == tag && tokens.size()>=3){
+			unsigned count = std::stoi(tokens[2]);
+			//printf("%d %s elements\n", count, tokens[1].c_str());
+			if("vertex" == tokens[1]){ currElem = VERTEX; vertElem.count = count; }
+			else if("face" == tokens[1]){ currElem = FACE; faceElem.count = count; }
+			else{ currElem = UNKNOWN_ELEM; otherElems.emplace_back(count); }
+		} else if("property" == tag && tokens.size()>=3){
+			switch(currElem){
+			case VERTEX:
+				vertElem.addAttrib(tokens[1], tokens[2]);
+				break;
+			case FACE:
+				if("list"==tokens[1] && tokens.size()>=4){
+					faceElem.addList(tokens[2], tokens[3]);
+				}
+				break;
+			case EDGE: break;
+			case UNKNOWN_ELEM:
+				if("list"==tokens[1] && tokens.size()>=4){
+					otherElems.back().addList(tokens[2], tokens[3]);
+				} else {
+					otherElems.back().addAttrib(tokens[1], tokens[2]);
+				}
+			}
+		} else if("end_header" == tag){
+			break;
+		}
 	}
 
+	//for(auto& v : vertElem.propDefs) printf("%d %d\n", v.attribDef.type, v.attribDef.attrib);
+	//for(auto& v : faceElem.propDefs) printf("%d %d\n", v.listDef.countType, v.listDef.valueType);
+
+	if(dataEnc == UNKNOWN_ENC) return false;
+
+	int bigEndian = 1;
+	if(1 == *(char *)&bigEndian) bigEndian = 0;
+	auto machineEndian = bigEndian ? BINARY_BE : BINARY_LE;
+
+	auto toDouble = [&](const char * buf, Type type){
+		double v = 0.;
+		switch(type){
+		case INT8:    v = *buf; break;
+		case UINT8:   v = *(unsigned char*)(buf); break;
+		case INT16:   v = *(short*)(buf); break;
+		case UINT16:  v = *(unsigned short*)(buf); break;
+		case INT32:   v = *(int*)(buf); break;
+		case UINT32:  v = *(unsigned int*)(buf); break;
+		case FLOAT32: v = *(float*)(buf); break;
+		case FLOAT64: v = *(double*)(buf); break;
+		default:;
+		}
+		return v;
+	};
+
+	auto normalize = [](double v, Type type){
+		switch(type){
+		case INT8:   v /= 127.; break;
+		case UINT8:  v /= 255.; break;
+		case INT16:  v /= 32767.; break;
+		case UINT16: v /= 65535.; break;
+		case INT32:  v /= 2147483647.; break;
+		case UINT32: v /= 4294967295.; break;
+		default:;
+		}
+		return v;
+	};
+
+	bool ascii = (dataEnc == ASCII);
+
+	auto readNextVal = [&](Type type){
+		char b[8]; auto Nbytes = typeSize[type];
+		f.read(b, Nbytes);
+		if(machineEndian != dataEnc){
+			for(int i=0; i<Nbytes/2; ++i) std::swap(b[i],b[Nbytes-1-i]);
+		}
+		return toDouble(b, type);
+	};
+
+	mesh.reset();
+
+	for(int k=0; k<vertElem.count; ++k){
+		bool Bp=false, Bn=false, Bc=false, Bt1=false, Bt2=false;
+		Vec3f pos, nrm;
+		Color col;
+		Vec2f tex;
+		if(ascii) getLineTokens();
+		int i=0;
+		for(auto& p : vertElem.propDefs){
+			if(p.type == PropDef::ATTRIB){
+				const auto& attrib = p.attribDef;
+				double v = ascii ? std::stod(tokens[i++]) : readNextVal(attrib.type);
+				v = normalize(v, attrib.type);
+				switch(attrib.attrib){
+				case PX: Bp=true; pos[0]=v; break;
+				case PY: Bp=true; pos[1]=v; break;
+				case PZ: Bp=true; pos[2]=v; break;
+				case NX: Bn=true; nrm[0]=v; break;
+				case NY: Bn=true; nrm[1]=v; break;
+				case NZ: Bn=true; nrm[2]=v; break;
+				case CR: Bc=true; col[0]=v; break;
+				case CG: Bc=true; col[1]=v; break;
+				case CB: Bc=true; col[2]=v; break;
+				case CA: Bc=true; col[3]=v; break;
+				case TX: Bt1=true;tex[0]=v; break;
+				case TY: Bt2=true;tex[1]=v; break;
+				default:;
+				}
+			} else { // skip over lists
+				if(ascii){
+				} else {
+					f.seekg(p.size(), ios_base::cur);
+				}
+			}
+		}
+		//printf("pos: %g %g %g\n", pos.x, pos.y, pos.z);
+		//printf("col: %g %g %g\n", col.r, col.g, col.b);
+		if(Bp) mesh.vertex(pos);
+		if(Bn) mesh.normal(nrm);
+		if(Bc) mesh.color(col);
+		if(Bt2) mesh.texCoord(tex[0], tex[1]);
+		else if(Bt1) mesh.texCoord(tex[0]);
+	}
+
+	std::vector<int> face;
+
+	for(int i=0; i<faceElem.count; ++i){
+		if(ascii) getLineTokens();
+		for(auto& p : faceElem.propDefs){
+			if(p.type == PropDef::LIST){
+				const auto& list = p.listDef;
+				unsigned count = ascii ? std::stod(tokens[0]) : readNextVal(list.countType);
+				//printf("count:%u\n", count);
+				if(count>=3){ // tri, quad or other poly
+					mesh.triangles();
+					face.clear();
+					for(unsigned i=0; i<count; ++i)
+						face.push_back(ascii ? std::stod(tokens[i+1]) : readNextVal(list.valueType));
+					//bool good = true;
+					//for(auto i:face){ if(i<0 || i>=vertElem.count) good=false; } // bad index
+					//for(auto i:face) printf("%d ",i); printf("\n");
+
+					for(unsigned i=1; i<count-1; ++i){ // add tri fan
+						mesh.index(face[0]);
+						mesh.index(face[i]);
+						mesh.index(face[i+1]);
+					}
+				}
+			} else { // skip over attribs
+				if(ascii){
+				} else {
+					f.seekg(p.size(), ios_base::cur);
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool loadOBJ(Mesh& mesh, const std::string& filePath){
+	using namespace std;
+	ifstream f(filePath, ios::in | ios::binary);
+	if(f.fail()) return false;
+
+	mesh.reset();
+	string buf;
+	vector<string> tokens;
+	vector<string> faceTokens;
+
+	struct Index{ int p=-1, t=-1, n=-1; };
+
+	// temp buffers
+	std::vector<Index> face; // face indices (of convex polygon)
+	std::vector<Vec3f> Ps;
+	std::vector<Vec2f> Ts;
+	std::vector<Vec3f> Ns;
+	char attr = 0; // 'p', 'n', 't', 'f'
+
+	while(!f.eof()){
+		getLineTrim(f, buf, " \r\t");
+		if(buf.empty() || '#'==buf[0]) continue;
+		//printf("%s\n", buf.c_str());
+		getTokens(tokens, buf);
+		if(tokens.empty()) continue;
+		//for(auto& s : tokens){ printf("%s,", s.c_str()); } printf("\n");
+
+		if("v"==tokens[0] && tokens.size()>=4){
+			if('p' != attr){
+				//TODO: new mesh started
+			}
+			attr = 'p';
+			auto x = std::stod(tokens[1]);
+			auto y = std::stod(tokens[2]);
+			auto z = std::stod(tokens[3]);
+			Ps.emplace_back(x,y,z);
+		} else if("vt"==tokens[0] && tokens.size()>=3){
+			attr = 't';
+			auto u = std::stod(tokens[1]);
+			auto v = std::stod(tokens[2]);
+			Ts.emplace_back(u,v);
+		}  else if("vn"==tokens[0] && tokens.size()>=4){
+			attr = 'n';
+			auto nx = std::stod(tokens[1]);
+			auto ny = std::stod(tokens[2]);
+			auto nz = std::stod(tokens[3]);
+			Ns.emplace_back(nx,ny,nz);
+		} else if("f"==tokens[0]){
+			attr = 'f';
+			auto numVerts = tokens.size()-1;
+			face.clear();
+			if(numVerts>=3){ // tris, quads and other polygons
+				for(int j=1; j<tokens.size(); ++j){
+					getTokens(faceTokens, tokens[j], '/', false);
+					// face types: v, v/t, v/t/n, v//n
+					Index idx;
+					idx.p = std::stoi(faceTokens[0]) - 1;
+					if(faceTokens.size()>=2 && !faceTokens[1].empty()){
+						auto t = std::stoi(faceTokens[1]) - 1;
+						if(t < Ts.size()) idx.t = t;
+					}
+					if(faceTokens.size()>=3 && !faceTokens[2].empty()){
+						auto n = std::stoi(faceTokens[2]) - 1;
+						if(n < Ns.size()) idx.n = n;
+					}
+					face.push_back(idx);
+				}
+				// add triangles as tri fan
+				mesh.triangles();
+				for(int i=1; i<face.size()-1; ++i){
+					auto i0 = face[0];
+					auto i1 = face[i];
+					auto i2 = face[i+1];
+					mesh.vertex(Ps[i0.p]);
+					mesh.vertex(Ps[i1.p]);
+					mesh.vertex(Ps[i2.p]);
+					if(i0.n>=0 && i1.n>=0 && i2.n>=0){
+						mesh.normal(Ns[i0.n]);
+						mesh.normal(Ns[i1.n]);
+						mesh.normal(Ns[i2.n]);
+					}
+					if(i0.t>=0 && i1.t>=0 && i2.t>=0){
+						mesh.texCoord(Ts[i0.t]);
+						mesh.texCoord(Ts[i1.t]);
+						mesh.texCoord(Ts[i2.t]);
+					}
+					// We can't easily use indices since attribute arrays can have different lengths
+					//mesh.index(i0.p, i1.p, i2.p);
+				}
+			}
+		} else if("g"==tokens[0]){
+			// object name
+		}
+	}
+
+	return true;
+}
+
+
+bool Mesh::load(const std::string& filePath){
+	auto ext = extension(filePath);
+	if("ply" == ext)		return loadPLY(*this, filePath);
+	else if("obj" == ext)	return loadOBJ(*this, filePath);
 	return false;
 }
 
