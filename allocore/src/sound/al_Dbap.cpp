@@ -1,4 +1,4 @@
-#include "allocore/io/al_AudioIOData.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Dbap.hpp"
 
 namespace al{
@@ -31,9 +31,13 @@ void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 			gain = powf(gain, mFocus);
 		}
 
+		/*
 		float * out = io.outBuffer(mDeviceChannels[k]);
 		for(int i = 0; i < numFrames; ++i){
 			out[i] += gain * samples[i];
+		}*/
+		for(int i = 0; i < numFrames; ++i){
+			io.bufferOut().at(i, mDeviceChannels[k]) += gain * samples[i];
 		}
 	}
 }
@@ -51,7 +55,7 @@ void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 			gain = powf(gain, mFocus);
 		}
 
-		io.out(mDeviceChannels[i], frameIndex) += gain*sample;
+		io.bufferOut().at(frameIndex, mDeviceChannels[i]) += gain*sample;
 	}
 }
 

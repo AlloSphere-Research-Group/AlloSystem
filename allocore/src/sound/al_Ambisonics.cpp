@@ -1,5 +1,5 @@
 #include <cstring>
-#include "allocore/io/al_AudioIOData.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Ambisonics.hpp"
 
 #ifdef USE_GAMMA
@@ -454,7 +454,7 @@ void AmbisonicsSpatializer::renderBuffer(AudioIOData& io,
 ////		//mEncoder.direction(-rf, -rr, ru);
 //		mEncoder.encode(ambiChans(), numFrames, i, samples[i]);
 //	}
-	float *outs = &io.out(0,0);//io.outBuffer();
+	float *outs = io.bufferOut().data();
 	mDecoder.decode(outs, ambiChans(), mNumFrames);
 }
 
@@ -489,7 +489,7 @@ void AmbisonicsSpatializer::renderSample(AudioIOData& io, const Pose& listeningP
 	mEncoder.direction(direction[0], direction[1], direction[2]);
     mEncoder.encode(ambiChans(), io.framesPerBuffer(), frameIndex, sample);
 
-	float *outs = &io.out(0,0);//io.outBuffer();
+	float *outs = io.bufferOut().data();
 	mDecoder.decode(outs, ambiChans(), mNumFrames);
 }
 

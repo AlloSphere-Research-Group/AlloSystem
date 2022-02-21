@@ -256,24 +256,22 @@ void App::initAudio(
 	double audioRate, int audioBlockSize,
 	int audioOutputs, int audioInputs
 ){
-	mAudioIO.callback = [this](AudioIOData& io){
-		if(clockNav() == &audioIO()){
-			nav().smooth(0.95);
-			nav().step(1./4);
-		}
+	mAudioIO.configure(
+		audioBlockSize, audioRate, audioOutputs, audioInputs,
+		[this](const AudioIOData& io){
+			if(clockNav() == &audioIO()){
+				nav().smooth(0.95);
+				nav().step(1./4);
+			}
 
-		if(clockAnimate() == &audioIO()){
-			mAnimateTime = appTime();
-			onAnimateWrapper(io.secondsPerBuffer());
-		}
+			if(clockAnimate() == &audioIO()){
+				mAnimateTime = appTime();
+				onAnimateWrapper(io.secondsPerBuffer());
+			}
 
-		io.frame(0);
-		onSoundWrapper(audioIO());
-	};
-	mAudioIO.framesPerSecond(audioRate);
-	mAudioIO.framesPerBuffer(audioBlockSize);
-	mAudioIO.channelsOut(audioOutputs);
-	mAudioIO.channelsIn(audioInputs);
+			onSoundWrapper(audioIO());
+		}
+	);
 }
 
 
@@ -408,7 +406,7 @@ void App::sendDisconnect(){
 }
 
 bool App::usingAudio() const {
-	return audioIO().callback != nullptr;
+	return !audioIO().empty();
 }
 
 

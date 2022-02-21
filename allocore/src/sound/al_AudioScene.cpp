@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "allocore/io/al_AudioIOData.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/sound/al_AudioScene.hpp"
 
@@ -144,7 +144,7 @@ void AudioScene::render(AudioIOData& io) {
 	assert(io.framesPerBuffer() == mNumFrames);
 
 	// double sampleRate = io.framesPerSecond();
-	io.zeroOut();
+	io.bufferOut().zero();
 
 	// iterate through all listeners adding contribution from all sources
 	for(unsigned il=0; il<mListeners.size(); ++il){

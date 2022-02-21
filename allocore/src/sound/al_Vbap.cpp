@@ -1,4 +1,4 @@
-#include "allocore/io/al_AudioIOData.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Vbap.hpp"
 
 namespace al{
@@ -422,14 +422,7 @@ void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float 
 		if ((gains[0] >= 0) && (gains[1] >= 0) && (!mIs3D || (gains[2] >= 0)) ){
 			gains.normalize();
 
-			SpeakerTriple triple = mTriplets[currentTripletIndex];
-
-			float * outBuff1 = io.outBuffer(triple.s1Chan);
-			float * outBuff2 = io.outBuffer(triple.s2Chan);
-			float * outBuff3 = nullptr;
-			if(mIs3D){
-				outBuff3 = io.outBuffer(triple.s3Chan);
-			}
+			const SpeakerTriple triple = mTriplets[currentTripletIndex];
 
 			// Check if any of the triplets are phantom channels and
 			// reassign signal
@@ -442,29 +435,29 @@ void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float 
 					float splitGain = gains[0] /mPhantomChannels.size();
 					float splitGainSQ = splitGain * splitGain;
 					for(auto const &element : it1->second) { // iterate across all assigned speakers
-						io.out(element, i) += samples[i]*splitGainSQ;
+						io.bufferOut().at(i, element) += samples[i]*splitGainSQ;
 					}
 				} else {
-					outBuff1[i] += samples[i]*gains[0];
+					io.bufferOut().at(i, triple.s1Chan) += samples[i]*gains[0];
 				}
 				if (it2 != mPhantomChannels.end()) { // vertex 2 is phantom
 					float splitGain = gains[1] /mPhantomChannels.size();
 					float splitGainSQ = splitGain * splitGain;
 					for(auto const &element : it2->second) {
-						io.out(element, i) += samples[i]*splitGainSQ;
+						io.bufferOut().at(i, element) += samples[i]*splitGainSQ;
 					}
 				} else {
-					outBuff2[i] += samples[i]*gains[1];
+					io.bufferOut().at(i, triple.s2Chan)  += samples[i]*gains[1];
 				}
 				if(mIs3D){
 					if (it3 != mPhantomChannels.end()) {
 						float splitGain = gains[2] /mPhantomChannels.size();
 						float splitGainSQ = splitGain * splitGain;
 						for(auto const &element : it3->second) {
-							io.out(element, i) += samples[i]*splitGainSQ;
+							io.bufferOut().at(i, element) += samples[i]*splitGainSQ;
 						}
 					} else {
-						outBuff3[i] += samples[i]*gains[2];
+						io.bufferOut().at(i, triple.s3Chan)  += samples[i]*gains[2];
 					}
 				}
 
@@ -514,7 +507,7 @@ void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, const float 
 		}
 	}
 
-	SpeakerTriple triple = mTriplets[currentTripletIndex];
+	const auto triple = mTriplets[currentTripletIndex];
 
 	//mCachedTripletIndex = currentTripletIndex; // Store the new index
 	// FIXME stored cached index
@@ -526,30 +519,34 @@ void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, const float 
 	auto it2 = mPhantomChannels.find(triple.s2Chan);
 	auto it3 = mPhantomChannels.find(triple.s3Chan);
 
+	auto& s1 = io.bufferOut().at(frameIndex, triple.s1Chan);
+	auto& s2 = io.bufferOut().at(frameIndex, triple.s2Chan);
+	auto& s3 = io.bufferOut().at(frameIndex, triple.s3Chan);
+
 	if (it1 != mPhantomChannels.end()) { // vertex 1 is phantom
 		float splitGain = gains[0]* gains[0] /2.0;
-		io.out(triple.s1Chan,frameIndex) = 0.0;
-		io.out(triple.s2Chan,frameIndex) += sample*splitGain;
-		io.out(triple.s3Chan, frameIndex) += sample*splitGain;
+		s1 = 0.0;
+		s2 += sample*splitGain;
+		s3 += sample*splitGain;
 	} else {
-		io.out(triple.s1Chan,frameIndex) += sample * gains[0];
+		s1 += sample * gains[0];
 	}
 	if (it2 != mPhantomChannels.end()) { // vertex 2 is phantom
 		float splitGain = gains[1]* gains[1] /2.0;
-		io.out(triple.s1Chan,frameIndex) += sample*splitGain;
-		io.out(triple.s2Chan,frameIndex) = 0.0;
-		io.out(triple.s3Chan, frameIndex) += sample*splitGain;
+		s1 += sample*splitGain;
+		s2 = 0.0;
+		s3 += sample*splitGain;
 	} else {
-		io.out(triple.s2Chan,frameIndex) += sample * gains[1];
+		s2 += sample * gains[1];
 	}
 	if(mIs3D){
 		if (it2 != mPhantomChannels.end()) {
 			float splitGain = gains[2]* gains[2] /2.0;
-			io.out(triple.s1Chan,frameIndex) += sample*splitGain;
-			io.out(triple.s2Chan,frameIndex) += sample*splitGain;
-			io.out(triple.s3Chan,frameIndex) = 0.0;
+			s1 += sample*splitGain;
+			s2 += sample*splitGain;
+			s3 = 0.0;
 		} else {
-			io.out(triple.s3Chan, frameIndex) += sample * gains[2];
+			s3 += sample * gains[2];
 		}
 	}
 }

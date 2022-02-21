@@ -27,8 +27,8 @@ RenderToDisk::RenderToDisk(Mode m)
 	mPBOs[0] = 0;
 	resetPBOQueue();
 
-	mAudioCB = [this](AudioIOData& io){
-		mAudioRing.write(io.outBuffer(0));
+	mAudioCB = [this](const AudioIOData& io){
+		mAudioRing.write(io.bufferOut().data());
 	};
 
 	/*AudioRing ring;
@@ -131,7 +131,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		char hdr[24] =
 			{'.','s','n','d', 0,0,0,24, -1,-1,-1,-1, 0,0,0,6, 0,0,0,0, 0,0,0,0};
 		serializeToBigEndian(hdr + 16, uint32_t(aio->framesPerSecond()));
-		serializeToBigEndian(hdr + 20, uint32_t(aio->channelsOut()));
+		serializeToBigEndian(hdr + 20, uint32_t(aio->bufferOut().channels()));
 		mSoundFile.write(hdr, sizeof(hdr));
 	
 		// Resize audio buffer to hold one block
@@ -141,7 +141,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		unsigned ringSizeInFrames = aio->fps() * 0.25; // 1/4 second of audio
 		unsigned numBlocks = ringSizeInFrames/aio->framesPerBuffer();
 		if(numBlocks < 2) numBlocks = 2; // should buffer at least two (?) blocks
-		mAudioRing.resize(aio->channelsOut(), aio->framesPerBuffer(), numBlocks);
+		mAudioRing.resize(aio->bufferOut().channels(), aio->framesPerBuffer(), numBlocks);
 	}
 
 	mAudioIO = aio;

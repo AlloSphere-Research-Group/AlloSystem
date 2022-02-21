@@ -210,7 +210,7 @@ private:
 	int mImagePaletteSize = -1;
 
 	al::AudioIO * mAudioIO = NULL;
-	AudioCallback mAudioCB;
+	al::AudioIO::Callback mAudioCB;
 	//std::vector<char> mAudioBuf;
 	AudioRing mAudioRing;
 	std::ofstream mSoundFile;
