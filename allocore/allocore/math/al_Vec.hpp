@@ -441,16 +441,21 @@ public:
 		return *this;
 	}
 
+	template <class V, class Func, class... Args>
+	Vec<N,V> map(Func func, Args... args) const {
+		Vec<N,V> r(VEC_NO_INIT);
+		for(int i=0; i<size(); ++i)
+			r[i] = func((*this)[i], args...);
+		return r;
+	}
+
 	/// Map elements through function into new vector
 
 	/// @param[in] func		Function taking old value and returning new value
 	/// @param[in] args		Extra function arguments
 	template <class Func, class... Args>
 	Vec map(Func func, Args... args) const {
-		Vec<N,T> r(VEC_NO_INIT);
-		for(int i=0; i<size(); ++i)
-			r[i] = func((*this)[i], args...);
-		return r;
+		return map<T>(func, args...);
 	}
 
 	/// Reduce elements into scalar
