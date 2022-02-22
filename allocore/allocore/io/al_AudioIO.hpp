@@ -164,12 +164,12 @@ public:
 	struct Device {
 		int id = -1;				///< Unique ID
 		std::string name;			///< Device name
-		double defSampleRate = 1.;	///< Default sample rate
-		short chanIMax = 0;			///< Maximum input channels
-		short chanOMax = 0;			///< Maximum output channels
+		double frameRate = 1.;		///< Default frame rate
+		short channelsIn = 0;		///< Maximum input channels
+		short channelsOut = 0;		///< Maximum output channels
 		bool nameMatches(const char * key) const; ///< Whether key string is in name
-		bool hasInput() const { return chanIMax; } ///< Whether device has input
-		bool hasOutput() const { return chanOMax; } ///< Whether device has output
+		bool hasInput() const { return channelsIn; } ///< Whether device has input
+		bool hasOutput() const { return channelsOut; } ///< Whether device has output
 		bool valid() const { return id>=0; } ///< Whether device is valid
 		void print() const;
 	};

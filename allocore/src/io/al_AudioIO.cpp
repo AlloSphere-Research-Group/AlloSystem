@@ -138,9 +138,9 @@ AudioIO::Device deviceFromImplID(int devID){
 	auto * info = Pa_GetDeviceInfo(devID);
 	dev.id = devID;
 	dev.name = info->name;
-	dev.defSampleRate = info->defaultSampleRate;
-	dev.chanIMax = info->maxInputChannels;
-	dev.chanOMax = info->maxOutputChannels;
+	dev.frameRate = info->defaultSampleRate;
+	dev.channelsIn  = info->maxInputChannels;
+	dev.channelsOut = info->maxOutputChannels;
 	return dev;
 }
 
@@ -215,7 +215,7 @@ struct AudioIO::Impl{
 		{
 			const auto& dev = mAudioIO.mDevI;
 			/*dev.print();
-			if(mAudioIO.mDevI.chanIMax <= 0){
+			if(mAudioIO.mDevI.channelsIn <= 0){
 				printf("Attempt to open input stream on device without input\n");
 			}*/
 			auto& P = pi;
@@ -272,10 +272,10 @@ struct AudioIO::Impl{
 		auto info = mRtAudio.getDeviceInfo(devID);
 		dev.id = devID;
 		dev.name = info.name;
-		//dev.defSampleRate = info.currentSampleRate;
-		dev.defSampleRate = info.preferredSampleRate;
-		dev.chanIMax = info.inputChannels;
-		dev.chanOMax = info.outputChannels;
+		//dev.frameRate = info.currentSampleRate;
+		dev.frameRate = info.preferredSampleRate;
+		dev.channelsIn  = info.inputChannels;
+		dev.channelsOut = info.outputChannels;
 		return dev;
 	}
 
@@ -440,9 +440,9 @@ AudioIO::Device AudioIO::device(int i) const {
 	AudioIO::Device dev;
 	dev.id = i;
 	dev.name = SDL_GetAudioDeviceName(i, AL_SDL_OUT);
-	dev.defSampleRate = 44100;
-	dev.chanIMax = 0;
-	dev.chanOMax = 2;
+	dev.frameRate = 44100;
+	dev.channelsIn  = 0;
+	dev.channelsOut = 2;
 	return dev;
 }
 
@@ -490,9 +490,9 @@ bool AudioIO::Device::nameMatches(const char * key) const {
 
 void AudioIO::Device::print() const {
 	if(valid()){
-		printf("[%2d] %s: %g Hz", id, name.c_str(), defSampleRate);
-		if(chanIMax) printf(", %d in", chanIMax);
-		if(chanOMax) printf(", %d out", chanOMax);
+		printf("[%2d] %s: %g Hz", id, name.c_str(), frameRate);
+		if(channelsIn ) printf(", %d in", channelsIn);
+		if(channelsOut) printf(", %d out", channelsOut);
 		printf("\n");
 	} else {
 		printf("Invalid audio device\n");
@@ -531,17 +531,17 @@ AudioIO::Device AudioIO::findDevice(std::function<bool(AudioIO::Device d)> pred)
 
 AudioIO& AudioIO::configure(int framesPerBuf, double framesPerSec, int chansOut, int chansIn){
 	if(!mIsOpen){
-		if(chansIn <0) chansIn  = mDevI.chanIMax;
-		if(chansOut<0) chansOut = mDevO.chanOMax;
+		if(chansIn <0) chansIn  = mDevI.channelsIn;
+		if(chansOut<0) chansOut = mDevO.channelsOut;
 
-#ifdef AL_LINUX
+		#ifdef AL_LINUX
 		/* The default device can report an insane number of max channels,
 	  presumably because it's being remapped through a software mixer;
 	  Opening all of them can cause an assertion dump in snd_pcm_area_copy
 	  so we limit "all channels" to a reasonable number.*/
 		if(chansIn  >= 128) chansIn  = 2;
 		if(chansOut >= 128) chansOut = 2;
-#endif
+		#endif
 
 		mBufI.resize(framesPerBuf, chansIn);
 		mBufO.resize(framesPerBuf, chansOut);
