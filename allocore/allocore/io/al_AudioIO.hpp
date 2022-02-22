@@ -54,25 +54,35 @@ public:
 
 	~AudioBlock();
 
+	/// Get number of frames
 	int frames() const { return mFrames; }
+	/// Get number of channels per frame
 	int channels() const { return mChannels; }
+	/// Get total number of samples
 	int samples() const { return mFrames * mChannels; }
-	int interleaved() const { return mInterleaved; }
+	/// Whether channels are interleaved
+	bool interleaved() const { return mInterleaved; }
 
+	/// Get sample at frame and channel
 	value_type& at(int frame, int chan=0){
 		return mData[mChannels*frame + chan]; // interleaved
 		//return mData[frame + mFrames*chan]; // non-interleaved
 	}
 
+	/// Raw access to sample
 	value_type& operator[] (int i){ return mData[i]; }
 
+	/// Get pointer to raw data
 	const value_type * data() const { return mData; }
 	value_type * data(){ return mData; }
 
+	/// Resize buffer
 	AudioBlock& resize(int frames, int chans);
 
+	/// Reference external array (frees any internal memory)
 	AudioBlock& ref(float * src, int frames, int chans);
 
+	/// Zero all samples in buffer
 	AudioBlock& zero();
 
 private:
@@ -81,7 +91,7 @@ private:
 	int mChannels = 0;
 	bool mInterleaved = true;
 	bool mOwner = false;
-	void clear();
+	void clear(); // free memory
 };
 
 
@@ -97,26 +107,38 @@ public:
 	/// Get current frame number
 	int frame() const { return mFrame; }
 
+	/// Set current frame number
 	AudioIOData& frame(int i){ mFrame = i-1; return *this; }
 
+	/// Get input buffer
 	const AudioBlock& bufferIn() const { return mBufI; }
 	AudioBlock& bufferIn(){ return mBufI; }
+	/// Get output buffer
 	const AudioBlock& bufferOut() const { return mBufO; }
 	AudioBlock& bufferOut(){ return mBufO; }
 
+	/// Get current input sample on specified channel
 	const value_type& in(int chan) const { return const_cast<AudioBlock&>(mBufI).at(mFrame, chan); }
 	const value_type& in(int chan){ return mBufI.at(mFrame, chan); }
+	/// Get current output sample on specified channel
 	value_type& out(int chan) const { return const_cast<AudioBlock&>(mBufO).at(mFrame, chan); }
 	value_type& out(int chan){ return mBufO.at(mFrame, chan); }
 
+	/// Whether channels are interleaved in buffers
 	bool interleaved() const { return mBufO.interleaved(); }
+	/// Whether buffers are empty
 	bool empty() const { return 0==mFramesPerBuffer; }
+	/// Get number of frames per buffer
 	int framesPerBuffer() const { return mFramesPerBuffer; }
+	/// Get number of frames per second
 	double framesPerSecond() const { return mFramesPerSecond; }
 	double fps() const { return mFramesPerSecond; }
+	/// Get number of seconds per buffer
 	double secondsPerBuffer() const { return mFramesPerBuffer/mFramesPerSecond; }
 
+	/// Get gain of output
 	float gain() const { return mGain; }
+	/// Set gain of output (ramped smoothly)
 	AudioIOData& gain(float v){ mGain=v; return *this; }
 	AudioIOData& gainMul(float v){ mGain*=v; return *this; }
 
@@ -140,9 +162,9 @@ public:
 		double defSampleRate = 1.;	///< Default sample rate
 		short chanIMax = 0;			///< Maximum input channels
 		short chanOMax = 0;			///< Maximum output channels
-		bool hasInput() const { return chanIMax; }
-		bool hasOutput() const { return chanOMax; }
-		bool valid() const { return id>=0; }
+		bool hasInput() const { return chanIMax; } ///< Whether device has input
+		bool hasOutput() const { return chanOMax; } ///< Whether device has output
+		bool valid() const { return id>=0; } ///< Whether device is valid
 		void print() const;
 	};
 
@@ -153,9 +175,29 @@ public:
 	AudioIO();
 	~AudioIO();
 
+	int numDevices() const;					///< Get number of devices
+	Device device(int i) const;				///< Get device with ID
+	Device defaultDeviceIn() const;			///< Get default input device
+	Device defaultDeviceOut() const;		///< Get default output device
+
+	Device deviceIn() const { return mDevI; } ///< Get current input device
+	Device deviceOut() const { return mDevO; } ///< Get current output device
+
+	AudioIO& deviceIn(const Device& d);		///< Set input device
+	AudioIO& deviceOut(const Device& d);	///< Set output device
+
 
 	AudioIO& configure(int framesPerBuf, double framesPerSec, int chansOut, int chansIn);
 
+	/// Configure streams
+
+	/// This should be called after setting the devices and before opening them.
+	///
+	/// @param[in] framesPerBuf		Number of frames per buffer
+	/// @param[in] framesPerSec		Frame rate of streams
+	/// @param[in] chansOut			Number of output channels (-1 for max)
+	/// @param[in] chansIn			Number of input channels (-1 for max)
+	/// @param[in] cb				Audio callback function
 	AudioIO& configure(int framesPerBuf, double framesPerSec, int chansOut, int chansIn, const Callback& cb){
 		return configure(framesPerBuf, framesPerSec, chansOut, chansIn).callback(cb);
 	}
@@ -182,18 +224,6 @@ public:
 
 	/// Set whether to zero any NaNs in the output
 	AudioIO& zeroNANs(bool v){ mZeroNANs=v; return *this; }
-
-	
-	int numDevices() const;					///< Get number of devices
-	Device device(int i) const;				///< Get device with ID
-	Device defaultDeviceIn() const;			///< Get default input device
-	Device defaultDeviceOut() const;		///< Get default output device
-
-	Device deviceIn() const { return mDevI; } ///< Get current input device
-	Device deviceOut() const { return mDevO; } ///< Get current output device
-
-	AudioIO& deviceIn(const Device& d);		///< Set input device
-	AudioIO& deviceOut(const Device& d);	///< Set output device
 
 	double cpu() const;						///< Get CPU usage
 
