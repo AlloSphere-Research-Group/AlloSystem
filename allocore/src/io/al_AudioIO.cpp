@@ -618,13 +618,16 @@ AudioIO& AudioIO::remove(const Callback& cb){
 
 void AudioIO::print() const {
 	if(mDevI.id == mDevO.id){
-		printf("I/O Device:  "); mDevO.print();
+		printf("I/O Device: "); mDevO.print();
 	}
 	else{
-		printf("Device In:   "); mDevI.print();
-		printf("Device Out:  "); mDevO.print();
+		printf("Device In:  "); mDevI.print();
+		printf("Device Out: "); mDevO.print();
 	}
-		printf("Chans In:    %d\n", mBufI.channels());
-		printf("Chans Out:   %d\n", mBufO.channels());
-		printf("Frames/Buf:  %d\n", mFramesPerBuffer);
+		printf("Chans I/O:  %d/%d\n", mBufI.channels(), mBufO.channels());
+		printf("Frames/Buf: %d\n", mFramesPerBuffer);
+}
+
+void AudioIO::printDevices() const {
+	for(int i=0; i<numDevices(); ++i) device(i).print();
 }
