@@ -504,6 +504,9 @@ namespace al{
 class Image::Impl {
 public:
 
+	// Reader suppports: JPG PNG BMP TGA GIF HDR PSD PIC PNM
+	// Writer suppports: JPG PNG BMP TGA GIF HDR
+
 	template <class Func, class... Args>
 	bool loadData(Array& arr, Func loadFunc, Args... args){
 		stbi_set_flip_vertically_on_load(1); // rows go bottom to top
