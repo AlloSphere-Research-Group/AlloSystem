@@ -460,6 +460,9 @@ void AudioBlock::clear(){
 	mOwner = false;
 }
 
+bool AudioIO::Device::nameMatches(const char * key) const {
+	return name.find(key) != std::string::npos;
+}
 
 void AudioIO::Device::print() const {
 	if(valid()){
