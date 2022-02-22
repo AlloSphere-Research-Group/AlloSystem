@@ -179,6 +179,8 @@ public:
 	Device device(int i) const;				///< Get device with ID
 	Device defaultDeviceIn() const;			///< Get default input device
 	Device defaultDeviceOut() const;		///< Get default output device
+	/// Find device using predicate
+	Device findDevice(std::function<bool(Device d)> predicate) const;
 
 	Device deviceIn() const { return mDevI; } ///< Get current input device
 	Device deviceOut() const { return mDevO; } ///< Get current output device

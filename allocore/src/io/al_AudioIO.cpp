@@ -462,10 +462,14 @@ void AudioBlock::clear(){
 
 
 void AudioIO::Device::print() const {
-	printf("[%2d] %s: %g Hz", id, name.c_str(), defSampleRate);
-	if(chanIMax) printf(", %d in", chanIMax);
-	if(chanOMax) printf(", %d out", chanOMax);
-	printf("\n");
+	if(valid()){
+		printf("[%2d] %s: %g Hz", id, name.c_str(), defSampleRate);
+		if(chanIMax) printf(", %d in", chanIMax);
+		if(chanOMax) printf(", %d out", chanOMax);
+		printf("\n");
+	} else {
+		printf("Invalid audio device\n");
+	}
 }
 
 
@@ -478,6 +482,24 @@ AudioIO::AudioIO()
 AudioIO::~AudioIO(){
 	close();
 	delete mImpl;
+}
+
+AudioIO& AudioIO::deviceIn(const Device& d){
+	if(d.hasInput()) mDevI = d;
+	return *this;
+}
+ 
+AudioIO& AudioIO::deviceOut(const Device& d){
+	if(d.hasOutput()) mDevO = d;
+	return *this;
+}
+
+AudioIO::Device AudioIO::findDevice(std::function<bool(AudioIO::Device d)> pred) const {
+	for(int i=0; i<numDevices(); ++i){
+		auto d = device(i);
+		if(pred(d)) return d;
+	}
+	return {};
 }
 
 AudioIO& AudioIO::configure(int framesPerBuf, double framesPerSec, int chansOut, int chansIn){
@@ -583,16 +605,6 @@ AudioIO& AudioIO::processAudio(){
 		}
 	}
 
-	return *this;
-}
-
-AudioIO& AudioIO::deviceIn(const Device& d){
-	if(d.hasInput()) mDevI = d;
-	return *this;
-}
-
-AudioIO& AudioIO::deviceOut(const Device& d){
-	if(d.hasOutput()) mDevO = d;
 	return *this;
 }
 
