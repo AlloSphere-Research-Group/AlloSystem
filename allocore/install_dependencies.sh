@@ -18,7 +18,6 @@ if binary_exists "apt-get"; then
 	sudo apt-get update
 	sudo apt-get install \
 		build-essential \
-		portaudio19-dev \
 		libglew-dev freeglut3-dev \
 		libavahi-client-dev \
 		libbluetooth-dev \
@@ -31,12 +30,12 @@ if binary_exists "apt-get"; then
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
 	brew update
-	brew install portaudio glew freetype
+	brew install glew freetype
 
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
-	sudo port install portaudio glew freetype
+	sudo port install glew freetype
 
 elif uname -o | grep -q "Msys"; then
 
@@ -55,41 +54,6 @@ elif uname -o | grep -q "Msys"; then
 		#DESTDIR=local/
 		DOWNLOAD="wget --no-check-certificate"
 		install -d $DESTDIR/bin/ $DESTDIR/include/ $DESTDIR/lib/
-
-		if files_exist $DESTDIR/lib/libportaudio*; then
-			echo 'Found PortAudio'
-		else
-			PKG=pa_stable_v19_20140130
-			DIR=$PWD
-			cd /tmp
-				$DOWNLOAD http://www.portaudio.com/archives/$PKG.tgz
-				tar -xzf $PKG.tgz
-				mv portaudio $PKG
-				
-				DXDIR=/usr/local/dx7sdk/include
-				DXURL=https://raw.githubusercontent.com/msys2-contrib/mingw-w64/master/mingw-w64-headers
-
-				install -d $DXDIR
-				$DOWNLOAD $DXURL/direct-x/include/dsound.h -O $DXDIR/dsound.h
-				$DOWNLOAD $DXURL/direct-x/include/dsconf.h -O $DXDIR/dsconf.h
-				$DOWNLOAD $DXURL/crt/_mingw_unicode.h -O $DXDIR/_mingw_unicode.h
-				
-				cd $PKG
-					# MME may artificially cap channels at 2! WDMKS or DirectX is needed for multi-channel.
-					# While WDMKS is supposedly superior to DirectX, it doesn't always give us all the devices, so we just use DirectX.
-					./configure --prefix=$DESTDIR --with-winapi=wmme,directx
-					#./configure --prefix=$DESTDIR --with-winapi=wmme,wdmks
-					make install
-				cd ..
-
-				# DX7 headers only needed to build PA, so we can remove them
-				rm -rf $DXDIR/..
-				
-				# Cleanup.
-				rm -rf $PKG
-				rm $PKG.*
-			cd $DIR
-		fi
 
 		if files_exist $DESTDIR/bin/bthprops.dll; then
 			echo 'Found Bluetooth'
@@ -169,7 +133,7 @@ elif uname -o | grep -q "Msys"; then
 	# MSYS2
 	else
 		echo 'Found MinGW-w64 / MSYS2'
-		LIBS="gcc gdb portaudio glew freeglut freetype libusb"
+		LIBS="gcc gdb glew freeglut freetype libusb"
 		PKGS=
 		for L in $LIBS
 		do

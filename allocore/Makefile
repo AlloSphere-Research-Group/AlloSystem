@@ -5,7 +5,7 @@ LIB_NAME	= allocore
 include ../Makefile.common
 
 BIG_ENDIAN	= 0
-AUDIO_BINDING	= PortAudio
+AUDIO_BINDING	= RtAudio
 WINDOW_BINDING	= GLUT
 #IMAGE_BINDING	= FreeImage
 AUTORUN_TESTS	= 1
