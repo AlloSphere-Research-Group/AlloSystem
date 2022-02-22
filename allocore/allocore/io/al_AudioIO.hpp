@@ -225,6 +225,8 @@ public:
 	/// Set whether to zero any NaNs in the output
 	AudioIO& zeroNANs(bool v){ mZeroNANs=v; return *this; }
 
+	void print() const;
+
 private:
 	struct Impl; Impl * mImpl;
 	Device mDevI, mDevO;
