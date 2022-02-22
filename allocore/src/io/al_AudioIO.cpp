@@ -1,9 +1,22 @@
+#include <cmath> // sin
 #include <cstdio>
 #include <cstring> // memcpy, memset
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Printing.hpp" // AL_WARN
 using namespace al;
+
+// Useful for debugging...
+struct SineOsc{
+	float phase = 0;
+	float freq = 0;
+	float operator()(){
+		auto s = std::sin(phase * 6.283185307);
+		phase += freq;
+		if(phase>1.) phase--;
+		return s;
+	}
+};
 
 
 #if defined(AL_AUDIO_DUMMY)
@@ -176,6 +189,15 @@ static int rtCallback(
 
 	io.processAudio();
 
+	/* Sine test
+	static SineOsc osc;
+	osc.freq = 440./io.fps();
+	for(int i=0; i<frameCount; ++i){
+		((float*)output)[i*io.channelsOut()] = osc()*0.2;
+	}
+	return 0;
+	//*/
+
 	// Copy AudioIO to output buffer
 	std::memcpy(output, io.bufferOut().data(), io.bufferOut().samples()*sizeof(float));
 
@@ -209,15 +231,13 @@ struct AudioIO::Impl{
 
 		// Must pass in nullptrs for input- or output-only streams.
 		// Stream will not be opened if no device or channel count is zero
-		auto * ppi = &pi;
-		auto * ppo = &po;
-		if((0 == pi.nChannels)) ppi = nullptr;
-		if((0 == po.nChannels)) ppo = nullptr;
-
+		auto * ppi = pi.nChannels ? &pi : nullptr;
+		auto * ppo = po.nChannels ? &po : nullptr;
 		unsigned int framesPerBuf = mAudioIO.mFramesPerBuffer;
 
 		RtAudio::StreamOptions opts;
 		opts.flags = RTAUDIO_SCHEDULE_REALTIME; // | RTAUDIO_MINIMIZE_LATENCY | RTAUDIO_NONINTERLEAVED
+		//opts.priority = 4; // real-time thread priority: what should this be?
 
 		auto fps = (unsigned int)(mAudioIO.mFramesPerSecond+0.5);
 
@@ -232,11 +252,15 @@ struct AudioIO::Impl{
 			&opts			// RtAudio::StreamOptions * (NULL for defaults)
 		);
 
-		if(framesPerBuf != mAudioIO.mFramesPerBuffer){
-			// openStream changed frames/buffer
+		if(RTAUDIO_NO_ERROR == err){
+			if(framesPerBuf != mAudioIO.mFramesPerBuffer){
+				AL_WARN("Opened audio stream with %d frames/buffer instead of requested %d frames/buffer", framesPerBuf, mAudioIO.mFramesPerBuffer);
+				mAudioIO.configure(framesPerBuf, fps, ppo?ppo->nChannels:0, ppi?ppi->nChannels:0);
+			}
+			return true;
 		}
 
-		return RTAUDIO_NO_ERROR == err;
+		return false;
 	}
 
 	bool start(){ return RTAUDIO_NO_ERROR == mRtAudio.startStream(); }
@@ -640,7 +664,8 @@ void AudioIO::print() const {
 		printf("Device Out: "); mDevO.print();
 	}
 		printf("Chans I/O:  %d/%d\n", mBufI.channels(), mBufO.channels());
-		printf("Frames/Buf: %d\n", mFramesPerBuffer);
+		printf("Frames/sec: %g Hz\n", mFramesPerSecond);
+		printf("Frames/buf: %d\n", mFramesPerBuffer);
 }
 
 void AudioIO::printDevices() const {
