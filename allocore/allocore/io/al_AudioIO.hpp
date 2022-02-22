@@ -225,8 +225,6 @@ public:
 	/// Set whether to zero any NaNs in the output
 	AudioIO& zeroNANs(bool v){ mZeroNANs=v; return *this; }
 
-	double cpu() const;						///< Get CPU usage
-
 private:
 	struct Impl; Impl * mImpl;
 	Device mDevI, mDevO;

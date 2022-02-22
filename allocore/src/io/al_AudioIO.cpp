@@ -16,7 +16,6 @@ struct AudioIO::Impl{
 	bool stop(){ return false; }
 };
 
-double AudioIO::cpu() const { return 0.; }
 int AudioIO::numDevices() const { return 0; }
 AudioIO::Device AudioIO::defaultDeviceIn() const { return {}; }
 AudioIO::Device AudioIO::defaultDeviceOut() const { return {}; }
@@ -117,7 +116,7 @@ struct AudioIO::Impl{
 	bool mInited;
 };
 
-double AudioIO::cpu() const { return Pa_GetStreamCpuLoad(mImpl->mStream); }
+//double AudioIO::cpu() const { return Pa_GetStreamCpuLoad(mImpl->mStream); }
 
 int AudioIO::numDevices() const { return Pa_GetDeviceCount(); }
 
@@ -259,8 +258,6 @@ struct AudioIO::Impl{
 	AudioIO& mAudioIO;
 	RtAudio mRtAudio;
 };
-
-double AudioIO::cpu() const { return 0.; }
 
 int AudioIO::numDevices() const { return mImpl->mRtAudio.getDeviceCount(); }
 
@@ -409,7 +406,6 @@ struct AudioIO::Impl{
 	SDL_AudioDeviceID devIn=0, devOut=0; // valid devices are >0
 };
 
-double AudioIO::cpu() const { return 0.; }
 int AudioIO::numDevices() const { return SDL_GetNumAudioDevices(AL_SDL_OUT); }
 AudioIO::Device AudioIO::defaultDeviceIn() const { return {}; }
 AudioIO::Device AudioIO::defaultDeviceOut() const { return device(0); }
