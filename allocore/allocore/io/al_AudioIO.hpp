@@ -117,6 +117,11 @@ public:
 	const AudioBlock& bufferOut() const { return mBufO; }
 	AudioBlock& bufferOut(){ return mBufO; }
 
+	/// Get number of input channels
+	int channelsIn() const { return mBufI.channels(); }
+	/// Get number of output channels
+	int channelsOut() const { return mBufO.channels(); }
+
 	/// Get current input sample on specified channel
 	const value_type& in(int chan) const { return const_cast<AudioBlock&>(mBufI).at(mFrame, chan); }
 	const value_type& in(int chan){ return mBufI.at(mFrame, chan); }
