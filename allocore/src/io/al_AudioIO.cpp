@@ -163,12 +163,12 @@ AudioIO::Device AudioIO::device(int i) const {
 #if defined(AL_OSX)
 	#define __MACOSX_CORE__
 #elif defined(AL_WINDOWS)
-	#define __WINDOWS_WASAPI__
+	//#define __WINDOWS_WASAPI__
 	//#define __WINDOWS_DS__
 	//#define __WINDOWS_ASIO__
 #elif defined(AL_LINUX)
-	#define __LINUX_PULSE__
-	//#define __LINUX_ALSA__
+	//#define __LINUX_PULSE__
+	#define __LINUX_ALSA__
 	//#define __LINUX_OSS__
 #endif
 #include "rtaudio/RtAudio.h"
@@ -270,6 +270,7 @@ struct AudioIO::Impl{
 	AudioIO::Device deviceFromImplID(int devID){
 		AudioIO::Device dev;
 		auto info = mRtAudio.getDeviceInfo(devID);
+		//printf("chansI/O/D:%d/%d/%d SR(curr):%d SR(pref):%d\n", info.inputChannels, info.outputChannels, info.duplexChannels, info.currentSampleRate, info.preferredSampleRate);
 		dev.id = devID;
 		dev.name = info.name;
 		//dev.frameRate = info.currentSampleRate;

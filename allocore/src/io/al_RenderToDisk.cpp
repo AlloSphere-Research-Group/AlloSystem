@@ -1,4 +1,5 @@
 #include <cstdlib> // std::system
+#include <cstring> // memcpy 
 #include "allocore/graphics/al_OpenGL.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Time.hpp"
@@ -381,7 +382,7 @@ void RenderToDisk::saveImage(
 			// Get pointer to data in currently bound PBO
 			// (This will block until glReadPixels finishes from last time the PBO was bound)
 			auto * ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
-			memcpy(pixs, ptr, numBytes);
+			std::memcpy(pixs, ptr, numBytes);
 			glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 			readPixels = true;
 		}
@@ -482,7 +483,7 @@ void RenderToDisk::AudioRing::resize(
 void RenderToDisk::AudioRing::write(const float * block){
 	unsigned blockSamps = blockSizeInSamples();
 	unsigned wblock = mWriteBlock % mNumBlocks;
-	memcpy(&mBuffer[wblock * blockSamps], block, blockSamps * sizeof(mBuffer[0]));
+	std::memcpy(&mBuffer[wblock * blockSamps], block, blockSamps * sizeof(mBuffer[0]));
 	++mWriteBlock;
 }
 
@@ -553,7 +554,7 @@ bool RenderToDisk::ImageWriter::run(
 
 	// Create local copy of pixels
 	mImage.resize<unsigned char>(w,h, format);
-	memcpy(mImage.pixels<void>(), &pixels[0], pixels.size());
+	std::memcpy(mImage.pixels<void>(), &pixels[0], pixels.size());
 
 	mImage.compression(compress);
 	mImage.paletteSize(paletteSize);
