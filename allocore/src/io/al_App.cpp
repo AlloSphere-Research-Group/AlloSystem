@@ -256,21 +256,20 @@ void App::initAudio(
 	double audioRate, int audioBlockSize,
 	int audioOutputs, int audioInputs
 ){
-	mAudioIO.configure(
-		audioBlockSize, audioRate, audioOutputs, audioInputs,
-		[this](const AudioIOData& io){
-			if(clockNav() == &audioIO()){
-				nav().smooth(0.95);
-				nav().step(1./4);
-			}
-
-			if(clockAnimate() == &audioIO()){
-				mAnimateTime = appTime();
-				onAnimateWrapper(io.secondsPerBuffer());
-			}
-
-			onSoundWrapper(audioIO());
+	mAudioIO.configure([this](const AudioIOData& io){
+		if(clockNav() == &audioIO()){
+			nav().smooth(0.95);
+			nav().step(1./4);
 		}
+
+		if(clockAnimate() == &audioIO()){
+			mAnimateTime = appTime();
+			onAnimateWrapper(io.secondsPerBuffer());
+		}
+
+		onSoundWrapper(audioIO());
+	},
+		audioBlockSize, audioRate, audioOutputs, audioInputs
 	);
 }
 

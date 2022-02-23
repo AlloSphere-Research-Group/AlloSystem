@@ -200,9 +200,6 @@ public:
 	AudioIO& deviceIn(const Device& d);		///< Set input device
 	AudioIO& deviceOut(const Device& d);	///< Set output device
 
-
-	AudioIO& configure(int framesPerBuf, double framesPerSec, int chansOut, int chansIn);
-
 	/// Configure streams
 
 	/// This should be called after setting the devices and before opening them.
@@ -211,8 +208,9 @@ public:
 	/// @param[in] framesPerSec		Frame rate of streams
 	/// @param[in] chansOut			Number of output channels (-1 for max)
 	/// @param[in] chansIn			Number of input channels (-1 for max)
-	/// @param[in] cb				Audio callback function
-	AudioIO& configure(int framesPerBuf, double framesPerSec, int chansOut, int chansIn, const Callback& cb){
+	AudioIO& configure(int framesPerBuf, double framesPerSec, int chansOut, int chansIn);
+
+	AudioIO& configure(const Callback& cb, int framesPerBuf=512, double framesPerSec=44100, int chansOut=2, int chansIn=1){
 		return configure(framesPerBuf, framesPerSec, chansOut, chansIn).callback(cb);
 	}
 
