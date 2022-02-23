@@ -64,12 +64,16 @@ public:
 	bool interleaved() const { return mInterleaved; }
 
 	/// Get sample at frame and channel
+	const value_type& at(int frame, int chan=0) const {
+		return const_cast<AudioBlock*>(this)->at(frame, chan);
+	}
 	value_type& at(int frame, int chan=0){
 		return mData[mChannels*frame + chan]; // interleaved
 		//return mData[frame + mFrames*chan]; // non-interleaved
 	}
 
 	/// Raw access to sample
+	const value_type& operator[] (int i) const { return mData[i]; }
 	value_type& operator[] (int i){ return mData[i]; }
 
 	/// Get pointer to raw data
@@ -86,11 +90,13 @@ public:
 	AudioBlock& zero();
 
 private:
+	friend class AudioIO;
 	value_type * mData = nullptr;
 	int mFrames = 0;
 	int mChannels = 0;
 	bool mInterleaved = true;
 	bool mOwner = false;
+	bool mLocked = false; // prevent public allocs/deallocs
 	void clear(); // free memory
 };
 
@@ -102,7 +108,7 @@ public:
 	typedef AudioBlock::value_type value_type;
 
 	/// Iterate frame counter, returning true while more frames
-	bool operator()() const { return ++mFrame < mFramesPerBuffer; }
+	bool operator()(){ return ++mFrame < mFramesPerBuffer; }
 		
 	/// Get current frame number
 	int frame() const { return mFrame; }
@@ -123,10 +129,9 @@ public:
 	int channelsOut() const { return mBufO.channels(); }
 
 	/// Get current input sample on specified channel
-	const value_type& in(int chan) const { return const_cast<AudioBlock&>(mBufI).at(mFrame, chan); }
-	const value_type& in(int chan){ return mBufI.at(mFrame, chan); }
+	const value_type& in(int chan) const { return mBufI.at(mFrame, chan); }
 	/// Get current output sample on specified channel
-	value_type& out(int chan) const { return const_cast<AudioBlock&>(mBufO).at(mFrame, chan); }
+	const value_type& out(int chan) const { return mBufO.at(mFrame, chan); }
 	value_type& out(int chan){ return mBufO.at(mFrame, chan); }
 
 	/// Whether channels are interleaved in buffers
@@ -148,7 +153,7 @@ public:
 	AudioIOData& gainMul(float v){ mGain*=v; return *this; }
 
 protected:
-	mutable int mFrame = 0;
+	int mFrame = 0;
 	int mFramesPerBuffer = 0;
 	double mFramesPerSecond = 0.;
 	AudioBlock mBufI, mBufO;
@@ -181,7 +186,7 @@ public:
 	};
 
 	/// Audio callback
-	typedef std::function<void(const AudioIOData&)> Callback;
+	typedef std::function<void(AudioIOData&)> Callback;
 
 
 	AudioIO();

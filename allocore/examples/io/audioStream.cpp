@@ -48,7 +48,7 @@ int main(){
 		1			// input channels
 	);
 	// Set callback
-	io.callback([](const AudioIOData& io){
+	io.callback([](AudioIOData& io){
 		// Loop through the frames in the block
 		while(io()){
 			float s = io.in(0); // get input (line-in or mic)
@@ -64,7 +64,7 @@ int main(){
 
 
 	/* Simplified one-step version that uses defaults:
-	io.configure([](const AudioIOData& io){
+	io.configure([](AudioIOData& io){
 		// Loop through the frames in the block
 		while(io()){
 			float s = io.in(0); // get input (line-in or mic)

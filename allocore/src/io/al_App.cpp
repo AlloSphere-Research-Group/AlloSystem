@@ -256,7 +256,7 @@ void App::initAudio(
 	double audioRate, int audioBlockSize,
 	int audioOutputs, int audioInputs
 ){
-	mAudioIO.configure([this](const AudioIOData& io){
+	mAudioIO.configure([this](AudioIOData& io){
 		if(clockNav() == &audioIO()){
 			nav().smooth(0.95);
 			nav().step(1./4);

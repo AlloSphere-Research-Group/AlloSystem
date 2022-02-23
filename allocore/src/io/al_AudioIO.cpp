@@ -454,22 +454,26 @@ AudioIO::Device AudioIO::device(int i) const {
 AudioBlock::~AudioBlock(){ clear(); }
 
 AudioBlock& AudioBlock::resize(int frames, int chans){
-	int newSize = frames*chans;
-	if(samples() != newSize || !mOwner){
-		clear();
-		mFrames = frames;
-		mChannels = chans;
-		mData = new value_type[newSize];
-		mOwner = true;
+	if(!mLocked){
+		int newSize = frames*chans;
+		if(samples() != newSize || !mOwner){
+			clear();
+			mFrames = frames;
+			mChannels = chans;
+			mData = new value_type[newSize];
+			mOwner = true;
+		}
 	}
 	return *this;
 }
 
 AudioBlock& AudioBlock::ref(float * src, int frames, int chans){
-	clear();
-	mData = src;
-	mFrames = frames;
-	mChannels = chans;
+	if(!mLocked){
+		clear();
+		mData = src;
+		mFrames = frames;
+		mChannels = chans;
+	}
 	return *this;
 }
 
@@ -543,7 +547,6 @@ AudioIO& AudioIO::configure(int framesPerBuf, double framesPerSec, int chansOut,
 		if(chansIn  >= 128) chansIn  = 2;
 		if(chansOut >= 128) chansOut = 2;
 		#endif
-
 		mBufI.resize(framesPerBuf, chansIn);
 		mBufO.resize(framesPerBuf, chansOut);
 		mFramesPerBuffer = framesPerBuf;
@@ -555,6 +558,10 @@ AudioIO& AudioIO::configure(int framesPerBuf, double framesPerSec, int chansOut,
 bool AudioIO::open(){
 	if(!mIsOpen && !mIsRunning){
 		mIsOpen = mImpl->open();
+		if(mIsOpen){
+			mBufI.mLocked = true;
+			mBufO.mLocked = true;
+		}
 		return mIsOpen;
 	}
 	return false;
@@ -582,7 +589,11 @@ bool AudioIO::close(){
 	stop();
 	if(mIsOpen && !mIsRunning){
 		mIsOpen = !mImpl->close();
-		return mIsOpen;
+		if(!mIsOpen){
+			mBufI.mLocked = false;
+			mBufO.mLocked = false;
+		}
+		return !mIsOpen;
 	}
 	return false;
 }
