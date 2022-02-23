@@ -161,6 +161,12 @@ class AudioIO : public AudioIOData {
 public:
 
 	/// Audio device
+
+	/// For multi-channel devices, be aware that the information reported here
+	/// (namely channel count) may not be what you expect. Often this is due to
+	/// the fact that devices are not accessed directly, but rather through a
+	/// mixer in the OS. In Windows, you may need to configure multi-channel
+	/// devices via Control Panel > Hardware and Sound > Sound > Configure.
 	struct Device {
 		int id = -1;				///< Unique ID
 		std::string name;			///< Device name
