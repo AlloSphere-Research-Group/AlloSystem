@@ -686,6 +686,16 @@ public:
 		return rotate90(Dim1,Dim2);
 	}
 
+
+	//--------------------------------------------------------------------------
+	// Analysis
+
+	/// Returns index of first occurrence of value or -1 if no match
+	int find(const T& v) const {
+		for(int i=0; i<N; ++i){ if((*this)[i] == v) return i; }
+		return -1;
+	}
+
 	/// Get index of minimum value
 	int indexOfMin() const {
 		int j = 0;
