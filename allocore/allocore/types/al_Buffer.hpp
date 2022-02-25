@@ -136,8 +136,9 @@ public:
 	/// Resets size to zero without deallocating allocated memory
 	void reset(){ resize(0); }
 
-	/// This will set the capacity of the buffer to the requested size.
-	/// If the number is smaller than the current capacity then nothing happens,
+	/// Ensure the buffer capacity is at least n
+
+	/// If n is smaller than the current capacity then nothing happens,
 	/// otherwise the buffer is extended and new elements are default-constructed.
 	void reserve(size_t n){
 		if(n > capacity()){
@@ -153,10 +154,9 @@ public:
 
 	/// Resize buffer
 
-	/// This will set both the size and capacity of the buffer to the requested
-	/// size. If the number is smaller than the current size the buffer is
-	/// truncated, otherwise the buffer is extended and new elements are
-	/// default-constructed.
+	/// If n is smaller than the current size the buffer is truncated, 
+	/// otherwise the buffer is extended and new elements are default-constructed.
+	/// If n is also larger than the capacity, then the capacity is increased.
 	void resize(size_t n){
 		resize(n, value_type());
 	}
@@ -165,8 +165,15 @@ public:
 	/// size. If the number is smaller than the current size the buffer is
 	/// truncated, otherwise the buffer is extended and new elements are
 	/// copy-constructed from the provided val.
+
+	/// Resize buffer
+
+	/// If n is smaller than the current size the buffer is truncated, 
+	/// otherwise the buffer is extended and new elements are copy-constructed
+	/// from the provided val.
+	/// If n is also larger than the capacity, then the capacity is increased.
 	void resize(size_t n, const value_type& val){
-		if(size() < n){
+		if(n > size()){
 			reserve(n);
 			//When sizing up
 			for (auto it = mEnd; it != mData+n; ++it)
@@ -187,7 +194,7 @@ public:
 	/// If the size of the buffer is smaller than its capacity then shrinks the
 	/// capacity of the buffer to match the size.
 	void shrink(){
-		if(size()<capacity()){
+		if(size() < capacity()){
 			size_t shrinkTo = size() > 2 ? size() : 2;
 			T* oldData = mData;
 			T* oldEnd = mEnd;
