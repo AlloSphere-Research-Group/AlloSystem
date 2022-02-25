@@ -199,8 +199,8 @@ public:
 	/// Find device using predicate
 	Device findDevice(std::function<bool(Device d)> predicate) const;
 
-	Device deviceIn() const { return mDevI; } ///< Get current input device
-	Device deviceOut() const { return mDevO; } ///< Get current output device
+	const Device& deviceIn() const { return mDevI; } ///< Get current input device
+	const Device& deviceOut() const { return mDevO; } ///< Get current output device
 
 	AudioIO& deviceIn(const Device& d);		///< Set input device
 	AudioIO& deviceOut(const Device& d);	///< Set output device
