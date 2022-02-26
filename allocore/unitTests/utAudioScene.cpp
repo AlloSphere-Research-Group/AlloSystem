@@ -6,49 +6,54 @@
 #include "allocore/sound/al_Vbap.hpp"
 using namespace al;
 
+// To support old ordering
+#define AIO_OUT(chan, frame) io.bufferOut().at(frame, chan)
+
 void testBasicStereo() {
 	SpeakerLayout speakerLayout = HeadsetSpeakerLayout();
 	StereoPanner panner(speakerLayout);
-	AudioIO audioIO(8, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
+	//AudioIO io(8, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
+	AudioIO io;
+	io.configure(8, 44100, speakerLayout.numSpeakers(), 0);
 
-	audioIO.zeroOut(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
+	io.bufferOut().zero(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
 
 	Pose listeningPose(Vec3d(0, 0, 4)); // Default Pose facing forward
-	panner.renderSample(audioIO, listeningPose, 0.5, 0);
+	panner.renderSample(io, listeningPose, 0.5, 0);
 
-	assert(almostEqual(audioIO.out(0, 0), 0.5 * sin(M_PI/4.0)));
-	assert(almostEqual(audioIO.out(1, 0), 0.5 * sin(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(0, 0), 0.5 * sin(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(0, 1), 0.5 * sin(M_PI/4.0)));
 
 	listeningPose = Pose(Vec3d(1, 0, 0)); // Full pan right
-	panner.renderSample(audioIO, listeningPose, 0.5, 1);
+	panner.renderSample(io, listeningPose, 0.5, 1);
 
-	assert(almostEqual(audioIO.out(0, 1), 0.0));
-	assert(almostEqual(audioIO.out(1, 1), 0.5));
+	assert(almostEqual(AIO_OUT(1, 0), 0.0));
+	assert(almostEqual(AIO_OUT(1, 1), 0.5));
 
 	listeningPose = Pose(Vec3d(-1, 0, 0)); // Full pan left
-	panner.renderSample(audioIO, listeningPose, 0.5, 2);
+	panner.renderSample(io, listeningPose, 0.5, 2);
 
-	assert(almostEqual(audioIO.out(0, 2), 0.5));
-	assert(almostEqual(audioIO.out(1, 2), 0.0));
+	assert(almostEqual(AIO_OUT(2, 0), 0.5));
+	assert(almostEqual(AIO_OUT(2, 1), 0.0));
 
 	// Test buffer rendering
-	audioIO.zeroOut();
+	io.bufferOut().zero();
 	listeningPose = Pose(Vec3d(0, 0, 4)); // Default Pose facing forward
 	float input[8] = {0.5, 0.5, 0.4, 0.3, 0.2, 0.1, -0.3, -0.4};
-	panner.renderBuffer(audioIO, listeningPose, input, 8);
+	panner.renderBuffer(io, listeningPose, input, 8);
 
 	for (int i = 0; i < 8; i++) {
-		assert(almostEqual(audioIO.out(0, i), input[i] * sin(M_PI/4.0)));
-		assert(almostEqual(audioIO.out(1, i), input[i] * sin(M_PI/4.0)));
+		assert(almostEqual(AIO_OUT(i, 0), input[i] * sin(M_PI/4.0)));
+		assert(almostEqual(AIO_OUT(i, 1), input[i] * sin(M_PI/4.0)));
 	}
 
-	audioIO.zeroOut();
+	io.bufferOut().zero();
 	listeningPose = Pose(Vec3d(1, 0, 0));
-	panner.renderBuffer(audioIO, listeningPose, input, 8);
+	panner.renderBuffer(io, listeningPose, input, 8);
 
 	for (int i = 0; i < 8; i++) {
-		assert(almostEqual(audioIO.out(0, i), 0.0));
-		assert(almostEqual(audioIO.out(1, i), input[i]));
+		assert(almostEqual(AIO_OUT(i, 0), 0.0));
+		assert(almostEqual(AIO_OUT(i, 1), input[i]));
 	}
 
 }
@@ -59,7 +64,8 @@ void testStereoAudioScene(int bufferSize) {
 	AudioScene scene(bufferSize);
 	SoundSource src;
 	Listener *listener = scene.createListener(panner);
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
+	AudioIO io;
+	io.configure(bufferSize, 44100, speakerLayout.numSpeakers(), 0);
 	src.dopplerType(DOPPLER_NONE);
 	src.useAttenuation(false);
 	scene.addSource(src);
@@ -69,11 +75,11 @@ void testStereoAudioScene(int bufferSize) {
 	}
 
 	src.pos(1, 0, 0); // Pan full right
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, 0.0));
 		assert(almostEqual(right, 0.5));
 	}
@@ -83,11 +89,11 @@ void testStereoAudioScene(int bufferSize) {
 		src.writeSample(0.6);
 	}
 
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, 0.0));
 		assert(almostEqual(right, 0.6));
 	}
@@ -100,11 +106,11 @@ void testStereoAudioScene(int bufferSize) {
 
 	// Pan center
 	src.pos(0, 0, -4);
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, sin(M_PI/4)));
 		assert(almostEqual(right, sin(M_PI/4)));
 	}
@@ -115,11 +121,11 @@ void testStereoAudioScene(int bufferSize) {
 
 	// Pan left
 	src.pos(-1, 0, 0);
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, 0.75));
 		assert(almostEqual(right, 0.0));
 	}
@@ -133,7 +139,9 @@ void testMultipleSourcesStereo(int bufferSize) {
 	AudioScene scene(bufferSize);
 	SoundSource src1,src2, src3, src4;
 	scene.createListener(panner);
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
+	AudioIO io;
+	io.configure(bufferSize, 44100, speakerLayout.numSpeakers(), 0);
+
 	src1.dopplerType(DOPPLER_NONE);
 	src1.useAttenuation(false);
 	src2.dopplerType(DOPPLER_NONE);
@@ -159,11 +167,11 @@ void testMultipleSourcesStereo(int bufferSize) {
 	src2.pos(-1, 0, 0);
 	src3.pos(-1, 0, 0);
 	src4.pos(-1, 0, 0);
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, 0.05));
 		assert(almostEqual(right, 0.5));
 	}
@@ -176,7 +184,8 @@ void testMultipleSourcesMovingStereo() {
 	AudioScene scene(bufferSize);
 	SoundSource src1,src2, src3, src4;
 	scene.createListener(panner);
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
+	AudioIO io;
+	io.configure(bufferSize, 44100, speakerLayout.numSpeakers(), 0);
 	scene.usePerSampleProcessing(true); // to enable interpolation of movement
 	src1.dopplerType(DOPPLER_NONE);
 	src1.useAttenuation(false);
@@ -197,11 +206,11 @@ void testMultipleSourcesMovingStereo() {
 	src1.pos(1, 0, 0);
 	src2.pos(-1, 0, 0);
 	src3.pos(-1, 0, 0);
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, 0.35));
 		assert(almostEqual(right, 0.492));
 	}
@@ -209,11 +218,11 @@ void testMultipleSourcesMovingStereo() {
 	src1.pos(-1, 0, 0);
 	src2.pos(1, 0, 0);
 	src3.pos(1, 0, 0);
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, 0.492));
 		assert(almostEqual(right, 0.35));
 	}
@@ -255,42 +264,43 @@ void testVbapTriples() {
 }
 
 void testVbapGains() {
-	AudioIO audioIO(8, 44100, NULL, NULL, 8, 0);
+	AudioIO io;
+	io.configure(8, 44100, 8, 0);
 	// Simple 2D triangle
 	SpeakerLayout speakerLayout;
 	speakerLayout.addSpeaker(Speaker(0, 0, 0, 1));
 	speakerLayout.addSpeaker(Speaker(1, -120, 0, 1));
 	speakerLayout.addSpeaker(Speaker(2, 120, 0, 1));
 	Vbap panner(speakerLayout);
-	audioIO.zeroOut(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
+	io.bufferOut().zero(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
 
 	Pose listeningPose(Vec3d(0, 0, 4)); // Default Pose facing forward
-	panner.renderSample(audioIO, listeningPose, 0.5, 0);
+	panner.renderSample(io, listeningPose, 0.5, 0);
 
-	assert(almostEqual(audioIO.out(0, 0), 0.5));
-	assert(almostEqual(audioIO.out(1, 0), 0.0));
-	assert(almostEqual(audioIO.out(2, 0), 0.0));
+	assert(almostEqual(AIO_OUT(0, 0), 0.5));
+	assert(almostEqual(AIO_OUT(1, 0), 0.0));
+	assert(almostEqual(AIO_OUT(2, 0), 0.0));
 
 	listeningPose = Pose(Vec3d(0, 0, -4)); // Default Pose facing back
-	panner.renderSample(audioIO, listeningPose, 0.5, 1);
+	panner.renderSample(io, listeningPose, 0.5, 1);
 
-	assert(almostEqual(audioIO.out(0, 1), 0));
-	assert(almostEqual(audioIO.out(1, 1), 0.5 * cos(M_PI/4.0)));
-	assert(almostEqual(audioIO.out(2, 1), 0.5 * cos(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(0, 1), 0));
+	assert(almostEqual(AIO_OUT(1, 1), 0.5 * cos(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(2, 1), 0.5 * cos(M_PI/4.0)));
 
 	listeningPose = Pose(Vec3d(0, 0, -4)); // Back
-	panner.renderSample(audioIO, listeningPose, 0.25, 2);
+	panner.renderSample(io, listeningPose, 0.25, 2);
 
-	assert(almostEqual(audioIO.out(0, 2), 0));
-	assert(almostEqual(audioIO.out(1, 2), 0.25 * cos(M_PI/4.0)));
-	assert(almostEqual(audioIO.out(2, 2), 0.25 * cos(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(0, 2), 0));
+	assert(almostEqual(AIO_OUT(1, 2), 0.25 * cos(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(2, 2), 0.25 * cos(M_PI/4.0)));
 
 	listeningPose = Pose(Vec3d(3.4641016151377535, 0, 2)); // Right
-	panner.renderSample(audioIO, listeningPose, 0.25, 3);
+	panner.renderSample(io, listeningPose, 0.25, 3);
 
-	assert(almostEqual(audioIO.out(0, 3), 0.25 * cos(M_PI/4.0)));
-	assert(almostEqual(audioIO.out(1, 3), 0));
-	assert(almostEqual(audioIO.out(2, 3), 0.25 * cos(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(0, 3), 0.25 * cos(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(1, 3), 0));
+	assert(almostEqual(AIO_OUT(2, 3), 0.25 * cos(M_PI/4.0)));
 
 	// 3D Octahedron
 
@@ -303,122 +313,124 @@ void testVbapGains() {
 	speakerLayout3D.addSpeaker(Speaker(5, 0, -90, 1));
 
 	Vbap panner3D(speakerLayout3D, true);
-	audioIO.zeroOut(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
+	io.bufferOut().zero(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
 
 	listeningPose = Pose(Vec3d(0, 0, 4)); // Default Pose facing forward
-	panner3D.renderSample(audioIO, listeningPose, 0.2, 0);
-	assert(almostEqual(audioIO.out(0, 0), 0.2));
-	assert(almostEqual(audioIO.out(1, 0), 0.0));
-	assert(almostEqual(audioIO.out(2, 0), 0.0));
-	assert(almostEqual(audioIO.out(3, 0), 0.0));
-	assert(almostEqual(audioIO.out(4, 0), 0.0));
-	assert(almostEqual(audioIO.out(5, 0), 0.0));
+	panner3D.renderSample(io, listeningPose, 0.2, 0);
+	assert(almostEqual(AIO_OUT(0, 0), 0.2));
+	assert(almostEqual(AIO_OUT(1, 0), 0.0));
+	assert(almostEqual(AIO_OUT(2, 0), 0.0));
+	assert(almostEqual(AIO_OUT(3, 0), 0.0));
+	assert(almostEqual(AIO_OUT(4, 0), 0.0));
+	assert(almostEqual(AIO_OUT(5, 0), 0.0));
 
 	listeningPose = Pose(Vec3d(1, 1, 1)); // Elevated Right
-	panner3D.renderSample(audioIO, listeningPose, 0.25, 4);
+	panner3D.renderSample(io, listeningPose, 0.25, 4);
 
-	assert(almostEqual(audioIO.out(0, 4), 0.25 * sqrt(1.0/3.0)));
-	assert(almostEqual(audioIO.out(1, 4), 0));
-	assert(almostEqual(audioIO.out(2, 4), 0.25 * sqrt(1.0/3.0)));
-	assert(almostEqual(audioIO.out(3, 4), 0.0));
-	assert(almostEqual(audioIO.out(4, 4), 0.25 * sqrt(1.0/3.0)));
-	assert(almostEqual(audioIO.out(5, 4), 0.0));
+	assert(almostEqual(AIO_OUT(0, 4), 0.25 * sqrt(1.0/3.0)));
+	assert(almostEqual(AIO_OUT(1, 4), 0));
+	assert(almostEqual(AIO_OUT(2, 4), 0.25 * sqrt(1.0/3.0)));
+	assert(almostEqual(AIO_OUT(3, 4), 0.0));
+	assert(almostEqual(AIO_OUT(4, 4), 0.25 * sqrt(1.0/3.0)));
+	assert(almostEqual(AIO_OUT(5, 4), 0.0));
 
 	float input[8] = {0.5f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, -0.3f, -0.4f};
-	audioIO.zeroOut();
+	io.bufferOut().zero();
 	listeningPose = Pose(Vec3d(1, 1, 1)); // Elevated Right
-	panner3D.renderBuffer(audioIO, listeningPose, input, 8);
+	panner3D.renderBuffer(io, listeningPose, input, 8);
 
 	for (int i = 0; i < 8; i++) {
-		assert(almostEqual(audioIO.out(0, i), input[i] * sqrt(1.0/3.0)));
-		assert(almostEqual(audioIO.out(1, i), 0));
-		assert(almostEqual(audioIO.out(2, i), input[i]  * sqrt(1.0/3.0)));
-		assert(almostEqual(audioIO.out(3, i), 0.0));
-		assert(almostEqual(audioIO.out(4, i), input[i]  * sqrt(1.0/3.0)));
-		assert(almostEqual(audioIO.out(5, i), 0.0));
+		assert(almostEqual(AIO_OUT(0, i), input[i] * sqrt(1.0/3.0)));
+		assert(almostEqual(AIO_OUT(1, i), 0));
+		assert(almostEqual(AIO_OUT(2, i), input[i]  * sqrt(1.0/3.0)));
+		assert(almostEqual(AIO_OUT(3, i), 0.0));
+		assert(almostEqual(AIO_OUT(4, i), input[i]  * sqrt(1.0/3.0)));
+		assert(almostEqual(AIO_OUT(5, i), 0.0));
 	}
 }
 
 void testVbapRing() {
 	SpeakerLayout speakerLayout = SpeakerRingLayout<8>();
 	Vbap panner(speakerLayout);
-	AudioIO audioIO(8, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
+	AudioIO io;
+	io.configure(8, 44100, speakerLayout.numSpeakers(), 0);
 
-	audioIO.zeroOut(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
+	io.bufferOut().zero(); // out buffers contain garbage by default, must zero manually as not using the callback facilities.
 
 	Pose listeningPose(Vec3d(0, 0, 4)); // Default Pose facing forward
-	panner.renderSample(audioIO, listeningPose, 0.5, 0);
+	panner.renderSample(io, listeningPose, 0.5, 0);
 
-	assert(almostEqual(audioIO.out(0, 0), 0.5));
-	assert(almostEqual(audioIO.out(1, 0), 0.0));
-	assert(almostEqual(audioIO.out(2, 0), 0.0));
-	assert(almostEqual(audioIO.out(3, 0), 0.0));
-	assert(almostEqual(audioIO.out(4, 0), 0.0));
-	assert(almostEqual(audioIO.out(5, 0), 0.0));
-	assert(almostEqual(audioIO.out(6, 0), 0.0));
-	assert(almostEqual(audioIO.out(7, 0), 0.0));
+	assert(almostEqual(AIO_OUT(0, 0), 0.5));
+	assert(almostEqual(AIO_OUT(1, 0), 0.0));
+	assert(almostEqual(AIO_OUT(2, 0), 0.0));
+	assert(almostEqual(AIO_OUT(3, 0), 0.0));
+	assert(almostEqual(AIO_OUT(4, 0), 0.0));
+	assert(almostEqual(AIO_OUT(5, 0), 0.0));
+	assert(almostEqual(AIO_OUT(6, 0), 0.0));
+	assert(almostEqual(AIO_OUT(7, 0), 0.0));
 
 	listeningPose = Pose(Vec3d(1, 0, 0)); // Full pan right
-	panner.renderSample(audioIO, listeningPose, 0.5, 1);
+	panner.renderSample(io, listeningPose, 0.5, 1);
 
-	assert(almostEqual(audioIO.out(0, 1), 0.0));
-	assert(almostEqual(audioIO.out(1, 1), 0.0));
-	assert(almostEqual(audioIO.out(2, 1), 0.5));
-	assert(almostEqual(audioIO.out(3, 1), 0.0));
-	assert(almostEqual(audioIO.out(4, 1), 0.0));
-	assert(almostEqual(audioIO.out(5, 1), 0.0));
-	assert(almostEqual(audioIO.out(6, 1), 0.0));
-	assert(almostEqual(audioIO.out(7, 1), 0.0));
+	assert(almostEqual(AIO_OUT(0, 1), 0.0));
+	assert(almostEqual(AIO_OUT(1, 1), 0.0));
+	assert(almostEqual(AIO_OUT(2, 1), 0.5));
+	assert(almostEqual(AIO_OUT(3, 1), 0.0));
+	assert(almostEqual(AIO_OUT(4, 1), 0.0));
+	assert(almostEqual(AIO_OUT(5, 1), 0.0));
+	assert(almostEqual(AIO_OUT(6, 1), 0.0));
+	assert(almostEqual(AIO_OUT(7, 1), 0.0));
 
 	listeningPose = Pose(Vec3d(-2, 0, 0)); // Full pan left
-	panner.renderSample(audioIO, listeningPose, 0.5, 2);
+	panner.renderSample(io, listeningPose, 0.5, 2);
 
-	assert(almostEqual(audioIO.out(1, 2), 0.0));
-	assert(almostEqual(audioIO.out(0, 2), 0.0));
-	assert(almostEqual(audioIO.out(2, 2), 0.0));
-	assert(almostEqual(audioIO.out(3, 2), 0.0));
-	assert(almostEqual(audioIO.out(4, 2), 0.0));
-	assert(almostEqual(audioIO.out(5, 2), 0.0));
-	assert(almostEqual(audioIO.out(6, 2), 0.5));
-	assert(almostEqual(audioIO.out(7, 2), 0.0));
+	assert(almostEqual(AIO_OUT(1, 2), 0.0));
+	assert(almostEqual(AIO_OUT(0, 2), 0.0));
+	assert(almostEqual(AIO_OUT(2, 2), 0.0));
+	assert(almostEqual(AIO_OUT(3, 2), 0.0));
+	assert(almostEqual(AIO_OUT(4, 2), 0.0));
+	assert(almostEqual(AIO_OUT(5, 2), 0.0));
+	assert(almostEqual(AIO_OUT(6, 2), 0.5));
+	assert(almostEqual(AIO_OUT(7, 2), 0.0));
 
 	listeningPose = Pose(Vec3d(0.3826834323650899, 0.0, -0.9238795325112867) ); // SSE
-	panner.renderSample(audioIO, listeningPose, 0.5, 3);
+	panner.renderSample(io, listeningPose, 0.5, 3);
 
-	assert(almostEqual(audioIO.out(0, 3), 0.0));
-	assert(almostEqual(audioIO.out(1, 3), 0.0));
-	assert(almostEqual(audioIO.out(2, 3), 0.0));
-	assert(almostEqual(audioIO.out(3, 3), 0.5 * cos(M_PI/4.0)));
-	assert(almostEqual(audioIO.out(4, 3), 0.5 * cos(M_PI/4.0)));
-	assert(almostEqual(audioIO.out(5, 3), 0.0));
-	assert(almostEqual(audioIO.out(6, 3), 0.0));
-	assert(almostEqual(audioIO.out(7, 3), 0.0));
+	assert(almostEqual(AIO_OUT(0, 3), 0.0));
+	assert(almostEqual(AIO_OUT(1, 3), 0.0));
+	assert(almostEqual(AIO_OUT(2, 3), 0.0));
+	assert(almostEqual(AIO_OUT(3, 3), 0.5 * cos(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(4, 3), 0.5 * cos(M_PI/4.0)));
+	assert(almostEqual(AIO_OUT(5, 3), 0.0));
+	assert(almostEqual(AIO_OUT(6, 3), 0.0));
+	assert(almostEqual(AIO_OUT(7, 3), 0.0));
 
 	// Test buffer rendering
-	audioIO.zeroOut();
+	io.bufferOut().zero();
 	listeningPose = Pose(Vec3d(-0.9238795325112867, 0.0, -0.3826834323650899) ); // SWW
 	float input[8] = {0.5f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, -0.3f, -0.4f};
-	panner.renderBuffer(audioIO, listeningPose, input, 8);
+	panner.renderBuffer(io, listeningPose, input, 8);
 
 	for (int i = 0; i < 8; i++) {
-		assert(almostEqual(audioIO.out(0, i), 0.0));
-		assert(almostEqual(audioIO.out(1, i), 0.0));
-		assert(almostEqual(audioIO.out(2, i), 0.0));
-		assert(almostEqual(audioIO.out(3, i), 0.0));
-		assert(almostEqual(audioIO.out(4, i), 0.0));
-		assert(almostEqual(audioIO.out(5, i), input[i] * sin(M_PI/4.0)));
-		assert(almostEqual(audioIO.out(6, i), input[i] * sin(M_PI/4.0)));
-		assert(almostEqual(audioIO.out(7, i), 0.0));
+		assert(almostEqual(AIO_OUT(0, i), 0.0));
+		assert(almostEqual(AIO_OUT(1, i), 0.0));
+		assert(almostEqual(AIO_OUT(2, i), 0.0));
+		assert(almostEqual(AIO_OUT(3, i), 0.0));
+		assert(almostEqual(AIO_OUT(4, i), 0.0));
+		assert(almostEqual(AIO_OUT(5, i), input[i] * sin(M_PI/4.0)));
+		assert(almostEqual(AIO_OUT(6, i), input[i] * sin(M_PI/4.0)));
+		assert(almostEqual(AIO_OUT(7, i), 0.0));
 	}
 }
 
 void testAmbisonicsFirstOrder2D(int bufferSize) {
 	// TODO Finish ambisonics scene tester
 	SpeakerLayout speakerLayout = OctalSpeakerLayout();
-	AudioIO audioIO(bufferSize, 44100, NULL, NULL, speakerLayout.numSpeakers(), 0);
+	AudioIO io;
+	io.configure(bufferSize, 44100, speakerLayout.numSpeakers(), 0);
 
 	AmbisonicsSpatializer *panner = new AmbisonicsSpatializer(speakerLayout, 2, 1);
-	AudioScene scene(audioIO.framesPerBuffer());
+	AudioScene scene(io.framesPerBuffer());
 	SoundSource src;
 	scene.createListener(panner);
 	src.dopplerType(DOPPLER_NONE);
@@ -431,12 +443,12 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 
 	// Front
 	src.pos(0, 0, -1);
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float front = audioIO.out(0, i);
+		float front = AIO_OUT(0, i);
 		for (int chan = 1; chan < speakerLayout.numSpeakers(); chan++) {
-			float spkr = audioIO.out(chan, i);
+			float spkr = AIO_OUT(chan, i);
 			assert(front > spkr);
 //			std::cout << spkr << std::endl;
 		}
@@ -448,11 +460,11 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 
 	// Pan center
 	src.pos(0, 0, 0);
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, right));
 		assert(almostEqual(right, sin(M_PI/4)));
 	}
@@ -463,11 +475,11 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 
 	// Pan left
 	src.pos(-1, 0, 0);
-	scene.render(audioIO);
+	scene.render(io);
 
 	for (int i = 0; i < bufferSize; i++) {
-		float left = audioIO.out(0, i);
-		float right = audioIO.out(1, i);
+		float left = AIO_OUT(0, i);
+		float right = AIO_OUT(1, i);
 		assert(almostEqual(left, 0.75));
 		assert(almostEqual(right, 0.0));
 	}
