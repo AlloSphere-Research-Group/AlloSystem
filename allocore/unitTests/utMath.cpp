@@ -199,11 +199,18 @@ int utMath(){
 		assert(eq(r, Vec3d(0,0,1)));
 		}
 
+		// analysis
+		assert(toVec(1,-10,7,2).find(7) == 2);
+		assert(toVec(1,-10,7,2).find(3) < 0);
+		assert(toVec(4,1,1,7).find(1) == 1);
+
+		assert(toVec(1,-10,7,2).indexOfMin() == 1);
+		assert(toVec(1,-10,7,2).indexOfMax() == 2);
+
 		a = 0;
 		b = 1;
 		assert(min(a,b) == 0);
 		assert(max(a,b) == 1);
-
 	}
 
 
