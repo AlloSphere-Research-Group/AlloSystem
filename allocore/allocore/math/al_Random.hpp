@@ -180,9 +180,6 @@ public:
 	template <class Array>
 	Array shuffle(const Array& a){ auto t=a; return shuffle(t); }
 
-	// DEPRECATED:
-	float gaussian(){ return normal(); }
-	template <class T> void gaussian(T& y1, T& y2){ normal(y1,y2); }
 protected:
 	RNG mRNG;
 };
@@ -378,7 +375,6 @@ inline VecType cube(){ return global().cube<VecType>(); }
 
 /// Returns standard normal variate
 inline float normal(){ return global().normal(); }
-inline float gaussian(){ return normal(); }
 
 /// Returns triangle distribution variate, in (-1,1)
 inline float triangle(){ return global().triangle(); }
