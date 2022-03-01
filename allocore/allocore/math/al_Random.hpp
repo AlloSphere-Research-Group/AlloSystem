@@ -87,9 +87,7 @@ public:
 
 	/// Returns uniform random in [0, 1)
 	float uniform(){
-		union{ uint32_t u; float f; };
-		u = mRNG() >> 9 | 0x3F800000;
-		return f - 1.f;
+		return to12(mRNG()) - 1.f;
 	}
 
 	/// Returns uniform random in [0, hi)
@@ -102,9 +100,7 @@ public:
 
 	/// Returns uniform random in [-1, 1)
 	float uniformS(){
-		union{ uint32_t u; float f; };
-		u = mRNG() >> 9 | 0x40000000;
-		return f - 3.f;
+		return to24(mRNG()) - 3.f;
 	}
 
 	/// Returns uniform random in [-lim, lim)
@@ -149,12 +145,26 @@ public:
 	template <class T>
 	void normal(T& y1, T& y2);
 
-	/// Returns triangle distribution variate, in (-1,1)
-	float triangle();
+	/// Returns triangle distribution variate in (-1,1)
+	float triangle(){
+		return to12(mRNG()) - to12(mRNG());
+	}
 
-	/// Returns triangle distribution variate, in (-hi,hi)
+	/// Returns triangle distribution variate in (-hi,hi)
 	template <class T>
 	T triangle(const T& hi){ return hi*triangle(); }
+
+	/// Returns linearly-decreasing variate in [0,1)
+	float linear0(){
+		auto i = mRNG(), j = mRNG();
+		return to12(i<j ? i:j) - 1.f;
+	}
+
+	/// Returns linearly-increasing variate in [0,1)
+	float linear1(){
+		auto i = mRNG(), j = mRNG();
+		return to12(i>j ? i:j) - 1.f;
+	}
 
 	/// Returns argument with sign randomly flipped
 	float sign(float x=1.f);
@@ -182,6 +192,14 @@ public:
 
 protected:
 	RNG mRNG;
+
+	static float toRange(uint32_t n, uint32_t expo){
+		union{ uint32_t u; float f; };
+		u = expo | (n>>9);
+		return f;
+	}
+	static float to12(uint32_t n){ return toRange(n,0x3f800000); } // [1,2)
+	static float to24(uint32_t n){ return toRange(n,0x40000000); } // [2,4)
 };
 
 
@@ -495,17 +513,9 @@ template <class T> void Random<RNG>::normal(T& y1, T& y2){
 }
 
 template <class RNG>
-inline float Random<RNG>::triangle(){
-	union {float f; uint32_t i;} u,v;
-	u.i = 0x3f800000 | (mRNG()>>9); // float in [1,2)
-	v.i = 0x3f800000 | (mRNG()>>9); // float in [1,2)
-	return u.f - v.f;
-}
-
-template <class RNG>
 inline float Random<RNG>::sign(float x){
 	union {float f; uint32_t i;} u = {x};
-	u.i |= mRNG() & 0x80000000;
+	u.i |= 0x80000000 & mRNG();
 	return u.f;
 }
 
