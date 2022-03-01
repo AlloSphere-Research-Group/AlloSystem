@@ -5,9 +5,10 @@ Description:
 Examples of random number facilities in the rnd:: namespace.
 
 Author:
-Lance Putnam, 10/2012, putnam.lance@gmail.com
+Lance Putnam, 10/2012
 */
 
+#include <cstdio>
 #include "allocore/math/al_Random.hpp"
 using namespace al;
 
