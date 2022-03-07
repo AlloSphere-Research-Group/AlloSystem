@@ -220,6 +220,46 @@ int utTypes(){
 			assert(a.capacity() > 0);
 		}
 
+		{ // resize
+			Buffer<int> a;
+			a.resize(4);
+			assert(a.size() == 4);
+			assert(!a.empty());
+			assert(a.capacity() == 4);
+			// size down
+			a.resize(2);
+			assert(a.size() == 2);
+			assert(!a.empty());
+			assert(a.capacity() == 4);
+			// size up
+			a.resize(8);
+			assert(a.size() == 8);
+			assert(!a.empty());
+			assert(a.capacity() == 8);			
+		}
+
+		{ // reserve / shrink
+			Buffer<int> a;
+			int cap = 16;
+			a.reserve(cap);
+			assert(a.size() == 0);
+			assert(a.empty());
+			assert(a.capacity() == cap);
+			a.reserve(2);
+			assert(a.capacity() == cap);
+			a.shrink();
+			assert(a.size() == 0);
+			assert(a.empty());
+			assert(a.capacity() < cap); // may be small non-zero...
+			a.reserve(cap);
+			a.resize(cap/2);
+			assert(a.size() == cap/2);
+			assert(!a.empty());
+			assert(a.capacity() == cap);
+			a.shrink();
+			assert(a.capacity() == a.size());
+		}
+
 		Buffer<int> a(0,2);
 		assert(a.size() == 0);
 		assert(a.empty());
@@ -232,6 +272,7 @@ int utTypes(){
 		a.append(1);
 		assert(a[0] == 1);
 		assert(a.size() == 1);
+		assert(!a.empty());
 		assert(a.last() == 1);
 
 		a.append(2);
@@ -243,6 +284,7 @@ int utTypes(){
 		int cap = a.capacity();
 		a.reset();
 		assert(a.size() == 0);
+		assert(a.empty());
 		assert(a.capacity() == cap);
 
 		a.append(7);
