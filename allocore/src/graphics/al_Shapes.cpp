@@ -465,6 +465,19 @@ int addDisc(Mesh& m, float radius, unsigned slices, unsigned stacks){
 	return addCone(m, radius, Vec3f(0,0,0), slices, stacks);
 }
 
+int addEllipse(Mesh& m, float radx, float rady, int N){
+	m.primitive(Graphics::LINES);
+	int Nv = m.vertices().size();
+	for(int i=0; i<N; ++i) m.indexRel(i, (i+1)%N);
+	m.vertices().resize(m.vertices().size() + N);
+	ellipse(&m.vertices().last() - N + 1, N, radx, rady);
+	return N;
+}
+
+int addCircle(Mesh& m, float radius, int N){
+	return addEllipse(m, radius, radius, N);
+}
+
 int addRect(Mesh& m, float width, float height, float x, float y){
 	float w_2 = width*0.5, h_2 = height*0.5;
 	m.primitive(Graphics::TRIANGLES);

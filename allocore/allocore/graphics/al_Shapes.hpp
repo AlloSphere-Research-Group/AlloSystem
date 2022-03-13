@@ -187,6 +187,24 @@ int addCone(
 int addDisc(Mesh& m, float radius=1, unsigned slices=16, unsigned stacks=1);
 
 
+/// Add ellipse outline as lines
+
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] radx			Radius along x axis
+/// @param[in] rady			Radius along y axis
+/// @param[in] N			Number of vertices
+/// \returns number of vertices added
+int addEllipse(Mesh& m, float radx=1., float rady=1., int N=60);
+
+/// Add circle outline as lines
+
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] radius		Radius
+/// @param[in] N			Number of vertices
+/// \returns number of vertices added
+int addCircle(Mesh& m, float radius=1., int N=60);
+
+
 /// Add a rectangle as indexed triangles
 
 /// @param[in,out] m		Mesh to add vertices and indices to
