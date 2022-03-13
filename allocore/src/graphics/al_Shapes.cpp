@@ -502,6 +502,19 @@ int addQuad(Mesh& m,
 	return 4;
 }
 
+int addFrame(Mesh& m, float w, float h, float cx, float cy){
+	m.primitive(Graphics::LINES);
+	float l = cx - w*0.5;
+	float r = cx + w*0.5;
+	float b = cy - h*0.5;
+	float t = cy + h*0.5;
+	m.indexRel(0,1, 1,2, 2,3, 3,0);
+	m.vertex(l,b,0);
+	m.vertex(r,b,0);
+	m.vertex(r,t,0);
+	m.vertex(l,t,0);
+	return 4;
+}
 
 int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist, bool caps){
 
