@@ -337,6 +337,9 @@ public:
 	/// Draw filled polygons
 	void polygonFill(Direction d=FRONT_AND_BACK){ polygonMode(FILL,d); }
 
+	/// Draw only edges of polygons with lines
+	void wireframe(bool v, Direction d=FRONT_AND_BACK){ polygonMode(v?LINE:FILL,d); }
+
 	/// Set shading model
 	void shadeModel(ShadeModel m);
 
