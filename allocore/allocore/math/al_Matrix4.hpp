@@ -43,6 +43,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include <cmath> // tan
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Mat.hpp"
@@ -155,7 +156,7 @@ public:
 	/// @param[in] near		distance from eye to near plane
 	/// @param[in] far		distance from eye to far plane
 	static Matrix4 perspective(T fovy, T aspect, T near, T far) {
-		double f = 1./tan(fovy*M_DEG2RAD/2.);
+		double f = std::tan((90.-fovy*0.5)*M_DEG2RAD); // tan(pi/2-x) = 1/tan(x)
 		T D = far-near;	T D2 = far+near;
 		T fn2 = far*near*2;
 		return Matrix4(	f/aspect,	0,	0,			0,
@@ -225,7 +226,7 @@ public:
 
 	/// Get an off-axis perspective projection matrix (for stereographics)
 	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T focal) {
-		T top = near * tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
+		T top = near * std::tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
 		T bottom = -top;
 		T shift = -xShift*near/focal;
 		T left = -aspect*top + shift;
@@ -243,7 +244,7 @@ public:
 	/// @param[in] yShift	amount to shift off y-axis
 	/// @param[in] focal	focal length
 	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T yShift, T focal) {
-		double tanfovy = tan(fovy*M_DEG2RAD/2.);
+		double tanfovy = std::tan(fovy*M_DEG2RAD*0.5);
 		T t = near * tanfovy;	// height of view at distance = near
 		T b = -t;
 		T l = -aspect*t;
