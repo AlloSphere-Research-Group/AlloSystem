@@ -18,13 +18,11 @@ using namespace al;
 class MyApp : public App{
 public:
 
-	float phase, pan, angle;
+	float phase=0, pan=0, angle=0;
 	Mesh shape;
 	RenderToDisk render;
 
-	MyApp()
-	:	phase(0), pan(0), angle(0)
-	{
+	MyApp(){
 		// Set path to render files to:
 		// If not specified, then a directory is automatically generated.
 		//render.path("./renderNRTSave/");
@@ -79,10 +77,7 @@ public:
 	}
 	
 	void onDraw(Graphics& g){
-
-		static Light light;
-		light();
-
+		g.light().pos(100,1000,100);
 		g.pushMatrix();
 		g.translate(pan, 0, 0);
 		g.rotate(angle);
