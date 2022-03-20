@@ -242,7 +242,6 @@ public:
 
 	/// This will be called from the main graphics renderer. Since it may be
 	/// called multiple times, no state updates should be made in it.
-	virtual void onDraw(Graphics& g, const Viewpoint& v){ onDraw(g); }
 	virtual void onDraw(Graphics& g){}
 
 	/// Called when a keyboard key is pressed
@@ -308,6 +307,11 @@ public:
 	const Nav& navDraw() const { return mNavDraw; }
 	Nav& navDraw(){ return mNavDraw; }
 
+	/// Get current viewpoint (only valid in onDraw)
+	const Viewpoint& viewpoint() const;
+	/// Get current viewport (only valid in onDraw)
+	const Viewport& viewport() const;
+
 	/// Get navigation keyboard/mouse controller
 	const NavInputControl& navControl() const { return mNavControl; }
 	NavInputControl& navControl(){ return mNavControl; }
@@ -316,9 +320,6 @@ public:
 	/// Get audio i/o object
 	AudioIO& audioIO(){ return mAudioIO; }
 	const AudioIO& audioIO() const { return mAudioIO; }
-
-	//const AudioScene&	audioScene() const { return mAudioScene; }
-	//AudioScene&			audioScene(){ return mAudioScene; }
 
 
 	/// Get the array of windows
@@ -382,13 +383,14 @@ public:
 protected:
 	virtual void onSoundWrapper(AudioIOData& io){ onSound(io); }
 	virtual void onAnimateWrapper(double dt){ onAnimate(dt); }
-	virtual void onDrawWrapper(Graphics& g, const Viewpoint& v){ onDraw(g,v); }
+	virtual void onDrawWrapper(Graphics& g){ onDraw(g); }
 
 private:
 
 	typedef std::vector<Viewpoint *> Viewpoints;
 
 	Viewpoints mFacViewpoints;
+	Viewpoint * mCurrViewpoint = nullptr;
 	Windows mFacWindows;
 	double mStartTime = 0.;
 	friend class SceneWindowHandler;

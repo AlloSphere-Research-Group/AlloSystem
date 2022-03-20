@@ -224,11 +224,12 @@ bool SceneWindowHandler::onFrame(){
 
 			void onDraw(Graphics& g){
 				for(auto& drawCall : win.drawCalls()) drawCall();
-				app.onDrawWrapper(g,vp);
+				app.onDrawWrapper(g);
 			}
 		} drawFunc(app, vp, win);
 
 		// Note that stereo pushes/pops both proj and modelview around Drawable::onDraw
+		app.mCurrViewpoint = &vp;
 		stereo.draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc, doClear);
 		stereo.clearColor(defaultClearColor);
 	}
@@ -369,10 +370,21 @@ void App::start(){
 	}
 }
 
+const Viewpoint& App::viewpoint() const {
+	if(mCurrViewpoint){
+		return *mCurrViewpoint;
+	}
+	static Viewpoint vp;
+	return vp;
+}
+
+const Viewport& App::viewport() const {
+	return viewpoint().viewport();
+}
+
 double App::appTime() const {
 	return timeNow() - mStartTime;
 }
-
 
 float mousePos1(const App * app, int window, int coord, bool clip){
 	if(window < app->windows().size()){
