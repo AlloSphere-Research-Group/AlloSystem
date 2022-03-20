@@ -80,9 +80,6 @@ public:
 	};
 
 
-	Stereoscopic();
-
-
 	/// Draw the scene according to the stored stereographic mode
 
 	/// @param[in] g		graphics interface
@@ -217,23 +214,25 @@ public:
 	Vec3d toNDCSpace() const;
 
 protected:
-	StereoMode mMode;
-	AnaglyphMode mAnaglyphMode;
-	Color mClearColor;
-	unsigned mSlices;	// number of omni slices
-	double mOmniFov;	// field of view of omnigraphics
-	Matrix4d mProjection, mView;
+	StereoMode mMode = ANAGLYPH;
+	AnaglyphMode mAnaglyphMode = RED_CYAN;
+	Color mClearColor{0};
+	unsigned mSlices = 24;	// number of omni slices
+	double mOmniFov = 360;	// field of view of omnigraphics
+	Matrix4d mProjection{1}, mView{1};
 	Vec3d mEye;
-	unsigned mEyeNumber;
+	unsigned mEyeNumber = 0;
 	Viewport mVP;
-	bool mStereo;
-	bool mOmni;
+	bool mStereo = false;
+	bool mOmni = false;
 
 	void pushDrawPop(Graphics& g, Drawable& draw);
 	void sendViewport(Graphics& g, const Viewport& vp);
 	void sendClear(Graphics& g);
 
 	void drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
+
+	double angleOfOmniSlice(int slice) const; // angle at center of slice
 
 public:
 	// \deprecated Use view()

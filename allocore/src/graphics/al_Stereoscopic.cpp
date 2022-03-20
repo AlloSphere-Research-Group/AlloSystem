@@ -5,13 +5,6 @@
 
 namespace al{
 
-Stereoscopic::Stereoscopic()
-:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)),
-	mSlices(24), mOmniFov(360),
-	mEyeNumber(0),
-	mStereo(false), mOmni(false)
-{}
-
 Vec3d Stereoscopic::unproject(const Vec3d& screenPos) const {
 	auto invprojview = modelViewProjection().inverse();
 	auto worldPos4 = invprojview * Vec4d(screenPos, 1.);
@@ -40,6 +33,10 @@ void Stereoscopic::sendClear(Graphics& g){
 	g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
 }
 
+double Stereoscopic::angleOfOmniSlice(int slice) const {
+	return mOmniFov * (0.5-((slice+0.5)/double(mSlices)));
+}
+
 void Stereoscopic :: draw(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
 	//printf("%d, %d\n", mStereo, mMode);
 	if(mStereo){
@@ -58,7 +55,7 @@ void Stereoscopic :: draw(Graphics& g, const Lens& lens, const Pose& pose, const
 
 void Stereoscopic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	const Vec3d& pos = pose.pos();
+	const auto& pos = pose.pos();
 
 	// We must configure scissoring BEFORE clearing buffers
 	g.scissorTest(true);
@@ -72,17 +69,16 @@ void Stereoscopic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, c
 	if (omni()) {
 		int wx = vp.l;
 		double fovx = mOmniFov;
-		for (unsigned i=0; i<mSlices; i++) {
-			// angle at center of slice:
-			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
+		for(unsigned i=0; i<mSlices; i++){
 
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect() * pixelaspect;
-			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
+			auto aspect = vp1.aspect() * pixelaspect;
+			auto fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
 			mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
 
 			// TODO: lerp quat instead of computing anew each iteration
+			auto angle = angleOfOmniSlice(i);
 			mView = (pose * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0)).matrix();
 			invertRigid(mView);
 
@@ -95,8 +91,8 @@ void Stereoscopic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, c
 		}
 
 	} else {
-		double fovy = lens.fovy();
-		double aspect = vp.aspect() * pixelaspect;
+		auto fovy = lens.fovy();
+		auto aspect = vp.aspect() * pixelaspect;
 		mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
 		
 		mView = pose.matrix();
@@ -153,18 +149,17 @@ void Stereoscopic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const 
 		double fovx = mOmniFov;
 
 		// Render slices starting on left of viewport
-		for (unsigned i=0; i<mSlices; i++) {
+		for(unsigned i=0; i<mSlices; i++){
 			// Position of right edge of slice (exclusive)
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect() * pixelaspect;
-			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
+			auto aspect = vp1.aspect() * pixelaspect;
+			auto fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
 
 			mProjection = Matrix4d::perspectiveOffAxis(fovy, aspect, near, far, -eyeShift, focal);
 
-			// angle at center of slice:
-			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
-			Quatd qrot = Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			auto angle = angleOfOmniSlice(i);
+			auto qrot = Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
 
 			setView(pose * qrot, eyeShift);
 
@@ -176,7 +171,7 @@ void Stereoscopic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const 
 		}
 
 	} else {
-		double aspect = vp.aspect() * pixelaspect;
+		auto aspect = vp.aspect() * pixelaspect;
 		mProjection = Matrix4d::perspectiveOffAxis(lens.fovy(), aspect, near, far, -eyeShift, focal);
 		setView(pose, eyeShift);
 
