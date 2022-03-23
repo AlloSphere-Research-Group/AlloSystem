@@ -45,7 +45,6 @@
 
 #include <cmath> // tan
 #include "allocore/math/al_Constants.hpp"
-#include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Vec.hpp"
 
@@ -95,39 +94,6 @@ public:
 		)
 	{}
 
-	/// Get a quaternion representation
-	Quat<T> toQuat() const {
-		return Quat<T>().fromMatrix(Base::elems());
-	}
-
-	/// Set from quaternion
-	Matrix4& fromQuat(Quat<T>& q) { q.toMatrix(Base::elems()); return *this; }
-	Matrix4& fromQuatTransposed(Quat<T>& q) { q.toMatrixTransposed(Base::elems()); return *this; }
-
-
-	/// Get a shear transformation matrix on the xy plane
-	static Matrix4 shearXY(T x, T y) {
-		return Matrix4(	1,	0,	x,	0,
-						0,	1,	y,	0,
-						0,	0,	1,	0,
-						0,	0,	0,	1	);
-	}
-
-	/// Get a shear transformation matrix on the yz plane
-	static Matrix4 shearYZ(T y, T z) {
-		return Matrix4(	1,	0,	0,	0,
-						y,	1,	0,	0,
-						z,	0,	1,	0,
-						0,	0,	0,	1	);
-	}
-
-	/// Get a shear transformation matrix on the zx plane
-	static Matrix4 shearZX(T z, T x) {
-		return Matrix4(	1,	x,	0,	0,
-						0,	1,	0,	0,
-						0,	z,	1,	0,
-						0,	0,	0,	1	);
-	}
 
 	/// Get a perspective projection matrix
 
@@ -137,16 +103,18 @@ public:
 	/// @param[in] t	distance from center of near plane to top edge
 	/// @param[in] n	distance from eye to near plane
 	/// @param[in] f	distance from eye to far plane
-	static Matrix4 perspective(T l, T r, T b, T t, T n, T f) {
+	static Matrix4 perspective(T l, T r, T b, T t, T n, T f){
 		T W = r-l;	T W2 = r+l;
 		T H = t-b;	T H2 = t+b;
 		T D = f-n;	T D2 = f+n;
 		T n2 = n*2;
 		T fn2 = f*n2;
-		return Matrix4(	n2/W,	0,		W2/W,		0,
-						0,		n2/H,	H2/H,		0,
-						0,		0,		-D2/D,		-fn2/D,
-						0,		0,		-1,			0 );
+		return {
+			n2/W,	0,		W2/W,		0,
+			0,		n2/H,	H2/H,		0,
+			0,		0,		-D2/D,		-fn2/D,
+			0,		0,		-1,			0
+		};
 	}
 
 	/// Get a perspective projection matrix
@@ -155,15 +123,16 @@ public:
 	/// @param[in] aspect	aspect ratio
 	/// @param[in] near		distance from eye to near plane
 	/// @param[in] far		distance from eye to far plane
-	static Matrix4 perspective(T fovy, T aspect, T near, T far) {
+	static Matrix4 perspective(T fovy, T aspect, T near, T far){
 		double f = std::tan((90.-fovy*0.5)*M_DEG2RAD); // tan(pi/2-x) = 1/tan(x)
 		T D = far-near;	T D2 = far+near;
 		T fn2 = far*near*2;
-		return Matrix4(	f/aspect,	0,	0,			0,
-						0,			f,	0,			0,
-						0,			0,	-D2/D,		-fn2/D,
-						0,			0,	-1,			0
-		);
+		return {
+			f/aspect,	0,	0,			0,
+			0,			f,	0,			0,
+			0,			0,	-D2/D,		-fn2/D,
+			0,			0,	-1,			0
+		};
 	}
 
 	/// Calculate perspective projection from near plane and eye coordinates
@@ -179,59 +148,39 @@ public:
 	/// @param[in] near		near plane distance from eye
 	/// @param[in] far		far plane distance from eye
 	static Matrix4 perspective(
-								const Vec<3,T>& nearBL,
-								const Vec<3,T>& nearBR,
-								const Vec<3,T>& nearTL,
-								const Vec<3,T>& eye,
-								T near,	T far)
-	{
-		Vec<3,T> va, vb, vc;
-		Vec<3,T> vr, vu, vn;
-		T l, r, b, t, d;
-
+		const Vec<3,T>& nearBL,
+		const Vec<3,T>& nearBR,
+		const Vec<3,T>& nearTL,
+		const Vec<3,T>& eye,
+		T near,	T far
+	){
 		// compute orthonormal basis for the screen
-		vr = (nearBR-nearBL).normalize();	// right vector
-		vu = (nearTL-nearBL).normalize();	// up vector
-		cross(vn, vr, vu);	// normal(forward) vector (out from screen)
-		vn.normalize();
+		auto vr = (nearBR - nearBL).normalize();	// right vector
+		auto vu = (nearTL - nearBL).normalize();	// up vector
+		auto vn = cross(vr, vu);					// forward vector (out from screen)
 
 		// compute vectors from eye to screen corners:
-		va = nearBL-eye;
-		vb = nearBR-eye;
-		vc = nearTL-eye;
+		auto va = nearBL - eye;
+		auto vb = nearBR - eye;
+		auto vc = nearTL - eye;
 
 		// distance from eye to screen-plane
 		// = component of va along vector vn (normal to screen)
-		d = -va.dot(vn);
+		auto d = -va.dot(vn);
 
 		// find extent of perpendicular projection
 		T nbyd = near/d;
-		l = vr.dot(va) * nbyd;
-		r = vr.dot(vb) * nbyd;
-		b = vu.dot(va) * nbyd;	// not vd?
-		t = vu.dot(vc) * nbyd;
+		auto l = vr.dot(va) * nbyd;
+		auto r = vr.dot(vb) * nbyd;
+		auto b = vu.dot(va) * nbyd;	// not vd?
+		auto t = vu.dot(vc) * nbyd;
 
 		return perspective(l, r, b, t, near, far);
 	}
 
-	/// Get a left-eye perspective projection matrix (for stereographics)
-	static Matrix4 perspectiveLeft(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
-		return perspectiveOffAxis(fovy, aspect, near, far,-0.5*eyeSep, focal);
-	}
-
-	/// Get a right-eye perspective projection matrix (for stereographics)
-	static Matrix4 perspectiveRight(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
-		return perspectiveOffAxis(fovy, aspect, near, far, 0.5*eyeSep, focal);
-	}
-
 	/// Get an off-axis perspective projection matrix (for stereographics)
-	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T focal) {
-		T top = near * std::tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
-		T bottom = -top;
-		T shift = -xShift*near/focal;
-		T left = -aspect*top + shift;
-		T right = aspect*top + shift;
-		return perspective(left, right, bottom, top, near, far);
+	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T focal){
+		return perspectiveOffAxis(fovy, aspect, near,far, xShift,T(0), focal);
 	}
 
 	/// Get an off-axis perspective projection matrix (for stereographics)
@@ -243,33 +192,29 @@ public:
 	/// @param[in] xShift	amount to shift off x-axis
 	/// @param[in] yShift	amount to shift off y-axis
 	/// @param[in] focal	focal length
-	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T yShift, T focal) {
+	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T yShift, T focal){
 		double tanfovy = std::tan(fovy*M_DEG2RAD*0.5);
-		T t = near * tanfovy;	// height of view at distance = near
+		T t = near * tanfovy; // height of view at distance = near
 		T b = -t;
 		T l = -aspect*t;
-		T r = aspect*t;
-
-		T shift = -xShift*near/focal;
-		l += shift;
-		r += shift;
-		shift = -yShift*near/focal;
-		t += shift;
-		b += shift;
-
-		return perspective(l, r, b, t, near, far);
+		T r =  aspect*t;
+		T dx = -xShift*near/focal;
+		T dy = -yShift*near/focal;
+		return perspective(l+dx, r+dx, b+dy, t+dy, near, far);
 	}
 
-	static Matrix4 unPerspective(T l, T r, T b, T t, T n, T f) {
+	static Matrix4 unPerspective(T l, T r, T b, T t, T n, T f){
 		T W = r-l;	T W2 = r+l;
 		T H = t-b;	T H2 = t+b;
 		T D = f-n;	T D2 = f+n;
 		T n2 = n*2;
 		T fn2 = f*n2;
-		return Matrix4(	W/n2,	0,		0,		W2/n2,
-						0,		H/n2,	0,		H2/n2,
-						0,		0,		0,		-1,
-						0,		0,		-D/fn2,	D2/fn2	);
+		return {
+			W/n2,	0,		0,		W2/n2,
+			0,		H/n2,	0,		H2/n2,
+			0,		0,		0,		-1,
+			0,		0,		-D/fn2,	D2/fn2
+		};
 	}
 
 	/// Get an orthographic projection matrix
@@ -280,24 +225,28 @@ public:
 	/// @param[in] t	coordinate of top clipping plane
 	/// @param[in] n	coordinate of near clipping plane
 	/// @param[in] f	coordinate of far clipping plane
-	static Matrix4 ortho(T l, T r, T b, T t, T n, T f) {
+	static Matrix4 ortho(T l, T r, T b, T t, T n, T f){
 		T W = r-l;	T W2 = r+l;
 		T H = t-b;	T H2 = t+b;
 		T D = f-n;	T D2 = f+n;
-		return Matrix4(	2/W,	0,		0,		-W2/W,
-						0,		2/H,	0,		-H2/H,
-						0,		0,		-2/D,	-D2/D,
-						0,		0,		0,		1	);
+		return {
+			2/W,	0,		0,		-W2/W,
+			0,		2/H,	0,		-H2/H,
+			0,		0,		-2/D,	-D2/D,
+			0,		0,		0,		1
+		};
 	}
 
-	static Matrix4 unOrtho(T l, T r, T b, T t, T n, T f) {
+	static Matrix4 unOrtho(T l, T r, T b, T t, T n, T f){
 		T W = r-l;	T W2 = r+l;
 		T H = t-b;	T H2 = t+b;
 		T D = f-n;	T D2 = f+n;
-		return Matrix4(	W/2,	0,		0,		W2/2,
-						0,		H/2,	0,		H2/2,
-						0,		0,		D/-2,	D2/2,
-						0,		0,		0,		1	);
+		return {
+			W/2,	0,		0,		W2/2,
+			0,		H/2,	0,		H2/2,
+			0,		0,		D/-2,	D2/2,
+			0,		0,		0,		1
+		};
 	}
 
 	/// Get a two-dimensional orthographic projection matrix
@@ -307,13 +256,15 @@ public:
 	/// @param[in] r	coordinate of right clipping plane
 	/// @param[in] b	coordinate of bottom clipping plane
 	/// @param[in] t	coordinate of top clipping plane
-	static Matrix4 ortho2D(T l, T r, T b, T t) {
+	static Matrix4 ortho2D(T l, T r, T b, T t){
 		T W = r-l;	T W2 = r+l;
 		T H = t-b;	T H2 = t+b;
-		return Matrix4(	2/W,	0,		0,		-W2/W,
-						0,		2/H,	0,		-H2/H,
-						0,		0,		-1,		0,
-						0,		0,		0,		1	);
+		return {
+			2/W,	0,		0,		-W2/W,
+			0,		2/H,	0,		-H2/H,
+			0,		0,		-1,		0,
+			0,		0,		0,		1
+		};
 	}
 
 	/// Get a view matrix based on an eye reference frame
@@ -322,7 +273,7 @@ public:
 	/// @param[in] uu		eye up direction unit vector
 	/// @param[in] ub		eye backward direction unit vector
 	/// @param[in] eyePos	eye position
-	static Matrix4 lookAt(const Vec<3,T>& ur, const Vec<3,T>& uu, const Vec<3,T>& ub, const Vec<3,T>& eyePos) {
+	static Matrix4 lookAt(const Vec<3,T>& ur, const Vec<3,T>& uu, const Vec<3,T>& ub, const Vec<3,T>& eyePos){
 		auto m = Matrix4(ur,uu,ub, eyePos);
 		invertRigid(m);
 		return m;
@@ -333,10 +284,10 @@ public:
 	/// @param[in] eyePos	eye position
 	/// @param[in] at		point being looked at
 	/// @param[in] up		up vector
-	static Matrix4 lookAt(const Vec<3,T>& eyePos, const Vec<3,T>& at, const Vec<3,T>& up) {
-		const auto ub = (eyePos - at).normalize();
-		const auto ur = cross(up, ub).normalize();
-		const auto uu = cross(ub, ur);
+	static Matrix4 lookAt(const Vec<3,T>& eyePos, const Vec<3,T>& at, const Vec<3,T>& up){
+		auto ub = (eyePos - at).normalize();
+		auto ur = cross(up, ub).normalize();
+		auto uu = cross(ub, ur);
 		return lookAt(ur, uu, ub, eyePos);
 	}
 };
