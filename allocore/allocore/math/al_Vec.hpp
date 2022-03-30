@@ -391,6 +391,8 @@ public:
 	Vec<2,T>& xy(){ return sub<2>(); }
 	const Vec<2,T>& yz() const { return sub<2,1>(); }
 	Vec<2,T>& yz(){ return sub<2,1>(); }
+	const Vec<2,T>& zw() const { return sub<2,2>(); }
+	Vec<2,T>& zw(){ return sub<2,2>(); }
 	const Vec<3,T>& xyz() const { return sub<3>(); }
 	Vec<3,T>& xyz(){ return sub<3>(); }
 	const Vec<3,T>& yzw() const { return sub<3,1>(); }
