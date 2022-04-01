@@ -516,6 +516,29 @@ int addFrame(Mesh& m, float w, float h, float cx, float cy){
 	return 4;
 }
 
+#define Spec_addWireGrid(Dim1,Dim2)\
+template<>\
+int addWireGrid<Dim1,Dim2>(Mesh& m, int n1, int n2, Vec2f radii, Vec2f center){\
+	m.lines();\
+	auto mn = center - radii;\
+	auto mx = center + radii;\
+	for(int i=0; i<n1+1; ++i){\
+		float x = (float(i)/n1*2.-1.)*radii[0] + center[0];\
+		m.vertex(Vec3f().template set<Dim1>(x).template set<Dim2>(mn[1]));\
+		m.vertex(Vec3f().template set<Dim1>(x).template set<Dim2>(mx[1]));\
+	}\
+	for(int i=0; i<n2+1; ++i){\
+		float y = (float(i)/n2*2.-1.)*radii[1] + center[1];\
+		m.vertex(Vec3f().template set<Dim2>(y).template set<Dim1>(mn[0]));\
+		m.vertex(Vec3f().template set<Dim2>(y).template set<Dim1>(mx[0]));\
+	}\
+	return (n1+1)*2 + (n2+1)*2;\
+}
+
+Spec_addWireGrid(0,1)
+Spec_addWireGrid(1,2)
+Spec_addWireGrid(2,1)
+
 int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist, bool caps){
 
 	m.primitive(Graphics::TRIANGLES);

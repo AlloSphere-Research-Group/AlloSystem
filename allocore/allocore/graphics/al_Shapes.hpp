@@ -44,6 +44,7 @@
 
 #include <cmath>
 #include <functional>
+#include "allocore/math/al_Vec.hpp"
 
 namespace al{
 
@@ -76,7 +77,7 @@ inline int addCuboid(Mesh& m, const Vec3f& radii){ return addCuboid(m,radii[0],r
 /// @param[in]		radius	Radius of cube from center to faces;
 ///							sqrt(1/3) gives cube inscribed in unit sphere
 /// \returns number of vertices added (8)
-inline int addCube(Mesh& m, float radius=M_SQRT_1_3){ return addCuboid(m,radius); }
+inline int addCube(Mesh& m, float radius=std::sqrt(1./3.)){ return addCuboid(m,radius); }
 
 /// Add octahedron as triangle vertices and indices
 
@@ -397,28 +398,6 @@ void circle(Vec2 * dst, int len, float rad=1){ ellipse(dst,len, rad,rad); }
 template <class Vec>
 int addQuad(Mesh& m, const Vec& a, const Vec& b, const Vec& c, const Vec& d){
 	return addQuad(m, a[0],a[1],a[2], b[0],b[1],b[2], c[0],c[1],c[2], d[0],d[1],d[2]);
-}
-
-template <int Dim1, int Dim2>
-int addWireGrid(Mesh& m, int n1, int n2, Vec2f radii, Vec2f center){
-	m.lines();
-	
-	auto mn = center - radii;
-	auto mx = center + radii;
-
-	for(int i=0; i<n1+1; ++i){
-		float x = (float(i)/n1*2.-1.)*radii[0] + center[0];
-		m.vertex(Vec3f().template set<Dim1>(x).template set<Dim2>(mn[1]));
-		m.vertex(Vec3f().template set<Dim1>(x).template set<Dim2>(mx[1]));
-	}
-
-	for(int i=0; i<n2+1; ++i){
-		float y = (float(i)/n2*2.-1.)*radii[1] + center[1];
-		m.vertex(Vec3f().template set<Dim2>(y).template set<Dim1>(mn[0]));
-		m.vertex(Vec3f().template set<Dim2>(y).template set<Dim1>(mx[0]));
-	}
-
-	return (n1+1)*2 + (n2+1)*2;
 }
 
 template <class Vec2>
