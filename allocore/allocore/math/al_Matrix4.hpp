@@ -178,12 +178,12 @@ public:
 		return perspective(l, r, b, t, near, far);
 	}
 
-	/// Get an off-axis perspective projection matrix (for stereographics)
+	/// Get an off-axis perspective projection matrix (for stereoscopy)
 	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T focal){
 		return perspectiveOffAxis(fovy, aspect, near,far, xShift,T(0), focal);
 	}
 
-	/// Get an off-axis perspective projection matrix (for stereographics)
+	/// Get an off-axis perspective projection matrix (for stereoscopy)
 
 	/// @param[in] fovy		field of view angle, in degrees, in the y direction
 	/// @param[in] aspect	aspect ratio
