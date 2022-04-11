@@ -923,6 +923,30 @@ Vec<N,T> closestPointOnLineSegment(const Vec<N,T>& a, const Vec<N,T>& b, const V
 	T f; return closestPointOnLineSegment(f, a,b,p);
 }
 
+/// Line-plane intersection test
+
+/// @param[out] d	scalar indicating intersection on line d*l + l0
+/// @param[in] l	direction of line d*l + l0
+/// @param[in] l0	point on line d*l + l0
+/// @param[in] n	normal of plane
+/// @param[in] p0	point on plane
+/// \returns 1 if single intersection, 0 if no intersection or 2 if line on plane
+template <int N, class T, class D>
+int linePlaneIntersection(
+	D& d,
+	const Vec<N,T>& l, const Vec<N,T>& l0,
+	const Vec<N,T>& n, const Vec<N,T>& p0
+){
+	auto a = (p0-l0).dot(n);
+	auto b = l.dot(n);
+	if(b == T(0)){ // line and plane parallel
+		if(a == T(0)) return 2; // line on plane
+		return 0;
+	}
+	d = a / b;
+	return 1;
+}
+
 /// Returns distance between two vectors
 template <int N, class T, class U>
 inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
