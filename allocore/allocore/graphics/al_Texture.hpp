@@ -371,7 +371,7 @@ public:
 	/// Flags resubmission of pixel data upon next bind
 
 	/// Calling this ensures that pixels get submitted on the next bind().
-	///internal array
+	///
 	Texture& dirty(){ mPixelsUpdated=true; return *this; }
 
 	/// Submit the texture to GPU using an Array as source
