@@ -53,6 +53,8 @@ namespace al{
 
 /// Render buffer objects are used for offscreen rendering. They are a single
 /// image of a renderable internal format, such as color, depth, or stencil.
+/// Since render buffers are write-only, they can have better performance than
+/// textures (read-write buffers).
 ///
 /// @ingroup allocore
 class RBO : public GPUObject{
