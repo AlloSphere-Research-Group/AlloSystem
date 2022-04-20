@@ -539,7 +539,7 @@ void Texture::sendPixels(bool force){
 }
 
 void Texture::sendShape(bool force){
-	if((mShapeUpdated || force)){
+	if(mShapeUpdated || force){
 
 		// Determine texel format (on GPU)
 		// Use specified texel format if defined, otherwise pixel (CPU) format
