@@ -56,6 +56,7 @@ struct EasyFBO {
 
 	EasyFBO(){}
 	EasyFBO(int w, int h){ resize(w,h); }
+	EasyFBO(int wh){ resize(wh,wh); }
 
 	EasyFBO& resize(int w, int h){
 		mTexture.format(Graphics::RGB);
