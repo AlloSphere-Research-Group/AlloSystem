@@ -146,6 +146,11 @@ public:
 	/// @param[in] level	mipmap level of texture
 	FBO& attachTexture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
 
+	template <class Texture2D>
+	FBO& attachTexture2D(Texture2D& tex, Attachment attach=COLOR_ATTACHMENT0, int level=0){
+		return attachTexture2D(tex.id(), attach, level);
+	}
+
 	/// Detach texture at a specified attachment point and mipmap level
 	FBO& detachTexture2D(Attachment attach, int level=0);
 
