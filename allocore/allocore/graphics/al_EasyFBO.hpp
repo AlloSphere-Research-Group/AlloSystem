@@ -35,10 +35,11 @@
   POSSIBILITY OF SUCH DAMAGE.
 
   File description:
-  FBO helper, wrapper around fbo, rbo, texture, pose, projectionMatrix..
+  Collates lower-level components into more user-friendly FBO
 
   File author(s):
   Tim Wood, 2015, fishuyo@gmail.com
+  Lance Putnam, 2022
 */
 
 #include "allocore/graphics/al_Graphics.hpp"
@@ -53,68 +54,75 @@ namespace al {
 ///
 struct EasyFBO {
 
-  int w, h;
-  Texture texture;
-  RBO rbo;
-  FBO fbo;
+	EasyFBO(){}
+	EasyFBO(int w, int h){ resize(w,h); }
 
-  Pose pose;
-  Matrix4d projectionMatrix;
+	EasyFBO& resize(int w, int h){
+		mTexture.format(Graphics::RGB);
+		mTexture.type(Graphics::UBYTE);
+		mTexture.resize(w,h);
+		mNeedsSync = true;
+		return *this;
+	}
 
-  Color clearColor;
+	int width() const { return mTexture.width(); }
+	int height() const { return mTexture.height(); }
 
-  Viewport savedViewport;
+	const Matrix4d& modelView() const { return mMV; }
+	Matrix4d& modelView(){ return mMV; }
 
-  EasyFBO(){}
+	const Matrix4d& projection() const { return mProj; }
+	Matrix4d& projection(){ return mProj; }
 
-  void init(int _w=512, int _h=512){
-    // both depth and color attachees must be valid on the GPU before use:
-    w = _w;
-    h = _h;
+	EasyFBO& clearColor(const Color& c){ mClearColor=c; return *this; }
 
-    clearColor = Color(0,0,0,0);
-    projectionMatrix = Matrix4d::ortho(-2, 2, -2, 2, 0.01, 100);
+	const Texture& texture() const { return mTexture; }
+	Texture& texture(){ return mTexture; }
 
-    rbo.resize(w, h);
-    //texture.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
-    texture.resize(w,h);
-    texture.validate();
+	template <class DrawFunc>
+	void draw(Graphics& g, const DrawFunc& drawFunc){
 
-    fbo.attachRBO(rbo, FBO::DEPTH_ATTACHMENT);
-    fbo.attachTexture2D(texture.id(), FBO::COLOR_ATTACHMENT0);
-    printf("fbo status %s\n", fbo.statusString());
-  }
+		sync();
 
-  void projection(Matrix4d proj){
-    projectionMatrix.set(proj);
-  }
-  Matrix4d& projection(){ return projectionMatrix; }
+		g.pushMatrix(Graphics::PROJECTION);
+		g.pushMatrix(Graphics::MODELVIEW);
+		auto oldVP = g.viewport();
 
-  void begin(Graphics &gl){
-    gl.pushMatrix(Graphics::PROJECTION);
-    gl.pushMatrix(Graphics::MODELVIEW);
-    savedViewport = gl.viewport();
+		mFBO.begin();
+			g.viewport(0, 0, width(), height());
+			g.clearColor(mClearColor);
+			g.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+			g.projection(mProj);
+			g.modelView(mMV);
+			drawFunc();
+		mFBO.end();
 
-    fbo.begin();
-      gl.viewport(0, 0, w, h);
-      gl.clearColor(clearColor);
-      gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+		g.popMatrix(Graphics::PROJECTION);
+		g.popMatrix(Graphics::MODELVIEW);
+		g.viewport(oldVP);
+	}
 
-      // gl.projection(Matrix4d::ortho(-viewWidth, viewWidth, -viewHeight, viewHeight, viewNear, viewFar));
-      // gl.projection(Matrix4d::perspective(10, 1, 0.001, 100));
-      gl.projection(projectionMatrix);
-      gl.modelView(Matrix4d::lookAt(pose.pos(), pose.uf(), pose.uu()));
+private:
 
-  }
+	FBO mFBO;
+	Texture mTexture; // for color buffer (read-write)
+	RBO mRBO; // for depth buffer (write-only)
+	Matrix4d mMV{1};
+	Matrix4d mProj = Matrix4d::ortho(-2, 2, -2, 2, 0.01, 100);
+	Color mClearColor = Color(0,0,0,1);
+	bool mNeedsSync = false;
 
-  void end(Graphics &gl){
-    fbo.end();
-    gl.popMatrix(Graphics::PROJECTION);
-    gl.popMatrix(Graphics::MODELVIEW);
-    gl.viewport(savedViewport);
-    // texture.generateMipmap();
-  }
-
+	void sync(){
+		if(mNeedsSync){
+			mNeedsSync = false;
+			// both depth and color attachees must be valid on the GPU before use:
+			mTexture.validate();
+			mRBO.resize(width(), height());
+			mFBO.attachRBO(mRBO, FBO::DEPTH_ATTACHMENT);
+			mFBO.attachTexture2D(mTexture, FBO::COLOR_ATTACHMENT0);
+			//printf("fbo status %s\n", mFBO.statusString());
+		}
+	}
 };
 
 } // al::
