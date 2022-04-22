@@ -288,7 +288,8 @@ public:
 	/// Append index to index buffer relative to current number of vertices
 
 	/// This should be called BEFORE adding the relevant vertex positions.
-	///
+	/// For example, if you want to add a triangle, call indexRel(0,1,2) then
+	/// add the triangle vertex positions.
 	Mesh& indexRel(unsigned int i){ return index(vertices().size()+i); }
 
 	template <class...Indices>
