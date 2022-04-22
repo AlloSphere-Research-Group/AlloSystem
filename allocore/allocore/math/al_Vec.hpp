@@ -220,8 +220,7 @@ public:
 
 	template <class V>
 	const V& as() const {
-		static_assert(sizeof(V) <= sizeof(*this), "Attempt to pun vector to object of larger size");
-		return *(const V *)(elems());
+		return const_cast<Vec*>(this)->as<V>();
 	}
 
 	/// Get read-only pointer to elements
