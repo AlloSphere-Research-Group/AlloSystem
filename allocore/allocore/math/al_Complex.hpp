@@ -125,6 +125,18 @@ public:
 
 	C& set(T vr, T vi){ r=vr; i=vi; return *this; }				///< Set real and imaginary components
 
+	/// Get reference to self as another type
+	template <class V>
+	V& as(){
+		static_assert(sizeof(V) <= sizeof(*this), "Attempt to pun Complex to object of larger size");
+		return *(V *)elems;
+	}
+
+	template <class V>
+	const V& as() const {
+		return const_cast<Complex*>(this)->as<V>();
+	}
+
 	C& arg(T v){ return fromPolar(norm(), v); }					///< Set argument leaving norm the same
 	C& norm(T v){ return fromPolar(v, arg()); }					///< Set norm leaving argument the same
 
