@@ -582,6 +582,9 @@ public:
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
 
+	/// Draw mesh normals as lines
+	void drawNormals(const Mesh& m, float length=0.1);
+
 	/// Prepare global drawing state (matrices, fog, lighting, etc.)
 
 	/// This only needs to be called before any drawing code not using the

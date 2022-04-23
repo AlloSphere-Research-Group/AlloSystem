@@ -1323,6 +1323,9 @@ Viewport Graphics::viewport() const {
 	return Viewport(vp[0], vp[1], vp[2], vp[3]);
 }
 
+void Graphics::drawNormals(const Mesh& m, float length){
+	draw(m.normalsMesh(mesh(), length));
+}
 
 // Immediate Mode
 void Graphics::begin(Primitive v) {
