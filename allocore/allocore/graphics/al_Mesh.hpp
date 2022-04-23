@@ -187,9 +187,9 @@ public:
 	/// @param[in]  length		length of normals
 	/// @param[in]  perFace		whether normals line should be generated per
 	///							face rather than per vertex
-	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false);
+	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false) const;
 
-	Mesh& normalsMesh(Mesh& mesh, float length=0.1, bool perFace=false){
+	Mesh& normalsMesh(Mesh& mesh, float length=0.1, bool perFace=false) const {
 		createNormalsMesh(mesh,length,perFace);
 		return mesh;
 	}

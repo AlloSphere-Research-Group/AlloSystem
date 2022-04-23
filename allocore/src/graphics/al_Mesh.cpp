@@ -150,15 +150,15 @@ public:
 		normal<float>(norm, p0, p1, p2);
 	}
 };
-void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
+void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
 
 	auto initMesh = [](Mesh& m, int n){
 		m.vertices().resize(n*2);
 		m.reset();
-		m.primitive(Graphics::LINES);
+		m.lines();
 	};
 
-	if (perFace) {
+	if(perFace){
 		// compute vertex based normals
 		if(indices().size()){
 
@@ -167,22 +167,18 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
 			initMesh(mesh, (Ni/3)*2);
 
 			for(int i=0; i<Ni; i+=3){
-				Index i1 = indices()[i+0];
-				Index i2 = indices()[i+1];
-				Index i3 = indices()[i+2];
-				const Vertex& v1 = vertices()[i1];
-				const Vertex& v2 = vertices()[i2];
-				const Vertex& v3 = vertices()[i3];
+				auto i1 = indices()[i+0];
+				auto i2 = indices()[i+1];
+				auto i3 = indices()[i+2];
+				auto& v1 = vertices()[i1];
+				auto& v2 = vertices()[i2];
+				auto& v3 = vertices()[i3];
 
-				// get mean:
-				const Vertex mean = (v1 + v2 + v3)/3.f;
-
-				// get face normal:
-				Vertex facenormal = cross(v2-v1, v3-v1);
-				facenormal.normalize();
+				auto mean = (v1 + v2 + v3)/3.f;
+				auto dN = cross(v2-v1, v3-v1).normalize(length);
 
 				mesh.vertex(mean);
-				mesh.vertex(mean + (facenormal*length));
+				mesh.vertex(mean + dN);
 			}
 		} else {
 			AL_WARN_ONCE("createNormalsMesh only valid for indexed meshes");
@@ -192,7 +188,7 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
 		initMesh(mesh, Ni*2);
 
 		for(int i=0; i<Ni; ++i){
-			const Vertex& v = vertices()[i];
+			auto& v = vertices()[i];
 			mesh.vertex(v);
 			mesh.vertex(v + normals()[i]*length);
 		}
