@@ -250,6 +250,8 @@ public:
 	Mesh& lines(float stroke);
 	Mesh& lineStrip();
 	Mesh& lineStrip(float stroke);
+	Mesh& lineLoop();
+	Mesh& lineLoop(float stroke);
 	Mesh& triangles();
 	Mesh& triangleStrip();
 

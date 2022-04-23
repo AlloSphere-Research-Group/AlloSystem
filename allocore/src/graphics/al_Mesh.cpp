@@ -48,6 +48,8 @@ Mesh& Mesh::lines(){ return primitive(Graphics::LINES); }
 Mesh& Mesh::lines(float stroke){ return lines().stroke(stroke); }
 Mesh& Mesh::lineStrip(){ return primitive(Graphics::LINE_STRIP); }
 Mesh& Mesh::lineStrip(float stroke){ return lineStrip().stroke(stroke); }
+Mesh& Mesh::lineLoop(){ return primitive(Graphics::LINE_LOOP); }
+Mesh& Mesh::lineLoop(float stroke){ return lineLoop().stroke(stroke); }
 Mesh& Mesh::triangles(){ return primitive(Graphics::TRIANGLES); }
 Mesh& Mesh::triangleStrip(){ return primitive(Graphics::TRIANGLE_STRIP); }
 
