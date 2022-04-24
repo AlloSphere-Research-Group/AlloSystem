@@ -404,9 +404,42 @@ public:
 
 	/// \tparam M	Number of elements to drop from head (if positive) or tail
 	///				(if negative).
+	/// This function is based on the APL function of the same name.
 	template <int M, int L = N-const_min(const_abs(M), N)>
-	Vec<L,T> drop() const{
+	Vec<L,T> drop() const {
 		return sub<L, M<0?0:N-L>();
+	}
+
+	/// Get new vector composed of subsequence of this vector
+
+	/// \tparam M	The size of the new vector is |M|. For M>0 or M<0, as many
+	///				elements as possible are copied from the front or back,
+	///				respectively. When |M|>N, "overtaking" occurs and extra
+	///				elements are filled with the argument value.
+	/// Examples:\n
+	/// \code
+	///		Vec(1,2,3,4,5).take< 3>() == Vec(1,2,3)
+	///		Vec(1,2,3,4,5).take<-3>() == Vec(3,4,5)
+	///		Vec(1,2,3).take< 5>(-1) == Vec(1,2,3,-1,-1)
+	/// 	Vec(1,2,3).take<-5>(-1) == Vec(-1,-1,1,2,3)
+	/// \endcode
+	/// This function is based on the APL function of the same name.
+	template <int M, int L = const_abs(M)>
+	Vec<L,T> take(const T& fill = T()) const {
+
+		constexpr auto Nc = const_min(L, N);
+		constexpr auto Bc = M>=0 ? 0 : L-Nc;
+		constexpr auto Ec = Bc + Nc;
+		constexpr auto Oc = M<0 && L<N ?  L-N : Bc;
+
+		constexpr auto Nf = L<=N ? 0 : L-N;
+		constexpr auto Bf = M>=0 ? Bc+Nc : 0;
+		constexpr auto Ef = Bf + Nf;
+
+		Vec<L,T> r(VEC_NO_INIT);
+		for(int i=Bc; i<Ec; ++i) r[i] = (*this)[i-Oc];
+		for(int i=Bf; i<Ef; ++i) r[i] = fill;
+		return r;
 	}
 
 	/// Swap elements

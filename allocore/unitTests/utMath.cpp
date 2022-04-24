@@ -132,6 +132,18 @@ int utMath(){
 								assert(a[0] == 1 && a[1] == 2 && a[2] == 3 && a[3] == 4);
 		}
 
+		{
+			assert(toVec(1,2,3).drop< 1>() == toVec(2,3));
+			assert(toVec(1,2,3).drop<-1>() == toVec(1,2));
+			assert(toVec(1,2,3).drop< 2>() == toVec(3));
+			assert(toVec(1,2,3).drop<-2>() == toVec(1));
+
+			assert(toVec(1,2,3,4,5).take< 3>() == toVec(1,2,3));
+			assert(toVec(1,2,3,4,5).take<-3>() == toVec(3,4,5));
+			assert(toVec(1,2,3).take< 5>(-1) == toVec(1,2,3,-1,-1));
+			assert(toVec(1,2,3).take<-5>(-1) == toVec(-1,-1,1,2,3));
+		}
+
 		assert(Vec3i().setAA(1, 10) == Vec3i(0,10,0));
 
 		a = 3;
