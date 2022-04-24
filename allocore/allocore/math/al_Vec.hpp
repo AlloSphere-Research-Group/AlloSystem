@@ -375,6 +375,9 @@ public:
 		return toVec(at<Indices>()...);
 	}
 
+	/// Get temp copy
+	Vec dup() const { return *this; }
+
 	/// Get a subvector
 	template <int M, int Begin=0>
 	const Vec<M,T>& sub() const {
@@ -422,15 +425,15 @@ public:
 	Vec& operator /=(const Vec& v){ IT(N) (*this)[i] /= v[i]; return *this; }
 	Vec& operator /=(const   T& v){ IT(N) (*this)[i] /= v;    return *this; }
 
-	Vec operator + (const Vec& v) const { return Vec(*this) += v; }
-	Vec operator + (const   T& v) const { return Vec(*this) += v; }
-	Vec operator - (const Vec& v) const { return Vec(*this) -= v; }
-	Vec operator - (const   T& v) const { return Vec(*this) -= v; }
-	Vec operator * (const Vec& v) const { return Vec(*this) *= v; }
-	Vec operator * (const   T& v) const { return Vec(*this) *= v; }
-	Vec operator / (const Vec& v) const { return Vec(*this) /= v; }
-	Vec operator / (const   T& v) const { return Vec(*this) /= v; }
-	Vec operator - () const { return Vec(*this).negate(); }
+	Vec operator + (const Vec& v) const { return dup() += v; }
+	Vec operator + (const   T& v) const { return dup() += v; }
+	Vec operator - (const Vec& v) const { return dup() -= v; }
+	Vec operator - (const   T& v) const { return dup() -= v; }
+	Vec operator * (const Vec& v) const { return dup() *= v; }
+	Vec operator * (const   T& v) const { return dup() *= v; }
+	Vec operator / (const Vec& v) const { return dup() /= v; }
+	Vec operator / (const   T& v) const { return dup() /= v; }
+	Vec operator - () const { return dup().negate(); }
 	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
 	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
 
@@ -636,7 +639,7 @@ public:
 	/// @param[in] magVal	magnitude (1 is a standard normalization)
 	///
 	Vec normalized(T magVal=T(1)) const {
-		return Vec(*this).normalize(magVal); }
+		return dup().normalize(magVal); }
 
 	/// Get projection of vector onto a unit vector
 	Vec projection(const Vec& u) const {

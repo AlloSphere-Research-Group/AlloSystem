@@ -49,6 +49,13 @@ int utMath(){
 		{ Vec<5, char> t; }
 		{ Vec<0,int> t; }
 
+		// many assertion rely on comparisons, so check first...
+		{
+			Vec3i v(1,2,3); assert(v.x==1 && v.y==2 && v.z==3);
+			assert(Vec3i(1,2,3) == Vec3i(1,2,3));
+			assert(Vec3i(1,2,3) != Vec3i(1,2,4));
+		}
+
 		const int N = 4;
 
 		Vec<N,double> a, b, c;	assert(a.size() == N);
@@ -85,6 +92,8 @@ int utMath(){
 
 		{
 		for(int i=0; i<a.size(); ++i) a[i]=i;
+
+		assert(a == a.dup());
 
 		Vec<2, double> t;
 		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
