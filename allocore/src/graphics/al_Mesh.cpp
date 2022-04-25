@@ -604,7 +604,6 @@ Mesh& Mesh::flipWinding(){
 
 Mesh& Mesh::merge(const Mesh& src){
 	// TODO: only do merge if source and dest are well-formed
-	// TODO: what to do when mixing float and integer colors? promote or demote?
 
 	if(src.vertices().empty()) return *this;
 
@@ -613,14 +612,15 @@ Mesh& Mesh::merge(const Mesh& src){
 		primitive(src.primitive());
 	}
 
+	const int Nv = vertices().size();
+
 	// Source has indices, and I either do or don't.
 	// After this block, I will have indices.
 	if(src.indices().size()){
-		Index Nv = vertices().size();
 		Index Ni = indices().size();
 		// If no indices, must create
 		if(0 == Ni){
-			for(Index i=0; i<Nv; ++i) index(i);
+			for(int i=0; i<Nv; ++i) index(i);
 		}
 		// Add source indices offset by my number of vertices
 		index(src.indices().data(), src.indices().size(), (unsigned int)Nv);
@@ -628,16 +628,28 @@ Mesh& Mesh::merge(const Mesh& src){
 
 	// Source doesn't have indices, but I do
 	else if(indices().size()){
-		int Nv = vertices().size();
 		for(int i=Nv; i<Nv+src.vertices().size(); ++i) index(i);
 	}
 
 	// From here, everything is indice invariant
-
-	//equalizeBuffers(); << TODO: must do this if we are using indices.
 	vertices().append(src.vertices());
 	normals().append(src.normals());
-	colors().append(src.colors());
+
+	#define COPY_COL(dcolor)\
+	if(dcolor##s().size() == Nv){\
+		if(src.colors().size() >= src.vertices().size()){\
+			for(auto& c : src.colors()) dcolor(c);\
+		} else if(src.colors().size() > 0){\
+			dcolor##Fill(src.colors()[0]);\
+		} else if(src.coloris().size() >= src.vertices().size()){\
+			for(auto& c : src.coloris()) dcolor(c);\
+		} else if(src.coloris().size() > 0){\
+			dcolor##Fill(src.coloris()[0]);\
+		}\
+	}
+	COPY_COL(color)
+	else COPY_COL(colori)
+
 	texCoord1s().append(src.texCoord1s());
 	texCoord2s().append(src.texCoord2s());
 	texCoord3s().append(src.texCoord3s());
