@@ -212,6 +212,9 @@ public:
 		return width() * (height()?height():1) * (depth()?depth():1);
 	}
 
+	/// Get texture unit
+	int unit() const { return mTexUnit; }
+
 
 	/// Set pixel (color) format
 	Texture& format(Format v){ return update(v, mFormat, mShapeUpdated); }
