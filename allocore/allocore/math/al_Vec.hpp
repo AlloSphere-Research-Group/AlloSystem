@@ -697,7 +697,7 @@ public:
 	/// @param[in] angle	angle of right-handed rotation, in radians
 	/// @param[in] dim1		dimension to rotate from
 	/// @param[in] dim2		dimension to rotate towards
-	Vec& rotate(double angle, int dim1=0, int dim2=1){
+	Vec& rotate(double angle, int dim1, int dim2){
 		double a = cos(angle);
 		double b = sin(angle);
 		T t = (*this)[dim1];
@@ -705,6 +705,12 @@ public:
 		(*this)[dim1] = t*a - u*b;
 		(*this)[dim2] = t*b + u*a;
 		return *this;
+	}
+
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	Vec& rotate(double angle){
+		static_assert_dims<Dim1,Dim2>();
+		return rotate(angle, Dim1, Dim2);
 	}
 
 	/// Rotate vector 90 degrees on a global plane
@@ -719,7 +725,7 @@ public:
 
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	Vec& rotate90(){
-		static_assert(Dim1<N && Dim2<N && Dim1!=Dim2, "Invalid dimension(s)");
+		static_assert_dims<Dim1,Dim2>();
 		return rotate90(Dim1,Dim2);
 	}
 
@@ -767,6 +773,12 @@ private:
 	template <int M>
 	void initTail(){
 		for(int i=M; i<size(); ++i) (*this)[i] = T();
+	}
+
+	template <unsigned Dim1, unsigned Dim2>
+	static constexpr int static_assert_dims(){
+		static_assert(Dim1<N && Dim2<N && Dim1!=Dim2, "Invalid dimension(s)");
+		return 0;
 	}
 };
 
