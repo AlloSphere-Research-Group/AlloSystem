@@ -483,9 +483,9 @@ int addRect(Mesh& m, float width, float height, float x, float y){
 	m.primitive(Graphics::TRIANGLES);
 	m.vertex(x-w_2, y-h_2);
 	m.vertex(x+w_2, y-h_2);
-	m.vertex(x-w_2, y+h_2);
 	m.vertex(x+w_2, y+h_2);
-	m.index(0,1,2, 2,1,3);
+	m.vertex(x-w_2, y+h_2);
+	m.index(0,1,3, 3,1,2);
 	return 4;
 }
 

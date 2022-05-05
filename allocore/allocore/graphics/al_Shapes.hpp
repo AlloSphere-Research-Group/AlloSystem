@@ -214,7 +214,7 @@ int addCircle(Mesh& m, float radius=1., int N=60);
 /// @param[in] x			Position of center along x
 /// @param[in] y			Position of center along y
 ///
-/// Vertex order is bottom-left, bottom-right, top-left, top-right.
+/// Vertex order is counter-clockwise from the bottom-left corner.
 ///
 /// \returns number of vertices added
 int addRect(Mesh& m, float width=2, float height=2, float x=0, float y=0);
