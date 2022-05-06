@@ -425,24 +425,10 @@ struct Colori {
 	Colori& invert(){ return set(255-r, 255-g, 255-b); }
 
 	/// Returns self linearly mixed with another color (0 = none)
-	Colori mix(const Colori& v, float amt=0.5f) const {
-		Colori res;
-		uint8_t f = toi(amt);
-		for(int i=0; i<size(); ++i){
-			auto a = int((*this)[i]);
-			auto b = int(v[i]);
-			res[i] = ((b-a)*f + (a<<8))>>8;
-		}
-		return res;
-	}
+	Colori mix(const Colori& v, float amt=0.5f) const;
 
 private:
-	static uint8_t toi(float v){
-		//return uint8_t(v*255.f);
-		if(v>=1.f) return 255;
-		union{ float f; uint32_t i; } u{v+1.f};
-		return uint8_t((u.i & 0x007fffff) >> 15);
-	}
+	static uint8_t toi(float v);
 };
 
 
@@ -541,11 +527,7 @@ struct HSV{
 	HSV& rotateHue(float dh){ h += dh; return wrapHue(); }
 
 	/// Wrap hue value into valid interval [0, 1)
-	HSV& wrapHue(){
-		if(h>1){ h -= int(h); }
-		else if(h<0){ h -= int(h)-1; }
-		return *this;
-	}
+	HSV& wrapHue();
 };
 
 
@@ -744,22 +726,13 @@ struct RGB{
 	float min() const { return const_cast<RGB*>(this)->min(); }
 
 	/// Set value of color in HSV space (leaving hue and saturation unchanged)
-	RGB& value(float v){
-		auto mx = max();
-		return mx > 0.f ? *this *= v/mx : *this = v;
-	}
+	RGB& value(float v);
 
 	/// Get saturation of color in HSV space
-	float saturation() const {
-		auto mx = max();
-		return mx > 0.f ? (mx-min())/mx : 0.f;
-	}
+	float saturation() const;
 
 	/// Set saturation of color in HSV space (leaving hue and value unchanged)
-	RGB& saturation(float s){
-		min() = 0.f;
-		return *this = RGB(max()).mix(*this, s);
-	}
+	RGB& saturation(float s);
 };
 
 

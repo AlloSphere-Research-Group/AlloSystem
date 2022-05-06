@@ -23,10 +23,52 @@ Vec transform(
 }
 
 
+/*static*/ uint8_t Colori::toi(float v){
+	//return uint8_t(v*255.f);
+	if(v>=1.f) return 255;
+	union{ float f; uint32_t i; } u{v+1.f};
+	return uint8_t((u.i & 0x007fffff) >> 15);
+}
+
+Colori Colori::mix(const Colori& v, float amt) const {
+	Colori res;
+	uint8_t f = toi(amt);
+	for(int i=0; i<size(); ++i){
+		auto a = int((*this)[i]);
+		auto b = int(v[i]);
+		res[i] = ((b-a)*f + (a<<8))>>8;
+	}
+	return res;
+}
+
+
+HSV& HSV::wrapHue(){
+	if(h>1.f){ h -= int(h); }
+	else if(h<0.f){ h -= int(h)-1; }
+	return *this;
+}
+
+
 RGB& RGB::complement(){
 	// max(c) - min(c) - (c - min(c)) + min(c)
 	return *this = (max() + min()) - *this;
 }
+
+RGB& RGB::value(float v){
+	auto mx = max();
+	return mx > 0.f ? *this *= v/mx : *this = v;
+}
+
+float RGB::saturation() const {
+	auto mx = max();
+	return mx > 0.f ? (mx-min())/mx : 0.f;
+}
+
+RGB& RGB::saturation(float s){
+	min() = 0.f;
+	return *this = RGB(max()).mix(*this, s);
+}
+
 
 RGB& RGB::operator= (const HSV& hsv){
 
