@@ -24,11 +24,8 @@ Vec transform(
 
 
 RGB& RGB::complement(){
-	auto mn = std::min({r, g, b});
-	auto mx = std::max({r, g, b});
-	auto df = mx-mn;
-	*this = (df+2.*mn)-*this; // (df-(*this-mn))+mn
-	return *this;
+	// max(c) - min(c) - (c - min(c)) + min(c)
+	return *this = (max() + min()) - *this;
 }
 
 RGB& RGB::operator= (const HSV& hsv){
