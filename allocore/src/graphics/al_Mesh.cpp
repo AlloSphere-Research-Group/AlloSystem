@@ -7,7 +7,8 @@
 #include <sstream> // stringstream
 #include <utility> // swap
 #include <vector>
-#include <fstream>
+#include <fstream> // filebuf
+#include <iostream> // istream
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
@@ -1257,8 +1258,8 @@ std::string strip(const std::string& s, const char * stripChars="\r"){
 }
 
 // getline that strips given chars from ends of string
-void getLineTrim(std::ifstream& f, std::string& s, const char * stripChars="\r"){
-	getline(f,s);
+void getLineTrim(std::istream& is, std::string& s, const char * stripChars="\r"){
+	getline(is, s);
 	s = strip(s, stripChars);
 }
 
@@ -1280,14 +1281,12 @@ void getTokens(std::vector<std::string>& tokens, const std::string& src, char de
 };
 
 
-bool loadPLY(Mesh& mesh, const std::string& filePath){
+bool loadPLY(Mesh& mesh, std::istream& is){
 	using namespace std;
-	ifstream f(filePath, ios::in | ios::binary);
-	if(f.fail()) return false;
 
 	string buf;
 
-	getLineTrim(f, buf);
+	getLineTrim(is, buf);
 	//printf("buf: %s\n", buf.c_str());
 	if("ply" != buf) return false; // not a PLY file
 
@@ -1376,12 +1375,12 @@ bool loadPLY(Mesh& mesh, const std::string& filePath){
 
 	vector<string> tokens;
 	auto getLineTokens = [&](){
-		getLineTrim(f, buf);
+		getLineTrim(is, buf);
 		getTokens(tokens, buf);
 	};
 
 	// Get header info
-	while(!f.eof()){
+	while(is){
 		getLineTokens();
 
 		const auto& tag = tokens[0];
@@ -1465,7 +1464,7 @@ bool loadPLY(Mesh& mesh, const std::string& filePath){
 
 	auto readNextVal = [&](Type type){
 		char b[8]; auto Nbytes = typeSize[type];
-		f.read(b, Nbytes);
+		is.read(b, Nbytes);
 		if(machineEndian != dataEnc){
 			for(int i=0; i<Nbytes/2; ++i) std::swap(b[i],b[Nbytes-1-i]);
 		}
@@ -1504,7 +1503,7 @@ bool loadPLY(Mesh& mesh, const std::string& filePath){
 			} else { // skip over lists
 				if(ascii){
 				} else {
-					f.seekg(p.size(), ios_base::cur);
+					is.seekg(p.size(), ios_base::cur);
 				}
 			}
 		}
@@ -1544,7 +1543,7 @@ bool loadPLY(Mesh& mesh, const std::string& filePath){
 			} else { // skip over attribs
 				if(ascii){
 				} else {
-					f.seekg(p.size(), ios_base::cur);
+					is.seekg(p.size(), ios_base::cur);
 				}
 			}
 		}
@@ -1554,10 +1553,8 @@ bool loadPLY(Mesh& mesh, const std::string& filePath){
 }
 
 
-bool loadOBJ(Mesh& mesh, const std::string& filePath){
+bool loadOBJ(Mesh& mesh, std::istream& is){
 	using namespace std;
-	ifstream f(filePath, ios::in | ios::binary);
-	if(f.fail()) return false;
 
 	mesh.reset();
 	string buf;
@@ -1573,8 +1570,8 @@ bool loadOBJ(Mesh& mesh, const std::string& filePath){
 	std::vector<Vec3f> Ns;
 	char attr = 0; // 'p', 'n', 't', 'f'
 
-	while(!f.eof()){
-		getLineTrim(f, buf, " \r\t");
+	while(is){
+		getLineTrim(is, buf, " \r\t");
 		if(buf.empty() || '#'==buf[0]) continue;
 		//printf("%s\n", buf.c_str());
 		getTokens(tokens, buf);
@@ -1654,11 +1651,32 @@ bool loadOBJ(Mesh& mesh, const std::string& filePath){
 
 
 bool Mesh::load(const std::string& filePath){
+	std::filebuf fb;
+	if(!fb.open(filePath, std::ios::in | std::ios::binary)) return false;
+	std::istream is(&fb);
 	auto ext = extension(filePath);
-	if("ply" == ext)		return loadPLY(*this, filePath);
-	else if("obj" == ext)	return loadOBJ(*this, filePath);
+	if("ply" == ext)		return al::loadPLY(*this, is);
+	else if("obj" == ext)	return al::loadOBJ(*this, is);
 	return false;
 }
+
+// Must subclass streambuf for reading raw bytes
+struct imembuf : public std::streambuf {
+	imembuf(const void * data, int len){
+		auto * ptr = static_cast<char *>(const_cast<void *>(data));
+		setg(ptr, ptr, ptr+len);
+	}
+};
+
+#define LOAD_MEM(TYPE)\
+bool Mesh::load##TYPE(const void * data, int numBytes){\
+	imembuf buf(data, numBytes);\
+	std::istream is(&buf);\
+	return al::load##TYPE(*this, is);\
+}
+
+LOAD_MEM(OBJ)
+LOAD_MEM(PLY)
 
 
 template <class Array>

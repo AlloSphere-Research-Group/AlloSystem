@@ -483,6 +483,9 @@ public:
 	/// @param[in] filePath		path of object file to load
 	bool load(const std::string& filePath);
 
+	bool loadOBJ(const void * data, int numBytes);
+	bool loadPLY(const void * data, int numBytes);
+
 
 	/// Print information about Mesh
 	void print(FILE * dst = stderr) const;
