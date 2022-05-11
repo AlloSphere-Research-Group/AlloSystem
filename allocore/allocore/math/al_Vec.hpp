@@ -692,25 +692,33 @@ public:
 		return (*this) -= ((T(2) * dot(u)) * u);
 	}
 
+	Vec& rotate(double cosAng, double sinAng, int dim1, int dim2){
+		T t = (*this)[dim1];
+		T u = (*this)[dim2];
+		(*this)[dim1] = t*cosAng - u*sinAng;
+		(*this)[dim2] = t*sinAng + u*cosAng;
+		return *this;
+	}
+
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	Vec& rotate(double cosAng, double sinAng){
+		static_assert_dims<Dim1,Dim2>();
+		return rotate(cosAng,sinAng, Dim1,Dim2);
+	}
+
 	/// Rotate vector on a global plane
 
 	/// @param[in] angle	angle of right-handed rotation, in radians
 	/// @param[in] dim1		dimension to rotate from
 	/// @param[in] dim2		dimension to rotate towards
 	Vec& rotate(double angle, int dim1, int dim2){
-		double a = cos(angle);
-		double b = sin(angle);
-		T t = (*this)[dim1];
-		T u = (*this)[dim2];
-		(*this)[dim1] = t*a - u*b;
-		(*this)[dim2] = t*b + u*a;
-		return *this;
+		return rotate(std::cos(angle),std::sin(angle), dim1,dim2);
 	}
 
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	Vec& rotate(double angle){
 		static_assert_dims<Dim1,Dim2>();
-		return rotate(angle, Dim1, Dim2);
+		return rotate(angle, Dim1,Dim2);
 	}
 
 	/// Rotate vector 90 degrees on a global plane
