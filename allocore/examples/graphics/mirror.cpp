@@ -15,13 +15,13 @@ using namespace al;
 class MyApp : public App {
 public:
 
-  EasyFBO fbo;
+  EasyFBO fbo{1024, 1024}; // constructor takes width,height of frame buffer
   Pose mirrorPose;
 
   Light light;      // Necessary to light objects in the scene
   Material material;    // Necessary for specular highlights
   Mesh surface, sphere; // Geometry to render
-  double phase;     // Animation phase
+  double phase = 0.5;     // Animation phase
 
   MyApp(){
 
@@ -32,8 +32,6 @@ public:
     // position nav
     nav().pos(0,-2.2,0.5);
     nav().faceToward(Vec3f(0,0,0.5));
-
-    phase = 0.5;
 
     // Create a circular wave pattern
     addSurface(surface, 64,64);
@@ -98,15 +96,6 @@ public:
 
 
   void onDraw(Graphics& g){
-    // init our framebuffer on first draw call
-    static bool inited=false;
-    if(!inited){
-      fbo.init(1024,1024); // set fbo/texture width and height
-      fbo.projection(Matrix4d::perspective(45, 1, 0.001, 100));
-      fbo.clearColor.set(0.2,0.2,0.2,0.2);
-      inited = true;
-    }
-
     // pose representing the virtual camera we will use to render the fbo 
     Pose mirrorCam;
 
@@ -119,8 +108,10 @@ public:
 
     // render scene to frame buffer
     // set fbo pose to be mirrorCam
-    fbo.pose = mirrorCam;
-    fbo.begin(g);
+    fbo.modelView() = mirrorCam.matrix();
+	fbo.projection() = Matrix4d::perspective(45, 1, 0.001, 100);
+	fbo.clearColor(RGB(0.2));
+    fbo.draw(g, [&](){
       g.pushMatrix();
       drawScene(g); // draw scene to mirror fbo
 
@@ -128,7 +119,7 @@ public:
       g.translate(nav().pos());
       g.draw(sphere);
       g.popMatrix();
-    fbo.end(g);
+    });
 
     // draw our mirror 
     g.lighting(false);
@@ -138,7 +129,7 @@ public:
     // float aspect = stereo().viewport().aspect();
     // g.scale(aspect,1,1); // fix aspect ratio
     g.color(1,1,1);
-    fbo.texture.quad(g, 2, 2, -1, -1);
+    fbo.texture().quad(g, 2, 2, -1, -1);
     g.popMatrix();
 
     // draw the scene 
