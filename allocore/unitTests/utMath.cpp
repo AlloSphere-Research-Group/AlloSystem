@@ -1,6 +1,7 @@
 #include <cmath>
 #include "utAllocore.h"
 #include "allocore/math/al_Complex.hpp"
+#include "allocore/math/al_Functions.hpp"
 #include "allocore/math/al_Frustum.hpp"
 #include "allocore/math/al_Interval.hpp"
 #include "allocore/math/al_Mat.hpp"

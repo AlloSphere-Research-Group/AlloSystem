@@ -49,7 +49,6 @@
 #include <initializer_list>
 #include <ostream>
 #include <type_traits> //remove_reference, is_polymorphic
-#include "allocore/math/al_Functions.hpp"
 
 namespace al {
 
@@ -506,39 +505,6 @@ public:
 		T r = prev;
 		for(auto& v : *this) r = func(r, v, args...);
 		return r;
-	}
-
-	/// Clip to range:
-	/// NOTE argument order (max,min)
-	Vec& clip(T max=T(1), T min=T(0)) {
-		IT(N) (*this)[i] = al::clip((*this)[i], max, min);
-		return *this;
-	}
-	Vec& clip(Vec max, Vec min) {
-		IT(N) (*this)[i] = al::clip((*this)[i], max[i], min[i]);
-		return *this;
-	}
-
-	/// Wrap in range:
-	/// NOTE argument order (max,min)
-	Vec& wrap(T max=T(1), T min=T(0)) {
-		IT(N) (*this)[i] = al::wrap((*this)[i], max, min);
-		return *this;
-	}
-	Vec& wrap(Vec max, Vec min) {
-		IT(N) (*this)[i] = al::wrap((*this)[i], max[i], min[i]);
-		return *this;
-	}
-
-	/// Fold in range:
-	/// NOTE argument order (max,min)
-	Vec& fold(T max=T(1), T min=T(0)) {
-		IT(N) (*this)[i] = al::fold((*this)[i], max, min);
-		return *this;
-	}
-	Vec& fold(Vec max, Vec min) {
-		IT(N) (*this)[i] = al::fold((*this)[i], max[i], min[i]);
-		return *this;
 	}
 
 

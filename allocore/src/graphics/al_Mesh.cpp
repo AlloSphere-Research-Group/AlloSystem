@@ -1,5 +1,6 @@
 #include <algorithm> // transform
 #include <cctype> // tolower
+#include <cmath> // min
 #include <cstdio>
 #include <map>
 #include <set>
@@ -185,7 +186,7 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
 			AL_WARN_ONCE("createNormalsMesh only valid for indexed meshes");
 		}
 	} else {
-		int Ni = al::min(vertices().size(), normals().size());
+		int Ni = std::min(vertices().size(), normals().size());
 		initMesh(mesh, Ni*2);
 
 		for(int i=0; i<Ni; ++i){
@@ -706,7 +707,7 @@ Mesh& Mesh::fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius, bool p
 
 	// adjust to use scale of largest axis:
 	if(proportional){
-		scale = al::min(scale.x, scale.y, scale.z);
+		scale = std::min({scale.x, scale.y, scale.z});
 	}
 	return *this;
 }

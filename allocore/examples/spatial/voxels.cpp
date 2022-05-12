@@ -10,6 +10,7 @@ Matt Wright, April 2015, matt@create.ucsb.edu
 */
 
 #include <iostream>
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/types/al_Voxels.hpp"
 
 // function used to initialize array data (from allocore/examples/graphics/texture3d.cpp)

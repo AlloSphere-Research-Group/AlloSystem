@@ -11,6 +11,7 @@ Author:
 Lance Putnam, Nov. 2015
 */
 
+#include <cmath> // max
 #include "allocore/io/al_App.hpp"
 using namespace al;
 
@@ -102,7 +103,7 @@ public:
 			// Newton's law of gravity
 			auto r21 = well.pos - p.pos;	// distance vector between well and particle
 			auto dist = r21.mag();			// distance between well and particle
-			dist = al::max(dist, 0.1f);		// prevent high velocities
+			dist = std::max(dist, 0.1f);	// prevent high velocities
 			auto F = r21/(dist*dist*dist);	// force vector acting on particle
 
 			// Newton's second law of motion, F = ma -> a = F/m

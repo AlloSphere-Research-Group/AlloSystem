@@ -107,7 +107,7 @@ int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, double 
 // (the limit is 10 so that the hash can fit inside a uint32_t integer)
 // default 5 implies 32 units per side
 HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
-:	mShift(al::clip(resolution, uint32_t(10), uint32_t(1))),
+:	mShift(std::max(uint32_t(1), std::min(resolution, uint32_t(10)))),
 	mShift2(mShift+mShift),
 	mDim(1<<mShift),
 	mDim2(mDim*mDim),

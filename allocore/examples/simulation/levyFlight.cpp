@@ -10,6 +10,7 @@ Lance Putnam, 9/2011
 */
 
 #include "allocore/io/al_App.hpp"
+#include "allocore/math/al_Functions.hpp"
 using namespace al;
 
 class MyApp : public App{

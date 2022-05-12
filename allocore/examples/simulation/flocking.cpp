@@ -81,7 +81,8 @@ public:
 				// Collision avoidance
 				float pushRadius = 0.05;
 				float pushStrength = 1;
-				float push = exp(-al::pow2(dist/pushRadius)) * pushStrength;
+				auto pow2 = [](float x){ return x*x; };
+				float push = exp(-pow2(dist/pushRadius)) * pushStrength;
 
 				auto pushVector = ds.normalized() * push;
 				boids[i].pos += pushVector;
@@ -89,7 +90,7 @@ public:
 
 				// Velocity matching
 				float matchRadius = 0.125;
-				float nearness = exp(-al::pow2(dist/matchRadius));
+				float nearness = exp(-pow2(dist/matchRadius));
 				Vec2f veli = boids[i].vel;
 				Vec2f velj = boids[j].vel;
 
