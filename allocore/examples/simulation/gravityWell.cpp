@@ -38,7 +38,6 @@ public:
 	Particle particles[N];
 	Particle well;
 	Mesh body1, body2;
-	Light light1, light2;
 
 	MyApp(){
 		reset();
@@ -118,23 +117,21 @@ public:
 		g.cullFace(true);
 		//g.polygonMode(Graphics::LINE);
 
-		light1.dir(1,1,1);
-		light1();
+		g.light(0).dir(1,1,1);
 
-		light2.pos(0,0,0);
-		light2.attenuation(1,0,4);
-		light2.diffuse(body2.colors()[0]);
-		light2();
+		g.light(1).pos(0,0,0)
+			.attenuation(1,0,4)
+			.diffuse(body2.colors()[0]);
 
 		// Draw the well
 		g.draw(body2);
 
 		// Draw the particles
 		for(auto& p : particles){
-			g.pushMatrix();
-			g.translate(p.pos);
-			g.draw(body1);
-			g.popMatrix();
+			g.matrixScope([&](){
+				g.translate(p.pos);
+				g.draw(body1);
+			});
 		}
 	}
 
