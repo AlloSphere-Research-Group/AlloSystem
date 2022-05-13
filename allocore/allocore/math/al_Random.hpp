@@ -190,6 +190,14 @@ public:
 	template <class Array>
 	Array shuffle(const Array& a){ auto t=a; return shuffle(t); }
 
+	/// Randomly pick and return one of the arguments
+	template <class T, class... Ts>
+	T pick(const T& v, const Ts&... vals){
+		constexpr int N = 1+sizeof...(vals);
+		T arr[] = {v, vals...};
+		return arr[uniform(N)];
+	}
+
 protected:
 	RNG mRNG;
 
