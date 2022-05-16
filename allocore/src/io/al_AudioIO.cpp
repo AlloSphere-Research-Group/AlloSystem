@@ -277,6 +277,7 @@ struct AudioIO::Impl{
 		dev.frameRate = info.preferredSampleRate;
 		dev.channelsIn  = info.inputChannels;
 		dev.channelsOut = info.outputChannels;
+		//for(auto sr : info.sampleRates) printf("%d ", sr); printf("\n");
 		return dev;
 	}
 
@@ -546,6 +547,12 @@ AudioIO& AudioIO::configure(int framesPerBuf, double framesPerSec, int chansOut,
 	  so we limit "all channels" to a reasonable number.*/
 		if(chansIn  >= 128) chansIn  = 2;
 		if(chansOut >= 128) chansOut = 2;
+		#endif
+		#ifdef AL_AUDIO_RTAUDIO
+		// Prevent glitchy output when specifying SR less than that of input stream
+		if(chansIn && framesPerSec < mDevI.frameRate){
+			framesPerSec = mDevI.frameRate;
+		}
 		#endif
 		mBufI.resize(framesPerBuf, chansIn);
 		mBufO.resize(framesPerBuf, chansOut);
