@@ -163,6 +163,9 @@ GPUMesh * currentGPUMesh = NULL;
 
 
 #ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+
+static const float colorArrayAlpha = 8192.;
+
 class Graphics::BackendProg : public Graphics::Backend{
 public:
 	BackendProg(Graphics& g)
@@ -278,20 +281,20 @@ uniform vec4 singleColor;
 uniform float pointSize;
 uniform bool hasNormals;
 attribute vec3 posIn;
-attribute vec3 normalIn;
-attribute vec4 colorIn;
-attribute vec2 texCoord2In;
+attribute vec3 nrmIn;
+attribute vec4 colIn;
+attribute vec2 tcIn;
 
 void main(){
 	posObj = posIn;
-	color = singleColor.a==8192. ? colorIn : singleColor;
+	color = singleColor.a==8192. ? colIn : singleColor;
 	if(hasNormals){
-		normal = normalMatrix * normalIn;
+		normal = normalMatrix * nrmIn;
 	} else {
 		normal = vec3(1.,0.,0.);
 	}
 	if(doTex2){
-		texCoord2 = texCoord2In;
+		texCoord2 = tcIn;
 	}
 	gl_PointSize = pointSize;
 )" +
@@ -475,10 +478,11 @@ R"(
 			);
 
 			if(mShader.linked()){
+				//printf("al::Graphics shader linked\n");
 				mLocPos       = mShader.attribute("posIn");
-				mLocColor     = mShader.attribute("colorIn");
-				mLocNormal    = mShader.attribute("normalIn");
-				mLocTexCoord2 = mShader.attribute("texCoord2In");
+				mLocColor     = mShader.attribute("colIn");
+				mLocNormal    = mShader.attribute("nrmIn");
+				mLocTexCoord2 = mShader.attribute("tcIn");
 				mMatrixStacks[MODELVIEW].loc() = mShader.uniform("MV");
 				mMatrixStacks[PROJECTION].loc() = mShader.uniform("P");
 				mGraphics.mDoLighting.loc() = mShader.uniform("doLighting");
@@ -504,6 +508,8 @@ R"(
 				// init uniforms
 				mShader.begin();
 					mShader.uniform("colorMaterial", true);
+					mShader.uniform("hasNormals", true);
+					mShader.uniform("singleColor", Color(0,0,0,colorArrayAlpha));
 				mShader.end();
 			} else {
 				printf("Critical error: al::Graphics failed to compile shader\n");
@@ -643,8 +649,7 @@ R"(
 			glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, m.normals);
 		}
 
-		const float colorArrayFlag = 8192.;
-		Color singleColor(0,0,0,colorArrayFlag); // if unchanged, triggers read from array
+		Color singleColor(0,0,0,colorArrayAlpha); // if unchanged, triggers read from array
 
 		if(m.Nc >= m.Nv){
 			glEnableVertexAttribArray(mLocColor);
@@ -665,9 +670,9 @@ R"(
 		// and array color reads in a shader.
 		// TODO: if VBO bound, must bind a separate color VBO
 		#ifdef AL_OSX
-		if(singleColor.a != colorArrayFlag){ // using single color
+		if(singleColor.a != colorArrayAlpha){ // using single color
 			Colori col = singleColor;
-			singleColor.a = colorArrayFlag;
+			singleColor.a = colorArrayAlpha;
 			// Avoid copies if possible
 			if(mColorArray.empty() || mColorArray.size() < unsigned(m.Nv) || mColorArray[0] != col){
 				mColorArray.clear();
