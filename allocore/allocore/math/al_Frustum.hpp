@@ -112,6 +112,11 @@ public:
 		return getPoint(Vec<3,U>(fracx,fracy,fracz));
 	}
 
+	/// Get center of near plane
+	Vec<3,T> centerNear() const {
+		return (ntr + ntl + nbl + nbr) * 0.25;
+	}
+
 	/// Test whether point is in frustum
 	
 	/// \returns OUTSIDE, INTERSECT or INSIDE
