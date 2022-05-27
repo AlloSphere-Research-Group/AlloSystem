@@ -80,7 +80,8 @@ public:
 
 	/// Set from three points lying on the plane
 
-	/// The normal is computed according to a right-handed coordinate system.
+	/// The normal is computed according to a right-handed coordinate system
+	/// with a counter-clockwise vertex winding order.
 	/// For left-handed, swap the first and last vertices.
 	Plane& from3Points(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 
