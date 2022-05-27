@@ -162,25 +162,33 @@ public:
 		return Mat(T(1));
 	}
 
+	static Mat rotation(double cosAngle, double sinAngle, unsigned dim1, unsigned dim2){
+		Mat m(T(1));
+		m(dim1,dim1) = cosAngle;
+		m(dim1,dim2) =-sinAngle;
+		m(dim2,dim1) = sinAngle;
+		m(dim2,dim2) = cosAngle;
+		return m;
+	}
+
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat rotation(double cosAngle, double sinAngle){
+		static_assert_plane<Dim1,Dim2>();
+		return rotation(cosAngle, sinAngle, Dim1, Dim2);
+	}
+
 	/// Get a rotation transform matrix
 
 	/// @param[in] angle	rotation angle in radians
 	/// @param[in] dim1		first ("from") basis vector of rotation plane
 	/// @param[in] dim2		second ("to") basis vector of rotation plane
 	static Mat rotation(double angle, unsigned dim1, unsigned dim2){
-		double cs = cos(angle);
-		double sn = sin(angle);
-		Mat m(T(1));
-		m(dim1,dim1) = cs;
-		m(dim1,dim2) =-sn;
-		m(dim2,dim1) = sn;
-		m(dim2,dim2) = cs;
-		return m;
+		return rotation(std::cos(angle), std::sin(angle), dim1, dim2);
 	}
 
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat rotation(double angle){
-		static_assert(Dim1<N && Dim2<N && Dim1!=Dim2, "Invalid plane dimensions");
+		static_assert_plane<Dim1,Dim2>();
 		return rotation(angle, Dim1, Dim2);
 	}
 
@@ -601,19 +609,19 @@ public:
 			const T& v1 = (*this)(R, dim1);
 			const T& v2 = (*this)(R, dim2);
 			T t = v1*cosAngle + v2*sinAngle;
-			(*this)(R, dim2) = v2*cosAngle - v1*sinAngle;
-			(*this)(R, dim1) = t;
+			v2 = v2*cosAngle - v1*sinAngle;
+			v1 = t;
 		}
 		return *this;
 	}
 
-	template <int Dim1, int Dim2>
+	template <int Dim1=0, int Dim2=1>
 	Mat& rotate(double angle){
-		static_assert(Dim1<N-1 && Dim2<N-1, "Dimension out of bounds");
+		static_assert_plane_homog<Dim1,Dim2>();
 		return rotate(angle, Dim1, Dim2);
 	}
 
-	template <int Dim1, int Dim2>
+	template <int Dim1=0, int Dim2=1>
 	Mat& rotate(double cosAngle, double sinAngle){
 		return rotate<Dim1,Dim2>(cosAngle, sinAngle);
 	}
@@ -626,9 +634,9 @@ public:
 		return *this;
 	}
 
-	template <int Dim1, int Dim2>
+	template <int Dim1=0, int Dim2=1>
 	Mat& rotate90(){
-		static_assert(Dim1<N-1 && Dim2<N-1, "Dimension out of bounds");
+		static_assert_plane_homog<Dim1,Dim2>();
 		return rotate90(Dim1, Dim2);
 	}
 
@@ -641,8 +649,8 @@ public:
 			const T& v1 = (*this)(dim1, C);
 			const T& v2 = (*this)(dim2, C);
 			T t = v1*cs - v2*sn;
-			(*this)(dim2, C) = v2*cs + v1*sn;
-			(*this)(dim1, C) = t;
+			v2 = v2*cs + v1*sn;
+			v1 = t;
 		}
 		return *this;
 	}
@@ -710,6 +718,17 @@ public:
 
 	/// Print to file (stream)
 	void print(FILE * file = stderr) const;
+
+private:
+	template <int Dim1, int Dim2, int DimMax=N>
+	static constexpr int static_assert_plane(){
+		static_assert(Dim1<DimMax && Dim2<DimMax && Dim1!=Dim2, "Invalid plane dimensions");
+		return {};
+	}
+	template <int Dim1, int Dim2>
+	static constexpr int static_assert_plane_homog(){
+		return static_assert_plane<Dim1,Dim2,N-1>();
+	}
 };
 
 
