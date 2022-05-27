@@ -60,7 +60,7 @@ public:
 	Plane(): mNormal(1,0,0), mD(0){}
 	Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 
-	/// Get normal perpendicular to plane (a, b, and c components)
+	/// Get normal perpendicular to plane (points in positive half-space direction)
 	const Vec3& normal() const { return mNormal; }
 
 	/// Get scalar component of plane equation
