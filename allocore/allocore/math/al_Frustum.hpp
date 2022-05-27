@@ -66,17 +66,20 @@ template <class T>
 class Frustum{
 public:
 
+	typedef T value_type;
+	typedef Vec<3,T> vec;
+
 	enum{ TOP=0, BOTTOM, LEFT, RIGHT, NEARP, FARP };
 	enum{ OUTSIDE=0, INTERSECT, INSIDE };
 
-	Vec<3,T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	///< Corners
-	Plane<T> pl[6];										///< Faces
+	vec ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr; ///< Corners
+	Plane<T> pl[6]; ///< Face planes (normals point inward)
 
 
-	const Vec<3,T>& corner(int i) const { return (&ntl)[i]; }
-	Vec<3,T>& corner(int i){ return (&ntl)[i]; }
+	const vec& corner(int i) const { return (&ntl)[i]; }
+	vec& corner(int i){ return (&ntl)[i]; }
 
-	const Vec<3,T>& corner(int i0, int i1, int i2) const {
+	const vec& corner(int i0, int i1, int i2) const {
 		return corner(i2<<2 | i1<<1 | i0);
 	}
 
@@ -92,7 +95,7 @@ public:
 
 	/// Get point in frustum corresponding to fraction along edges
 	template <class Vec3>
-	Vec<3,T> getPoint(const Vec3& frac) const {
+	vec getPoint(const Vec3& frac) const {
 		return
 		lerp(frac[2],
 			lerp(frac[1],
@@ -108,26 +111,27 @@ public:
 
 	/// Get point in frustum corresponding to fraction along edges
 	template <class U>
-	Vec<3,T> getPoint(const U& fracx, const U& fracy, const U& fracz) const {
+	vec getPoint(const U& fracx, const U& fracy, const U& fracz) const {
 		return getPoint(Vec<3,U>(fracx,fracy,fracz));
 	}
 
 	/// Get center of near plane
-	Vec<3,T> centerNear() const {
-		return (ntr + ntl + nbl + nbr) * 0.25;
-	}
+	vec centerNear() const { return (ntr+ntl+nbl+nbr)*0.25; }
+
+	/// Get center of frustum
+	vec center() const { return (ntl+ntr+nbl+nbr+ftl+ftr+fbl+fbr)*0.125; }
 
 	/// Test whether point is in frustum
 	
 	/// \returns OUTSIDE, INTERSECT or INSIDE
 	///
-	int testPoint(const Vec<3,T>& p) const;
+	int testPoint(const vec& p) const;
 
 	/// Test whether sphere is in frustum
 
 	/// \returns OUTSIDE, INTERSECT or INSIDE
 	///
-	int testSphere(const Vec<3,T>& center, float radius) const;
+	int testSphere(const vec& center, float radius) const;
 
 	/// Test whether axis-aligned box is in frustum
 
@@ -136,20 +140,19 @@ public:
 	/// thus returning a false positive.
 	///
 	/// \returns OUTSIDE, INTERSECT or INSIDE
-	int testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
+	int testBox(const vec& xyz, const vec& dim) const;
+	int testBoxMinMax(const vec& min, const vec& max) const;
 
 	/// Get axis-aligned bounding box
 	template <class Vec3>
 	void boundingBox(Vec3& xyz, Vec3& dim) const;
 
-	/// Returns center of frustum
-	Vec<3,T> center() const { return (ntl+ntr+nbl+nbr+ftl+ftr+fbl+fbr)*0.125; }
 
 
 	/// Compute planes based on frustum corners (planes face to inside)
 
 	/// This must be called if any of the corners change value.
-	///	The plane normals are computed assuming a right-hand coordinate system.
+	///
 	Frustum& computePlanes();
 
 private:
@@ -214,7 +217,7 @@ Frustum<T>& Frustum<T>::computePlanes(){
 }
 
 template <class T>
-int Frustum<T>::testPoint(const Vec<3,T>& p) const {
+int Frustum<T>::testPoint(const vec& p) const {
 	for(const auto& plane : pl){
 		if(plane.inNegativeSpace(p)) return OUTSIDE;
 	}
@@ -222,7 +225,7 @@ int Frustum<T>::testPoint(const Vec<3,T>& p) const {
 }
 
 template <class T>
-int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
+int Frustum<T>::testSphere(const vec& c, float r) const {
 	int result = INSIDE;
 	for(const auto& plane : pl){
 		auto distance = plane.distance(c);
@@ -233,7 +236,7 @@ int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
 }
 
 template <class T>
-int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
+int Frustum<T>::testBoxMinMax(const vec& min, const vec& max) const {
 	int result = INSIDE;
 	for(const auto& plane : pl){
 		const auto plNrm = plane.normal();
@@ -248,20 +251,21 @@ int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 		the right side of the plane, or if the box intersects the plane.
 */
 		// Is positive vertex outside?
-		auto vp = xyz;
-		if(plNrm[0] > 0) vp[0] += dim[0];
-		if(plNrm[1] > 0) vp[1] += dim[1];
-		if(plNrm[2] > 0) vp[2] += dim[2];
+		vec vp;
+		for(int i=0; i<3; ++i) vp[i] = plNrm[i]>T(0) ? max[i] : min[i];
 		if(plane.inNegativeSpace(vp)) return OUTSIDE;
 
 		// Is negative vertex outside?
-		auto vn = xyz;
-		if(plNrm[0] < 0) vn[0] += dim[0];
-		if(plNrm[1] < 0) vn[1] += dim[1];
-		if(plNrm[2] < 0) vn[2] += dim[2];
+		vec vn;
+		for(int i=0; i<3; ++i) vn[i] = plNrm[i]<T(0) ? max[i] : min[i];
 		if(plane.inNegativeSpace(vn)) result = INTERSECT;
 	}
 	return result;
+}
+
+template <class T>
+int Frustum<T>::testBox(const vec& xyz, const vec& dim) const {
+	return testBoxMinMax(xyz, xyz+dim);
 }
 
 } // al::
