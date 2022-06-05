@@ -646,8 +646,8 @@ public:
 		double cs = cos(angle);
 		double sn = sin(angle);
 		for(int C=0; C<M; ++C){
-			const T& v1 = (*this)(dim1, C);
-			const T& v2 = (*this)(dim2, C);
+			T& v1 = (*this)(dim1, C);
+			T& v2 = (*this)(dim2, C);
 			T t = v1*cs - v2*sn;
 			v2 = v2*cs + v1*sn;
 			v1 = t;
