@@ -124,7 +124,7 @@ public:
 	/// @param[in] near		distance from eye to near plane
 	/// @param[in] far		distance from eye to far plane
 	static Matrix4 perspective(T fovy, T aspect, T near, T far){
-		double f = std::tan((90.-fovy*0.5)*M_DEG2RAD); // tan(pi/2-x) = 1/tan(x)
+		T f = std::tan((90.-fovy*0.5)*M_DEG2RAD); // tan(pi/2-x) = 1/tan(x)
 		T D = far-near;	T D2 = far+near;
 		T fn2 = far*near*2;
 		return {
@@ -193,7 +193,7 @@ public:
 	/// @param[in] yShift	amount to shift off y-axis
 	/// @param[in] focal	focal length
 	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T yShift, T focal){
-		double tanfovy = std::tan(fovy*M_DEG2RAD*0.5);
+		T tanfovy = std::tan(fovy*M_DEG2RAD*0.5);
 		T t = near * tanfovy; // height of view at distance = near
 		T b = -t;
 		T l = -aspect*t;
