@@ -254,6 +254,16 @@ public:
 	static Mat& pun(T * src){ return *(Mat*)(src); }
 	static const Mat& pun(const T * src){ return pun(const_cast<T*>(src)); }
 
+	template <class UniformPOD>
+	static Mat& pun(UniformPOD& v){
+		static_assert(sizeof(UniformPOD) == sizeof(Mat), "Size mismatch");
+		static_assert(!std::is_polymorphic<UniformPOD>::value, "Punning polymorphic class disallowed");
+		return pun((T*)(&v));
+	}
+
+	template <class UniformPOD>
+	static Mat& pun(const UniformPOD& v){ return pun(const_cast<UniformPOD&>(v)); }
+
 	/// Returns total number of elements
 	static constexpr int size(){ return N*N; }
 
