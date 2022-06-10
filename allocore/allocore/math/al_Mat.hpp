@@ -339,6 +339,18 @@ public:
 		return *this;
 	}
 
+	template <int M>
+	Mat& transpose(){
+		static_assert(0 <= M && M <= N, "Invalid (sub)matrix size");
+		return transpose(M);
+	}
+
+	/// Get transposed copy
+	Mat transposed(int size=N) const { return Mat(*this).transpose(size); }
+
+	template <int M>
+	Mat transposed() const { return Mat(*this).transpose<M>(); }
+
 	/// Get an MxM submatrix
 	template <int M>
 	Mat<M,T> sub(int row=0, int col=0) const {
