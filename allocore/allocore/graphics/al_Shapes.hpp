@@ -42,7 +42,6 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#include <cmath>
 #include <functional>
 #include "allocore/math/al_Vec.hpp"
 
@@ -75,9 +74,9 @@ inline int addCuboid(Mesh& m, const Vec3f& radii){ return addCuboid(m,radii[0],r
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
 /// @param[in]		radius	Radius of cube from center to faces;
-///							sqrt(1/3) gives cube inscribed in unit sphere
+///							sqrt(1/3)~=0.57735 gives cube inscribed in unit sphere
 /// \returns number of vertices added (8)
-inline int addCube(Mesh& m, float radius=std::sqrt(1./3.)){ return addCuboid(m,radius); }
+inline int addCube(Mesh& m, float radius=0.57735026919){ return addCuboid(m,radius); }
 
 /// Add octahedron as triangle vertices and indices
 
@@ -228,7 +227,9 @@ int addFrame(Mesh& m, float width=2, float height=2, float x=0, float y=0);
 ///
 /// \returns number of vertices added
 template <class Vec>
-int addQuad(Mesh& m, const Vec& a, const Vec& b, const Vec& c, const Vec& d);
+int addQuad(Mesh& m, const Vec& a, const Vec& b, const Vec& c, const Vec& d){
+	return addQuad(m, a[0],a[1],a[2], b[0],b[1],b[2], c[0],c[1],c[2], d[0],d[1],d[2]);
+}
 
 int addQuad(
 	Mesh& m,
@@ -381,48 +382,30 @@ int addVoxels(
 );
 
 
-/// Fill array with ellipse (using fast recursion method)
+/// Fill array with ellipse
 template <class Vec2>
-void ellipse(Vec2 * dst, int len, float radx=1, float rady=1);
+void ellipse(Vec2 * dst, int len, float radx=1, float rady=1){
+	auto absv = [](float x){ return x>=0.f ? x : -x; };
+	// Input is in [-2, 6] corresponding to [-pi, 3pi]
+	auto sinFast = [&](float x){
+		if(x >= 2.f) x -= 4.f; // increase domain from [-2,2] to [-2,6]
+		auto y = x * (2.f - absv(x));
+		return y * (0.775f + 0.225f * absv(y));
+	};
+
+	for(int i=0; i<len; ++i){
+		float t = float(i)/len * 4.f; // [0,4]
+		dst[i][0] = radx * sinFast(t+1.f);
+		dst[i][1] = rady * sinFast(t);
+	}
+}
 
 
-/// Fill array with circle (using fast recursion method)
+/// Fill array with circle
 template <class Vec2>
 void circle(Vec2 * dst, int len, float rad=1){ ellipse(dst,len, rad,rad); }
 
 /// @} // end allocore group
-
-
-
-// Implementation only below
-template <class Vec>
-int addQuad(Mesh& m, const Vec& a, const Vec& b, const Vec& c, const Vec& d){
-	return addQuad(m, a[0],a[1],a[2], b[0],b[1],b[2], c[0],c[1],c[2], d[0],d[1],d[2]);
-}
-
-template <class Vec2>
-void ellipse(Vec2 * dst, int len, float radx, float rady){
-	struct RSin{
-		float mul,val,val2;
-		RSin(float f=1, float a=1, float p=0){
-			static const float twoPi = 6.283185307179586476925286766559;
-			f *= twoPi, p *= twoPi;
-			mul  = 2. * std::cos(f);
-			val2 = std::sin(p - f * 2.)*a;
-			val  = std::sin(p - f     )*a;
-		}
-		float operator()(){
-			auto v0 = mul * val - val2;
-			val2 = val;
-			return val = v0;
-		}
-	};
-	RSin x(1./len, radx, 0.25), y(1./len, rady);
-	for(int i=0; i<len; ++i){
-		dst[i][0] = x();
-		dst[i][1] = y();
-	}
-}
 
 } // al::
 
