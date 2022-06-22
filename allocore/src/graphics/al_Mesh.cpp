@@ -197,11 +197,6 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
 	}
 }
 
-Mesh& Mesh::invertNormals() {
-	for(auto& v : normals()) v = -v;
-	return *this;
-}
-
 Mesh& Mesh::compress() {
 
 	int Ni = indices().size();
@@ -439,7 +434,15 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 	return *this;
 }
 
+Mesh& Mesh::ensureNormals(bool equalWeightPerFace){
+	if(mNormals.empty()) generateNormals(true, equalWeightPerFace);
+	return *this;
+}
 
+Mesh& Mesh::invertNormals(){
+	for(auto& v : normals()) v = -v;
+	return *this;
+}
 
 Mesh& Mesh::repeatLast(){
 	if(indices().size()){

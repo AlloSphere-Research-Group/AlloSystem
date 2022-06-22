@@ -178,6 +178,9 @@ public:
 	///									based on face areas
 	Mesh& generateNormals(bool normalize=true, bool equalWeightPerFace=false);
 
+	/// Generate normals if they do not exist
+	Mesh& ensureNormals(bool equalWeightPerFace=false);
+
 	/// Invert direction of normals
 	Mesh& invertNormals();
 
