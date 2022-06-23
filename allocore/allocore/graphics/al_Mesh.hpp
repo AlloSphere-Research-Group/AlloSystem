@@ -549,36 +549,6 @@ protected:
 	float mStroke = -1.f;
 };
 
-
-
-
-template <class T>
-Mesh& Mesh::transform(const Mat<4,T>& m, int begin, int end){
-	if(begin<0) begin += vertices().size();
-	if(  end<0)   end += vertices().size()+1; // negative index wraps to end of array
-	for(int i=begin; i<end; ++i){
-		vertices()[i] = m * Vec<4,T>(vertices()[i], T(1));
-	}
-
-	Mat3f nmat(MAT_NO_INIT);
-	bool nmatInvalid = true;
-
-	auto xfmOriVec = [&](Buffer<UnitVector>& buf){
-		if(buf.size() >= mVertices.size()){
-			if(nmatInvalid){ nmat = normalMatrix(m); nmatInvalid=false; }
-			for(int i=begin; i<end; ++i){
-				buf[i] = nmat * buf[i];
-				buf[i].normalize(); // since xfm may have scaling
-			}
-		}	
-	};
-
-	xfmOriVec(mNormals);
-	xfmOriVec(mTangents);
-
-	return *this;
-}
-
 } // al::
 
 #endif
