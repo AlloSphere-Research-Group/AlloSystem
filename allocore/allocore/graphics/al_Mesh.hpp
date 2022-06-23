@@ -65,13 +65,10 @@ public:
 	typedef Vec3f			UnitVector;
 	typedef UnitVector		Normal;
 	typedef UnitVector		Tangent;
-	//typedef Vec4f			Color;
 	typedef float			TexCoord1;
 	typedef Vec2f			TexCoord2;
 	typedef Vec3f			TexCoord3;
 	typedef unsigned int	Index;
-	typedef Vec3i			TriFace;
-	typedef Vec4i			QuadFace;
 
 	typedef Buffer<Vertex>		Vertices;
 	typedef Buffer<Normal>		Normals;
@@ -87,179 +84,15 @@ public:
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0);
 
+	/// Copy constructor
 	Mesh(const Mesh& cpy);
 
 
-	/// Get corners of bounding box of vertices
-
-	/// @param[out] min		minimum corner of bounding box
-	/// @param[out] max		maximum corner of bounding box
-	void getBounds(Vec3f& min, Vec3f& max) const;
-
-	/// Get center of vertices
-	Vertex getCenter() const;
-
-
-	// destructive edits to internal vertices:
-
-	/// Generates indices for a set of vertices
-	Mesh& compress();
-
-	/// Convert indices (if any) to flat vertex buffers
-	Mesh& decompress();
-
-	/// Extend buffers to match number of vertices
-
-	/// This will resize all populated buffers to match the size of the vertex
-	/// buffer. Buffers are extended by copying their last element.
-	Mesh& equalizeBuffers();
-
-	/// Append buffers from another mesh:
-	Mesh& merge(const Mesh& src);
-
-	template <class T>
-	Mesh& merge(const Mesh& src, const Mat<4,T>& xfm){
-		return merge(src).transform(xfm, -src.vertices().size());
-	}
-
-	/// Convert triangle strip to triangles
-	Mesh& toTriangles();
-
-
-	/// Reset all buffers
-	Mesh& reset();
-
-	/// Scales and translates vertices to lie in sphere
-	Mesh& fitToSphere(float radius=1);
-
-	/// Scales and translates vertices to lie in cube
-	Mesh& fitToCube(float radius=1, bool proportional=true);
-
-	Mesh& fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius=1, bool proportional=true);
-
-	/// Scales and translates vertices to lie in cube with extrema [-1,1]
-	Mesh& unitize(bool proportional=true);
-
-	/// Scale all vertices
-	Mesh& scale(float x, float y, float z=1.f);
-	Mesh& scale(float s){ return scale(s,s,s); }
-
-	template <class T>
-	Mesh& scale(const Vec<3,T>& v){ return scale(v[0],v[1],v[2]); }
-
-	/// Translate all vertices
-	Mesh& translate(float x, float y, float z=0.f);
-
-	template <class T>
-	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
-
-	template <class T>
-	Mesh& translate(const T& v){ return translate(v,v,v); }
-
-	/// Rotate 90 degrees on specified plane
-	template <unsigned Dim1=0, unsigned Dim2=1>
-	Mesh& rotate90(){
-		for(auto& v : vertices()) v.rotate90<Dim1,Dim2>();
-		for(auto& v : normals() ) v.rotate90<Dim1,Dim2>();
-		for(auto& v : tangents()) v.rotate90<Dim1,Dim2>();
-		return *this;
-	}
-
-	/// Transform vertices by projective transform matrix
-
-	/// @param[in] m		projective transform matrix
-	/// @param[in] begin	beginning index of vertices; negative value specifies
-	///						distance from last element
-	/// @param[in] end		ending index of vertices; negative value specifies
-	///						distance from one past last element
-	template <class T>
-	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
-
-
-	/// Generates normals for a set of vertices
-
-	/// This method will generate a normal for each vertex in the buffer
-	/// assuming the drawing primitive is either triangles or a triangle strip.
-	/// Averaged vertex normals are generated if indices are present and, for
-	/// triangles only, face normals are generated if no indices are present.
-	/// This will replace any normals currently in use.
-	///
-	/// @param[in] normalize			whether to normalize normals
-	/// @param[in] equalWeightPerFace	whether to use an equal weighting of
-	///									face normals rather than a weighting
-	///									based on face areas
-	Mesh& generateNormals(bool normalize=true, bool equalWeightPerFace=false);
-
-	/// Generate normals if they do not exist
-	Mesh& ensureNormals(bool equalWeightPerFace=false);
-
-	/// Invert direction of normals
-	Mesh& invertNormals();
-
-	/// Creates a mesh filled with lines for each normal of the source
-
-	/// @param[out] mesh		normal lines
-	/// @param[in]  length		length of normals
-	/// @param[in]  perFace		whether normals line should be generated per
-	///							face rather than per vertex
-	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false) const;
-
-	Mesh& normalsMesh(Mesh& mesh, float length=0.1, bool perFace=false) const {
-		createNormalsMesh(mesh,length,perFace);
-		return mesh;
-	}
-
-	/// Ribbonize curve
-
-	/// This creates a two-dimensional ribbon from a one-dimensional space curve.
-	/// The result is to be rendered with a triangle strip.
-	/// @param[in] width			Width of ribbon
-	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
-	///								If false, surface faces normal vector of curve.
-	Mesh& ribbonize(float width=0.04, bool faceBinormal=false){
-		return ribbonize(&width, 0, faceBinormal);
-	}
-
-	/// Ribbonize curve
-
-	/// This creates a two-dimensional ribbon from a one-dimensional space curve.
-	/// The result is to be rendered with a triangle strip.
-	/// @param[in] widths			Array specifying width of ribbon at each point along curve
-	/// @param[in] widthsStride		Stride factor of width array
-	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
-	///								If false, surface faces normal vector of curve.
-	Mesh& ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
-
-	/// Smooths a triangle mesh
-
-	/// This smooths a triangle mesh using Laplacian (low-pass) filtering.
-	/// New vertex positions are a weighted sum of their nearest neighbors. 
-	/// The number of vertices is not changed.
-	/// @param[in] amount		interpolation fraction between original and smoothed result
-	/// @param[in] weighting	0 = equal weight, 1 = inverse distance weight
-	Mesh& smooth(float amount=1, int weighting=0);
-
-	/// Flip the winding order (of triangles)
-	Mesh& flipWinding();
-
-
-	int primitive() const { return mPrimitive; }
-	float stroke() const { return mStroke; }
-	const Buffer<Vertex>& vertices() const { return mVertices; }
-	const Buffer<Normal>& normals() const { return mNormals; }
-	const Buffer<Tangent>& tangents() const { return mTangents; }
-	const Buffer<Color>& colors() const { return mColors; }
-	const Buffer<Colori>& coloris() const { return mColoris; }
-	const Buffer<TexCoord1>& texCoord1s() const { return mTexCoord1s; }
-	const Buffer<TexCoord2>& texCoord2s() const { return mTexCoord2s; }
-	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
-	const Buffer<Index>& indices() const { return mIndices; }
-
-	/// Returns whether mesh has valid data for rendering
-	bool valid() const;
-
 	/// Set geometric primitive
 	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
+
+	int primitive() const { return mPrimitive; }
+
 	Mesh& points();
 	Mesh& points(float stroke);
 	Mesh& lines();
@@ -284,8 +117,29 @@ public:
 	/// A negative value uses the current value of the renderer.
 	Mesh& stroke(float v){ mStroke=v; return *this; }
 
-	/// Repeat last vertex element(s)
-	Mesh& repeatLast();
+	float stroke() const { return mStroke; }
+
+	/// Reset all buffers
+	Mesh& reset();
+
+	const Vertices& vertices() const { return mVertices; }
+	Vertices& vertices(){ return mVertices; }
+	const Normals& normals() const { return mNormals; }
+	Normals& normals(){ return mNormals; }
+	const Tangents& tangents() const { return mTangents; }
+	Tangents& tangents(){ return mTangents; }
+	const Colors& colors() const { return mColors; }
+	Colors& colors(){ return mColors; }
+	const Coloris& coloris() const { return mColoris; }
+	Coloris& coloris(){ return mColoris; }
+	const TexCoord1s& texCoord1s() const { return mTexCoord1s; }
+	TexCoord1s& texCoord1s(){ return mTexCoord1s; }
+	const TexCoord2s& texCoord2s() const { return mTexCoord2s; }
+	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
+	const TexCoord3s& texCoord3s() const { return mTexCoord3s; }
+	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
+	const Indices& indices() const { return mIndices; }
+	Indices& indices(){ return mIndices; }
 
 	/// Append index to index buffer
 	Mesh& index(unsigned int i){ indices().append(i); return *this; }
@@ -314,6 +168,75 @@ public:
 	Mesh& indexRel(unsigned i, Indices... indices){
 		indexRel(i);
 		return indexRel(indices...);
+	}
+
+
+	/// Append vertex to vertex buffer
+	Mesh& vertex(float x, float y, float z=0){ return vertex(Vertex(x,y,z)); }
+
+	/// Append vertex to vertex buffer
+	Mesh& vertex(const Vertex& v){ vertices().append(v); return *this; }
+
+	/// Append vertex to vertex buffer
+	template <class T>
+	Mesh& vertex(const Vec<2,T>& v, float z=0){ return vertex(v[0], v[1], z); }
+
+	/// Append vertices from flat array
+	template <class T>
+	Mesh& vertex(const T * src, int numVerts){
+		for(int i=0; i<numVerts; ++i) vertex(src[3*i+0], src[3*i+1], src[3*i+2]);
+		return *this;
+	}
+
+	/// Append vertices to vertex buffer
+	template <class T>
+	Mesh& vertex(const Vec<3,T> * src, int numVerts){
+		for(int i=0; i<numVerts; ++i) vertex(src[i][0], src[i][1], src[i][2]);
+		return *this;
+	}
+
+	/// Append 2D vertex
+	template <class T1, class T2>
+	Mesh& vertex2(T1 x1, T2 y1){ return vertex(x1, y1); }
+
+	/// Append 2D vertices
+	template <class T1, class T2, class... Ts>
+	Mesh& vertex2(T1 x1, T2 y1, Ts... xnyn){ return vertex2(x1, y1).vertex2(xnyn...); }
+
+
+	/// Append normal to normal buffer
+	Mesh& normal(float x, float y, float z=0){ return normal(Normal(x,y,z)); }
+
+	/// Append normal to normal buffer
+	Mesh& normal(const Normal& v){ normals().append(v); return *this; }
+
+	/// Append normal to normal buffer
+	template <class T>
+	Mesh& normal(const Vec<2,T>& v, float z=0){ return normal(v[0], v[1], z); }
+
+	/// Append normals from flat array
+	template <class T>
+	Mesh& normal(const T * src, int len){
+		for(int i=0; i<len; ++i) normal(src[3*i+0], src[3*i+1], src[3*i+2]);
+		return *this;
+	}
+
+
+	/// Append tangent to tangent buffer
+	Mesh& tangent(float x, float y, float z=0){ return tangent(Tangent(x,y,z)); }
+
+	/// Append tangent to tangent buffer
+	Mesh& tangent(const Tangent& v){ mTangents.append(v); return *this; }
+
+	/// Append tangent to tangent buffer
+	template <class T>
+	Mesh& tangent(const Vec<2,T>& v, float z=0){ return tangent(v[0], v[1], z); }
+
+	/// Append tangents from flat array
+	template <class T>
+	Mesh& tangent(const T * src, int len){
+		for(int i=0; i<len; ++i) tangent(src[3*i+0], src[3*i+1], src[3*i+2]);
+		return *this;
 	}
 
 
@@ -370,42 +293,6 @@ public:
 	Mesh& coloriFill(const Colori& v);
 
 
-	/// Append normal to normal buffer
-	Mesh& normal(float x, float y, float z=0){ return normal(Normal(x,y,z)); }
-
-	/// Append normal to normal buffer
-	Mesh& normal(const Normal& v){ normals().append(v); return *this; }
-
-	/// Append normal to normal buffer
-	template <class T>
-	Mesh& normal(const Vec<2,T>& v, float z=0){ return normal(v[0], v[1], z); }
-
-	/// Append normals from flat array
-	template <class T>
-	Mesh& normal(const T * src, int len){
-		for(int i=0; i<len; ++i) normal(src[3*i+0], src[3*i+1], src[3*i+2]);
-		return *this;
-	}
-
-
-	/// Append tangent to tangent buffer
-	Mesh& tangent(float x, float y, float z=0){ return tangent(Tangent(x,y,z)); }
-
-	/// Append tangent to tangent buffer
-	Mesh& tangent(const Tangent& v){ mTangents.append(v); return *this; }
-
-	/// Append tangent to tangent buffer
-	template <class T>
-	Mesh& tangent(const Vec<2,T>& v, float z=0){ return tangent(v[0], v[1], z); }
-
-	/// Append tangents from flat array
-	template <class T>
-	Mesh& tangent(const T * src, int len){
-		for(int i=0; i<len; ++i) tangent(src[3*i+0], src[3*i+1], src[3*i+2]);
-		return *this;
-	}
-
-
 	/// Append texture coordinate to 1D texture coordinate buffer
 	Mesh& texCoord(float u){ texCoord1s().append(TexCoord1(u)); return *this; }
 
@@ -424,49 +311,11 @@ public:
 	Mesh& texCoord(const Vec<3,T>& v){ return texCoord(v[0], v[1], v[2]); }
 
 
-	/// Append vertex to vertex buffer
-	Mesh& vertex(float x, float y, float z=0){ return vertex(Vertex(x,y,z)); }
+	/// Returns whether mesh has valid data for rendering
+	bool valid() const;
 
-	/// Append vertex to vertex buffer
-	Mesh& vertex(const Vertex& v){ vertices().append(v); return *this; }
-
-	/// Append vertex to vertex buffer
-	template <class T>
-	Mesh& vertex(const Vec<2,T>& v, float z=0){ return vertex(v[0], v[1], z); }
-
-	/// Append vertices from flat array
-	template <class T>
-	Mesh& vertex(const T * src, int numVerts){
-		for(int i=0; i<numVerts; ++i) vertex(src[3*i+0], src[3*i+1], src[3*i+2]);
-		return *this;
-	}
-
-	/// Append vertices to vertex buffer
-	template <class T>
-	Mesh& vertex(const Vec<3,T> * src, int numVerts){
-		for(int i=0; i<numVerts; ++i) vertex(src[i][0], src[i][1], src[i][2]);
-		return *this;
-	}
-
-	/// Append 2D vertex
-	template <class T1, class T2>
-	Mesh& vertex2(T1 x1, T2 y1){ return vertex(x1, y1); }
-
-	/// Append 2D vertices
-	template <class T1, class T2, class... Ts>
-	Mesh& vertex2(T1 x1, T2 y1, Ts... xnyn){ return vertex2(x1, y1).vertex2(xnyn...); }
-
-
-	Vertices& vertices(){ return mVertices; }
-	Normals& normals(){ return mNormals; }
-	Tangents& tangents(){ return mTangents; }
-	Colors& colors(){ return mColors; }
-	Coloris& coloris(){ return mColoris; }
-	TexCoord1s& texCoord1s(){ return mTexCoord1s; }
-	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
-	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
-	Indices& indices(){ return mIndices; }
-
+	/// Repeat last vertex element(s)
+	Mesh& repeatLast();
 
 	/// Call function for each face in mesh
 
@@ -474,6 +323,151 @@ public:
 	/// each point or line segment, respectively.
 	const Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace) const;
 	Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace);
+
+	/// Get corners of bounding box of vertices
+
+	/// @param[out] min		minimum corner of bounding box
+	/// @param[out] max		maximum corner of bounding box
+	void getBounds(Vec3f& min, Vec3f& max) const;
+
+	/// Get center of vertices
+	Vertex getCenter() const;
+
+	/// Scale all vertices
+	Mesh& scale(float x, float y, float z=1.f);
+	Mesh& scale(float s){ return scale(s,s,s); }
+
+	template <class T>
+	Mesh& scale(const Vec<3,T>& v){ return scale(v[0],v[1],v[2]); }
+
+	/// Translate all vertices
+	Mesh& translate(float x, float y, float z=0.f);
+
+	template <class T>
+	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
+
+	template <class T>
+	Mesh& translate(const T& v){ return translate(v,v,v); }
+
+	/// Rotate 90 degrees on specified plane
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	Mesh& rotate90(){
+		for(auto& v : vertices()) v.rotate90<Dim1,Dim2>();
+		for(auto& v : normals() ) v.rotate90<Dim1,Dim2>();
+		for(auto& v : tangents()) v.rotate90<Dim1,Dim2>();
+		return *this;
+	}
+
+	/// Transform vertices by projective transform matrix
+
+	/// @param[in] m		projective transform matrix
+	/// @param[in] begin	beginning index of vertices; negative value specifies
+	///						distance from last element
+	/// @param[in] end		ending index of vertices; negative value specifies
+	///						distance from one past last element
+	template <class T>
+	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
+
+	/// Scales and translates vertices to lie in sphere
+	Mesh& fitToSphere(float radius=1);
+
+	/// Scales and translates vertices to lie in cube
+	Mesh& fitToCube(float radius=1, bool proportional=true);
+
+	Mesh& fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius=1, bool proportional=true);
+
+	/// Scales and translates vertices to lie in cube with extrema [-1,1]
+	Mesh& unitize(bool proportional=true);
+
+
+	/// Generates indices for a set of vertices
+	Mesh& compress();
+
+	/// Convert indices (if any) to flat vertex buffers
+	Mesh& decompress();
+
+	/// Extend buffers to match number of vertices
+
+	/// This will resize all populated buffers to match the size of the vertex
+	/// buffer. Buffers are extended by copying their last element.
+	Mesh& equalizeBuffers();
+
+	/// Append buffers from another mesh:
+	Mesh& merge(const Mesh& src);
+
+	template <class T>
+	Mesh& merge(const Mesh& src, const Mat<4,T>& xfm){
+		return merge(src).transform(xfm, -src.vertices().size());
+	}
+
+	/// Convert triangle strip to triangles
+	Mesh& toTriangles();
+
+	/// Generates normals for a set of vertices
+
+	/// This method will generate a normal for each vertex in the buffer
+	/// assuming the drawing primitive is either triangles or a triangle strip.
+	/// Averaged vertex normals are generated if indices are present and, for
+	/// triangles only, face normals are generated if no indices are present.
+	/// This will replace any normals currently in use.
+	///
+	/// @param[in] normalize			whether to normalize normals
+	/// @param[in] equalWeightPerFace	whether to use an equal weighting of
+	///									face normals rather than a weighting
+	///									based on face areas
+	Mesh& generateNormals(bool normalize=true, bool equalWeightPerFace=false);
+
+	/// Generate normals if they do not exist
+	Mesh& ensureNormals(bool equalWeightPerFace=false);
+
+	/// Invert direction of normals
+	Mesh& invertNormals();
+
+	/// Creates a mesh filled with lines for each normal of the source
+
+	/// @param[out] mesh		normal lines
+	/// @param[in]  length		length of normals
+	/// @param[in]  perFace		whether normals line should be generated per
+	///							face rather than per vertex
+	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false) const;
+
+	Mesh& normalsMesh(Mesh& mesh, float length=0.1, bool perFace=false) const {
+		createNormalsMesh(mesh,length,perFace);
+		return mesh;
+	}
+
+	/// Flip the winding order (of triangles)
+	Mesh& flipWinding();
+
+	/// Smooths a triangle mesh
+
+	/// This smooths a triangle mesh using Laplacian (low-pass) filtering.
+	/// New vertex positions are a weighted sum of their nearest neighbors. 
+	/// The number of vertices is not changed.
+	/// @param[in] amount		interpolation fraction between original and smoothed result
+	/// @param[in] weighting	0 = equal weight, 1 = inverse distance weight
+	Mesh& smooth(float amount=1, int weighting=0);
+
+	/// Ribbonize curve
+
+	/// This creates a two-dimensional ribbon from a one-dimensional space curve.
+	/// The result is to be rendered with a triangle strip.
+	/// @param[in] width			Width of ribbon
+	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
+	///								If false, surface faces normal vector of curve.
+	Mesh& ribbonize(float width=0.04, bool faceBinormal=false){
+		return ribbonize(&width, 0, faceBinormal);
+	}
+
+	/// Ribbonize curve
+
+	/// This creates a two-dimensional ribbon from a one-dimensional space curve.
+	/// The result is to be rendered with a triangle strip.
+	/// @param[in] widths			Array specifying width of ribbon at each point along curve
+	/// @param[in] widthsStride		Stride factor of width array
+	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
+	///								If false, surface faces normal vector of curve.
+	Mesh& ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
 
 
 	/// Save mesh to file
