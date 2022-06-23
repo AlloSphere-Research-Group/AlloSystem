@@ -33,14 +33,15 @@ Mesh::Mesh(const Mesh& cpy)
 {}
 
 Mesh& Mesh::reset() {
-	vertices().reset();
-	normals().reset();
-	colors().reset();
-	coloris().reset();
-	texCoord1s().reset();
-	texCoord2s().reset();
-	texCoord3s().reset();
-	indices().reset();
+	mVertices.reset();
+	mNormals.reset();
+	mTangents.reset();
+	mColors.reset();
+	mColoris.reset();
+	mTexCoord1s.reset();
+	mTexCoord2s.reset();
+	mTexCoord3s.reset();
+	mIndices.reset();
 	return *this;
 }
 
@@ -62,73 +63,50 @@ bool Mesh::isTriangles() const { return primitive() == Graphics::TRIANGLES; }
 bool Mesh::isTriangleStrip() const { return primitive() == Graphics::TRIANGLE_STRIP; }
 
 Mesh& Mesh::decompress(){
-	if(indices().size()){ // only makes sense for indexed mesh
+	if(mIndices.size()){ // only makes sense for indexed mesh
 		toTriangles();
-		int Ni = indices().size();
+		int Ni = mIndices.size();
 
-		#define DECOMPRESS(buf, Type)\
-		{\
+		#define DECOMPRESS(buf){\
 			int N = buf.size();\
 			if(N > 1){\
-				std::vector<Type> old(N);\
-				std::copy(&buf[0], (&buf[0]) + N, old.begin());\
+				auto old(buf);\
 				buf.resize(Ni);\
-				for(int i=0; i<Ni; ++i)	buf[i] = old[indices()[i]];\
+				for(int i=0; i<Ni; ++i)	buf[i] = old[mIndices[i]];\
 			}\
 		}
-		DECOMPRESS(vertices(), Vertex)
-		DECOMPRESS(colors(), Color)
-		DECOMPRESS(coloris(), Colori)
-		DECOMPRESS(normals(), Normal)
-		DECOMPRESS(texCoord1s(), TexCoord1)
-		DECOMPRESS(texCoord2s(), TexCoord2)
-		DECOMPRESS(texCoord3s(), TexCoord3)
+		DECOMPRESS(mVertices)
+		DECOMPRESS(mNormals)
+		DECOMPRESS(mTangents)
+		DECOMPRESS(mColors)
+		DECOMPRESS(mColoris)
+		DECOMPRESS(mTexCoord1s)
+		DECOMPRESS(mTexCoord2s)
+		DECOMPRESS(mTexCoord3s)
 		#undef DECOMPRESS
 
-		indices().reset();
+		mIndices.reset();
 	}
 	return *this;
 }
 
-Mesh& Mesh::equalizeBuffers() {
-	const int Nv = vertices().size();
-	const int Nn = normals().size();
-	const int Nc = colors().size();
-	const int Nci= coloris().size();
-	const int Nt1= texCoord1s().size();
-	const int Nt2= texCoord2s().size();
-	const int Nt3= texCoord3s().size();
+template <class T>
+void equalize(Buffer<T>& b, int N){
+	auto M = b.size();
+	if(M){
+		for(int i=M; i<N; ++i) b.append(b[M-1]);
+	}
+}
 
-	if(Nn){
-		for(int i=Nn; i<Nv; ++i){
-			normals().append(normals()[Nn-1]);
-		}
-	}
-	if(Nc){
-		for(int i=Nc; i<Nv; ++i){
-			colors().append(colors()[Nc-1]);
-		}
-	}
-	else if(Nci){
-		for(int i=Nci; i<Nv; ++i){
-			coloris().append(coloris()[Nci-1]);
-		}
-	}
-	if(Nt1){
-		for(int i=Nt1; i<Nv; ++i){
-			texCoord1s().append(texCoord1s()[Nt1-1]);
-		}
-	}
-	if(Nt2){
-		for(int i=Nt2; i<Nv; ++i){
-			texCoord2s().append(texCoord2s()[Nt2-1]);
-		}
-	}
-	if(Nt3){
-		for(int i=Nt3; i<Nv; ++i){
-			texCoord3s().append(texCoord3s()[Nt3-1]);
-		}
-	}
+Mesh& Mesh::equalizeBuffers() {
+	auto Nv = mVertices.size();
+	equalize(mNormals, Nv);
+	equalize(mTangents, Nv);
+	equalize(mColors, Nv);
+	equalize(mColoris, Nv);
+	equalize(mTexCoord1s, Nv);
+	equalize(mTexCoord2s, Nv);
+	equalize(mTexCoord3s, Nv);
 	return *this;
 }
 
@@ -155,26 +133,26 @@ public:
 void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
 
 	auto initMesh = [](Mesh& m, int n){
-		m.vertices().resize(n*2);
+		m.mVertices.resize(n*2);
 		m.reset();
 		m.lines();
 	};
 
 	if(perFace){
 		// compute vertex based normals
-		if(indices().size()){
+		if(mIndices.size()){
 
-			int Ni = indices().size();
+			int Ni = mIndices.size();
 			Ni = Ni - (Ni%3); // must be multiple of 3
 			initMesh(mesh, (Ni/3)*2);
 
 			for(int i=0; i<Ni; i+=3){
-				auto i1 = indices()[i+0];
-				auto i2 = indices()[i+1];
-				auto i3 = indices()[i+2];
-				auto& v1 = vertices()[i1];
-				auto& v2 = vertices()[i2];
-				auto& v3 = vertices()[i3];
+				auto i1 = mIndices[i+0];
+				auto i2 = mIndices[i+1];
+				auto i3 = mIndices[i+2];
+				auto& v1 = mVertices[i1];
+				auto& v2 = mVertices[i2];
+				auto& v3 = mVertices[i3];
 
 				auto mean = (v1 + v2 + v3)/3.f;
 				auto dN = cross(v2-v1, v3-v1).normalize(length);
@@ -186,36 +164,37 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
 			AL_WARN_ONCE("createNormalsMesh only valid for indexed meshes");
 		}
 	} else {
-		int Ni = std::min(vertices().size(), normals().size());
+		int Ni = std::min(mVertices.size(), mNormals.size());
 		initMesh(mesh, Ni*2);
 
 		for(int i=0; i<Ni; ++i){
-			auto& v = vertices()[i];
+			auto& v = mVertices[i];
 			mesh.vertex(v);
-			mesh.vertex(v + normals()[i]*length);
+			mesh.vertex(v + mNormals[i]*length);
 		}
 	}
 }
 
-Mesh& Mesh::compress() {
+Mesh& Mesh::compress(){
 
-	int Ni = indices().size();
-	int Nv = vertices().size();
-	if (Ni) {
+	int Ni = mIndices.size();
+	int Nv = mVertices.size();
+	if(Ni){
 		AL_WARN_ONCE("cannot compress Mesh with indices");
 		return *this;
 	}
-	if (Nv == 0) {
+	if(0 == Nv){
 		AL_WARN_ONCE("cannot compress Mesh with no vertices");
 		return *this;
 	}
 
-	int Nc = colors().size();
-	int Nci = coloris().size();
-	int Nn = normals().size();
-	int Nt1 = texCoord1s().size();
-	int Nt2 = texCoord2s().size();
-	int Nt3 = texCoord3s().size();
+	int Nc = mColors.size();
+	int Nci = mColoris.size();
+	int Nn = mNormals.size();
+	int Nt = mTangents.size();
+	int Nt1 = mTexCoord1s.size();
+	int Nt2 = mTexCoord2s.size();
+	int Nt3 = mTexCoord3s.size();
 
 	// map tree to uniquely ID vertices with same values:
 	typedef std::map<float, int> Zmap;
@@ -228,40 +207,36 @@ Mesh& Mesh::compress() {
 
 	// walk backward through the vertex list
 	// create a ID for each one
-	for (int i=vertices().size()-1; i>=0; i--) {
-		Vertex& v = vertices()[i];
+	for(int i=mVertices.size()-1; i>=0; i--){
+		auto v = mVertices[i];
 		xmap[v.x][v.y][v.z] = i;
 	}
 
 	// map of old vertex index to new vertex index:
-	typedef std::map<int, int> Imap;
-	Imap imap;
+	std::map<int, int> imap;
 
-	// reset current mesh:
 	reset();
 
 	// walk forward, inserting if
-	for (int i=0; i<old.vertices().size(); i++) {
-		Vertex& v = old.vertices()[i];
+	for(int i=0; i<old.mVertices.size(); i++){
+		auto v = old.mVertices[i];
 		int idx = xmap[v.x][v.y][v.z];
-		Imap::iterator it = imap.find(idx);
-		if (it != imap.end()) {
-			// use existing
-			index(it->second);
+		auto it = imap.find(idx);
+		if(it != imap.end()){
+			index(it->second); // use existing
 		} else {
 			// create new
-			int newidx = vertices().size();
+			int newidx = mVertices.size();
 			vertex(v);
-			if (Nc) color(old.colors()[i]);
-			if (Nci) colori(old.coloris()[i]);
-			if (Nn) normal(old.normals()[i]);
-			if (Nt1) texCoord(old.texCoord1s()[i]);
-			if (Nt2) texCoord(old.texCoord2s()[i]);
-			if (Nt3) texCoord(old.texCoord3s()[i]);
-			// store new index:
-			imap[idx] = newidx;
-			// use new index:
-			index(newidx);
+			if(Nc) color(old.mColors[i]);
+			if(Nci) colori(old.mColoris[i]);
+			if(Nn) normal(old.mNormals[i]);
+			if(Nt) tangent(old.mTangents[i]);
+			if(Nt1) texCoord(old.mTexCoord1s[i]);
+			if(Nt2) texCoord(old.mTexCoord2s[i]);
+			if(Nt3) texCoord(old.mTexCoord3s[i]);
+			imap[idx] = newidx; // store new index
+			index(newidx); // use new index
 		}
 	}
 
@@ -286,8 +261,8 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 //
 //	std::map<std::string, int> vertexHash;
 //
-//	int Ni = indices().size();
-//	int Nv = vertices().size();
+//	int Ni = mIndices.size();
+//	int Nv = mVertices.size();
 //	if (Ni) {
 //		for (int i=0; i<Ni;) {
 //			TriFace face(
@@ -326,37 +301,37 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 		return vn;
 	};
 
-	unsigned Nv = vertices().size();
+	unsigned Nv = mVertices.size();
 
 	// need at least one triangle
 	if(Nv < 3) return *this;
 
 	// make same number of normals as vertices
-	normals().resize(Nv);
+	mNormals.resize(Nv);
 
 	// compute vertex based normals
-	if(indices().size()){
+	if(mIndices.size()){
 
-		for(auto& n : normals()) n = 0.;
+		for(auto& n : mNormals) n = 0.;
 
-		unsigned Ni = indices().size();
+		unsigned Ni = mIndices.size();
 
 		if(isTriangles()){
 			Ni = Ni - (Ni%3); // must be multiple of 3
 
 			for(unsigned i=0; i<Ni; i+=3){
-				auto i1 = indices()[i  ];
-				auto i2 = indices()[i+1];
-				auto i3 = indices()[i+2];
+				auto i1 = mIndices[i  ];
+				auto i2 = mIndices[i+1];
+				auto i3 = mIndices[i+2];
 
 				auto vn = calcNormal(
-					vertices()[i1], vertices()[i2], vertices()[i3],
+					mVertices[i1], mVertices[i2], mVertices[i3],
 					equalWeightPerFace
 				);
 
-				normals()[i1] += vn;
-				normals()[i2] += vn;
-				normals()[i3] += vn;
+				mNormals[i1] += vn;
+				mNormals[i2] += vn;
+				mNormals[i3] += vn;
 			}
 		}
 		else if(isTriangleStrip()){
@@ -365,23 +340,23 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 				// Flip every other normal due to change in winding direction
 				auto odd = i & 1;
 
-				auto i1 = indices()[i];
-				auto i2 = indices()[i+1+odd];
-				auto i3 = indices()[i+2-odd];
+				auto i1 = mIndices[i];
+				auto i2 = mIndices[i+1+odd];
+				auto i3 = mIndices[i+2-odd];
 
 				auto vn = calcNormal(
-					vertices()[i1], vertices()[i2], vertices()[i3],
+					mVertices[i1], mVertices[i2], mVertices[i3],
 					equalWeightPerFace
 				);
 
-				normals()[i1] += vn;
-				normals()[i2] += vn;
-				normals()[i3] += vn;
+				mNormals[i1] += vn;
+				mNormals[i2] += vn;
+				mNormals[i3] += vn;
 			}
 		}
 
 		// normalize the normals
-		if(normalize) for(auto& n : normals()) n.normalize();
+		if(normalize) for(auto& n : mNormals) n.normalize();
 	}
 
 	// non-indexed case
@@ -394,22 +369,22 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 				auto i1 = i+0;
 				auto i2 = i+1;
 				auto i3 = i+2;
-				const auto& v1 = vertices()[i1];
-				const auto& v2 = vertices()[i2];
-				const auto& v3 = vertices()[i3];
+				const auto& v1 = mVertices[i1];
+				const auto& v2 = mVertices[i2];
+				const auto& v3 = mVertices[i3];
 
 				auto vn = cross(v2-v1, v3-v1);
 				if(normalize) vn.normalize();
 
-				normals()[i1] = vn;
-				normals()[i2] = vn;
-				normals()[i3] = vn;
+				mNormals[i1] = vn;
+				mNormals[i2] = vn;
+				mNormals[i3] = vn;
 			}
 		}
 		// compute vertex based normals
 		else if(isTriangleStrip()){
 
-			for(auto& n : normals()) n = 0.;
+			for(auto& n : mNormals) n = 0.;
 
 			for(unsigned i=0; i<Nv-2; ++i){
 
@@ -417,17 +392,17 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 				auto odd = i & 1;
 
 				auto vn = calcNormal(
-					vertices()[i], vertices()[i+1+odd], vertices()[i+2-odd],
+					mVertices[i], mVertices[i+1+odd], mVertices[i+2-odd],
 					equalWeightPerFace
 				);
 
-				normals()[i  ] += vn;
-				normals()[i+1] += vn;
-				normals()[i+2] += vn;
+				mNormals[i  ] += vn;
+				mNormals[i+1] += vn;
+				mNormals[i+2] += vn;
 			}
 
 			// normalize the normals
-			if(normalize) for(auto& n : normals()) n.normalize();
+			if(normalize) for(auto& n : mNormals) n.normalize();
 		}
 	}
 
@@ -440,22 +415,24 @@ Mesh& Mesh::ensureNormals(bool equalWeightPerFace){
 }
 
 Mesh& Mesh::invertNormals(){
-	for(auto& v : normals()) v = -v;
+	for(auto& v : mNormals) v = -v;
+	for(auto& v : mTangents) v = -v;
 	return *this;
 }
 
 Mesh& Mesh::repeatLast(){
-	if(indices().size()){
-		index(indices().last());
+	if(mIndices.size()){
+		index(mIndices.last());
 	}
 	else{
-		if(colors().size()) colors().repeatLast();
-		else if(coloris().size()) coloris().repeatLast();
-		if(vertices().size()) vertices().repeatLast();
-		if(normals().size()) normals().repeatLast();
-		if(texCoord2s().size()) texCoord2s().repeatLast();
-		else if(texCoord3s().size()) texCoord3s().repeatLast();
-		else if(texCoord1s().size()) texCoord1s().repeatLast();
+		if(mVertices.size()) mVertices.repeatLast();
+		if(mNormals.size()) mNormals.repeatLast();
+		if(mTangents.size()) mTangents.repeatLast();
+		if(mColors.size()) mColors.repeatLast();
+		else if(mColoris.size()) mColoris.repeatLast();
+		if(mTexCoord2s.size()) mTexCoord2s.repeatLast();
+		else if(mTexCoord3s.size()) mTexCoord3s.repeatLast();
+		else if(mTexCoord1s.size()) mTexCoord1s.repeatLast();
 	}
 	return *this;
 }
@@ -541,13 +518,13 @@ Mesh& Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 Mesh& Mesh::smooth(float amount, int weighting){
 	std::map<int, std::set<int>> nodes;
 
-	int Ni = indices().size();
+	int Ni = mIndices.size();
 
 	// Build adjacency map
 	for(int i=0; i<Ni; i+=3){
-		int i0 = indices()[i  ];
-		int i1 = indices()[i+1];
-		int i2 = indices()[i+2];
+		int i0 = mIndices[i  ];
+		int i1 = mIndices[i+1];
+		int i2 = mIndices[i+2];
 		nodes[i0].insert(i1);
 		nodes[i0].insert(i2);
 		nodes[i1].insert(i2);
@@ -556,7 +533,7 @@ Mesh& Mesh::smooth(float amount, int weighting){
 		nodes[i2].insert(i1);
 	}
 
-	Mesh::Vertices vertsCopy(vertices());
+	auto vertsCopy = mVertices;
 
 	for(const auto& node: nodes){
 		Mesh::Vertex sum(0,0,0);
@@ -584,7 +561,7 @@ Mesh& Mesh::smooth(float amount, int weighting){
 		} break;
 		}
 
-		auto& orig = vertices()[node.first];
+		auto& orig = mVertices[node.first];
 		orig = (sum-orig)*amount + orig;
 	}
 
@@ -606,69 +583,69 @@ Mesh& Mesh::flipWinding(){
 }
 
 
-
 Mesh& Mesh::merge(const Mesh& src){
 	// TODO: only do merge if source and dest are well-formed
 
-	if(src.vertices().empty()) return *this;
+	if(src.mVertices.empty()) return *this;
 
 	// Inherit primitive if no verts yet
-	if(vertices().empty()){
+	if(mVertices.empty()){
 		primitive(src.primitive());
 	}
 
-	const int Nv = vertices().size();
+	const int Nv = mVertices.size();
 
 	// Source has indices, and I either do or don't.
 	// After this block, I will have indices.
-	if(src.indices().size()){
-		Index Ni = indices().size();
+	if(src.mIndices.size()){
+		Index Ni = mIndices.size();
 		// If no indices, must create
 		if(0 == Ni){
 			for(int i=0; i<Nv; ++i) index(i);
 		}
 		// Add source indices offset by my number of vertices
-		index(src.indices().data(), src.indices().size(), (unsigned int)Nv);
+		index(src.mIndices.data(), src.mIndices.size(), (unsigned int)Nv);
 	}
 
 	// Source doesn't have indices, but I do
-	else if(indices().size()){
-		for(int i=Nv; i<Nv+src.vertices().size(); ++i) index(i);
+	else if(mIndices.size()){
+		for(int i=Nv; i<Nv+src.mVertices.size(); ++i) index(i);
 	}
 
 	// From here, everything is indice invariant
-	vertices().append(src.vertices());
-	normals().append(src.normals());
+	mVertices.append(src.mVertices);
+	mNormals.append(src.mNormals);
+	mTangents.append(src.mTangents);
 
 	#define COPY_COL(dcolor)\
 	if(dcolor##s().size() == Nv){\
-		if(src.colors().size() >= src.vertices().size()){\
-			for(auto& c : src.colors()) dcolor(c);\
-		} else if(src.colors().size() > 0){\
-			dcolor##Fill(src.colors()[0]);\
-		} else if(src.coloris().size() >= src.vertices().size()){\
-			for(auto& c : src.coloris()) dcolor(c);\
-		} else if(src.coloris().size() > 0){\
-			dcolor##Fill(src.coloris()[0]);\
+		if(src.mColors.size() >= src.mVertices.size()){\
+			for(auto& c : src.mColors) dcolor(c);\
+		} else if(src.mColors.size() > 0){\
+			dcolor##Fill(src.mColors[0]);\
+		} else if(src.mColoris.size() >= src.mVertices.size()){\
+			for(auto& c : src.mColoris) dcolor(c);\
+		} else if(src.mColoris.size() > 0){\
+			dcolor##Fill(src.mColoris[0]);\
 		}\
 	}
 	COPY_COL(color)
 	else COPY_COL(colori)
 
-	texCoord1s().append(src.texCoord1s());
-	texCoord2s().append(src.texCoord2s());
-	texCoord3s().append(src.texCoord3s());
+	mTexCoord1s.append(src.mTexCoord1s);
+	mTexCoord2s.append(src.mTexCoord2s);
+	mTexCoord3s.append(src.mTexCoord3s);
 
 	return *this;
 }
 
 
 void Mesh::getBounds(Vertex& min, Vertex& max) const {
-	if(vertices().size()){
-		min = vertices()[0];
+	if(mVertices.size()){
+		min = mVertices[0];
 		max = min;
-		for(int v=1; v<vertices().size(); ++v){
-			const Vertex& vt = vertices()[v];
+		for(int v=1; v<mVertices.size(); ++v){
+			const Vertex& vt = mVertices[v];
 			for(int i=0; i<3; ++i){
 				min[i] = std::min(min[i], vt[i]);
 				max[i] = std::max(max[i], vt[i]);
@@ -787,24 +764,25 @@ Mesh& Mesh::toTriangles(){
 
 	if(isTriangleStrip()){
 		primitive(Graphics::TRIANGLES);
-		int Nv = vertices().size();
-		int Ni = indices().size();
+		int Nv = mVertices.size();
+		int Ni = mIndices.size();
 
 		// indexed:
 		if(Ni > 3){
-			stripToTri(indices());
-			removeDegenerates(indices());
+			stripToTri(mIndices);
+			removeDegenerates(mIndices);
 		}
 		// non-indexed:
 		// TODO: remove degenerate triangles
 		else if(Ni == 0 && Nv > 3){
-			stripToTri(vertices());
-			if(normals().size() >= Nv) stripToTri(normals());
-			if(colors().size() >= Nv) stripToTri(colors());
-			if(coloris().size() >= Nv) stripToTri(coloris());
-			if(texCoord1s().size() >= Nv) stripToTri(texCoord1s());
-			if(texCoord2s().size() >= Nv) stripToTri(texCoord2s());
-			if(texCoord3s().size() >= Nv) stripToTri(texCoord3s());
+			stripToTri(mVertices);
+			if(mNormals.size() >= Nv) stripToTri(mNormals);
+			if(mTangents.size() >= Nv) stripToTri(mTangents);
+			if(mColors.size() >= Nv) stripToTri(mColors);
+			if(mColoris.size() >= Nv) stripToTri(mColoris);
+			if(mTexCoord1s.size() >= Nv) stripToTri(mTexCoord1s);
+			if(mTexCoord2s.size() >= Nv) stripToTri(mTexCoord2s);
+			if(mTexCoord3s.size() >= Nv) stripToTri(mTexCoord3s);
 		}
 	}
 
@@ -812,13 +790,13 @@ Mesh& Mesh::toTriangles(){
 }
 
 Mesh& Mesh::colorFill(const Color& v){
-	int N = vertices().size() - colors().size();
+	int N = mVertices.size() - mColors.size();
 	for(int i=0; i<N; ++i) color(v);
 	return *this;
 }
 
 Mesh& Mesh::coloriFill(const Colori& v){
-	int N = vertices().size() - coloris().size();
+	int N = mVertices.size() - mColoris.size();
 	for(int i=0; i<N; ++i) colori(v);
 	return *this;
 }
@@ -877,7 +855,7 @@ bool Mesh::saveFBX(const std::string& filePath, const std::string& solidName) co
 		return false;
 	}
 
-	if(!vertices().size()) return false;
+	if(!mVertices.size()) return false;
 
 	const bool binary = false;
 	std::ofstream fs;
@@ -892,9 +870,9 @@ bool Mesh::saveFBX(const std::string& filePath, const std::string& solidName) co
 	}
 	const auto& m = isTriangleStrip() ? copy : *this;
 
-	const auto Nv = m.vertices().size();
-	const auto Nc = m.colors().size();
-	const auto Nci = m.coloris().size();
+	const auto Nv = m.mVertices.size();
+	const auto Nc = m.mColors.size();
+	const auto Nci = m.mColoris.size();
 
 	fs <<
 R"(; FBX 7.4.0 project file
@@ -944,7 +922,7 @@ Objects: {
 
 	fs << "\t\tVertices: *" << Nv*3 << " {\n";
 	fs << "\t\t\ta: ";
-	for(auto& p : m.vertices()){
+	for(auto& p : m.mVertices){
 		writeFloat(p[0]);
 		writeFloat(p[1]);
 		writeFloat(p[2]);
@@ -952,12 +930,12 @@ Objects: {
 	fs.seekp(-1, std::ios::cur); // erase last comma
 	fs << "\n\t\t}\n";
 
-	if(m.indices().size()){
-		fs << "\t\tPolygonVertexIndex: *" << m.indices().size() << " {\n\t\t\ta: ";
-		for(int i=0; i<m.indices().size(); i+=3){
-			fs << (int)(m.indices()[i  ]) << ',';
-			fs << (int)(m.indices()[i+1]) << ',';
-			fs <<-(int)(m.indices()[i+2]+1) << ','; // negate to close polygon (yes, needs +1!!!)
+	if(m.mIndices.size()){
+		fs << "\t\tPolygonVertexIndex: *" << m.mIndices.size() << " {\n\t\t\ta: ";
+		for(int i=0; i<m.mIndices.size(); i+=3){
+			fs << (int)(m.mIndices[i  ]) << ',';
+			fs << (int)(m.mIndices[i+1]) << ',';
+			fs <<-(int)(m.mIndices[i+2]+1) << ','; // negate to close polygon (yes, needs +1!!!)
 		}
 		fs.seekp(-1, std::ios::cur); // erase last comma
 		fs << "\n\t\t}\n";
@@ -965,8 +943,8 @@ Objects: {
 
 	fs << "\t\tGeometryVersion: 100\n";
 
-	bool hasNormals = m.normals().size()>=Nv;
-	bool hasColors = m.colors().size()>=Nv || m.coloris().size()>=Nv;
+	bool hasNormals = m.mNormals.size()>=Nv;
+	bool hasColors = m.mColors.size()>=Nv || m.mColoris.size()>=Nv;
 
 	if(hasNormals){
 		fs << R"(
@@ -975,8 +953,8 @@ Objects: {
 			Name: ""
 			MappingInformationType: "ByVertice"
 			ReferenceInformationType: "Direct"
-			Normals: *)" << m.normals().size()*3 << " {\n\t\t\t\ta: ";
-		for(auto& n : m.normals()){
+			Normals: *)" << m.mNormals.size()*3 << " {\n\t\t\t\ta: ";
+		for(auto& n : m.mNormals){
 			writeFloat(n[0], 4);
 			writeFloat(n[1], 4);
 			writeFloat(n[2], 4);
@@ -986,17 +964,17 @@ Objects: {
 	}
 
 	if(hasColors){
-		auto Nc = m.colors().size();
-		auto Nci = m.coloris().size();
+		auto Nc = m.mColors.size();
+		auto Nci = m.mColoris.size();
 		fs << R"(
 		LayerElementColor: 0 {
 			Version: 100
 			Name: ""
 			MappingInformationType: "ByVertice"
 			ReferenceInformationType: "Direct"
-			Colors: *)" << (Nc?m.colors().size():m.coloris().size())*4 << " {\n\t\t\t\ta: ";
+			Colors: *)" << (Nc?m.mColors.size():m.mColoris.size())*4 << " {\n\t\t\t\ta: ";
 		for(int i=0; i<Nv; ++i){
-			auto col = Nc ? Color(m.colors()[i]) : Color(m.coloris()[i]);
+			auto col = Nc ? Color(m.mColors[i]) : Color(m.mColoris[i]);
 			writeFloat(col.r, 4);
 			writeFloat(col.g, 4);
 			writeFloat(col.b, 4);
@@ -1047,7 +1025,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		return false;
 	}
 
-	if(!vertices().size()) return false;
+	if(!mVertices.size()) return false;
 
 	std::ofstream s;
 	s.open(filePath, binary ? (std::ios::out | std::ios::binary) : std::ios::out);
@@ -1061,10 +1039,10 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	}
 	const auto& m = isTriangleStrip() ? copy : *this;
 
-	const unsigned Nv = m.vertices().size();
-	const unsigned Nn = m.normals().size();
-	const unsigned Nc = m.colors().size();
-	const unsigned Nci= m.coloris().size();
+	const unsigned Nv = m.mVertices.size();
+	const unsigned Nn = m.mNormals.size();
+	const unsigned Nc = m.mColors.size();
+	const unsigned Nci= m.mColoris.size();
 	const unsigned Ni = m.indices().size();
 	//const unsigned Bi = Nv<=65536 ? 2 : 4; // max bytes/index
 	const unsigned Bi = Nv<=32768 ? 2 : 4; // changed since assimp import not working with full ushort range up to 65536
@@ -1123,15 +1101,15 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	if(binary){
 		// Vertex data
 		for(unsigned i=0; i<Nv; ++i){
-			s.write(reinterpret_cast<const char*>(&m.vertices()[i][0]), sizeof(Mesh::Vertex));
+			s.write(reinterpret_cast<const char*>(&m.mVertices[i][0]), sizeof(Mesh::Vertex));
 			if(hasNormals){
 				for(int k=0; k<3; ++k){
-					short v=m.normals()[i][k]*32767.;
+					short v=m.mNormals[i][k]*32767.;
 					s.write(reinterpret_cast<const char*>(&v), 2);
 				}
 			}
 			if(hasColors){
-				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
+				auto col = Nci >= Nv ? m.mColoris[i] : Colori(m.mColors[i]);
 				s << col.r << col.g << col.b << col.a;
 			}
 		}
@@ -1159,14 +1137,14 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	else {
 		// Vertex data
 		for(unsigned i = 0; i < Nv; ++i){
-			auto vrt = m.vertices()[i];
+			auto vrt = m.mVertices[i];
 			s << vrt.x << " " << vrt.y << " " << vrt.z;
 			if(hasNormals){
-				auto nrm = m.normals()[i];
+				auto nrm = m.mNormals[i];
 				s << " " << nrm.x << " " << nrm.y << " " << nrm.z;
 			}
 			if(hasColors){
-				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
+				auto col = Nci >= Nv ? m.mColoris[i] : Colori(m.mColors[i]);
 				s << " " << int(col.r) << " " << int(col.g) << " " << int(col.b) << " " << int(col.a);
 			}
 			s << "\n";
@@ -1192,7 +1170,7 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 		return false;
 	}
 
-	if(!vertices().size()) return false;
+	if(!mVertices.size()) return false;
 
 	// Create a copy since we must convert to non-indexed triangles
 	Mesh m(*this);
@@ -1211,14 +1189,14 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 	s.flags(std::ios::scientific);
 
 	s << "solid " << solidName << "\n";
-	for(int i=0; i<m.vertices().size(); i+=3){
+	for(int i=0; i<m.mVertices.size(); i+=3){
 		s << "facet normal";
-		for(int j=0; j<3; j++) s << " " << m.normals()[i][j];
+		for(int j=0; j<3; j++) s << " " << m.mNormals[i][j];
 		s << "\n";
 		s << "outer loop\n";
 		for(int j=0; j<3; ++j){
 			s << "vertex";
-			for(int k=0; k<3; k++) s << " " << m.vertices()[i+j][k] - vmin[k];
+			for(int k=0; k<3; k++) s << " " << m.mVertices[i+j][k] - vmin[k];
 			s << "\n";
 		}
 		s << "endloop\n";
@@ -1729,7 +1707,7 @@ bool Mesh::debug(FILE * dst) const {
 	#define DPRINTF(...) if(dst){ fprintf(dst, __VA_ARGS__); }
 
 	bool ok = true;
-	int Nv = vertices().size();
+	int Nv = mVertices.size();
 	if(!Nv){ DPRINTF("No vertices\n"); ok=false; }
 
 	#define CHECK_ARR(arr, oneOkay)\
@@ -1747,18 +1725,18 @@ bool Mesh::debug(FILE * dst) const {
 	CHECK_ARR(mTexCoord3s, false);
 	#undef CHECK_ARR
 
-	if(colors().size() && coloris().size()){
+	if(mColors.size() && mColoris.size()){
 		DPRINTF("More than one color array populated\n");
 		ok=false;
 	}
 
-	if(texCoord1s().size() && texCoord2s().size() && texCoord2s().size()){
+	if(mTexCoord1s.size() && mTexCoord2s.size() && mTexCoord3s.size()){
 		DPRINTF("More than one texture coordinate array populated\n");
 		ok=false;
 	}
 
-	if(indices().size()){
-		for(auto i : indices()){
+	if(mIndices.size()){
+		for(auto i : mIndices){
 			if(i > Nv){
 				DPRINTF("Index out of bounds: %d (%d max)\n", i, Nv);
 				ok=false;

@@ -62,7 +62,9 @@ class Mesh {
 public:
 
 	typedef Vec3f			Vertex;
-	typedef Vec3f			Normal;
+	typedef Vec3f			UnitVector;
+	typedef UnitVector		Normal;
+	typedef UnitVector		Tangent;
 	//typedef Vec4f			Color;
 	typedef float			TexCoord1;
 	typedef Vec2f			TexCoord2;
@@ -73,6 +75,7 @@ public:
 
 	typedef Buffer<Vertex>		Vertices;
 	typedef Buffer<Normal>		Normals;
+	typedef Buffer<Tangent>		Tangents;
 	typedef Buffer<Color>		Colors;
 	typedef Buffer<Colori>		Coloris;
 	typedef Buffer<TexCoord1>	TexCoord1s;
@@ -156,8 +159,9 @@ public:
 	/// Rotate 90 degrees on specified plane
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	Mesh& rotate90(){
-		for(auto& p : vertices()) p.rotate90<Dim1,Dim2>();
-		for(auto& n : normals() ) n.rotate90<Dim1,Dim2>();
+		for(auto& v : vertices()) v.rotate90<Dim1,Dim2>();
+		for(auto& v : normals() ) v.rotate90<Dim1,Dim2>();
+		for(auto& v : tangents()) v.rotate90<Dim1,Dim2>();
 		return *this;
 	}
 
@@ -243,6 +247,7 @@ public:
 	float stroke() const { return mStroke; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
 	const Buffer<Normal>& normals() const { return mNormals; }
+	const Buffer<Tangent>& tangents() const { return mTangents; }
 	const Buffer<Color>& colors() const { return mColors; }
 	const Buffer<Colori>& coloris() const { return mColoris; }
 	const Buffer<TexCoord1>& texCoord1s() const { return mTexCoord1s; }
@@ -364,11 +369,12 @@ public:
 	/// Fill any deficit in colori buffer with a color
 	Mesh& coloriFill(const Colori& v);
 
+
 	/// Append normal to normal buffer
 	Mesh& normal(float x, float y, float z=0){ return normal(Normal(x,y,z)); }
 
 	/// Append normal to normal buffer
-	Mesh& normal(const Normal& v) { normals().append(v); return *this; }
+	Mesh& normal(const Normal& v){ normals().append(v); return *this; }
 
 	/// Append normal to normal buffer
 	template <class T>
@@ -376,8 +382,26 @@ public:
 
 	/// Append normals from flat array
 	template <class T>
-	Mesh& normal(const T * src, int numNormals){
-		for(int i=0; i<numNormals; ++i) normal(src[3*i+0], src[3*i+1], src[3*i+2]);
+	Mesh& normal(const T * src, int len){
+		for(int i=0; i<len; ++i) normal(src[3*i+0], src[3*i+1], src[3*i+2]);
+		return *this;
+	}
+
+
+	/// Append tangent to tangent buffer
+	Mesh& tangent(float x, float y, float z=0){ return tangent(Tangent(x,y,z)); }
+
+	/// Append tangent to tangent buffer
+	Mesh& tangent(const Tangent& v){ mTangents.append(v); return *this; }
+
+	/// Append tangent to tangent buffer
+	template <class T>
+	Mesh& tangent(const Vec<2,T>& v, float z=0){ return tangent(v[0], v[1], z); }
+
+	/// Append tangents from flat array
+	template <class T>
+	Mesh& tangent(const T * src, int len){
+		for(int i=0; i<len; ++i) tangent(src[3*i+0], src[3*i+1], src[3*i+2]);
 		return *this;
 	}
 
@@ -435,6 +459,7 @@ public:
 
 	Vertices& vertices(){ return mVertices; }
 	Normals& normals(){ return mNormals; }
+	Tangents& tangents(){ return mTangents; }
 	Colors& colors(){ return mColors; }
 	Coloris& coloris(){ return mColoris; }
 	TexCoord1s& texCoord1s(){ return mTexCoord1s; }
@@ -512,6 +537,7 @@ protected:
 	// Only populated (size>0) buffers will be used
 	Vertices mVertices;
 	Normals mNormals;
+	Tangents mTangents;
 	Colors mColors;
 	Coloris mColoris;
 	TexCoord1s mTexCoord1s;
@@ -533,13 +559,23 @@ Mesh& Mesh::transform(const Mat<4,T>& m, int begin, int end){
 	for(int i=begin; i<end; ++i){
 		vertices()[i] = m * Vec<4,T>(vertices()[i], T(1));
 	}
-	if(normals().size() >= vertices().size()){
-		auto nmat = normalMatrix(m);
-		for(int i=begin; i<end; ++i){
-			normals()[i] = nmat * normals()[i];
-			normals()[i].normalize(); // since xfm may have scaling
-		}
-	}
+
+	Mat3f nmat(MAT_NO_INIT);
+	bool nmatInvalid = true;
+
+	auto xfmOriVec = [&](Buffer<UnitVector>& buf){
+		if(buf.size() >= mVertices.size()){
+			if(nmatInvalid){ nmat = normalMatrix(m); nmatInvalid=false; }
+			for(int i=begin; i<end; ++i){
+				buf[i] = nmat * buf[i];
+				buf[i].normalize(); // since xfm may have scaling
+			}
+		}	
+	};
+
+	xfmOriVec(mNormals);
+	xfmOriVec(mTangents);
+
 	return *this;
 }
 
