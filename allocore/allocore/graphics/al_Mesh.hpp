@@ -153,6 +153,14 @@ public:
 	template <class T>
 	Mesh& translate(const T& v){ return translate(v,v,v); }
 
+	/// Rotate 90 degrees on specified plane
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	Mesh& rotate90(){
+		for(auto& p : vertices()) p.rotate90<Dim1,Dim2>();
+		for(auto& n : normals() ) n.rotate90<Dim1,Dim2>();
+		return *this;
+	}
+
 	/// Transform vertices by projective transform matrix
 
 	/// @param[in] m		projective transform matrix
