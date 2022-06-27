@@ -16,8 +16,7 @@ public:
 	Vec3f pos;
 
 	MyApp(){
-		addSphere(shape);
-		shape.scale(0.2);
+		addDisc(shape, 0.2);
 		nav().pullBack(4);
 		initWindow();
 	}
