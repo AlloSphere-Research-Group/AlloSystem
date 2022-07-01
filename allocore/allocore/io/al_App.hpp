@@ -205,7 +205,7 @@ public:
 	/// @param[in] inputChannels	Number of input channels to open or -1 for all
 	void initAudio(
 		double sampleRate=44100, int blockSize=128,
-		int outputChannels=-1, int inputChannels=-1
+		int outputChannels=2, int inputChannels=0
 	);
 
 
