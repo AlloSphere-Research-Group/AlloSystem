@@ -25,7 +25,8 @@ Vec transform(
 
 /*static*/ uint8_t Colori::toi(float v){
 	//return uint8_t(v*255.f);
-	if(v>=1.f) return 255;
+	constexpr float maxVal = 255./256.;
+	if(v > maxVal) return 255;
 	union{ float f; uint32_t i; } u{v+1.f};
 	return uint8_t((u.i & 0x007fffff) >> 15);
 }
