@@ -126,6 +126,11 @@ public:
 		);
 	}
 
+	template <class V>
+	Mat(const Vec<2,V>& c1, const Vec<2,V>& c2){
+		set(c1, c2);
+	}
+
 	/// 3x3 matrix constructor with element initialization
 	Mat(
 		const T& r1c1, const T& r1c2, const T& r1c3,
@@ -136,6 +141,11 @@ public:
 			r2c1, r2c2, r2c3,
 			r3c1, r3c2, r3c3
 		);
+	}
+
+	template <class V>
+	Mat(const Vec<3,V>& c1, const Vec<3,V>& c2, const Vec<3,V>& c3){
+		set(c1, c2, c3);
 	}
 
 	/// 4x4 matrix constructor with element initialization
@@ -152,6 +162,10 @@ public:
 		);
 	}
 
+	template <class V>
+	Mat(const Vec<4,V>& c1, const Vec<4,V>& c2, const Vec<4,V>& c3, const Vec<4,V>& c4){
+		set(c1, c2, c3, c4);
+	}
 
 
 	//--------------------------------------------------------------------------
@@ -525,6 +539,25 @@ public:
 		setCol4(r1c2, r2c2, r3c2, r4c2, col+1,row);
 		setCol4(r1c3, r2c3, r3c3, r4c3, col+2,row);
 		setCol4(r1c4, r2c4, r3c4, r4c4, col+3,row); return *this;
+	}
+
+	/// Set from column vectors
+	template <class V>
+	Mat& set(const Vec<2,V>& c1, const Vec<2,V>& c2){
+		col<0>()=c1; col<1>()=c2;
+		return *this;
+	}
+	/// Set from column vectors
+	template <class V>
+	Mat& set(const Vec<3,V>& c1, const Vec<3,V>& c2, const Vec<3,V>& c3){
+		col<0>()=c1; col<1>()=c2; col<2>()=c3;
+		return *this;
+	}
+	/// Set from column vectors
+	template <class V>
+	Mat& set(const Vec<4,V>& c1, const Vec<4,V>& c2, const Vec<4,V>& c3, const Vec<4,V>& c4){
+		col<0>()=c1; col<1>()=c2; col<2>()=c3; col<3>()=c4;
+		return *this;
 	}
 
 	/// Set a (sub)column
