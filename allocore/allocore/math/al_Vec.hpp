@@ -849,6 +849,10 @@ inline Vec<N,T> pow(const T& base, const Vec<N,T>& powers){
 template <int N, class T>
 inline Vec<N,int> roundi(const Vec<N,T>& v){ return v + v.sgn(T(0.5)); }
 
+/// Returns sum of elements
+template <int N, class T>
+inline T sum(const Vec<N,T>& v){ return v.sum(); }
+
 /// Sets r to cross product, a x b
 template <class T>
 inline void cross(Vec<3,T>& r, const Vec<3,T>& a, const Vec<3,T>& b){
