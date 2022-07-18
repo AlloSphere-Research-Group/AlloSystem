@@ -107,6 +107,7 @@ public:
 	bool isPoints() const;
 	bool isLines() const;
 	bool isLineStrip() const;
+	bool isLineLoop() const;
 	bool isTriangles() const;
 	bool isTriangleStrip() const;
 

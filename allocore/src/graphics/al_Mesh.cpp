@@ -59,6 +59,7 @@ Mesh& Mesh::triangleStrip(){ return primitive(Graphics::TRIANGLE_STRIP); }
 bool Mesh::isPoints() const { return primitive() == Graphics::POINTS; }
 bool Mesh::isLines() const { return primitive() == Graphics::LINES; }
 bool Mesh::isLineStrip() const { return primitive() == Graphics::LINE_STRIP; }
+bool Mesh::isLineLoop() const { return primitive() == Graphics::LINE_LOOP; }
 bool Mesh::isTriangles() const { return primitive() == Graphics::TRIANGLES; }
 bool Mesh::isTriangleStrip() const { return primitive() == Graphics::TRIANGLE_STRIP; }
 
@@ -847,6 +848,12 @@ Mesh& Mesh::forEachFace(const std::function<void(int v1, int v2, int v3)>& onFac
 			for(int i=1; i<mIndices.size(); i+=2){
 				onFace(mIndices[i-1], mIndices[i], mIndices[i-1]);
 			}
+		} else if(isLineStrip() || isLineLoop()){
+			for(int i=1; i<mIndices.size(); i++){
+				onFace(mIndices[i-1], mIndices[i], mIndices[i-1]);
+			}
+			if(isLineLoop())
+				onFace(mIndices.last(), mIndices[0], mIndices.last());
 		} else if(isPoints()){
 			for(int i=0; i<mIndices.size(); i++){
 				onFace(mIndices[i], mIndices[i], mIndices[i]);
@@ -866,6 +873,12 @@ Mesh& Mesh::forEachFace(const std::function<void(int v1, int v2, int v3)>& onFac
 			for(int i=1; i<mVertices.size(); i+=2){
 				onFace(i-1, i, i-1);
 			}
+		} else if(isLineStrip() || isLineLoop()){
+			for(int i=1; i<mVertices.size(); i++){
+				onFace(i-1, i, i-1);
+			}
+			if(isLineLoop())
+				onFace(mVertices.size()-1, 0, mVertices.size()-1);
 		} else if(isPoints()){
 			for(int i=0; i<mVertices.size(); i++){
 				onFace(i, i, i);
