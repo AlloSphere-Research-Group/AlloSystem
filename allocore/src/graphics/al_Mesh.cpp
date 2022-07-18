@@ -1251,6 +1251,110 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 	return true;
 }
 
+bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
+	if(!isLines() && !isLineStrip() && !isLineLoop() && !isPoints()) return false;
+
+	std::ofstream fs;
+	fs.open(filePath);
+	if(fs.fail()) return false;
+
+	int w = opt.width(), h = opt.height();
+
+	fs << "<?xml version=\"1.0\"?>\n";
+	//fs << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 " << w << " " << h << "\">\n";
+	fs << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"" << -w/2 << " " << -h/2 << " " << w << " " << h << "\">\n";
+	if(opt.title().size()) fs << "<title>" << opt.title() << "</title>\n";
+	if(opt.desc().size() ) fs << "<desc>\n" << opt.desc() << "\n</desc>\n";
+
+	auto toHexString = [](float v01){
+		auto clamp = [](float v){ return v<0.f ? 0.f : (v>1.f ? 1.f : v); };
+		unsigned char vbyte = clamp(v01)*255.f + 0.5f;
+		char hex[2];
+		for(int i=0; i<2; ++i)
+			hex[i] = "0123456789ABCDEF"[(vbyte>>((1-i)*4))&0xF];
+		return std::string(hex,2);
+	};
+	auto rgbToHexString = [&toHexString](float rgb[3]){
+		return "#" + toHexString(rgb[0]) + toHexString(rgb[1]) + toHexString(rgb[2]);
+	};
+
+	// SVG typically has transparent background, but this is how we can color it:
+	//fs << "<rect x=\"-50%\" y=\"-50%\" width=\"100%\" height=\"100%\" fill=\"#ff8888\"/>\n";
+
+	RGB col(0);
+
+	if(colors().size()) col = colors()[0].rgb();
+	else if(coloris().size()) col = coloris()[0];
+
+	std::string style = "style=\"fill:none";
+	style += ";stroke-width:" + std::to_string(int(stroke()+0.5));
+	style += ";stroke:" + rgbToHexString(col.components);
+	style += ";stroke-linecap:round";
+	style += ";stroke-linejoin:round";
+	style += "\" ";
+
+	// (0,0) is left-top (y is flipped) in SVG
+	std::string xfm = "transform=\"";
+	xfm += "scale(1,-1)";
+	/* Probably right thing to do, but affects stroke-width
+	xfm += "scale(" + al::toString(w/2) + "," + al::toString(-h/2) + ")";
+	//*/
+	xfm += "\" ";
+
+	// projection plane
+	const int e1 = 0;
+	const int e2 = 1;
+
+	Vec3f mn, mx;
+	getBounds(mn,mx);
+	float vmul = w * 0.5 * opt.scale()/(max(mn.absVec(), mx.absVec()).get(e1,e2).max());
+
+	auto encodePos = [&](Vec3f pos){
+		auto xy = pos.get(e1,e2) * vmul;
+		for(auto& v : xy){
+			auto a = std::abs(v);
+			if(a < 1e-10) v = 0.;
+		}
+		return xy;
+	};
+
+	// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands
+	fs << "<path " << style << xfm << "d=\"";	
+	
+	if(isLines()){
+		Vec2f prevPos{1e38}; // to detect line strips
+		forEachFace([&](int i1, int i2, int i3){
+			auto v1 = encodePos(mVertices[i1]);
+			auto v2 = encodePos(mVertices[i2]);
+			if(v1 != prevPos){
+				fs << "M" << v1.x << "," << v1.y << " ";
+			}
+			fs << "L" << v2.x << "," << v2.y << " ";
+			prevPos = v2;
+		});
+	} else if(isLineStrip() || isLineLoop()){
+		forEachFace([&](int i1, int i2, int i3){
+			if(0==i1){
+				auto v1 = encodePos(mVertices[i1]);
+				fs << "M" << v1.x << "," << v1.y << " ";
+			}
+			auto v2 = encodePos(mVertices[i2]);
+			fs << "L" << v2.x << "," << v2.y << " ";
+		});
+	} else if(isPoints()){
+		forEachFace([&](int i1, int i2, int i3){
+			auto v1 = encodePos(mVertices[i1]);
+			fs << "M" << v1.x << "," << v1.y << " ";
+			fs << "h0 "; // dup; points are degenerate lines
+		});
+	}
+
+	fs << "\"/>\n"; // end path
+	fs << "</svg>";
+
+	return true;
+}
+
 std::string extension(const std::string& path){
 	std::string ext;
 	auto pos = path.find_last_of('.');
@@ -1266,6 +1370,7 @@ bool Mesh::save(const std::string& filePath, const std::string& solidName, bool 
 	if("fbx" == ext)		return saveFBX(filePath, solidName);
 	else if("ply" == ext)	return savePLY(filePath, solidName, binary);
 	else if("stl" == ext)	return saveSTL(filePath, solidName);
+	else if("svg" == ext)	return saveSVG(filePath, SVGOptions().title(solidName));
 	return false;
 }
 

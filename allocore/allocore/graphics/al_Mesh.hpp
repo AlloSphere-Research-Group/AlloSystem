@@ -53,6 +53,21 @@
 
 namespace al{
 
+// Ideally in Mesh, but some trickery here that doesn't work with nested classes
+struct SVGOptions{
+	#define AL_SVG_PROPERTY(T, name, ...)\
+	protected: T m_##name{__VA_ARGS__};\
+	public: auto name(const T& v) -> decltype(*this)& { m_##name = v; return *this; }\
+	public: const T& name() const { return m_##name; }\
+	public: T& name(){ return m_##name; }
+	AL_SVG_PROPERTY(std::string, title);
+	AL_SVG_PROPERTY(std::string, desc);
+	AL_SVG_PROPERTY(int, width, 400);
+	AL_SVG_PROPERTY(int, height, 400);
+	AL_SVG_PROPERTY(float, scale, 0.95);
+	#undef AL_SVG_PROPERTY
+};
+
 /// Stores buffers related to rendering graphical objects
 
 /// A mesh is a collection of buffers storing vertices, colors, indices, etc.
@@ -505,6 +520,16 @@ public:
 	/// @param[in] solidName	solid name defined within the file (optional)
 	/// \returns true on successful save, otherwise false
 	bool saveSTL(const std::string& filePath, const std::string& solidName = "") const;
+
+	/// Save mesh to SVG file
+
+	/// This implementation supports only line and point primitives. Since SVG
+	/// is a 2D format, only the XY projection is written out.
+	///
+	/// @param[in] filePath		path of file to save to
+	/// @param[in] opt			options specific to SVG
+	/// \returns true on successful save, otherwise false
+	bool saveSVG(const std::string& filePath, const SVGOptions& opt = {}) const;
 
 
 	/// Load mesh data from 3D object file
