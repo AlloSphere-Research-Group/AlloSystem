@@ -15,9 +15,6 @@ struct HIDSetup{
 
 class HID::Impl{
 public:
-	Impl()
-	:	mHandle(NULL), mTimeout(0)
-	{}
 
 	~Impl(){
 		close();
@@ -55,7 +52,10 @@ public:
 	}
 
 	void close(){
-		if(opened()) hid_close(mHandle);
+		if(opened()){
+			hid_close(mHandle);
+			mHandle = nullptr;
+		}
 	}
 
 	void timeout(int msec){
@@ -76,7 +76,7 @@ public:
 	}
 
 	bool opened() const {
-		return NULL != mHandle; }
+		return nullptr != mHandle; }
 
 	#define RETURN_STRING(hid_func)\
 		if(opened()){\
@@ -150,8 +150,8 @@ public:
 	}
 
 private:
-	hid_device * mHandle;
-	int mTimeout;
+	hid_device * mHandle = nullptr;
+	int mTimeout = 0;
 };
 
 
