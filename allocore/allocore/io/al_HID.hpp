@@ -97,7 +97,7 @@ public:
 
 	/// Read an input report from the HID device
 
-	/// The first byte will contain the Report number if the device uses
+	/// The first byte will contain the report number if the device uses
 	/// numbered reports.
 	///
 	/// @param[in] data		A buffer to put the read data into.
@@ -106,6 +106,26 @@ public:
 	///						for the report number.
 	/// \returns the actual number of bytes read and -1 on error.
 	int read(unsigned char * data, size_t length);
+
+	/// Read all input reports in queue
+
+	/// @param[in] onReport	Function called for each report.
+	///						Signature is void(unsigned char *).
+	/// \returns the actual number of bytes read and -1 on error.
+	template <unsigned Nbuf, class OnReport>
+	int readAll(OnReport onReport){
+		unsigned char buf[Nbuf];
+		int bytesRead = 0;
+		int num;
+		while((num = read(buf, sizeof(buf))) > 0){
+			onReport(buf);
+			bytesRead += num;
+		}
+		return num>=0 ? bytesRead : -1;
+	}
+
+	template <class OnReport>
+	int readAll(OnReport onReport){ return readAll<64>(onReport); }
 
 
 	/// Get whether the device has been opened
