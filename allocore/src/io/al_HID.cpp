@@ -52,10 +52,8 @@ public:
 	}
 
 	void close(){
-		if(opened()){
-			hid_close(mHandle);
-			mHandle = nullptr;
-		}
+		hid_close(mHandle);
+		mHandle = nullptr;
 	}
 
 	void timeout(int msec){
@@ -116,8 +114,8 @@ public:
 		struct hid_device_info * begin = hid_enumerate(vID, pID);
 		struct hid_device_info * dev = begin;
 
-		if(NULL != begin){
-			while(NULL != dev){
+		if(begin){
+			while(dev){
 				print(*dev);
 				printf("\n");
 				dev = dev->next;
@@ -133,12 +131,13 @@ public:
 		struct hid_device_info * begin = hid_enumerate(0, 0);
 		struct hid_device_info * dev = begin;
 
-		if(NULL != begin){
-			while(NULL != dev){
+		if(begin){
+			while(dev){
 				if(NULL != ::wcsstr(dev->product_string, searchTerm)){
 					info.vendorID = dev->vendor_id;
 					info.productID = dev->product_id;
 					info.serialNumber = dev->serial_number;
+					//printf("Found v:%#.4x p:%#.4x\n", info.vendorID, info.productID);
 					break;
 				}
 				dev = dev->next;
@@ -171,7 +170,9 @@ bool HID::open(const char * path){
 }
 
 void HID::close(){
-	mImpl->close();
+	if(opened()){
+		mImpl->close();
+	}
 }
 
 void HID::timeout(int msec){
