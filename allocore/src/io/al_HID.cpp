@@ -156,13 +156,7 @@ private:
 
 
 
-HID::HID()
-:	mImpl(new Impl)
-{}
-
-HID::~HID(){
-	delete mImpl;
-}
+HID::HID(){}
 
 bool HID::open(unsigned short vid, unsigned short pid, const wchar_t *ser){
 	return mImpl->open(vid, pid, ser);

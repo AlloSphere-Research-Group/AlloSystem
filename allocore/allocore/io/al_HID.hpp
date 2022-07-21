@@ -44,6 +44,7 @@
 
 #include <wchar.h>
 #include <string>
+#include "allocore/system/al_Pimpl.hpp"
 
 namespace al{
 
@@ -60,7 +61,6 @@ public:
 	};
 
 	HID();
-	~HID();
 
 	/// Open a HID device
 
@@ -129,7 +129,7 @@ public:
 
 private:
 	class Impl;
-	Impl * mImpl;
+	Pimpl<Impl> mImpl;
 };
 
 } // al::
