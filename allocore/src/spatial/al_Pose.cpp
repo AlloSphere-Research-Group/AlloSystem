@@ -7,10 +7,6 @@ Pose::Pose(const Vec3d& v, const Quatd& q)
 :	mVec(v), mQuat(q)
 {}
 
-Pose::Pose(const Pose& p){
-	set(p);
-}
-
 void Pose::faceToward(const Vec3d& point, double amt){
 
 	auto target = (point - pos()).normalize();
@@ -177,24 +173,26 @@ Nav& Nav::view(const Quatd& v) {
 	return *this;
 }
 
-Nav& Nav::set(const Pose& v){
-	Pose::set(v);
+Nav& Nav::operator=(const Pose& v){
+	Pose::operator=(v);
 	updateDirectionVectors();
 	return *this;
 }
 
-Nav& Nav::set(const Nav& v){
-	Pose::set(v);
-	mMove0 = v.mMove0;
-	mMove1 = v.mMove1;
-	mSpin0 = v.mSpin0;
-	mSpin1 = v.mSpin1;
-	mTurn = v.mTurn;
-	mUR = v.mUR;
-	mUU = v.mUU;
-	mUF = v.mUF;
-	mSmooth = v.mSmooth;
-	updateDirectionVectors();
+Nav& Nav::operator=(const Nav& v){
+	if(&v != this){
+		Pose::operator=(v);
+		mMove0 = v.mMove0;
+		mMove1 = v.mMove1;
+		mSpin0 = v.mSpin0;
+		mSpin1 = v.mSpin1;
+		mTurn = v.mTurn;
+		mUR = v.mUR;
+		mUU = v.mUU;
+		mUF = v.mUF;
+		mSmooth = v.mSmooth;
+		updateDirectionVectors();
+	}
 	return *this;
 }
 

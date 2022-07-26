@@ -104,7 +104,7 @@ class AudioSceneObject{
 public:
 
 	/// Set current pose
-	void pose(const Pose& p) { mPose.set(p); }
+	void pose(const Pose& p) { mPose = p; }
 	Pose& pose(){ return mPose; }
 
 	/// Set position

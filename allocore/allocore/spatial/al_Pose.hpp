@@ -65,9 +65,6 @@ public:
 	/// @param[in] ori		Initial orientation
 	Pose(const Vec3d& pos=Vec3d(0), const Quatd& ori=Quatd::identity());
 
-	/// Copy constructor
-	Pose(const Pose& p);
-
 
 	/// Get identity
 	static Pose identity(){ return Pose().setIdentity(); }
@@ -159,6 +156,9 @@ public:
 	/// Get forward unit vector (negative of Z)
 	Vec3d uf() const { return -uz(); }
 
+	// Overloaded cast operators
+	operator Vec3d() const { return mVec; }
+	operator Quatd() const { return mQuat; }
 
 	/// Get a linear-interpolated Pose between this and another
 	// (useful ingredient for smooth animations, estimations, etc.)
@@ -166,13 +166,6 @@ public:
 
 
 	// Setters
-
-	/// Copy all attributes from another Pose
-	Pose& set(Pose& src){
-		mVec = src.pos(); mQuat = src.quat(); return *this; }
-
-	/// Set state from another Pose
-	Pose& set(const Pose& v){ mVec=v.vec(); mQuat=v.quat(); return *this; }
 
 	/// Set to identity transform
 	Pose& setIdentity(){ mQuat.setIdentity(); mVec = 0; return *this; }
@@ -191,11 +184,6 @@ public:
 	/// Set quaternion component
 	template <class T>
 	Pose& quat(const Quat<T>& v){ mQuat = v; return *this; }
-
-
-	// Overloaded cast operators
-	operator Vec3d() { return mVec; }
-	operator Quatd() { return mQuat; }
 
 
 	/// Print to standard output
@@ -233,14 +221,14 @@ public:
 
 	// set the target to smoothly interpolate to:
 	Pose& target() { return mTarget; }
-	void target(const Pose& v) { mTarget.set(v); }
+	void target(const Pose& v) { mTarget = v; }
 	void target(const Vec3d& v) { mTarget.pos() = v; }
 	void target(const Quatd& v) { mTarget.quat() = v; }
 
 	// set immediately (without smoothing):
 	void jump(Pose& p) {
 		target(p);
-		set(p);
+		*this = p;
 	}
 	void jump(Vec3d& v) {
 		target(v);
@@ -321,10 +309,10 @@ public:
 	/// Set linear velocity along right vector
 	void moveR(double v){ mMove0[0] = v; }
 
-	/// Set linear velocity long up vector
+	/// Set linear velocity along up vector
 	void moveU(double v){ mMove0[1] = v; }
 
-	/// Set linear velocity long forward vector
+	/// Set linear velocity along forward vector
 	void moveF(double v){ mMove0[2] = v; }
 
 	Vec3d& move(){ return mMove0; }
@@ -387,9 +375,9 @@ public:
 		directionVectors(mUR, mUU, mUF);
 	}
 
-	Nav& set(const Pose& v);
+	Nav& operator=(const Pose& v);
 
-	Nav& set(const Nav& v);
+	Nav& operator=(const Nav& v);
 
 	/// Accumulate pose based on velocity
 	void step(double dt=1);
