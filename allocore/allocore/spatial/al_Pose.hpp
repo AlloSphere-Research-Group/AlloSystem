@@ -326,6 +326,7 @@ public:
 	void nudgeU(double amount){ mNudge[1] += amount; }
 	void nudgeF(double amount){ mNudge[2] += amount; }
 
+	Vec3d& nudge(){ return mNudge; }
 
 	/// Set angular velocity from azimuth, elevation, and bank differentials, in radians
 	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
@@ -361,6 +362,8 @@ public:
 
 	/// Turn by a single increment, in radians, around the forward vector (bank)
 	void turnF(double v){ mTurn[2] = v; }
+
+	Vec3d& turn(){ return mTurn; }
 
 
 	/// Stop moving and spinning
