@@ -191,6 +191,10 @@ Nav& Nav::operator=(const Nav& v){
 		mUU = v.mUU;
 		mUF = v.mUF;
 		mSmooth = v.mSmooth;
+		mVelScale = v.mVelScale;
+		mPullBack0 = v.mPullBack0;
+		mPullBack1 = v.mPullBack1;
+		mTransformed = v.mTransformed;
 		updateDirectionVectors();
 	}
 	return *this;
