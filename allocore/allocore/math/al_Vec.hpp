@@ -653,6 +653,16 @@ public:
 		return (*this) - projection(u);
 	}
 
+	/// Returns whether point is inside sphere
+	template <int Rnum=1, int Rden=1>
+	bool insideSphere(){
+		static_assert(Rden != 0, "Divide by zero");
+		static constexpr T R = T(Rnum)/Rden;
+		static constexpr T Rsqr = R*R;
+		return magSqr() < Rsqr;
+	}
+
+
 	/// Reflect vector around a unit vector
 	Vec& reflect(const Vec& u){
 		return (*this) -= ((T(2) * dot(u)) * u);
