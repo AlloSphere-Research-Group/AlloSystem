@@ -24,7 +24,8 @@ int main(){
 	// to more distinct echoes.
 	reverb.diffusion(0.76, 0.666, 0.707, 0.571);
 
-	AudioIO audioIO(256, 44100, [&](AudioIOData& io){
+	AudioIO audioIO;
+	audioIO.configure([&](AudioIOData& io){
 		while(io()){
 			float dry = io.in(0);
 
@@ -36,7 +37,7 @@ int main(){
 			io.out(0) = wet1*0.2;
 			io.out(1) = wet2*0.2;
 		}
-	}, nullptr, 2,1);
+	}, 256, 44100, 2,1);
 
 	audioIO.start();
 

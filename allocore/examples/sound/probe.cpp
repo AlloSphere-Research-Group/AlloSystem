@@ -31,41 +31,37 @@ void unmute() {
 	for (int i=0; i<channels; i++) gains[i] = 1.f;
 }
 
-void audioCB(AudioIOData& io){
-	double sr = io.fps();
-	if (!started) {
-		printf("callback started\n");
-		started = true;
-	}
 
-	while(io()){
-		float t1 = 1.f - std::fmod(count / sr, 1.);	// time in seconds
-		for (int i=0; i<channels; i++) {
-			float t2 = std::fmod(t1 * (i+1), 1.);
-			io.out(i) = rng.uniformS() * gains[i] * amp * t2 * t1;
-		}
-		count++;
-	}
-}
+int main(){
 
+	AudioIO aio;
 
-int main (int argc, char * argv[]){
+	aio.printDevices();
 
-	AudioDevice::printAll();
-
-	const AudioDevice& dev = AudioDevice::defaultOutput();
-	channels = dev.channelsOutMax();
-
+	const auto& dev = aio.defaultDeviceOut();
+	channels = dev.channelsOut;
 	gains.resize(channels);
 	unmute();
 	dev.print();
 
+	aio.configure([&](AudioIOData& io){
+		double sr = io.fps();
+		if (!started) {
+			printf("callback started\n");
+			started = true;
+		}
 
-	AudioIO audioIO;
-	audioIO.deviceIn(AudioDevice::defaultInput());
-	audioIO.deviceOut(AudioDevice::defaultOutput());
-	audioIO.callback = audioCB;
-	audioIO.start();
+		while(io()){
+			float t1 = 1.f - std::fmod(count / sr, 1.);	// time in seconds
+			for (int i=0; i<channels; i++) {
+				float t2 = std::fmod(t1 * (i+1), 1.);
+				io.out(i) = rng.uniformS() * gains[i] * amp * t2 * t1;
+			}
+			count++;
+		}
+	}, 512, 44100, -1, 0);
+
+	aio.start();
 
 	printf("\nPress + and - (and return) to adjust volume\nPress a number (and return) to solo the channel\nPress 'space' (and return) to hear all channels\nPress 'q' (and return) to quit...\n");
 	while (true) {
