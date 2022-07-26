@@ -40,7 +40,9 @@ public:
 
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
-			float m = 1-al::clip(x*x + y*y);
+			auto m = x*x + y*y;
+			if(m > 1.) m = 1.;
+			m = 1.-m;
 			pix[j*Nx + i] = m; // spherical looking
 			//pix[j*Nx + i] = m*m; // Gaussian-like
 			//pix[j*Nx + i] = pow(2, 1.-1./m); // bright bump
