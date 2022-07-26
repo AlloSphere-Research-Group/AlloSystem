@@ -661,9 +661,9 @@ public:
 
 	Mat& rotate(double cosAngle, double sinAngle, int dim1, int dim2){
 		for(int R=0; R<N-1; ++R){
-			const T& v1 = (*this)(R, dim1);
-			const T& v2 = (*this)(R, dim2);
-			T t = v1*cosAngle + v2*sinAngle;
+			auto& v1 = (*this)(R, dim1);
+			auto& v2 = (*this)(R, dim2);
+			T t= v1*cosAngle + v2*sinAngle;
 			v2 = v2*cosAngle - v1*sinAngle;
 			v1 = t;
 		}
@@ -701,9 +701,9 @@ public:
 		double cs = cos(angle);
 		double sn = sin(angle);
 		for(int C=0; C<M; ++C){
-			T& v1 = (*this)(dim1, C);
-			T& v2 = (*this)(dim2, C);
-			T t = v1*cs - v2*sn;
+			auto& v1 = (*this)(dim1, C);
+			auto& v2 = (*this)(dim2, C);
+			T t= v1*cs - v2*sn;
 			v2 = v2*cs + v1*sn;
 			v1 = t;
 		}
