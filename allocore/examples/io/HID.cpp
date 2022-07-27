@@ -21,8 +21,9 @@ int main(){
 	HID hid;
 
 	//int vid=0x046d, pid=0xc06c; // Logitech, USB Optical Mouse
-	int vid=0x046d, pid=0xc218; // Logitech, Logitech RumblePad 2 USB
+	//int vid=0x046d, pid=0xc218; // Logitech, Logitech RumblePad 2 USB
 	//int vid=0x045e, pid=0x0040; // Microsoft 3-Button Mouse with IntelliEye(TM)
+	int vid=0x046d, pid=0xc626; // 3DConnexion SpaceNavigator
 
 	//* Attempt to open HID with given vendor and product IDs
 	if(!hid.open(vid, pid)){
@@ -36,9 +37,11 @@ int main(){
 		return -1;
 	}//*/
 
+	printf("Opened HID device:\n");
 	printf("Manufacturer:  %ls\n", hid.manufacturer().c_str());
 	printf("Product:       %ls\n", hid.product().c_str());
 	printf("Serial number: %ls\n", hid.serialNumber().c_str());
+	fflush(stdout);
 
 	// Create a do-wait loop to read data from the HID
 	unsigned char buf[256];
