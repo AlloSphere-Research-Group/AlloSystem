@@ -239,7 +239,7 @@ public:
 
 	/// Repeat last element
 	void repeatLast(){ append(last()); }
-
+	template <int N> void repeatLast(){ for(int i=0;i<N;++i) append(last()); }
 
 	/// Insert new elements after each existing element
 
