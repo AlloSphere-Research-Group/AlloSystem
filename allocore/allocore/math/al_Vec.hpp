@@ -466,6 +466,7 @@ public:
 	Vec operator / (const Vec& v) const { return dup() /= v; }
 	Vec operator / (const   T& v) const { return dup() /= v; }
 	Vec operator - () const { return dup().negate(); }
+	Vec operator + () const { return *this; }
 	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
 	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
 
