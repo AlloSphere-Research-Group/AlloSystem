@@ -1014,6 +1014,13 @@ inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Ve
 	n.normalize();
 }
 
+/// Get surface normal given 2D gradient (useful for terrain rendering)
+template <class T>
+inline Vec<3,T> gradToNormal(const Vec<2,T>& g){
+	// result is normalized (-g.x, -g.y, 1)
+	return g.template take<3>(T(-1)).normalized(T(-1));
+}
+
 /// Returns element with minimum value
 template <int N, class T>
 inline const T& min(const Vec<N,T>& v){
