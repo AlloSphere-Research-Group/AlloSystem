@@ -728,11 +728,17 @@ struct RGB{
 	/// Set value of color in HSV space (leaving hue and saturation unchanged)
 	RGB& value(float v);
 
+	/// Get color with specified brightness
+	RGB shade(float v) const { return RGB(*this).value(v); }
+
 	/// Get saturation of color in HSV space
 	float saturation() const;
 
 	/// Set saturation of color in HSV space (leaving hue and value unchanged)
 	RGB& saturation(float s);
+
+	/// Get color with specified saturation
+	RGB tint(float v) const { return RGB(*this).saturation(v); }
 };
 
 
