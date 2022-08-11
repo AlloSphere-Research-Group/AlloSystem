@@ -748,6 +748,7 @@ template Mesh& Mesh::transform<double>(const Mat<4,double>&, int, int);
 
 
 bool Mesh::valid() const { return mVertices.size(); }
+bool Mesh::empty() const { return 0==mVertices.size(); }
 
 // removes triplets with two matching values
 template <class T>

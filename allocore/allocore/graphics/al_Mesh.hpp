@@ -330,6 +330,9 @@ public:
 	/// Returns whether mesh has valid data for rendering
 	bool valid() const;
 
+	/// Returns whether mesh is empty (has no vertex positions)
+	bool empty() const;
+
 	/// Repeat last vertex element(s)
 	Mesh& repeatLast();
 
