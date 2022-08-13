@@ -725,10 +725,13 @@ struct RGB{
 	float& min(){ return r<g ? (r<b?r:b) : (g<b?g:b); }
 	float min() const { return const_cast<RGB*>(this)->min(); }
 
+	/// Get value of color in HSV space
+	float value() const { return max(); }
+
 	/// Set value of color in HSV space (leaving hue and saturation unchanged)
 	RGB& value(float v);
 
-	/// Get color with specified brightness
+	/// Get color with specified brightness (value in HSV space)
 	RGB shade(float v) const { return RGB(*this).value(v); }
 
 	/// Get saturation of color in HSV space
