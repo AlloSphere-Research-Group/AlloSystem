@@ -663,6 +663,9 @@ public:
 		return magSqr() < Rsqr;
 	}
 
+	/// Returns whether point is outside sphere
+	template <int Rnum=1, int Rden=1>
+	bool outsideSphere(){ return !insideSphere(); }
 
 	/// Reflect vector around a unit vector
 	Vec& reflect(const Vec& u){
