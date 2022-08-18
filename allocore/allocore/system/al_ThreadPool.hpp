@@ -42,6 +42,7 @@
 	Lance Putnam, 2021
 */
 
+#include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
@@ -70,14 +71,28 @@ public:
 	/// Joins all threads
 	~ThreadPool();
 
+
+	/// Get number of threads in pool
+	int size() const;
+
 	/// Push a new task onto the queue; execution begins immediately
-	void push(Task task);
+	ThreadPool& push(Task task);
+
+	/// Runs function in parallel for a specified count; a parallel for loop
+	ThreadPool& pushRange(int count, std::function<void(int i)> func);
+
+	/// Returns how many tasks are currently executing; does not block
+	unsigned busy();
+
+	/// Block until all task are finished
+	void wait();
 
 private:
 	std::vector<std::thread> mThreads;
 	std::queue<Task> mTasks;
 	std::condition_variable mCondition;
 	std::mutex mTasksMutex;
+	std::atomic<unsigned> mBusy{0};
 	bool mTerminate = false;
 };
 

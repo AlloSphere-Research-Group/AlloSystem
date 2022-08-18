@@ -13,11 +13,11 @@ ThreadPool::ThreadPool(int numThreads){
 	for(int i=0; i<numThreads; ++i){
 		mThreads.emplace_back([this](){
 			while(true){
-				std::function<void(void)> task;
+				Task task;
 				{
 					std::unique_lock<std::mutex> lock(mTasksMutex);
+					// block until something in queue or terminate called
 					mCondition.wait(lock, [this](){
-						// block until something in queue or terminate called
 						return !mTasks.empty() || mTerminate;
 					});
 					if(mTerminate && mTasks.empty()) return; // exit condition
@@ -25,6 +25,7 @@ ThreadPool::ThreadPool(int numThreads){
 					mTasks.pop();
 				}
 				task();
+				--mBusy;
 			}
 		});
 	}
@@ -40,10 +41,38 @@ ThreadPool::~ThreadPool(){
 	for(auto& t : mThreads) t.join();	// join all threads
 }
 
-void ThreadPool::push(Task task){
+int ThreadPool::size() const {
+	return mThreads.size();
+}
+
+ThreadPool& ThreadPool::push(Task task){
+	++mBusy; // tally execution immediately
 	{
 		std::unique_lock<std::mutex> lock(mTasksMutex);
 		mTasks.push(task);
 	}
 	mCondition.notify_one();
+	return *this;
+}
+
+ThreadPool& ThreadPool::pushRange(int count, std::function<void(int)> func){
+	int numTasks = size();
+	double di = double(count)/numTasks;
+	for(int j=0; j<numTasks; ++j){
+		int beg =  j   *di;
+		int end = (j+1)*di;
+		//printf("[%d, %d)\n", beg, end);
+		push([beg,end,func](){
+			for(int i=beg; i<end; ++i) func(i);
+		});
+	}
+	return *this;
+}
+
+unsigned ThreadPool::busy(){
+	return mBusy;
+}
+
+void ThreadPool::wait(){
+	while(busy()){}
 }
