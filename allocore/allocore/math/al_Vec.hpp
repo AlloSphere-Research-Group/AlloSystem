@@ -665,7 +665,7 @@ public:
 
 	/// Returns whether point is outside sphere
 	template <int Rnum=1, int Rden=1>
-	bool outsideSphere(){ return !insideSphere(); }
+	bool outsideSphere(){ return !insideSphere<Rnum,Rden>(); }
 
 	/// Reflect vector around a unit vector
 	Vec& reflect(const Vec& u){
