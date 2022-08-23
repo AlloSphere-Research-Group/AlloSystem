@@ -717,6 +717,22 @@ public:
 		return rotate90(Dim1,Dim2);
 	}
 
+	/// Rotate vector 180 degrees on a global plane
+
+	/// @param[in] dim1		dimension to rotate from
+	/// @param[in] dim2		dimension to rotate towards
+	Vec& rotate180(int dim1, int dim2){
+		(*this)[dim1] = -(*this)[dim1];
+		(*this)[dim2] = -(*this)[dim2];
+		return *this;
+	}
+
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	Vec& rotate180(){
+		static_assert_dims<Dim1,Dim2>();
+		return rotate180(Dim1,Dim2);
+	}
+
 
 	//--------------------------------------------------------------------------
 	// Analysis
