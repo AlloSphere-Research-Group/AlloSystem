@@ -906,10 +906,10 @@ bool invert(Mat<2,T>& m){
 
 template <class T>
 bool invert(Mat<3,T>& m){
-	auto nx = cross(m.col(1), m.col(2));
-	auto ny = cross(m.col(2), m.col(0));
-	auto nz = cross(m.col(0), m.col(1));
-	auto det= m(0,0)*nx.x + m(1,0)*ny.x + m(2,0)*nz.x;
+	auto nx = cross(m.template col<1>(), m.template col<2>());
+	auto ny = cross(m.template col<2>(), m.template col<0>());
+	auto nz = cross(m.template col<0>(), m.template col<1>());
+	auto det= m.template at<0,0>()*nx.x + m.template at<1,0>()*ny.x + m.template at<2,0>()*nz.x;
 	if(det != T(0)){
 		m.set(
 			nx.x, nx.y, nx.z,
@@ -932,7 +932,7 @@ void invertRigid(Mat<N,T>& m){
 	// Compute inverse translation T^-1
 	T it[N-1];
 	for(int i=0; i<N-1; ++i)
-		it[i] = -(m.col(i).dot(m.col(N-1)));
+		it[i] = -(m.col(i).dot(m.template col<N-1>()));
 
 	for(int r=0; r<N-1; ++r)
 		m(r,N-1) = it[r];
