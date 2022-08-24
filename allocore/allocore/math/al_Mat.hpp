@@ -308,9 +308,7 @@ public:
 
 	template <int Row, int Col>
 	const T& at() const {
-		static_assert(Row<N && Col<N, "Row or column out of bounds");
-		constexpr auto idx = Col*N+Row;
-		return mElems[idx];
+		return const_cast<Mat*>(this)->at<Row,Col>();
 	}
 
 	/// Return column i as vector
@@ -318,15 +316,15 @@ public:
 	Vec<N,T>& col(int i){ return Vec<N,T>::pun(elems() + i*N); }
 
 	template <unsigned Index>
-	const Vec<N,T>& col() const {
+	Vec<N,T>& col(){
 		static_assert(Index < N, "Column index out of bounds");
-		return col(Index);
+		constexpr auto j = Index*N;
+		return Vec<N,T>::pun(elems() + j);
 	}
 
 	template <unsigned Index>
-	Vec<N,T>& col(){
-		static_assert(Index < N, "Column index out of bounds");
-		return col(Index);
+	const Vec<N,T>& col() const {
+		return const_cast<Mat*>(this)->col<Index>();
 	}
 
 	/// Return row i as vector
