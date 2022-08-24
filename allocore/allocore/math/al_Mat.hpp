@@ -447,7 +447,7 @@ public:
 		return r;
 	}
 
-	/// Transform a point by this matrix treated as a homogenous transform
+	/// Transform a point by this matrix treated as a homogeneous transform
 	template <class U>
 	Vec<N-1,U> transformPoint(const Vec<N-1,U>& v) const {
 		Vec<N-1,U> r;
@@ -458,7 +458,7 @@ public:
 		return r;
 	}
 
-	/// Transform a vector by this matrix treated as a homogenous transform
+	/// Transform a vector by this matrix treated as a homogeneous transform
 	template <class U>
 	Vec<N-1,U> transformVector(const Vec<N-1,U>& v) const {
 		Vec<N-1,U> r;
