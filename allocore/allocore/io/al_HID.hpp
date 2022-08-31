@@ -130,6 +130,7 @@ public:
 
 	/// Get whether the device has been opened
 	bool opened() const;
+	operator bool() const { return opened(); }
 
 	/// Get manufacturer string
 	std::wstring manufacturer() const;
