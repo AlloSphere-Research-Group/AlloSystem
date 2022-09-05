@@ -249,8 +249,7 @@ public:
 	/// Get element at index with compile-time bounds checking
 	template <int i>
 	const T& at() const {
-		static_assert(0<=i && i<N, "Index out of bounds");
-		return (*this)[i];
+		return const_cast<Vec*>(this)->at<i>();
 	}
 
 	Vec& operator = (const T& v){ IT(N) (*this)[i] = v; return *this; }
