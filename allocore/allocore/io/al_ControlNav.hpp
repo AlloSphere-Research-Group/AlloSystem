@@ -48,9 +48,10 @@
 
 namespace al {
 
+/// @addtogroup allocore
+/// @{
+
 /// Mapping from keyboard and mouse controls to a Nav object
-///
-/// @ingroup allocore
 class NavInputControl : public InputEventHandler {
 public:
 	NavInputControl(const NavInputControl& v);
@@ -97,6 +98,8 @@ public:
 	virtual bool onKeyUp(const Keyboard& k) override;
 	virtual bool onMouseDrag(const Mouse& m) override;
 };
+
+/// @} // end allocore group
 
 } // al::
 

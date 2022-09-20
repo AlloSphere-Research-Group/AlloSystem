@@ -49,9 +49,10 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
 /// A network socket
-///
-/// @ingroup allocore
 class Socket{
 public:
 
@@ -181,8 +182,6 @@ private:
 /// A client socket connects to a remote address to which it sends data to
 /// (e.g., a request to a server) and possibly receives data from
 /// (e.g., a response from a server).
-///
-/// @ingroup allocore
 class SocketClient : public Socket {
 public:
 
@@ -211,8 +210,6 @@ protected:
 /// A server socket typically waits and listens for incoming socket connections.
 /// After accepting an incoming connection, data is received and possibly sent
 /// through the accepted socket.
-///
-/// @ingroup allocore
 class SocketServer : public Socket {
 public:
 
@@ -242,6 +239,7 @@ typedef SocketClient SocketSend;
 /// \deprecated Use SocketServer
 typedef SocketServer SocketRecv;
 
+/// @} // end allocore group
 
 } // al::
 

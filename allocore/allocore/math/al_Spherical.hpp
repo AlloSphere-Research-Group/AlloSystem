@@ -51,6 +51,9 @@ namespace al{
 
 template <class T> class SphereCoord;
 
+/// @addtogroup allocore
+/// @{
+
 typedef SphereCoord<float> SphereCoordf;	///< float SphereCoord
 typedef SphereCoord<double> SphereCoordd;	///< double SphereCoord
 
@@ -92,8 +95,6 @@ Vec<N-1,T> sterProj(const Vec<N,T>& v);
 /// The first component, theta, is the angle on the x-y plane and the second
 /// component, phi, is the angle from the +z axis. The magnitude of theta
 /// should always be 1, while the magnitude of phi is the radius.
-///
-/// @ingroup allocore
 template <class T>
 class SphereCoord {
 public:
@@ -159,8 +160,6 @@ public:
 /// ball"-like (sectoral) and when m = 0, the harmonics are "target"-like
 /// (zonal). Other values of m produce a checkerboard pattern (tesseral).
 /// Th Condon-Shortley phase factor of (-1)^m is included.
-///
-/// @ingroup allocore
 template <int L_MAX=16>
 class SphericalHarmonic{
 public:
@@ -228,9 +227,10 @@ private:
 static SphericalHarmonic<> spharm;
 
 
+/// @} // end allocore group
+
 
 // Implementation
-//------------------------------------------------------------------------------
 
 template <class T>
 void sphericalToCart(T& r, T& t, T& p){
@@ -261,8 +261,5 @@ inline Vec<N-1,T> sterProj(const Vec<N,T>& v){
 	return sub<N-1>(v) * (T(1)/v[N-1]);
 }
 
-
-
 } // ::al
-
 #endif

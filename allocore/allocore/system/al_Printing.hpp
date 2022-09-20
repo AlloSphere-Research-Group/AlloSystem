@@ -47,6 +47,9 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
 /// Returns an ASCII character with intensity most closely matching a value in [0,1)
 char intensityToASCII(float v);
 
@@ -107,6 +110,7 @@ void _warnOnce(const char * fileName, int lineNumber, const char * fmt, ...);
 /// Enable/disable echoing stdin
 void stdinEcho(bool enable);
 
+/// @} // end allocore group
 
 // Implementation --------------------------------------------------------------
 
@@ -151,6 +155,4 @@ template<class T> void print2D(const T* pix, int nx, int ny, FILE * fp){
 }
 
 } // al::
-
 #endif
-

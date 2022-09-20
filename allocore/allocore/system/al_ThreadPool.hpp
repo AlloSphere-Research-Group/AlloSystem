@@ -52,6 +52,9 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
 /// A pool of threads for running concurrent tasks
 
 /// Creating a thread can be more expensive than the task it executes.
@@ -96,5 +99,7 @@ private:
 	bool mTerminate = false;
 };
 
-} // namespace
+/// @} // end allocore group
+
+} // al::
 #endif

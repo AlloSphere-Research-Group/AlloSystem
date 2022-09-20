@@ -46,6 +46,11 @@
 #include <string>
 #include <cstring> // memcpy
 
+namespace al{
+
+/// @addtogroup allocore
+/// @{
+
 /**
  * @brief The CSVReader class reads simple CSV files
  *
@@ -55,13 +60,13 @@
  * is used as a decimal separator, semicolon, TAB, or other characters are used 
  * instead. [Reference: https://en.wikipedia.org/wiki/Comma-separated_values].
  *
- * To use, first create a CSVReader object and call addType() to add the type of a
- * column. Then call readFile().
+ * To use, first create a CSVReader object and call addType() to add the type of
+ * a column. Then call readFile().
  *
  * Once the file is in memory it can be read as columns of floats using
  * getColumn(). Or the whole CSV data can be copied to memory by defining
- * a struct that will hold the values from each row from the csv file and calling
- * copyToStruct() to create a vector with the data from the CSV file.
+ * a struct that will hold the values from each row from the csv file and 
+ * calling copyToStruct() to create a vector with the data from the CSV file.
  *
  * This reader is currently very naive (but efficient) and might choke with
  * complex or malformed CSV files.
@@ -191,6 +196,7 @@ private:
 	char mDelim = ',';
 };
 
+/// @} // end allocore group
 
 template <class T>
 std::vector<T> CSVReader::getColumn(int index) const {
@@ -230,4 +236,6 @@ inline std::vector<std::string> CSVReader::getColumn<std::string>(int index) con
 	return out;
 }
 
-#endif // INCLUDE_AL_CSVREADER_HPP
+} //al::
+
+#endif // include guard

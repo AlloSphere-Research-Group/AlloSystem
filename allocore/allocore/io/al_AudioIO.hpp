@@ -47,6 +47,9 @@
 
 namespace al {
 
+/// @addtogroup allocore
+/// @{
+
 /// Buffer of multi-channel audio samples
 class AudioBlock {
 public:
@@ -256,6 +259,8 @@ private:
 	bool mZeroNANs = true;		// whether to zero NANs
 	bool mClipOut = true;		// whether to clip output between -1 and 1
 };
+
+/// @} // end allocore group
 
 }  // al::
 

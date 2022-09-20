@@ -47,13 +47,14 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
 /// Buffer
 
 /// This buffer automatically expands itself as new elements are added.
 /// Additionally, its logical size can be reduced without triggering memory
 /// deallocations.
-///
-/// @ingroup allocore
 template <class T>
 class Buffer{
 public:
@@ -307,8 +308,6 @@ private:
 
 /// This buffer allows potentially large amounts of data to be buffered without
 /// moving memory. This is accomplished by use of a moving write tap.
-///
-/// @ingroup allocore
 template <class T>
 class RingBuffer {
 public:
@@ -463,8 +462,6 @@ protected:
 /// Adding new elements to the buffer physically moves existing elements. The
 /// advantage of moving memory like this is that elements stay logically ordered
 /// making access faster and operating on the history easier.
-///
-/// @ingroup allocore
 template <int N, class T>
 class ShiftBuffer{
 public:
@@ -507,8 +504,7 @@ protected:
 	T mElems[N];
 };
 
-
+/// @} // end allocore group
 
 } // al::
-
 #endif

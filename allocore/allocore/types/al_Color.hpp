@@ -1166,7 +1166,6 @@ struct HCLuv{
 /// @} // end allocore group
 
 
-
 // Implementation --------------------------------------------------------------
 
 inline RGB operator + (float s, const RGB& c){ return  c+s; }

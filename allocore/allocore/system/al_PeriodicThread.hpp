@@ -48,6 +48,9 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
 /// Thread that calls a function periodically
 
 /// The sleep time is dynamically adjusted based on the time taken by the
@@ -55,8 +58,6 @@ namespace al{
 /// more simplistic implementation using a fixed sleep interval.
 ///
 /// Upon destruction, the thread loop will be stopped and, by default, joined.
-///
-/// @ingroup allocore
 class PeriodicThread : public Thread{
 public:
 
@@ -110,6 +111,7 @@ private:
 	bool mRun;
 };
 
-} // al::
+/// @} // end allocore group
 
+} // al::
 #endif

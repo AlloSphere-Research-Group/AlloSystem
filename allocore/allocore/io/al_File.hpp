@@ -67,10 +67,10 @@ namespace al{
 
 class FilePath;
 
+/// @addtogroup allocore
+/// @{
 
 /// File information
-///
-/// @ingroup allocore
 class FileInfo{
 public:
 
@@ -114,8 +114,6 @@ private:
 
 /// Used to retrieve data from and store data to disk.
 /// The term 'path' means a file or directory.
-///
-/// @ingroup allocore
 class File{
 public:
 
@@ -318,8 +316,6 @@ protected:
 
 
 /// Filesystem directory
-///
-/// @ingroup allocore
 class Dir{
 public:
 
@@ -422,8 +418,6 @@ private:
 
 
 /// A pair of path (folder/directory) and file name
-///
-/// @ingroup allocore
 class FilePath {
 public:
 	FilePath(){}
@@ -464,8 +458,6 @@ protected:
 
 
 /// Keeps a list of files
-///
-/// @ingroup allocore
 class FileList {
 public:
 	typedef std::vector<FilePath>::iterator iterator;
@@ -501,8 +493,6 @@ protected:
 
 
 /// A handy way to manage several possible search paths
-///
-/// @ingroup allocore
 class SearchPaths {
 public:
 	typedef std::pair<std::string, bool> SearchPath;
@@ -542,6 +532,8 @@ protected:
 	std::list<SearchPath> mSearchPaths;
 	std::string mAppPath;
 };
+
+/// @} // end allocore group
 
 } // al::
 

@@ -48,6 +48,10 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
+/// Read and extract contents of zip archive
 class ZipReader {
 public:
 
@@ -84,6 +88,7 @@ private:
 };
 
 
+/// Write contents to zip archive
 class ZipWriter {
 public:
 
@@ -120,6 +125,8 @@ private:
 
 	int mCompression = -1;
 };
+
+/// @} // end allocore group
 
 } // al::
 #endif

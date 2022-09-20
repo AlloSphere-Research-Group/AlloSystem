@@ -51,12 +51,13 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
 /// Open Sound Control (OSC) utilities
 namespace osc{
 
 /// User-defined data
-///
-/// @ingroup allocore
 struct Blob{
     Blob(){}
     explicit Blob(const void* data_, unsigned long size_)
@@ -78,8 +79,6 @@ typedef unsigned long long TimeTag;
 
 
 /// Outbound OSC packet
-///
-/// @ingroup allocore
 class Packet{
 public:
 
@@ -180,8 +179,6 @@ protected:
 
 
 /// Inbound OSC message
-///
-/// @ingroup allocore
 class Message{
 public:
 
@@ -231,8 +228,6 @@ protected:
 
 
 /// Interface for classes that can be registered as handlers with a osc::Recv server object
-///
-/// @ingroup allocore
 class PacketHandler{
 public:
 
@@ -254,8 +249,6 @@ public:
 /// When you write a class that inherits from PacketHandler, you might want to add a
 /// method to register MessageConsumer objects. This allows writing classes that can consume
 /// OSC messages with a set OSC prefix and that can notify if they have consumed the message
-///
-/// @ingroup allocore
 class MessageConsumer {
 public:
 	virtual ~MessageConsumer() {}
@@ -266,8 +259,6 @@ public:
 
 
 /// Socket for sending OSC packets
-///
-/// @ingroup allocore
 class Send : public SocketClient, public Packet{
 public:
 	Send(){}
@@ -336,9 +327,8 @@ public:
 
 /// Socket for receiving OSC packets
 
-/// Supports explicit polling or implicit background thread polling
+/// Supports explicit polling or implicit background thread polling.
 ///
-/// @ingroup allocore
 class Recv : public SocketServer{
 public:
 	Recv();
@@ -383,9 +373,9 @@ protected:
 	bool mBackground;
 };
 
+/// @} // end allocore group
 
 } // osc::
 } // al::
 
 #endif
-

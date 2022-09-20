@@ -53,6 +53,9 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
 /// Sleep for an interval of seconds
 inline void wait(al_sec dt){ al_sleep(dt); }
 
@@ -114,8 +117,6 @@ struct Timestamp{
 
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
-///
-/// @ingroup allocore
 class Timer {
 public:
 	Timer(bool setStartTime=true){
@@ -214,8 +215,6 @@ private:
 ///	A curve mapping logical to real time can be drawn over an event period
 ///		by interpolating between t0 and t1
 ///	@see http://kokkinizita.linuxaudio.org/papers/usingdll.pdf
-///
-/// @ingroup allocore
 class DelayLockedLoop {
 public:
 
@@ -269,8 +268,6 @@ protected:
 
 
 /// A timing source that can be locked to realtime or driven manually
-///
-/// @ingroup allocore
 class Clock {
 public:
 
@@ -341,6 +338,7 @@ protected:
 	bool bUseRT;
 };
 
-} // al::
+/// @} // end allocore group
 
-#endif /* INCLUDE_AL_TIME_CPP_H */
+} // al::
+#endif

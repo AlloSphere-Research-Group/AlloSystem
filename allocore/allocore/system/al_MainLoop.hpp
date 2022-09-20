@@ -48,12 +48,13 @@
 
 namespace al {
 
+/// @addtogroup allocore
+/// @{
+
 /// Encapsulates a program's main run loop
 
 /// A run loop is used for programs that need to persist and execute actions
 /// at a periodic interval.
-///
-/// @ingroup allocore
 class Main {
 public:
 
@@ -170,6 +171,8 @@ private:
 	bool mInited[NUM_DRIVERS];
 };
 
+/// @} // end allocore group
+
 // deprecated; for backwards compatibility only
 namespace MainLoop {
 	inline Main& get() { return Main::get(); }
@@ -188,4 +191,4 @@ namespace MainLoop {
 
 } // al::
 
-#endif /* include guard */
+#endif

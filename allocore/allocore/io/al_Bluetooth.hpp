@@ -50,6 +50,9 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
+
 /// Bluetooth connection
 class Bluetooth{
 public:
@@ -150,8 +153,9 @@ private:
 };
 
 
-
 inline int Bluetooth::channel() const { return mChannel; }
+
+/// @} // end allocore group
 
 } // al::
 

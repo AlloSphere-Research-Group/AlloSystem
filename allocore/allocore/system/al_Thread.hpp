@@ -48,10 +48,10 @@
 
 namespace al{
 
+/// @addtogroup allocore
+/// @{
 
 /// Thread
-///
-/// @ingroup allocore
 class Thread{
 public:
 
@@ -113,8 +113,6 @@ protected:
 
 
 /// Multiple threads acting as a single work unit
-///
-/// @ingroup allocore
 template <class ThreadFunction>
 class Threads{
 public:
@@ -211,7 +209,7 @@ protected:
 	void clear(){ if(mWorkers) delete[] mWorkers; }
 };
 
+/// @} // end allocore group
+
 } // al::
-
 #endif
-

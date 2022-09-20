@@ -38,6 +38,9 @@
 
 namespace al {
 
+/// @addtogroup allocore
+/// @{
+
 /// Pimpl (Pointer to implementation) helper class
 
 /// Based on
@@ -72,6 +75,7 @@ private:
 	}
 };
 
-} //al::
+/// @} // end allocore group
 
+} //al::
 #endif
