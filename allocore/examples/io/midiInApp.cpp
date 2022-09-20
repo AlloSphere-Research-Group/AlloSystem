@@ -37,7 +37,7 @@ public:
 	}
 
 	// This gets called whenever a MIDI message is received on the port
-	void onMIDIMessage(const MIDIMessage& m){
+	void onMIDIMessage(const MIDIMessage& m) override {
 
 		printf("%s: ", MIDIByte::messageTypeString(m.status()));
 
