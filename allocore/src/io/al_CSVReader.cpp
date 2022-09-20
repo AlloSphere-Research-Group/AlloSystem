@@ -6,6 +6,7 @@
 #include <cstdint> // int32_t
 #include "allocore/io/al_CSVReader.hpp"
 
+using namespace al;
 
 class Tokenizer{
 public:
