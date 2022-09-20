@@ -197,6 +197,9 @@ public:
 	virtual void onMIDIMessage(const MIDIMessage& m) = 0;
 
 	/// Bind handler to a MIDI input
+
+	/// Calling this will override the callback function of the MIDIIn.
+	///
 	void bindTo(MIDIIn& midiIn, unsigned port=0);
 
 protected:

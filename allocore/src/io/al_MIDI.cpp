@@ -104,10 +104,13 @@ void MIDIMessage::print() const{
 }
 
 void MIDIMessageHandler::bindTo(MIDIIn& midiIn, unsigned port){
-	struct F{
-	static void callback(double t, std::vector<unsigned char> * msgPtr, void *user){
-		Binding& b = *static_cast<Binding *>(user);
-		std::vector<unsigned char>& m = *msgPtr;
+
+	Binding b = { &midiIn, this, port };
+	mBindings.push_back(b);
+
+	midiIn.setCallback([](double t, std::vector<unsigned char> * msgPtr, void *user){
+		auto& b = *static_cast<Binding *>(user);
+		auto& m = *msgPtr;
 
 		switch(m.size()){
 		case 3:
@@ -123,13 +126,7 @@ void MIDIMessageHandler::bindTo(MIDIIn& midiIn, unsigned port){
 		default: // sysex
 			b.handler->onMIDIMessage(MIDIMessage(t, b.port, m[0], m[1], m[2], &m[3]));
 		}
-	}
-	};
-
-	Binding b = { &midiIn, this, port };
-	mBindings.push_back(b);
-
-	midiIn.setCallback(F::callback, &mBindings.back());
+	}, &mBindings.back());
 }
 
 
