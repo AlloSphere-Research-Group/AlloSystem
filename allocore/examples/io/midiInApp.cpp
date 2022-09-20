@@ -22,12 +22,13 @@ public:
 	MyApp(){
 		// Check for connected MIDI devices
 		if(midiIn.getPortCount() > 0){
+			//int port = midiIn.getPortCount()-1; // last port
+			int port = 0; // first port
 
 			// Bind ourself to the MIDIIn
-			MIDIMessageHandler::bindTo(midiIn);
+			MIDIMessageHandler::bindTo(midiIn, port);
 
-			// Open the last device found
-			int port = midiIn.getPortCount()-1;
+			// Open specified port
 			midiIn.openPort(port);
 			printf("Opened port to %s\n", midiIn.getPortName(port).c_str());
 		}
@@ -84,6 +85,8 @@ public:
 			printf("%3u ", (int)m.bytes[i]);
 		}
 		printf(", time = %g\n", m.timeStamp());
+
+		fflush(stdout);
 	}
 };
 
