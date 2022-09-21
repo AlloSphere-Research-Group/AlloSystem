@@ -237,9 +237,9 @@ void subdivide(Mesh& m, unsigned iterations, bool normalize){
 				}
 				else{
 					middlePointIndexCache.insert(std::make_pair(key, newIndex));
-					Mesh::Vertex v1 = m.vertices()[i1];
-					Mesh::Vertex v2 = m.vertices()[i2];
-					Mesh::Vertex vm;
+					auto v1 = m.vertices()[i1];
+					auto v2 = m.vertices()[i2];
+					decltype(v1) vm;
 					if(normalize){
 						vm = v1 + v2;
 						//vm.normalize();
@@ -704,11 +704,11 @@ int addTorus(
 	);
 
 	for(int i=beg; i<beg+Nv; ++i){
-		Mesh::Vertex& v = m.vertices()[i];
-		v = Mesh::Vertex(
-			(majRadius + minRadius*::cos(v.y)) * ::cos(v.x),
-			(majRadius + minRadius*::cos(v.y)) * ::sin(v.x),
-			minRadius*::sin(v.y)
+		auto& p = m.vertices()[i];
+		p = Mesh::Vertex(
+			(majRadius + minRadius*::cos(p.y)) * ::cos(p.x),
+			(majRadius + minRadius*::cos(p.y)) * ::sin(p.x),
+			minRadius*::sin(p.y)
 		);
 	}
 
