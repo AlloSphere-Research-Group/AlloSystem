@@ -342,6 +342,24 @@ int addSurfaceLoop(
 );
 
 
+/// Add a tessellated rectangular surface as indexed lines
+
+/// Like addSurface, except grid cells are drawn as outlines.
+///
+/// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		Nx		Number of vertices along x
+/// @param[in]		Ny		Number of vertices along y
+/// @param[in]		width	Total width (along x)
+/// @param[in]		height	Total height (along y)
+/// @param[in]		x		Position of center along x
+/// @param[in]		y		Position of center along y
+/// \returns number of vertices added
+int addWireSurface(
+	Mesh& m, int Nx, int Ny,
+	double width=2, double height=2, double x=0, double y=0
+);
+
+
 /// Add a torus as an indexed triangle strip
 
 /// If you need a texture-mapped torus, /see addSurface.

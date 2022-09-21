@@ -677,6 +677,23 @@ int addSurfaceLoop(
 }
 
 
+int addWireSurface(
+	Mesh& m, int Nx, int Ny,
+	double width, double height, double x, double y
+){
+	m.lines();
+	double mx=width /(Nx-1), ax=-0.5*width +x;
+	double my=height/(Ny-1), ay=-0.5*height+y;
+	for(int j=0; j<Ny; ++j){ float gy = j*my+ay;
+	for(int i=0; i<Nx; ++i){ float gx = i*mx+ax;
+		if(i<=(Nx-2)) m.indexRel(0, 1);
+		if(j<=(Ny-2)) m.indexRel(0, Nx);
+		m.vertex(gx,gy);
+	}}
+	return Nx*Ny;
+}
+
+
 int addTorus(
 	Mesh& m, double minRadius, double majRadius, int Nmin, int Nmaj,
 	double minPhase
