@@ -440,8 +440,14 @@ public:
 		return r;
 	}
 
-	/// Swap elements
+	/// Swap elements within vector
 	Vec& swap(int i, int j){ std::swap((*this)[i], (*this)[j]); return *this; }
+
+	template <int i=0, int j=1>
+	Vec& swap(){ std::swap(at<i>(), at<j>()); return *this; }
+
+	/// Swap elements with another vector
+	Vec& swap(Vec& v){ IT(N) std::swap((*this)[i], v[i]); return *this; }
 
 
 	//--------------------------------------------------------------------------
@@ -1082,6 +1088,10 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 	IT(N){ r[i] = a[i] < b[i] ? b[i] : a[i]; }
 	return r;
 }
+
+/// Swap elements between vectors
+template <int N, class T>
+inline void swap(Vec<N,T>& a, Vec<N,T>& b){ a.swap(b); }
 
 /// Pun uniform POD into vector
 template <class T, class UniformPOD>
