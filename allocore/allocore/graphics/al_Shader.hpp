@@ -242,6 +242,13 @@ public:
 	/// End use of shader program
 	void end();
 
+	/// Call a function wrapped inside begin/end calls
+	template <class Func>
+	ShaderProgram& scope(const Func& f){
+		begin(); f(); end();
+		return *this;
+	}
+
 
 	/// Returns whether program linked successfully
 	bool linked() const;
@@ -254,6 +261,13 @@ public:
 	/// This is useful for initializing uniforms.
 	///
 	bool once() const { return mOnce; }
+
+	/// Call a function wrapped inside begin/end calls once after compile
+	template <class Func>
+	ShaderProgram& scopeOnce(const Func& f){
+		if(once()){ scope([&f](){ f(); }); }
+		return *this;
+	}
 
 
 	/// Set parameters for geometry shader
