@@ -312,6 +312,15 @@ public:
 		return uniform(uniform(name), v);
 	}
 
+	// Terminal case for below...
+	const ShaderProgram& uniform() const { return *this; }
+
+	/// Set multiple uniforms via location or name
+	template <class Loc, class Val, class... Rest>
+	const ShaderProgram& uniform(Loc l, const Val& v, Rest&&... rest) const {
+		return uniform(l,v).uniform(std::forward<Rest>(rest)...);
+	}
+
 
 	/// Set uniform via location from fixed-sized vector/array
 	template <typename VecN>
