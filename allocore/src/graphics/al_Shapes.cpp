@@ -2,7 +2,6 @@
 #include <cmath>
 #include <cstdint> // uint64_t
 #include "allocore/math/al_Constants.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Shapes.hpp"
 
@@ -47,7 +46,7 @@ static void scaleVerts(Mesh& m, float radius, int N){
 
 int addCuboid(Mesh& m, float rx, float ry, float rz){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 	/* 0 1      t  b
 	   2 3      | /
 	4 5       l +--r
@@ -76,7 +75,7 @@ int addCuboid(Mesh& m, float rx, float ry, float rz){
 
 int addTetrahedron(Mesh& m, float radius){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 
 	static const float l = sqrt(1./3);
 	static const float vertices[] = {
@@ -101,7 +100,7 @@ int addTetrahedron(Mesh& m, float radius){
 
 int addOctahedron(Mesh& m, float radius){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 
 	static const float vertices[] = {
 		 1,0,0, 0, 1,0, 0,0, 1,	// 0 1 2
@@ -126,7 +125,7 @@ int addOctahedron(Mesh& m, float radius){
 
 int addDodecahedron(Mesh& m, float radius){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 
 	static const float b = sqrt(1./3);
 	static const float a = (phi-1)*b;
@@ -167,7 +166,7 @@ int addDodecahedron(Mesh& m, float radius){
 
 int addIcosahedron(Mesh& m, float radius){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 
 	static const float a = (0.5) / 0.587785;
 	static const float b = (1. / (2 * phi)) / 0.587785;
@@ -208,7 +207,7 @@ void subdivide(Mesh& m, unsigned iterations, bool normalize){
 
 	typedef std::map<uint64_t, unsigned> PointToIndex;
 
-	if(m.primitive() != Graphics::TRIANGLES) return;
+	if(!m.isTriangles()) return;
 
 	for(unsigned k=0; k<iterations; ++k){
 
@@ -281,7 +280,7 @@ int addIcosphere(Mesh& m, double radius, int divisions){
 // The top is (0,0,radius) and the bottom is (0,0,-radius).
 int addSphere(Mesh& m, double radius, int slices, int stacks){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 
 	int Nv = m.vertices().size();
 
@@ -339,7 +338,7 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 
 int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 
 	double r = radius;
 
@@ -382,7 +381,7 @@ int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
 }
 
 int addWireBox(Mesh& m, const Vec3f& l, const Vec3f& h){
-	m.primitive(Graphics::LINES);
+	m.lines();
 
 	int Nv = m.vertices().size();
 
@@ -421,7 +420,7 @@ int addWireBox(Mesh& m, float w, float h, float d){
 
 int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned stacks, unsigned cycles){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 
 	unsigned Nv = m.vertices().size();
 
@@ -466,8 +465,7 @@ int addDisc(Mesh& m, float radius, unsigned slices, unsigned stacks){
 }
 
 int addEllipse(Mesh& m, float radx, float rady, int N){
-	m.primitive(Graphics::LINES);
-	int Nv = m.vertices().size();
+	m.lines();
 	for(int i=0; i<N; ++i) m.indexRel(i, (i+1)%N);
 	m.vertices().resize(m.vertices().size() + N);
 	ellipse(&m.vertices().last() - N + 1, N, radx, rady);
@@ -480,13 +478,12 @@ int addCircle(Mesh& m, float radius, int N){
 
 int addRect(Mesh& m, float width, float height, float x, float y){
 	float w_2 = width*0.5, h_2 = height*0.5;
-	m.primitive(Graphics::TRIANGLES);
-	m.indexRel(0,1,3, 3,1,2);
-	m.vertex(x-w_2, y-h_2);
-	m.vertex(x+w_2, y-h_2);
-	m.vertex(x+w_2, y+h_2);
-	m.vertex(x-w_2, y+h_2);
-	return 4;
+	return addQuad(m,
+		x-w_2, y-h_2, 0.f,
+		x+w_2, y-h_2, 0.f,
+		x+w_2, y+h_2, 0.f,
+		x-w_2, y+h_2, 0.f
+	);
 }
 
 int addQuad(Mesh& m,
@@ -495,15 +492,14 @@ int addQuad(Mesh& m,
 	float x3, float y3, float z3,
 	float x4, float y4, float z4
 ){
-	m.primitive(Graphics::TRIANGLES);
-	auto i = m.vertices().size();
+	m.triangles();
+	m.indexRel(0,1,3, 3,1,2);
 	m.vertex(x1,y1,z1).vertex(x2,y2,z2).vertex(x3,y3,z3).vertex(x4,y4,z4);
-	m.index(i,i+1,i+2, i,i+2,i+3);
 	return 4;
 }
 
 int addFrame(Mesh& m, float w, float h, float cx, float cy){
-	m.primitive(Graphics::LINES);
+	m.lines();
 	float l = cx - w*0.5;
 	float r = cx + w*0.5;
 	float b = cy - h*0.5;
@@ -541,7 +537,7 @@ Spec_addWireGrid(2,1)
 
 int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist, bool caps){
 
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 	unsigned Nv = m.vertices().size();
 	float height_2 = height/2;
 
@@ -596,7 +592,7 @@ int addSurface(
 	Mesh& m, int Nx, int Ny,
 	double width, double height, double x, double y
 ){
-	m.primitive(Graphics::TRIANGLE_STRIP);
+	m.triangleStrip();
 
 	int Nv = m.vertices().size();
 
@@ -635,7 +631,7 @@ int addSurfaceLoop(
 	Mesh& m, int Nx, int Ny, int loopMode,
 	double width, double height, double x, double y
 ){
-	m.primitive(Graphics::TRIANGLE_STRIP);
+	m.triangleStrip();
 
 	int Nv = m.vertices().size();
 
@@ -723,7 +719,7 @@ int addVoxels(
 	const std::function<void(int vertex)>& onFace
 ){
 	int numVertIn = m.vertices().size();
-	m.primitive(Graphics::TRIANGLES);
+	m.triangles();
 	float n = 1.; // 1 normals point out, -1 normals point in
 	for(int k=0; k<Nz+1; ++k){
 	for(int j=0; j<Ny+1; ++j){
