@@ -481,11 +481,11 @@ int addCircle(Mesh& m, float radius, int N){
 int addRect(Mesh& m, float width, float height, float x, float y){
 	float w_2 = width*0.5, h_2 = height*0.5;
 	m.primitive(Graphics::TRIANGLES);
+	m.indexRel(0,1,3, 3,1,2);
 	m.vertex(x-w_2, y-h_2);
 	m.vertex(x+w_2, y-h_2);
 	m.vertex(x+w_2, y+h_2);
 	m.vertex(x-w_2, y+h_2);
-	m.index(0,1,3, 3,1,2);
 	return 4;
 }
 
