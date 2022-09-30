@@ -216,10 +216,10 @@ int addCircle(Mesh& m, float radius=1., int N=60);
 /// Vertex order is counter-clockwise from the bottom-left corner.
 ///
 /// \returns number of vertices added
-int addRect(Mesh& m, float width=2, float height=2, float x=0, float y=0);
+int addRect(Mesh& m, float width=2, float height=2, float x=0, float y=0, float z=0);
 
 /// Add a rectangular frame as indexed lines
-int addFrame(Mesh& m, float width=2, float height=2, float x=0, float y=0);
+int addFrame(Mesh& m, float width=2, float height=2, float x=0, float y=0, float z=0);
 
 /// Add a quadrilateral as indexed triangles
 

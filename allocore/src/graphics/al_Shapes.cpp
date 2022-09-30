@@ -476,14 +476,26 @@ int addCircle(Mesh& m, float radius, int N){
 	return addEllipse(m, radius, radius, N);
 }
 
-int addRect(Mesh& m, float width, float height, float x, float y){
+int addRect(Mesh& m, float width, float height, float x, float y, float z){
 	float w_2 = width*0.5, h_2 = height*0.5;
 	return addQuad(m,
-		x-w_2, y-h_2, 0.f,
-		x+w_2, y-h_2, 0.f,
-		x+w_2, y+h_2, 0.f,
-		x-w_2, y+h_2, 0.f
+		x-w_2, y-h_2, z,
+		x+w_2, y-h_2, z,
+		x+w_2, y+h_2, z,
+		x-w_2, y+h_2, z
 	);
+}
+
+int addFrame(Mesh& m, float w, float h, float x, float y, float z){
+	m.lines();
+	float l = x - w*0.5, r = x + w*0.5;
+	float b = y - h*0.5, t = y + h*0.5;
+	m.indexRel(0,1, 1,2, 2,3, 3,0);
+	m.vertex(l,b,z);
+	m.vertex(r,b,z);
+	m.vertex(r,t,z);
+	m.vertex(l,t,z);
+	return 4;
 }
 
 int addQuad(Mesh& m,
@@ -495,20 +507,6 @@ int addQuad(Mesh& m,
 	m.triangles();
 	m.indexRel(0,1,3, 3,1,2);
 	m.vertex(x1,y1,z1).vertex(x2,y2,z2).vertex(x3,y3,z3).vertex(x4,y4,z4);
-	return 4;
-}
-
-int addFrame(Mesh& m, float w, float h, float cx, float cy){
-	m.lines();
-	float l = cx - w*0.5;
-	float r = cx + w*0.5;
-	float b = cy - h*0.5;
-	float t = cy + h*0.5;
-	m.indexRel(0,1, 1,2, 2,3, 3,0);
-	m.vertex(l,b,0);
-	m.vertex(r,b,0);
-	m.vertex(r,t,0);
-	m.vertex(l,t,0);
 	return 4;
 }
 
