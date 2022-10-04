@@ -276,6 +276,21 @@ public:
 	/// Returns true if path is a directory
 	static bool isDirectory(const std::string& path);
 
+	/// Check if path exists from variadic list
+
+	/// Search paths are checked in sequence.
+	/// \returns true if a search path exists and sets path to match.
+	/// \returns false if none of the search paths exist.
+	template <class... Rest>
+	static bool locate(std::string& path, const std::string& searchPath, Rest&&... rest){
+		if(File::exists(searchPath)){
+			path = searchPath;
+			return true;
+		}
+		return locate(path, std::forward<Rest>(rest)...);
+	}
+	static bool locate(std::string& path){ return true; }
+
 	/// Search for file or directory back from current directory
 
 	/// @param[in,out] rootPath	The input should contain the path to search
