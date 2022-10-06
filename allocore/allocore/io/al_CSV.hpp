@@ -36,13 +36,15 @@
 
 
 	File description:
-	CSV File reader
+	CSV file reader and writer
 
 	File author(s):
 	Andres Cabrera mantaraya36@gmail.com 2017
+	Lance Putnam 2022
 */
 
 #include <vector>
+#include <sstream>
 #include <string>
 #include <cstring> // memcpy
 
@@ -196,7 +198,53 @@ private:
 	char mDelim = ',';
 };
 
+
+/// Simple CSV writer
+class CSVWriter {
+public:
+
+	/// Set column delimiter
+	CSVWriter& delim(char v){ mDelim=v; return *this; }
+	const char delim() const { return mDelim; }
+
+	/// Start new row
+	CSVWriter& beginRow();
+
+	/// End current row
+	CSVWriter& endRow();
+
+	/// Start row, call function (that adds columns) and end row
+	template <class Func>
+	CSVWriter& addRow(const Func& f){
+		beginRow(); f(); endRow(); return *this;
+	}
+
+	/// Add column from value
+	template <class T>
+	CSVWriter& operator << (const T& v){
+		if(mWriteDelim) mSS << mDelim;
+		mWriteDelim = true;
+		mSS << v;
+		return *this;
+	}
+
+	/// Clear current contents
+	CSVWriter& clear();
+
+	/// Write current contents to file
+	bool writeFile(const std::string& path, bool append=false);
+
+	/// Append current contents to end of file
+	bool appendToFile(const std::string& path);
+
+private:
+	std::ostringstream mSS;
+	char mDelim = ',';
+	bool mWriteDelim = false;
+};
+
 /// @} // end allocore group
+
 
 template <class T>
 std::vector<T> CSVReader::getColumn(int index) const {

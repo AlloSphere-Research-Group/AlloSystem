@@ -9,7 +9,7 @@ Lance Putnam
 */
 
 #include <iostream>
-#include "allocore/io/al_CSVReader.hpp"
+#include "allocore/io/al_CSV.hpp"
 
 typedef struct {
 	char s[32];

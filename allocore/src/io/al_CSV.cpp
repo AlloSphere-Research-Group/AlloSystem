@@ -1,10 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <algorithm> // count, min
 #include <cstdlib> // atoi, atof, strtod
 #include <cstdint> // int32_t
-#include "allocore/io/al_CSVReader.hpp"
+#include "allocore/io/al_CSV.hpp"
 
 using namespace al;
 
@@ -174,4 +173,27 @@ size_t CSVReader::columnByteOffset(int col) const {
 
 size_t CSVReader::calculateRowLength() const {
 	return columnByteOffset(mColumnNames.size());
+}
+
+
+
+CSVWriter& CSVWriter::beginRow(){ mWriteDelim=false; return *this; }
+
+CSVWriter& CSVWriter::endRow(){ mSS << "\n"; return *this; }
+
+CSVWriter& CSVWriter::clear(){ decltype(mSS)().swap(mSS); return *this; }
+
+bool CSVWriter::writeFile(const std::string& path, bool append){
+	auto flags = std::ios::out;
+	if(append) flags |= std::ios::app;
+	std::ofstream fs(path, flags);
+	if(fs.good()){
+		fs << mSS.str();
+		return true;
+	}
+	return false;
+}
+
+bool CSVWriter::appendToFile(const std::string& path){
+	return writeFile(path,true);
 }
