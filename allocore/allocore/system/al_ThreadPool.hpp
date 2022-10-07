@@ -90,6 +90,10 @@ public:
 	/// Block until all task are finished
 	void wait();
 
+
+	/// Get a static thread-safe thread pool
+	static ThreadPool& get();
+
 private:
 	std::vector<std::thread> mThreads;
 	std::queue<Task> mTasks;

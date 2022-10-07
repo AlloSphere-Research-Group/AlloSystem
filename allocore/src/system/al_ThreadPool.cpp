@@ -76,3 +76,9 @@ unsigned ThreadPool::busy(){
 void ThreadPool::wait(){
 	while(busy()){}
 }
+
+
+/*static*/ ThreadPool& ThreadPool::get(){
+	static thread_local ThreadPool tp;
+	return tp;
+}
