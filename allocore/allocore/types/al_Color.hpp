@@ -711,6 +711,7 @@ struct RGB{
 
 	/// Returns grayscale of current color
 	RGB gray() const { return RGB(luminance()); }
+	RGB gray(float v) const { return mix(gray(),v); }
 
 	/// Returns self linearly mixed with another color (0 = none)
 	RGB mix(const RGB& v, float amt=0.5f) const {
