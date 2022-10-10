@@ -770,7 +770,7 @@ public:
 
 
 	/// Print to file (stream)
-	void print(FILE * file = stderr) const;
+	void print(FILE * file = stdout) const;
 
 private:
 	template <int Dim1, int Dim2, int DimMax=N>
