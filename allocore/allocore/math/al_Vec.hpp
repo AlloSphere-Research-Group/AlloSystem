@@ -486,8 +486,7 @@ public:
 	template <class V, class Func, class... Args>
 	Vec<N,V> map(Func func, Args... args) const {
 		Vec<N,V> r(VEC_NO_INIT);
-		for(int i=0; i<size(); ++i)
-			r[i] = func((*this)[i], args...);
+		for(int i=0; i<size(); ++i) r[i] = func((*this)[i], args...);
 		return r;
 	}
 
@@ -498,6 +497,14 @@ public:
 	template <class Func, class... Args>
 	Vec map(Func func, Args... args) const {
 		return map<T>(func, args...);
+	}
+
+	/// Map element indices through function into new vector
+	template <class Func, class... Args>
+	static Vec<N,T> mapIndex(Func func, Args... args){
+		Vec<N,T> r(VEC_NO_INIT);
+		for(int i=0; i<size(); ++i) r[i] = func(i, args...);
+		return r;
 	}
 
 	/// Reduce elements into scalar
