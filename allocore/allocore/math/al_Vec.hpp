@@ -252,6 +252,10 @@ public:
 		return const_cast<Vec*>(this)->at<i>();
 	}
 
+	/// Access last element
+	T& back(){ return at<N-1>(); }
+	const T& back() const { return const_cast<Vec*>(this)->back(); }
+
 	Vec& operator = (const T& v){ IT(N) (*this)[i] = v; return *this; }
 
 	template <int N2, class T2>
