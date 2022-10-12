@@ -22,7 +22,6 @@ using namespace al;
 class MyApp : public App{
 public:
 	Mesh solids[5];
-	Light light;
 	double angle1=0, angle2=0;
 
 	MyApp(){
@@ -68,12 +67,12 @@ public:
 		initWindow();
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 		angle1 += 1./3;
 		angle2 += M_PI/3;
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		g.light().pos(100, 1000, 500);
 
 		float angPos = 2*M_PI/5;

@@ -26,7 +26,7 @@ public:
 		initWindow();
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		// The modelview matrix transforms each vertex before it is rendered.
 		// First, we push a copy of the current modelview matrix onto a stack.

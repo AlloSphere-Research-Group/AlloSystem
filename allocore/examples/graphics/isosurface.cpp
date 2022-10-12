@@ -23,9 +23,6 @@ public:
 	double phase = 0;
 	bool evolve = true, wireframe = false;
 
-	Light light;
-	Material mtrl1, mtrl2;
-
 	MyApp(){
 		nav().pullBack(6);
 		nav().faceToward(Vec3f(-0.5,-1,-1));
@@ -56,30 +53,29 @@ public:
 
 	void onDraw(Graphics& g) override {
 
-		// Set colors of front- and back-facing surfaces
-		mtrl1.face(Graphics::FRONT);
-		mtrl1.ambientAndDiffuse(RGB(1));
-		mtrl1.specular(RGB(0.3));
-		mtrl1.shininess(20);
-		mtrl1();
+		auto& light = g.light();
+		auto& mtrlF = g.materialFront();
+		auto& mtrlB = g.materialBack();
 
-		mtrl2.face(Graphics::BACK);
-		mtrl2.ambientAndDiffuse(HSV(0.6,0.5,0.5));
-		mtrl2();
+		// Set colors of front- and back-facing surfaces
+		mtrlF.ambientAndDiffuse(RGB(1));
+		mtrlF.specular(RGB(0.3));
+		mtrlF.shininess(20);
+
+		mtrlB.ambientAndDiffuse(HSV(0.6,0.5,0.5));
 
 		// Apply lighting
 		Light::twoSided(true); // light both sides of surface
 		light.pos(1,1,1);
 		light.attenuation(1,0.2);
-		light();
 
-		g.polygonMode(wireframe ? Graphics::LINE : Graphics::FILL);
+		g.wireframe(wireframe);
 
-		g.pushMatrix();
+		g.matrixScope([&](){
 			g.translate(-1,-1,-1);
 			g.scale(2);
 			g.draw(iso);
-		g.popMatrix();
+		});
 	}
 
 	void onKeyDown(const Keyboard& k) override {

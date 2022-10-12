@@ -16,21 +16,18 @@ class MyApp : public App {
 public:
 
 	Mesh shapes;
-	Light light;
-	Material material;
 
 	MyApp(){
 
-		for(int i=0; i<800; ++i){
+		for(int i=0; i<100; ++i){
 			int Nv = rnd::prob(0.5)
 						? (rnd::prob(0.5) ? addCube(shapes) : addDodecahedron(shapes))
 						: addIcosahedron(shapes);
 
 			// Scale and translate the newly added shape
-			Mat4f xfm;
-			xfm.setIdentity();
-			xfm.scale(Vec3f(rnd::uniform(1.,0.1), rnd::uniform(1.,0.1), rnd::uniform(1.,0.1)));
-			xfm.translate(Vec3f(rnd::uniformS(8.), rnd::uniformS(8.), rnd::uniformS(8.)));
+			Mat4f xfm(1);
+			xfm.translate(rnd::ball<Vec3f>());
+			xfm.scale(0.05f + 0.05f*rnd::cube<Vec3f>());
 			shapes.transform(xfm, shapes.vertices().size()-Nv);
 
 			// Color newly added vertices
@@ -44,13 +41,13 @@ public:
 		shapes.decompress();
 		shapes.generateNormals();
 
-		nav().pullBack(24);
+		nav().pullBack(4);
 		initWindow();
 	}
 
-	void onDraw(Graphics& g){
-		material();
-		light();
+	void onDraw(Graphics& g) override {
+		g.light();
+		g.material();
 		g.draw(shapes);
 	}
 

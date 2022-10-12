@@ -18,13 +18,11 @@ using namespace al;
 
 class MyApp : public App {
 public:
-	Light light;			// Necessary to light objects in the scene
-	Material material;		// Necessary for specular highlights
+	Vec3f lightPos;
 	Mesh surface, sphere;	// Geometry to render
-	double phase;			// Animation phase
+	double phase = 0.5;		// Animation phase
 
 	MyApp(){
-		phase = 0.5;
 
 		// Create a circular wave pattern
 		addSurface(surface, 64,64);
@@ -47,45 +45,49 @@ public:
 		initWindow();
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 		// Set light position
 		phase += 1./1800; if(phase > 1) phase -= 1;
 		float x = cos(7*phase*2*M_PI);
 		float y = sin(11*phase*2*M_PI);
 		float z = cos(phase*2*M_PI)*0.5 + 0.6;
 
-		light.pos(x,y,z);
+		lightPos.set(x,y,z);
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
-		// Render sphere at light position; this will not be lit
-		g.lighting(false);
-		g.pushMatrix(Graphics::MODELVIEW);
-			g.translate(Vec3f(light.pos()));
-			sphere.colors()[0] = light.diffuse();
-			g.draw(sphere);
-		g.popMatrix();
+		// Grab a light and material from Graphics object.
+		// Accessing these will activate lighting.
+		auto& light = g.light();
+		auto& mtrl = g.material();
 
 		// Set up light
-		light.globalAmbient(RGB(0.1));	// Ambient reflection for all lights
-		light.ambient(RGB(0));			// Ambient reflection for this light
-		light.diffuse(RGB(1,1,0.5));	// Light scattered directly from light
-		light.attenuation(1,1,0);		// Inverse distance attenuation
-		//light.attenuation(1,0,1);		// Inverse-squared distance attenuation
-
-		// Activate light
-		light();
+		light
+			.pos(lightPos)
+			.ambient(RGB(0))			// Ambient reflection for this light
+			.diffuse(RGB(1,1,0.5))		// Light scattered directly from light
+			.attenuation(1,1,0)			// Inverse distance attenuation
+			//.attenuation(1,0,1)		// Inverse-squared distance attenuation
+			.globalAmbient(RGB(0.1))	// Ambient reflection for all lights
+		;
 
 		// Set up material (i.e., specularity)
-		material.specular(light.diffuse()*0.2); // Specular highlight, "shine"
-		material.shininess(50);			// Concentration of specular component [0,128]
-
-		// Activate material
-		material();
+		mtrl
+			.specular(light.diffuse()*0.2) // Specular highlight, "shine"
+			.shininess(50)			// Concentration of specular component [0,128]
+		;
 
 		// Draw surface with lighting
 		g.draw(surface);
+
+		// Render sphere at light position; this will not be lit
+		g.lighting(false);
+		g.matrixScope([&](){
+			g.translate(light.pos());
+			sphere.colors()[0] = light.diffuse();
+			g.draw(sphere);
+		});
 	}
 };
 

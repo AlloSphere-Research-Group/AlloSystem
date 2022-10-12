@@ -16,23 +16,21 @@ using namespace al;
 class MyApp : public App{
 public:
 
-	Texture tex;
+	// Construct texture
+	// Arguments: width, height, pixel format, pixel data type
+	// Note that when we construct a texture in this way, the default
+	// policy is to allocate a client-side buffer to hold the pixels.
+	Texture tex{64,64, Graphics::RGBA, Graphics::UBYTE};
 	Mesh mesh;
 
-	MyApp():
-		// Construct texture
-		// Arguments: width, height, pixel format, pixel data type
-		// Note that when we construct a texture in this way, the default
-		// policy is to allocate a client-side buffer to hold the pixels.
-		tex(64,64, Graphics::RGBA, Graphics::UBYTE)
-	{
+	MyApp(){
 		// The default magnification filter is linear
 		//tex.filterMag(Texture::NEAREST);
 
 		// Get a pointer to the (client-side) pixel buffer.
 		// When we make a read access to the pixels, they are flagged as dirty
 		// and get sent to the GPU the next time the texture is bound.
-		unsigned char * pixels = tex.data<unsigned char>();
+		auto * pixels = tex.data<unsigned char>();
 
 		// Loop through the pixels to generate an image
 		int Nx = tex.width();
@@ -54,7 +52,7 @@ public:
 		}}
 
 		// Generate the geometry onto which to display the texture
-		mesh.primitive(Graphics::TRIANGLE_STRIP);
+		mesh.triangleStrip();
 		mesh.vertex(-1,  1);
 		mesh.vertex(-1, -1);
 		mesh.vertex( 1,  1);
@@ -74,7 +72,7 @@ public:
 		initWindow();
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		// We must tell the GPU to use the texture when rendering primitives
 		tex.bind();
 			g.draw(mesh);

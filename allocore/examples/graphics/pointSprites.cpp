@@ -47,7 +47,7 @@ public:
 			pixels[j*Nx + i] = m;
 		}}
 
-		nav().pos(0,0,6);
+		nav().pullBack(6);
 		initWindow();
 	}
 
