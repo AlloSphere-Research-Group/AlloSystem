@@ -159,7 +159,7 @@ public:
 /// (geodesics intersecting the z axis). When |m| = l, the harmonics are "beach
 /// ball"-like (sectoral) and when m = 0, the harmonics are "target"-like
 /// (zonal). Other values of m produce a checkerboard pattern (tesseral).
-/// Th Condon-Shortley phase factor of (-1)^m is included.
+/// The Condon-Shortley phase factor of (-1)^m is included.
 template <int L_MAX=16>
 class SphericalHarmonic{
 public:
