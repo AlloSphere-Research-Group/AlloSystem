@@ -55,7 +55,7 @@ public:
 		return (y*Nx + x)*2 + z; // may give slightly faster accessing
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 
 		int zprev = 1-zcurr;
 
@@ -111,7 +111,7 @@ public:
 		zcurr = zprev;
 	}
 
-	void onDraw(Graphics& g){		
+	void onDraw(Graphics& g) override {		
 		g.material().specular(RGB(0.5)).shininess(30);
 		g.light().pos(100,100,100);
 		g.draw(mesh);

@@ -17,20 +17,18 @@ using namespace al;
 class MyApp : public App{
 public:
 
-	double phase;
-	RingBuffer<Vec2f> ring;
+	double phase = 0.;
+	RingBuffer<Vec2f> ring{1024};
 	Mesh curve;
 
-	MyApp()
-	:	phase(0), ring(1024)
-	{
+	MyApp(){
 		nav().pos(0,0,4);
 		initWindow();
 		initAudio();
 	}
 
 	// Audio callback
-	void onSound(AudioIOData& io){
+	void onSound(AudioIOData& io) override {
 
 		// Set the base frequency to 55 Hz
 		double freq = 55/io.framesPerSecond();
@@ -58,10 +56,9 @@ public:
 	}
 
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 
-		curve.primitive(Graphics::LINE_STRIP);
-		curve.reset();
+		curve.reset().lineStrip();
 
 		/* We first need to determine the oldest sample we will attempt read
 		from the buffer. Note that we do not want to attempt to read the entire
@@ -83,7 +80,7 @@ public:
 		}
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		g.draw(curve);
 	}
 };

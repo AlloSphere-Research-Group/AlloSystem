@@ -92,7 +92,7 @@ public:
 
 
 	// This is the audio callback
-	void onSound(AudioIOData& io){
+	void onSound(AudioIOData& io) override {
 
 		// Things here occur at block rate...
 
@@ -112,7 +112,7 @@ public:
 	// This is the application's (graphical) model update.
 	// This is called once for each frame of graphics. Typically, you will
 	// update your application's geometry, physics, etc. here.
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 		// The phase will ramp from 0 to 1 over 10 seconds. We will use it to
 		// animate the sphere.
 		double period = 10;
@@ -125,22 +125,22 @@ public:
 	// This is called one or more times per frame, for each window, viewport,
 	// and eye (for stereoscopic). Typically, this is where you instruct the
 	// GPU to render something.
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		// Note: we don't need to do all the normal graphics setup as this
 		// is handled by the App's stereographic object (App::stereo()).
 		// We can just draw our geometry immediately!
 
-		g.polygonMode(Graphics::LINE); // wireframe mode
-		g.pushMatrix();
-		g.rotate(phase*360, 0,1,0);
-		g.draw(mesh);
-		g.popMatrix();
+		g.wireframe(true);
+		g.matrixScope([&](){
+			g.rotate(phase*360, 0,1,0);
+			g.draw(mesh);
+		});
 	}
 
 
 	// This is called whenever a key is pressed.
-	void onKeyDown(const Keyboard& k){
+	void onKeyDown(const Keyboard& k) override {
 
 		// Use a switch to do something when a particular key is pressed
 		switch(k.key()){
@@ -161,7 +161,7 @@ public:
 	}
 
 	// This is called whenever a mouse button is pressed.
-	void onMouseDown(const Mouse& m){
+	void onMouseDown(const Mouse& m) override {
 		switch(m.button()){
 		case Mouse::LEFT: printf("Pressed left mouse button.\n"); break;
 		case Mouse::RIGHT: printf("Pressed right mouse button.\n"); break;
@@ -170,7 +170,7 @@ public:
 	}
 
 	// This is called whenever the mouse is dragged.
-	void onMouseDrag(const Mouse& m){
+	void onMouseDrag(const Mouse& m) override {
 		// Get mouse coordinates, in pixels, relative to top-left corner of window
 		int x = m.x();
 		int y = m.y();

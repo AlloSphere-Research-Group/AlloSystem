@@ -95,7 +95,7 @@ public:
 		}
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 
 		// Compute forces
 		for(auto& p : particles){
@@ -113,7 +113,7 @@ public:
 		for(auto& p : particles) p.update(dt);
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		g.cullFace(true);
 		//g.polygonMode(Graphics::LINE);
 

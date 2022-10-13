@@ -25,7 +25,7 @@ public:
 		window().displayMode(window().displayMode() | Window::MULTISAMPLE);
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 
 		for(int i=0; i<4; ++i){
 			auto p = rnd::ball<Vec3f>();
@@ -34,24 +34,23 @@ public:
 			float l = 0.04;				// spread of steps; lower is more flighty
 			float v = l/(mm+l*l) * 0.1;	// map uniform to Cauchy distribution
 
-			p = p.normalized() * v;
+			p = p.normalized(v);
 			p += A.newest();
 			A.write(p);
 		}
 
-		vert.primitive(Graphics::LINE_STRIP);
-		vert.reset();
+		vert.reset().lineStrip();
 		for(int i=0; i<A.fill(); ++i){
 			float f = float(i)/A.size();
 			vert.vertex(A.read(i));
 
-			Vec3f dr = A.read(i+1) - A.read(i-1);
+			auto dr = A.read(i+1) - A.read(i-1);
 
 			vert.color(HSV((1-f)*0.2, al::clip(dr.mag()*4 + 0.2), 1-f));
 		}
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		g.draw(vert);
 	}
 };

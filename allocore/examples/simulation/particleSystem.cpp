@@ -77,8 +77,7 @@ public:
 	void onAnimate(double dt) override {
 		em1.update<40>();
 
-		mesh.reset();
-		mesh.primitive(Graphics::POINTS);
+		mesh.reset().points(6);
 
 		for(int i=0; i<em1.size(); ++i){
 			auto& p = em1.particles[i];
@@ -92,7 +91,6 @@ public:
 	void onDraw(Graphics& g) override {
 		g.blendAdd();
 		g.nicest();
-		g.pointSize(6);
 		g.draw(mesh);
 	}
 };

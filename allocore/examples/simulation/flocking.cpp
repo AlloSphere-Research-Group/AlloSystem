@@ -68,7 +68,7 @@ public:
 		}
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 
 		// Compute boid-boid interactions
 		for(int i=0; i<Nb-1; ++i){
@@ -144,7 +144,7 @@ public:
 		}
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		g.nicest();
 		g.stroke(8);
 		g.draw(heads);
@@ -154,7 +154,7 @@ public:
 		g.draw(box);
 	}
 
-	void onKeyDown(const Keyboard& k){
+	void onKeyDown(const Keyboard& k) override {
 		switch(k.key()){
 		case 'r': resetBoids(); break;
 		}
