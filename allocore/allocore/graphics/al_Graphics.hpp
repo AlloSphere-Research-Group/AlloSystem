@@ -440,7 +440,7 @@ public:
 
 	/// Push specified matrix, call function, then pop
 	void matrixScope(MatrixMode mmode, std::function<void(void)> f){
-		pushMatrix(mmode); f(); popMatrix();
+		pushMatrix(mmode); f(); popMatrix(mmode);
 	}
 
 	/// Push current matrix, call function, then pop
