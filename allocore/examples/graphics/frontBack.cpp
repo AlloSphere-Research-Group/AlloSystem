@@ -18,7 +18,6 @@ public:
 	// A Viewpoint combines a position/orientation in world space and a viewport
 	Viewpoint vpFront, vpBack;
 	Mesh mesh;
-	Light light;
 
 	MyApp(){
 
@@ -49,14 +48,14 @@ public:
 	}
 
 	void onDraw(Graphics& g){
-		light();
+		g.light();
 		for(int i=0; i<7; ++i){
-			g.pushMatrix();
-			float frac = float(i)/7;
-			g.translate(4*sin(frac*2*M_PI), 0, 4*cos(frac*2*M_PI));
-			mesh.colors()[0] = HSV(frac,1,1);
-			g.draw(mesh);
-			g.popMatrix();
+			g.matrixScope([&](){
+				float frac = float(i)/7;
+				g.translate(4*sin(frac*2*M_PI), 0, 4*cos(frac*2*M_PI));
+				mesh.colors()[0] = HSV(frac,1,1);
+				g.draw(mesh);
+			});
 		}
 	}
 };

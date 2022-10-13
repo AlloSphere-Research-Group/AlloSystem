@@ -28,7 +28,7 @@ public:
 		initWindow(Window::Dim(600,600), "Shape Gallery");
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 
 		angle += 2 * dt;
 		if(angle > 360) angle -= 360;
@@ -133,23 +133,23 @@ public:
 		}
 	}
 
-	void onDraw(Graphics& g){
-		g.polygonMode(wireframe ? Graphics::LINE : Graphics::FILL);
+	void onDraw(Graphics& g) override {
+		g.wireframe(wireframe);
 		g.light().pos(1,4,1);
 
 		for(int i=0; i<Nm; ++i){
-			g.pushMatrix();
-			float x = float(i%3)/2 * 2 - 1;
-			float y = float(i/3)/2 * 2 - 1;
-			g.translate(x,-y,0);
-			g.rotate(angle*13, 0,0,1);
-			g.rotate(angle*17, 1,0,0);
-			g.draw(meshes[i]);
-			g.popMatrix();
+			g.matrixScope([&](){
+				float x = float(i%3)/2 * 2 - 1;
+				float y = float(i/3)/2 * 2 - 1;
+				g.translate(x,-y,0);
+				g.rotate(angle*13, 0,0,1);
+				g.rotate(angle*17, 1,0,0);
+				g.draw(meshes[i]);
+			});
 		}
 	}
 
-	void onKeyDown(const Keyboard& k){
+	void onKeyDown(const Keyboard& k) override {
 		switch(k.key()){
 		case 'f': wireframe  ^=true; break;
 		case 'l': vertexLight^=true; break;

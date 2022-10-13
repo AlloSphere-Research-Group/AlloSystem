@@ -33,8 +33,7 @@ public:
 		}}
 
 		// Compile the vertex and fragment shaders to display the texture
-		shader.compile(
-		R"(
+		shader.compile(R"(
 			void main(){
 				// Built-in varying that we will use in the fragment shader
 				gl_TexCoord[0] = gl_MultiTexCoord0;
@@ -48,31 +47,29 @@ public:
 			void main(){
 				gl_FragColor = texture2D(texSampler, gl_TexCoord[0].xy);
 			}
-		)"
-		);
+		)");
 
 		nav().pullBack(4);
 		initWindow();
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		
-		shader.begin();
-		tex.bind();
-
-			g.begin(Graphics::TRIANGLE_STRIP);
-				g.vertex(-1, -1);
-				g.vertex( 1, -1);
-				g.vertex(-1,  1);
-				g.vertex( 1,  1);
-				g.texCoord(0,0);
-				g.texCoord(1,0);
-				g.texCoord(0,1);
-				g.texCoord(1,1);
-			g.end();
-
-		tex.unbind();
-		shader.end();
+		shader.scope([&](){
+			tex.bind();
+			auto& m = g.mesh();
+			m.reset().triangleStrip();
+			m.vertex(-1, -1);
+			m.vertex( 1, -1);
+			m.vertex(-1,  1);
+			m.vertex( 1,  1);
+			m.texCoord(0,0);
+			m.texCoord(1,0);
+			m.texCoord(0,1);
+			m.texCoord(1,1);
+			g.draw();
+			tex.unbind();
+		});
 	}
 };
 

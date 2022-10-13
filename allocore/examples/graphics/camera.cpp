@@ -24,9 +24,13 @@ using namespace al;
 
 struct MyWindow : public Window, public Drawable {
 
-    MyWindow()
-	:	nav(Vec3d(0,0,-2), 0.8)
-	{
+    Graphics gl;
+	Lens lens;
+	Nav nav{Vec3f(0,0,-2), 0.8};
+	Stereoscopic stereo;
+	Mesh shapes;
+
+    MyWindow(){
 		lens.fovy(90);	// set field of view angle
 
 		append(*new StandardWindowKeyControls);
@@ -36,10 +40,9 @@ struct MyWindow : public Window, public Drawable {
 		for(int j=0; j<1000; ++j){
 			int Nv = addCube(shapes);
 
-			Mat4f xfm;
-			xfm.setIdentity();
+			Mat4f xfm{1};
 			xfm.scale(rnd::uniform(2.,0.2));
-			xfm.translate(Vec3f(rnd::uniformS(20.), rnd::uniformS(20.), rnd::uniformS(20.)));
+			xfm.translate(rnd::ball<Vec3f>().normalize(20));
 			shapes.transform(xfm, shapes.vertices().size()-Nv);
 
 			for(int i=0; i<Nv; ++i){
@@ -49,7 +52,7 @@ struct MyWindow : public Window, public Drawable {
 		}
 	}
 
-	bool onFrame(){
+	bool onFrame() override {
 
         nav.step();
 
@@ -60,11 +63,11 @@ struct MyWindow : public Window, public Drawable {
 		return true;
 	}
 
-	virtual void onDraw(Graphics& gl){
+	void onDraw(Graphics& gl) override {
 		gl.draw(shapes);
 	}
 
-	virtual bool onKeyDown(const Keyboard& k){
+	bool onKeyDown(const Keyboard& k) override {
 		switch(k.key()){
 			case 'f': lens.fovy(lens.fovy()-5); break;
 			case 'g': lens.fovy(lens.fovy()+5); break;
@@ -72,12 +75,6 @@ struct MyWindow : public Window, public Drawable {
 		}
 		return true;
 	}
-
-    Graphics gl;
-	Lens lens;
-	Nav nav;
-	Stereoscopic stereo;
-	Mesh shapes;
 };
 
 

@@ -17,10 +17,9 @@ public:
 
 	ShaderProgram shader;
 	Mesh geom;
-	float phase;
+	float phase = 0.;
 
 	MyApp(){
-		phase = 0;
 		background(HSV(0.1, 0.5, 1));
 		lens().near(0.1).far(20);
 
@@ -79,21 +78,21 @@ public:
 		initWindow();
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 		phase += 0.00017; if(phase>=1) --phase;
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		// Activate fog;
 		// the fog and background color will typically be the same.
 		g.fog(lens().far(), lens().near()+2, background());
 
 		// Render
-		shader.begin();
+		shader.scope([&](){
 			shader.uniform("fogCurve", 4*cos(8*phase*6.2832));
 			g.draw(geom);
-		shader.end();
+		});
 	}
 };
 

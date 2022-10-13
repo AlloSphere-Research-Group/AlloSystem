@@ -16,18 +16,14 @@ using namespace al;
 class MyApp : public App{
 public:
 
-	float angle;
+	float angle = 0.;
 	Mesh data;
-	Texture spriteTex;
+	Texture spriteTex{16,16, Graphics::LUMINANCE, Graphics::FLOAT};
 
-	MyApp()
-	:	spriteTex(16,16, Graphics::LUMINANCE, Graphics::FLOAT)
-	{
-		angle = 0;
-
+	MyApp(){
 		// Generate a grid of points
 		const int N = 12;
-		data.primitive(Graphics::POINTS);
+		data.points();
 
 		for(int k=0; k<N; ++k){ float z = float(k)/(N-1)*2-1;
 		for(int j=0; j<N; ++j){ float y = float(j)/(N-1)*2-1;
@@ -51,12 +47,12 @@ public:
 		initWindow();
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 		angle += 0.1;
 		if(angle>360) angle -= 360;
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		// Tell GPU to render a screen-aligned textured quad at each vertex
 		glEnable(GL_POINT_SPRITE);

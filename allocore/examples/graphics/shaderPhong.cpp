@@ -17,9 +17,7 @@ class MyApp : public App {
 public:
 	ShaderProgram shader;
 	Mesh shape;
-	Light light;
-	Material material;
-	double angle = 0;
+	double angle = 0.;
 
 	MyApp(){
 		addTorus(shape);
@@ -78,32 +76,32 @@ public:
 		initWindow();
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 		angle += dt*10;
 		if(angle >= 360) angle -= 360;
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		// Set lighting properties
-		material.ambientAndDiffuse(HSV(0,0.8));
-		material.specular(RGB(0.4));
-		material.shininess(16);
-		material();
-		light.dir(1,1,1);
-		light();
+		g.material()
+			.ambientAndDiffuse(HSV(0,0.8))
+			.specular(RGB(0.4))
+			.shininess(16)
+		;
+		g.light().dir(1,1,1);
 
 		// Render
-		shader.begin();
+		shader.scope([&](){
 			g.pushMatrix();
 			g.rotate(angle  , 1,0,0);
 			g.rotate(angle*8, 0,1,0);
 			g.draw(shape);
 			g.popMatrix();
-		shader.end();
+		});
 	}
 
-	void onKeyDown(const Keyboard& k){
+	void onKeyDown(const Keyboard& k) override {
 		if(k.key('l')) shader.toggleActive();
 	}
 

@@ -56,7 +56,7 @@ public:
 		initWindow();
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		// Here we tell the renderer to draw the mesh
 		g.draw(mesh);

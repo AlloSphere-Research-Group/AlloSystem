@@ -20,7 +20,7 @@ public:
 	ShaderProgram shader;
 	Texture tex{16,16, Graphics::LUMINANCE, Graphics::FLOAT};
 	Mesh geom;
-	float angle = 0;
+	float angle = 0.;
 
 	MyApp(){
 
@@ -52,7 +52,7 @@ public:
 		initWindow();
 	}
 
-	void onCreate(const ViewpointWindow& w){
+	void onCreate(const ViewpointWindow& w) override {
 
 		// Geometry inputs/outputs must be specified BEFORE compiling shader
 		shader.setGeometryInputPrimitive(Graphics::POINTS);
@@ -123,23 +123,23 @@ public:
 		);
 	}
 
-	void onAnimate(double dt){
+	void onAnimate(double dt) override {
 		angle += dt*8;
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		g.blendAdd();
 
-		shader.begin();
-		tex.bind();
-			shader.uniform("spriteRadius", 1./N);
-			g.pushMatrix();
-			g.rotate(angle, 0,1,0);
-			g.draw(geom);
-			g.popMatrix();
-		tex.unbind();
-		shader.end();
+		shader.scope([&](){
+			tex.bind();
+				shader.uniform("spriteRadius", 1./N);
+				g.matrixScope([&](){
+					g.rotate(angle, 0,1,0);
+					g.draw(geom);
+				});
+			tex.unbind();
+		});
 	}
 };
 

@@ -11,7 +11,7 @@
 
 struct Foo : al::Window {
 
-  virtual bool onCreate() {
+  virtual bool onCreate() override {
 
     // We know there's a valid OpenGL context now
     //

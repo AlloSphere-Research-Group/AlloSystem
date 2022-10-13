@@ -25,7 +25,7 @@ public:
 		initWindow();
 	}
 	
-	void onResize(const ViewpointWindow& win, int w, int h){
+	void onResize(const ViewpointWindow& win, int w, int h) override {
 
 		// Configure texture on GPU
 		texDepth.format(Graphics::DEPTH_COMPONENT);
@@ -45,7 +45,7 @@ public:
 		fbo.unbind();
 	}
 
-	void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g) override {
 
 		// To render our scene to the FBO, we must first bind it
 		fbo.bind();
@@ -60,7 +60,7 @@ public:
 		fbo.unbind();
 
 		// Show depth buffer texture
-		g.viewport(0, 0, v.viewport().w, v.viewport().h);
+		g.viewport(0, 0, viewport().w, viewport().h);
 		g.colorMask(true);
 		texDepth.quadViewport(g);
 	}

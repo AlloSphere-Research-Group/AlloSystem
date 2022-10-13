@@ -20,11 +20,13 @@ public:
 		initWindow();
 	}
 
-	void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g) override {
+
+		auto& vp = viewpoint();
 
 		// First, we get the frustum in world space coordinates
 		Frustumd fr;
-		v.lens().frustum(fr, v.worldTransform(), v.viewport().aspect());
+		vp.lens().frustum(fr, vp.worldTransform(), vp.viewport().aspect());
 
 		//printf("ntl: %g %g %g\n", fr.ntl[0], fr.ntl[1], fr.ntl[2]);
 		//printf("ftl: %g %g %g\n", fr.ftl[0], fr.ftl[1], fr.ftl[2]);
@@ -32,8 +34,7 @@ public:
 		Mesh& m = g.mesh();
 
 		// Draw some lines for testing
-		m.reset();
-		m.primitive(Graphics::LINES);
+		m.reset().lines();
 
 		for(int i=0; i<16; ++i){
 			float ang = float(i)/16 * M_PI;
@@ -59,8 +60,7 @@ public:
 
 
 		// Draw rectangle across frustum diagonal
-		m.reset();
-		m.primitive(Graphics::LINE_LOOP);
+		m.reset().lineLoop();
 		m.color(RGB(0.5));
 		m.vertex(fr.nbl);
 		m.vertex(fr.fbr);

@@ -19,7 +19,7 @@ public:
 
 	MyApp(){
 
-		verts.primitive(Graphics::LINE_STRIP);
+		verts.lineStrip();
 		verts.color(1,1,1);
 
 		// Create a sine wave
@@ -32,29 +32,27 @@ public:
 		initWindow();
 	}
 
-	void onDraw(Graphics& g, const Viewpoint& vp){
+	void onDraw(Graphics& g) override {
 
-		// Switch to the projection matrix
-		g.pushMatrix(Graphics::PROJECTION);
+		// Push projection matrix
+		g.matrixScope(Graphics::PROJECTION, [&](){
 
-		// Set up 2D orthographic projection coordinates
-		// The args to Matrix4::ortho2D are left, right, bottom, top
-		float aspect = vp.viewport().aspect(); // width divided by height
-		g.loadMatrix(Matrix4f::ortho2D(-aspect,aspect, -1,1));
+			// Set up 2D orthographic projection coordinates
+			// The args to Matrix4::ortho2D are left, right, bottom, top
+			const auto& vp = viewport();
+			float aspect = vp.aspect(); // width divided by height
+			g.loadMatrix(Matrix4f::ortho2D(-aspect,aspect, -1,1));
 
-		// If you want units of pixels, use this instead:
-		//g.loadMatrix(Matrix4f::ortho2D(0,vp.viewport().w, vp.viewport().h, 0));
+			// If you want units of pixels, use this instead:
+			//g.loadMatrix(Matrix4f::ortho2D(0,vp.w, vp.h, 0));
 
-		// Switch to the modelview matrix
-		g.pushMatrix(Graphics::MODELVIEW);
-		g.loadIdentity();
+			// Push modelview matrix
+			g.matrixScope(Graphics::MODELVIEW, [&](){
+				g.loadIdentity();
+				g.draw(verts);
+			});
 
-			g.draw(verts);
-
-		g.popMatrix();
-
-		// Don't forget to restore original projection matrix
-		g.popMatrix(Graphics::PROJECTION);
+		});
 	}
 };
 

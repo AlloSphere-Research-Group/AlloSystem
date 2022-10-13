@@ -52,7 +52,7 @@ public:
 		initWindow();
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 		
 		// Draw all scene objects first
 		g.draw(mesh);

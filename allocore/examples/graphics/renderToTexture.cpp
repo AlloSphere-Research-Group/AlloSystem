@@ -32,7 +32,7 @@ public:
 		initWindow();
 	}
 
-	void onResize(const ViewpointWindow& win, int w, int h){
+	void onResize(const ViewpointWindow& win, int w, int h) override {
 		// Note: all attachments (textures, RBOs, etc.) to the FBO must have the
 		// same width and height.
 
@@ -50,7 +50,7 @@ public:
 		fbo.attachRBO(rbo, FBO::DEPTH_ATTACHMENT);
 	}
 
-	void onDraw(Graphics& g){
+	void onDraw(Graphics& g) override {
 
 		// To render our scene to the FBO, we must first bind it
 		fbo.bind();

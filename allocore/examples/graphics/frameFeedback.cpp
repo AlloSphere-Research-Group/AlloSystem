@@ -21,12 +21,9 @@ public:
 
 	Mesh shape;
 	Texture texBlur;
-	float angle;
+	float angle = 0.f;
 
 	MyApp(){
-
-		angle = 0;
-
 		// Create a colored square
 		shape.primitive(Graphics::LINE_LOOP);
 		const int N = 4;
@@ -36,19 +33,19 @@ public:
 			shape.color(HSV(theta/2/M_PI));
 		}
 
-		nav().pos(0,0,4);
+		nav().pullBack(4);
 		initWindow();
 	}
 
-	virtual void onAnimate(double dt){
+	virtual void onAnimate(double dt) override {
 		angle += dt * 90;
 		if(angle >= 360) angle -= 360;
 	}
 
-	virtual void onDraw(Graphics& g, const Viewpoint& v){
+	virtual void onDraw(Graphics& g) override {
 
 		// 1. Match texture dimensions to viewport
-		texBlur.resize(v.viewport().w, v.viewport().h);
+		texBlur.resize(viewport().w, viewport().h);
 	
 		// 2. Draw feedback texture. Try the different varieties!
 		// Note, we do not want to draw the texture if has just been resized.
@@ -70,10 +67,10 @@ public:
 		}
 
 		// 3. Do your drawing...
-		g.pushMatrix(Graphics::MODELVIEW);
+		g.matrixScope([&](){
 			g.rotate(angle, 0,0,1);
 			g.draw(shape);
-		g.popMatrix();
+		});
 
 
 		// 4. Copy current (read) frame buffer to texture
