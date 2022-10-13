@@ -1,4 +1,4 @@
-/*
+/*	
   This example shows how to use Image, Array and Texture to read a .jpg file,
 display it as an OpenGL texture and print the pixel values on the command line.
 Notice that while the intput image has only 4 pixels, the rendered texture is
@@ -26,7 +26,7 @@ public:
 	MyApp() {
 
 		// Load an image file
-		const char *filename = "../../share/images/tiny.jpg";
+		const char *filename = RUN_MAIN_SOURCE_DIR "../../share/images/tiny.jpg";
 
 		if (image.load(filename)) {
 			printf("Read image from %s\n", filename);
