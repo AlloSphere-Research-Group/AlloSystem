@@ -66,7 +66,7 @@ const char * ShaderBase::log() const {
 
 void ShaderBase::printLog(const char * prepend) const {
 	const char * s = log();
-	if(s && s[0]) printf("%s\n%s\n", prepend, s);
+	if(s && s[0]){ printf("%s\n%s\n", prepend, s); fflush(stdout); }
 }
 
 void Shader::getLog(char * buf) const {
@@ -551,6 +551,8 @@ void ShaderProgram::listParams() const {
 		printf("attribute %d(%s): type %d size %d length %d\n",
 			j, name, gltype, size, length);
 	}
+
+	fflush(stdout);
 }
 
 } // al::
