@@ -96,6 +96,15 @@ public:
 	typedef Buffer<Index>		Indices;
 
 
+	enum Attrib{
+		POSITION	= 1<<0,
+		NORMAL		= 1<<1,
+		TANGENT		= 1<<2,
+		TEXCOORD	= 1<<3,
+		COLOR		= 1<<4
+	};
+
+
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0);
 
@@ -546,6 +555,10 @@ public:
 	bool loadPLY(const void * data, int numBytes);
 
 
+	/// Set hint for what attributes generators/loaders should produce
+	Mesh& attribHint(Attrib v){ mAttribHint = v; return *this; }
+	Attrib attribHint() const { return mAttribHint; }
+
 	/// Print information about Mesh
 	void print(FILE * dst = stderr) const;
 
@@ -569,8 +582,12 @@ protected:
 	Indices mIndices;
 
 	int mPrimitive;
+	Attrib mAttribHint = Attrib(0);
 	float mStroke = -1.f;
 };
+
+inline Mesh::Attrib operator& (Mesh::Attrib a, Mesh::Attrib b){ return Mesh::Attrib(+a & +b); }
+inline Mesh::Attrib operator| (Mesh::Attrib a, Mesh::Attrib b){ return Mesh::Attrib(+a | +b); }
 
 } // al::
 
