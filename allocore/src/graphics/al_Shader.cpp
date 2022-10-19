@@ -407,6 +407,9 @@ template<> const ShaderProgram& ShaderProgram::uniform<Color>(int loc, const Col
 template<> const ShaderProgram& ShaderProgram::uniform<RGB>(int loc, const RGB& v) const {
 	return uniformVec(loc, v);
 }
+template<> const ShaderProgram& ShaderProgram::uniform<HSV>(int loc, const HSV& v) const {
+	return uniformVec(loc, v);
+}
 
 template<> const ShaderProgram& ShaderProgram::uniform<Mat3f>(int loc, const Mat3f& v) const {
 	return uniformMatrix3(loc, &v[0]);
