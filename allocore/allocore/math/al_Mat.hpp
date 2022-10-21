@@ -336,6 +336,19 @@ public:
 		return row(Index);
 	}
 
+	/// Set row values
+	template <class V>
+	Mat& row(int i, const Vec<N,V>& v){
+		for(int c=0; c<N; ++c) (*this)(i,c) = v[c];
+		return *this;
+	}
+
+	template <unsigned Index, class V>
+	Mat& row(const Vec<N,V>& v){
+		static_assert(Index < N, "Row index out of bounds");
+		return row(Index, v);
+	}
+
 	/// Return diagonal
 	Vec<N,T> diagonal() const { return Vec<N,T>(elems(), N+1); }
 
