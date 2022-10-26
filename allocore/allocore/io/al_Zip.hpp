@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_ZIP_HPP
-#define INCLUDE_AL_ZIP_HPP
+#ifndef INCLUDE_AL_IO_ZIP_HPP
+#define INCLUDE_AL_IO_ZIP_HPP
 /*	Allocore --
 	Multimedia / virtual environment application class library
 
