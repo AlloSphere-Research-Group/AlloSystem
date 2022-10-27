@@ -922,8 +922,8 @@ inline T dot(const Vec<N,T>& a, const Vec<N,T>& b){
 
 /// Rotate a vector around a normal vector
 
-/// @param[in,out]	vec		The vector to rotate
-/// @param[in]		normal	A normal perpendicular to the plane of rotation
+/// @param[in,out]	vec		Vector to rotate
+/// @param[in]		normal	Normal perpendicular to the plane of rotation
 /// @param[in]		cosAng	Cosine of the rotation angle
 /// @param[in]		sinAng	Sine of the rotation angle
 template <class T>
@@ -937,14 +937,24 @@ void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng)
 
 /// Rotate a vector around a normal vector
 
-/// @param[in,out]	vec			The vector to rotate
-/// @param[in]		normal		A normal perpendicular to the plane of rotation
-/// @param[in]		angle		The rotation angle, in radians
+/// @param[in,out]	vec			Vector to rotate
+/// @param[in]		normal		Normal perpendicular to the plane of rotation
+/// @param[in]		angle		Rotation angle, in radians
 template <class T>
 void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
 	rotate(vec, normal, cos(angle), sin(angle));
 }
 
+/// Rotate a vector 90 degrees around a normal vector
+
+/// @param[in,out]	vec		Vector to rotate
+/// @param[in]		normal	Normal perpendicular to the plane of rotation
+template <class T>
+void rotate90(Vec<3,T>& vec, const Vec<3,T>& normal){
+	// Simplified Rodrigues' rotation formula with c=0,s=1:
+	//vec = vec*c + cross(normal, vec)*s + normal*(normal.dot(vec)*(T(1)-c));
+	vec = cross(normal, vec) + vec.projection(normal);
+}
 
 /// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
