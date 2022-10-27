@@ -14,98 +14,88 @@ Lance Putnam, 12/2012
 using namespace al;
 
 
-void midiCallback(double deltaTime, std::vector<unsigned char> *msg, void *userData){
-	unsigned numBytes = msg->size();
+int main(){
+	MIDIIn midiIn;
 
-	if(numBytes > 0){
+	unsigned numPorts = midiIn.portCount();
 
-		// The first byte is the status byte indicating the message type
-		unsigned char status = msg->at(0);
+	// First check if there are any MIDI devices
+	if(!numPorts){
+		printf("No MIDI devices detected!\n");
+		return 0;
+	}
 
-		printf("%s: ", MIDIByte::messageTypeString(status));
+	// Print out names of available input ports
+	for(unsigned i=0; i<numPorts; ++i){
+		printf("Port %u: %s\n", i, midiIn.portName(i).c_str());
+	}
 
-		// Check if we received a channel message
-		if(MIDIByte::isChannelMessage(status)){
-			unsigned char type = status & MIDIByte::MESSAGE_MASK;
-			unsigned char chan = status & MIDIByte::CHANNEL_MASK;
+	unsigned portToOpen = 0;
 
-			// Here we demonstrate how to parse to common channel messages
-			switch(type){
-			case MIDIByte::NOTE_ON:
-				printf("Note %u, Vel %u", msg->at(1), msg->at(2));
+	// Check available ports vs. specified
+	if(portToOpen >= numPorts){
+		printf("Invalid port specifier!\n");
+		return 0;
+	}
+
+	// Set our callback function. This should be done before opening the port.
+	midiIn.onMessage([](const MIDIMessage& m){
+
+		printf("%s: ", MIDIByte::messageTypeString(m.status()));
+
+		// Here we check for the more common channel messages
+		switch(m.type()){
+		case MIDIByte::NOTE_ON:
+			printf("Note %u, Vel %f", m.noteNumber(), m.velocity());
+			break;
+
+		case MIDIByte::NOTE_OFF:
+			printf("Note %u, Vel %f", m.noteNumber(), m.velocity());
+			break;
+
+		case MIDIByte::PITCH_BEND:
+			printf("Value %f", m.pitchBend());
+			break;
+
+		case MIDIByte::CONTROL_CHANGE:
+			printf("%s ", MIDIByte::controlNumberString(m.controlNumber()));
+			switch(m.controlNumber()){
+			case MIDIByte::MODULATION:
+				printf("%f", m.controlValue());
 				break;
 
-			case MIDIByte::NOTE_OFF:
-				printf("Note %u, Vel %u", msg->at(1), msg->at(2));
+			case MIDIByte::EXPRESSION:
+				printf("%f", m.controlValue());
 				break;
-
-			case MIDIByte::PITCH_BEND:
-				printf("Value %u", MIDIByte::convertPitchBend(msg->at(1), msg->at(2)));
-				break;
-
-			// Control messages need to be parsed again...
-			case MIDIByte::CONTROL_CHANGE:
-				printf("%s ", MIDIByte::controlNumberString(msg->at(1)));
-				switch(msg->at(1)){
-				case MIDIByte::MODULATION:
-					printf("%u", msg->at(2));
-					break;
-				}
-				break;
-			default:;
 			}
+			break;
+		default:;
+		}
 
-			printf(" (MIDI chan %u)", chan + 1);
+		if(m.isChannelMessage()){
+			printf(" (MIDI chan %u)", m.channel() + 1);
 		}
 
 		printf("\n");
 
-
 		printf("\tBytes = ");
-		for(unsigned i=0; i<numBytes; ++i){
-			printf("%3u ", (int)msg->at(i));
+		for(unsigned i=0; i<3; ++i){
+			printf("%3u ", (int)m.bytes[i]);
 		}
-		printf(", stamp = %g\n", deltaTime);
+		printf(", time = %g\n", m.timeStamp());
 
 		fflush(stdout);
+	});
+
+	// Optional: Don't ignore sysex, timing, or active sensing messages
+	//midiIn.ignoreTypes(false, false, false);
+
+	// Open the port specified above
+	if(midiIn.open(portToOpen)){
+		printf("\nReading MIDI input from \"%s\" ... press <enter> to quit.\n", midiIn.name().c_str());
+		fflush(stdout);
+		getchar();
+	} else {
+		printf("Failed to open port to device.\n");
 	}
-}
-
-
-int main(){
-	MIDIIn midiIn;
-
-	// Check available ports vs. specified
-	unsigned portToOpen = 0;
-	unsigned numPorts = midiIn.getPortCount();
-
-	if(portToOpen >= numPorts){
-		printf("Invalid port specifier!\n");
-	}
-
-	try {
-		// Print out names of available input ports
-		for(unsigned i=0; i<numPorts; ++i){
-			printf("Port %u: %s\n", i, midiIn.getPortName(i).c_str());
-		}
-
-		// Open the port specified above
-		midiIn.openPort(portToOpen);
-	}
-	catch(MIDIError &error){
-		error.printMessage();
-		return 1;
-	}
-
-	// Set our callback function.  This should be done immediately after
-	// opening the port to avoid having incoming messages written to the
-	// queue instead of sent to the callback function.
-	midiIn.setCallback(&midiCallback);
-
-	// Don't ignore sysex, timing, or active sensing messages.
-	midiIn.ignoreTypes(false, false, false);
-
-	printf("\nReading MIDI input ... press <enter> to quit.\n");
-	fflush(stdout);
-	getchar();
 }
