@@ -187,10 +187,9 @@ protected:
 class MIDIIn {
 public:
 
-	MIDIIn();
+	typedef std::function<void(const MIDIMessage&)> OnMessage;
 
-	/// Called when a MIDI message is received
-	std::function<void(const MIDIMessage&)> onMessage;
+	MIDIIn();
 
 	/// Open device on port
 	bool open(int port);
@@ -201,6 +200,9 @@ public:
 	/// Whether a port was opened
 	bool opened() const;
 	operator bool() const { return opened(); }
+
+	/// Set callback when a MIDI message is received
+	MIDIIn& onMessage(const OnMessage& m){ mOnMessage = m; return *this; }
 
 	/// Get current port (or -1 if none)
 	int port() const { return mPort; }
@@ -220,6 +222,7 @@ private:
 	class Impl;
 	Pimpl<Impl> mImpl;
 	int mPort = -1;
+	OnMessage mOnMessage;
 };
 
 /// @} // end allocore group

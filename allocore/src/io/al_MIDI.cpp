@@ -44,23 +44,23 @@ struct MIDIIn::Impl{
 	void bindCallback(MIDIIn * outer){
 		midi.setCallback([](double t, std::vector<unsigned char> * msgPtr, void *user){
 			auto& o = *static_cast<MIDIIn *>(user);
-			if(!o.onMessage) return;
+			if(!o.mOnMessage) return;
 
 			auto& m = *msgPtr;
 
 			switch(m.size()){
 			case 3:
-				o.onMessage(MIDIMessage(t, m[0], m[1], m[2]));
+				o.mOnMessage(MIDIMessage(t, m[0], m[1], m[2]));
 				break;
 			case 2:
-				o.onMessage(MIDIMessage(t, m[0], m[1]));
+				o.mOnMessage(MIDIMessage(t, m[0], m[1]));
 				break;
 			case 1:
-				o.onMessage(MIDIMessage(t, m[0]));
+				o.mOnMessage(MIDIMessage(t, m[0]));
 				break;
 			case 0:;
 			default: // sysex
-				o.onMessage(MIDIMessage(t, m[0], m[1], m[2], &m[3]));
+				o.mOnMessage(MIDIMessage(t, m[0], m[1], m[2], &m[3]));
 			}
 		}, outer);
 	}
