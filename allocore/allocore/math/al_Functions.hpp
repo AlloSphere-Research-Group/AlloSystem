@@ -192,7 +192,7 @@ bool inSet(const T& val, const T& x){ return val==x; }
 /// Suitable for any type with == operator defined (including std::string).
 template <class T, class... Ts>
 bool inSet(const T& val, const T& x, Ts&&... xs){
-	return inSet(val, x) || inSet(val, std::forward<Ts>(xs)...);
+	return inSet(val, x) || inSet<T>(val, std::forward<Ts>(xs)...);
 }
 
 /// Returns true if integer is prime
