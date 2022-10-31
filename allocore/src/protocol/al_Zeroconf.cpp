@@ -1,12 +1,29 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include "allocore/io/al_Socket.hpp" // Socket::hostname
 #include "allocore/protocol/al_Zeroconf.hpp"
+#include "allocore/system/al_Config.h"
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/system/al_Printing.hpp" // AL_WARN
+using namespace al;
+using namespace al::zero;
+
+#ifdef AL_ZEROCONF_DUMMY
+
+Client::Client(const std::string& type, const std::string& domain)
+:	type(type), domain(domain){}
+
+Client::~Client(){}
+
+void Client::poll(double interval) {}
+
+Service::Service(const std::string& name, unsigned short port, const std::string& type, const std::string& domain){}
+
+Service::~Service(){}
+
 
 // On OSX these are implemented in al_Zeroconf_OSX.mm instead
-#ifndef AL_OSX
+#elif !defined(AL_OSX)
 
 #include <avahi-client/client.h>
 #include <avahi-client/publish.h>
@@ -17,9 +34,6 @@
 #include <avahi-common/error.h>
 #include <avahi-common/alternative.h>
 #include <avahi-common/timeval.h>
-
-using namespace al;
-using namespace al::zero;
 
 static AvahiSimplePoll * poller = 0;
 
@@ -345,6 +359,7 @@ public:
 	AvahiEntryGroup * group;
 	Service * master;
 };
+
 
 Client::Client(const std::string& type, const std::string& domain)
 :	type(type), domain(domain) {
