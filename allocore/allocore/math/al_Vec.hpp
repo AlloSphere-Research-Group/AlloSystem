@@ -44,7 +44,7 @@
 */
 
 
-#include <cmath> // pow
+#include <cmath> // abs, pow
 #include <cstdio>
 #include <initializer_list>
 #include <ostream>
@@ -873,9 +873,12 @@ inline Vec<M,T>& sub(Vec<N,T>& v){
 	return sub<M,0>(v);
 }
 
-/// Get absolute value (magnitude) of vector
+/// Get vector with absolute value of each element
 template <int N, class T>
-inline T abs(const Vec<N,T>& v){ return v.mag(); }
+inline Vec<N,T> abs(const Vec<N,T>& v){
+	auto r=v; for(auto& e:r) e = std::abs(e);
+	return r;
+}
 
 /// Get vector with each element raised to a power
 template <int N, class T>

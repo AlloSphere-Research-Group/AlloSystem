@@ -183,7 +183,6 @@ int utMath(){
 		assert(Vec3f(1,2,3).mean() == 2);
 		assert(a.mag() == sqrt(N));
 		assert(b.mag() == sqrt(N));
-		assert(a.mag() == abs(a));
 		assert(a.magSqr() == N);
 		assert(b.magSqr() == N);
 		assert(a.norm1() == N);
@@ -212,6 +211,11 @@ int utMath(){
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(1, 0, 0)), 0.));
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(0, 1, 0)), M_PI_2));
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(0,-1, 0)), M_PI_2));
+
+		assert(eq(abs(Vec3d(-1,2,-3)), Vec3d(1,2,3)));
+
+		assert(eq(pow(Vec3d(1,2,3), 2.), Vec3d(1,4,9)));
+		assert(eq(pow(2., Vec3d(1,2,3)), Vec3d(2,4,8)));
 
 		{
 		auto r = centroid(Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(0,0,1));
