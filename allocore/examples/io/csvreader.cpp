@@ -17,7 +17,9 @@ typedef struct {
 	bool b;
 } RowTypes;
 
-int main(int argc, char *argv[]) {
+
+int main() {
+	using namespace al;
 
 	CSVReader reader;
 	reader.addType(CSVReader::STRING);
