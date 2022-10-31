@@ -193,6 +193,9 @@ public:
 
 	/// Open device on port
 	bool open(int port);
+	
+	/// Open first device matching keyword in name
+	bool open(const std::string& keyword);
 
 	/// Close device
 	void close();

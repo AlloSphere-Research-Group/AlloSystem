@@ -176,6 +176,15 @@ bool MIDIIn::open(int port){
 	return false;
 }
 
+bool MIDIIn::open(const std::string& keyword){
+	int numPorts = portCount();
+	for(int i=0; i<numPorts; ++i){
+		auto name = portName(i);
+		if(name.find(keyword) != std::string::npos) return open(i);
+	}
+	return false;
+}
+
 void MIDIIn::close(){
 	if(opened()){
 		mImpl->close();
