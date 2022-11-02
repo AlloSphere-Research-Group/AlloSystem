@@ -128,6 +128,10 @@ Tv linear(Tf frac, const Tv& x, const Tv& y);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
+/// Linear interpolation into a list
+template <class Tf, class Tv>
+Tv linear(Tf frac, const std::initializer_list<Tv>& src);
+
 /// Cyclic linear interpolation between three elements
 template <class Tf, class Tv>
 Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z);
@@ -408,6 +412,17 @@ inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 	frac *= Tf(2);
 	if(frac<Tf(1)) return ipl::linear(frac, x,y);
 	return ipl::linear(frac-Tf(1), y,z);
+}
+
+template <class Tf, class Tv>
+inline Tv linear(Tf frac, const std::initializer_list<Tv>& src){
+	if(frac >= Tf(1)) return *(src.end()-1);
+	int N = src.size();
+	Tf idxf = (N-1)*frac;
+	int i0 = int(idxf);
+	int i1 = i0+1;
+	Tf f = idxf - i0;
+	return linear(f, *(src.begin()+i0), *(src.begin()+i1));
 }
 
 template <class Tf, class Tv>
