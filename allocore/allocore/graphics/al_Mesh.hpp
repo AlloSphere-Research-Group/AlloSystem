@@ -375,6 +375,9 @@ public:
 	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
 
 	template <class T>
+	Mesh& translate(const Vec<2,T>& xy, float z=0.f){ return translate(xy[0],xy[1],z); }
+
+	template <class T>
 	Mesh& translate(const T& v){ return translate(v,v,v); }
 
 	/// Rotate 90 degrees on specified plane
