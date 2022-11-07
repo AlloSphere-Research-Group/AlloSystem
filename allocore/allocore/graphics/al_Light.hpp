@@ -43,8 +43,6 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include <string>
-
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/types/al_Color.hpp"
 
