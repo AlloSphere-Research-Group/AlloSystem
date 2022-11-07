@@ -77,36 +77,23 @@ public:
 	/// Set reflectance at non-grazing viewing angles; in [0,1]
 	Material& reflectance(float v){ mReflectance=v; return *this; }
 
-	Material& opticalDensity(float v) { mOpticalDensity=v; return *this; }
-	Material& illumination(float v) { mIllumination=v; return *this; }
-
 	Material& ambientAndDiffuse(const Color& v);
 	Material& ambient(const Color& v);
 	Material& diffuse(const Color& v);
 	Material& emission(const Color& v);
 	Material& specular(const Color& v);
 
-	Material& ambientMap(const std::string& map) { mMapKa = map; return *this; }
-	Material& specularMap(const std::string& map) { mMapKs = map; return *this; }
-	Material& diffuseMap(const std::string& map) { mMapKd = map; return *this; }
-	Material& bumpMap(const std::string& map) { mMapBump = map; return *this; }
 	Material& useColorMaterial(bool v) { mUseColorMaterial = v; return *this; }
 
 	int face() const { return mFace; }
 
 	float shininess() const { return mShine; }
 	float reflectance() const { return mReflectance; }
-	float opticalDensity() const { return mOpticalDensity; }
-	float illumination() const { return mIllumination; }
 	const Color& ambient() const { return mAmbient; }
 	const Color& diffuse() const  { return mDiffuse; }
 	const Color& emission() const { return mEmission; }
 	const Color& specular() const { return mSpecular; }
 
-	const std::string& ambientMap() const { return mMapKa; }
-	const std::string& specularMap() const { return mMapKs; }
-	const std::string& diffuseMap() const { return mMapKd; }
-	const std::string& bumpMap() const { return mMapBump; }
 	bool useColorMaterial() const { return mUseColorMaterial; }
 
 protected:
@@ -115,9 +102,7 @@ protected:
 	Color mEmission{0.};
 	Color mSpecular{0.};
 	float mShine=40., mReflectance=1.;
-	float mOpticalDensity=0., mIllumination=0.;
 	int mFace;
-	std::string mMapKa, mMapKs, mMapKd, mMapBump;
 	bool mUseColorMaterial=true;
 };
 
@@ -236,7 +221,7 @@ protected:
 	static bool sGlobalAmbientUpdate;
 	static bool sTwoSided;
 	static bool sTwoSidedUpdate;
-	int mIndex;
+
 	Vec3f mPos{0,0,1}, mDir{0,0,-1};
 	Color mAmbient{0};
 	Color mDiffuse{1};
@@ -245,6 +230,7 @@ protected:
 	float mSpread{180};
 	float mHalfDist{1e16};
 	float mAtten[3] = {1,0,0};
+	char mIndex;
 	bool mIsDir = false;
 
 	friend class Graphics;
