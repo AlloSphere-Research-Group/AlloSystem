@@ -118,6 +118,9 @@ public:
 	/// Get center of near plane
 	vec centerNear() const { return (ntr+ntl+nbl+nbr)*0.25; }
 
+	/// Get center of far plane
+	vec centerFar() const { return (ftr+ftl+fbl+fbr)*0.25; }
+
 	/// Get center of frustum
 	vec center() const { return (ntl+ntr+nbl+nbr+ftl+ftr+fbl+fbr)*0.125; }
 
@@ -178,12 +181,12 @@ Frustum<T>& Frustum<T>::fromCorners(const Vec * corners){
 template <class T>
 template <class Mat4>
 Frustum<T>& Frustum<T>::fromInverseMVP(const Mat4& invMVP){
-	static const Vec4f bb[8] = {
-		{-1.f, 1.f,-1.f, 1.f}, { 1.f, 1.f,-1.f, 1.f}, {-1.f,-1.f,-1.f, 1.f}, { 1.f,-1.f,-1.f, 1.f},
-		{-1.f, 1.f, 1.f, 1.f}, { 1.f, 1.f, 1.f, 1.f}, {-1.f,-1.f, 1.f, 1.f}, { 1.f,-1.f, 1.f, 1.f}
+	static const Vec3f bb[8] = {
+		{-1.f, 1.f,-1.f}, { 1.f, 1.f,-1.f}, {-1.f,-1.f,-1.f}, { 1.f,-1.f,-1.f},
+		{-1.f, 1.f, 1.f}, { 1.f, 1.f, 1.f}, {-1.f,-1.f, 1.f}, { 1.f,-1.f, 1.f}
 	};
 	for(unsigned i=0; i<8; ++i){
-		auto c = invMVP * bb[i];
+		auto c = invMVP * Vec4f(bb[i],1.f);
 		corner(i) = c.xyz() / c.w;
 	}
 	return computePlanes();
