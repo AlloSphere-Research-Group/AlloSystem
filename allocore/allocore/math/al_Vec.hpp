@@ -222,6 +222,10 @@ public:
 		return const_cast<Vec*>(this)->as<V>();
 	}
 
+	/// Get vector with elements casted to new type
+	template <class V>
+	Vec<N,V> to() const { return Vec<N,V>(*this); }
+
 	/// Get read-only pointer to elements
 	const T * elems() const { return &x; }
 
