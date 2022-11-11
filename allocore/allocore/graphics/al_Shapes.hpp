@@ -218,6 +218,10 @@ int addCircle(Mesh& m, float radius=1., int N=60);
 /// \returns number of vertices added
 int addRect(Mesh& m, float width=2, float height=2, float x=0, float y=0, float z=0);
 
+inline int addSquare(Mesh& m, float extent=2, float x=0, float y=0, float z=0){
+	return addRect(m, extent,extent, x,y,z);
+}
+
 /// Add a rectangular frame as indexed lines
 int addFrame(Mesh& m, float width=2, float height=2, float x=0, float y=0, float z=0);
 
