@@ -86,6 +86,9 @@ public:
 	RNG& rng(){ return mRNG; }
 
 
+	/// Returns uniform random integer
+	uint32_t operator()(){ return mRNG(); }
+
 	/// Returns uniform random in [0, 1)
 	float uniform(){
 		return to12(mRNG()) - 1.f;
