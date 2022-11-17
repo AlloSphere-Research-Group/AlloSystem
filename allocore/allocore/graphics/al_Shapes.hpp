@@ -392,14 +392,14 @@ int addTorus(
 /// @param[in] Nx			Voxel samples along x
 /// @param[in] Ny			Voxel samples along y
 /// @param[in] Nz			Voxel samples along z
-/// @param[in] cellSize		Length of each rendered voxel cell
+/// @param[in] cellSize		Diameter of each rendered voxel cell
 /// @param[in] onFace		Called when quad face (4 verts) added to mesh;
 ///							argument is index of first vertex of quad
 /// \returns number of vertices added
 int addVoxels(
 	Mesh& m,
 	const std::function<float(int x, int y, int z)>& getVoxel,
-	int Nx, int Ny, int Nz, float cellSize = 0.1,
+	int Nx, int Ny, int Nz, float cellSize = 1.,
 	const std::function<void(int vertex)>& onFace = [](int){}
 );
 

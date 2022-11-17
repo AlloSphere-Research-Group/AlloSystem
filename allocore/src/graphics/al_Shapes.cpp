@@ -719,6 +719,8 @@ int addVoxels(
 	int numVertIn = m.vertices().size();
 	m.triangles();
 	float n = 1.; // 1 normals point out, -1 normals point in
+	bool wantsTan = m.attribHint() & Mesh::TANGENT;
+	bool wantsTxc = m.attribHint() & Mesh::TEXCOORD;
 	for(int k=0; k<Nz+1; ++k){
 	for(int j=0; j<Ny+1; ++j){
 	for(int i=0; i<Nx+1; ++i){
@@ -739,7 +741,11 @@ int addVoxels(
 			m.vertex(pos.x, pos.y  , pos.z+D);
 			m.vertex(pos.x, pos.y+D, pos.z+D);
 			if(v<vx){
-				for(int i=0; i<4; ++i) m.normal( n, 0., 0.);
+				for(int i=0; i<4; ++i){
+					m.normal( n, 0., 0.);
+					//if(wantsTan) m.tangent(0.,0.,1.);
+					//if(wantsTxc) m.texCoord(0.,0.,1.);
+				}
 				m.index(Nv, Nv+1, Nv+2, Nv+2, Nv+1, Nv+3);
 			} else {
 				for(int i=0; i<4; ++i) m.normal(-n, 0., 0.);
