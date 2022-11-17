@@ -345,12 +345,19 @@ public:
 	/// Repeat last vertex element(s)
 	Mesh& repeatLast();
 
-	/// Call function for each face in mesh
+	/// Call function for each face
 
 	/// If the primitive is points or lines, then the function is called for
 	/// each point or line segment, respectively.
 	const Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace) const;
 	Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace);
+
+	/// Call function for each vertex (position)
+
+	/// A less error-prone way of writing
+	/// 	for(int i=0; i<mesh.vertices().size(); ++i) ...
+	const Mesh& forEachVertex(const std::function<void(int i)>& onVert) const;
+	Mesh& forEachVertex(const std::function<void(int i)>& onVert);
 
 	/// Get corners of bounding box of vertices
 
