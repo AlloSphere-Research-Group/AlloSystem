@@ -278,6 +278,9 @@ public:
 	template <class UniformPOD>
 	static Mat& pun(const UniformPOD& v){ return pun(const_cast<UniformPOD&>(v)); }
 
+	/// Returns order (number of columns or rows)
+	static constexpr int order(){ return N; }
+
 	/// Returns total number of elements
 	static constexpr int size(){ return N*N; }
 
