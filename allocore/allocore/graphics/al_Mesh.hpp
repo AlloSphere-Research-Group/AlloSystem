@@ -570,13 +570,13 @@ public:
 	Attrib attribHint() const { return mAttribHint; }
 
 	/// Print information about Mesh
-	void print(FILE * dst = stderr) const;
+	void print(FILE * dst = stdout) const;
 
 	/// Debug mesh
 
 	/// @param[in] dst	file to print log to or nullptr for no logging
 	/// \returns whether the mesh is well-formed
-	bool debug(FILE * dst = stderr) const;
+	bool debug(FILE * dst = stdout) const;
 
 protected:
 
