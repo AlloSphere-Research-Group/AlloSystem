@@ -110,6 +110,7 @@ class Vec : public VecElems<N,T>{
 
 	static constexpr int const_abs(int x){ return x>=0 ? x : -x; }
 	static constexpr int const_min(int x, int y){ return x<=y ? x : y; }
+	static constexpr int const_mods(int x, int y){ return (x%y + y) % y; }
 
 public:
 	using VecElems<N,T>::x;
@@ -446,6 +447,16 @@ public:
 		for(int i=Bc; i<Ec; ++i) r[i] = (*this)[i-Oc];
 		for(int i=Bf; i<Ef; ++i) r[i] = fill;
 		return r;
+	}
+
+	/// Apply circular shift to elements
+
+	/// Element i is moved to element (i+D)%N.
+	///
+	template <int D>
+	Vec& cshift(){
+		constexpr auto Dp = const_mods(D,N);
+		return (*this) = concat(drop<N-Dp>(), drop<-Dp>());
 	}
 
 	/// Swap elements within vector
