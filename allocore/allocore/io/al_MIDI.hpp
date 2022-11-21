@@ -150,6 +150,9 @@ public:
 
 
 	/// Get note number (type must be NOTE_ON or NOTE_OFF)
+
+	/// The frequency in Hz is typically calculated as:
+	///		440 2^((n-69)/12)
 	unsigned char noteNumber() const { return bytes[1]; }
 
 	/// Get mapped note velocity (type must be NOTE_ON or NOTE_OFF)
