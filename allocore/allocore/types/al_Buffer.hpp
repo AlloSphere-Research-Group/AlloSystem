@@ -135,6 +135,8 @@ public:
 	T& last(){ return *(mEnd-1); }
 	const T& last(int i) const { return const_cast<Buffer*>(this)->last(i); }
 	T& last(int i){ return *(mEnd-1-i); }
+	const T& back() const { return last(); }
+	T& back(){ return last(); }
 
 	/// Resets size to zero without deallocating allocated memory
 	void reset(){ resize(0); }
