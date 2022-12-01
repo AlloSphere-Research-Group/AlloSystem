@@ -222,6 +222,7 @@ protected:
 	auto Bs= [&](float p=0.5, float v=1.){ return P(p)?v:-v; };\
 	auto U = [&](){ return rng.uniform(1.); };\
 	auto Us= [&](){ return rng.uniform(1.,-1.); };\
+	auto Ui= [&](int n){ return rng.uniform(n); };\
 	auto L0= [&](){ return std::min(U(), U()); }; /* more 0 than 1 */ \
 	auto L1= [&](){ return std::max(U(), U()); }; /* more 1 than 0 */ \
 	auto T = [&](){ return (U()+U())*0.5; };\
