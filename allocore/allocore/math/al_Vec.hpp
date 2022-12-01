@@ -71,9 +71,7 @@ typedef Vec<4,int>		Vec4i;	///< integer 4-vector
 template <int N, class T>
 struct VecElems{ T x,y,z,w; private: T data[N-4]; };
 
-template<class T> struct VecElems<0,T>{ static T x; };
-template<class T> T VecElems<0,T>::x=0;
-
+template<class T> struct VecElems<0,T>{};
 template<class T> struct VecElems<1,T>{ T x; };
 template<class T> struct VecElems<2,T>{ T x,y; };
 template<class T> struct VecElems<3,T>{
@@ -113,7 +111,6 @@ class Vec : public VecElems<N,T>{
 	static constexpr int const_mods(int x, int y){ return (x%y + y) % y; }
 
 public:
-	using VecElems<N,T>::x;
 
 	typedef T value_type;
 
@@ -228,10 +225,10 @@ public:
 	Vec<N,V> to() const { return Vec<N,V>(*this); }
 
 	/// Get read-only pointer to elements
-	const T * elems() const { return &x; }
+	const T * elems() const { return const_cast<Vec*>(this)->elems(); }
 
 	/// Get read-write pointer to elements
-	T * elems(){ return &x; }
+	T * elems(){ return (T*)(this); }
 
 	T * begin(){ return elems(); }
 	const T * begin() const { return elems(); }
