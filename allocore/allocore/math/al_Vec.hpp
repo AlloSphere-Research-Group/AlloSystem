@@ -446,6 +446,20 @@ public:
 		return r;
 	}
 
+	/// Returns self concatenated with other
+	template <int M, class U>
+	Vec<N+M,T> concat(const Vec<M,U>& v) const {
+		Vec<N+M,T> r;
+		r.set(this->elems());
+		for(int i=0; i<M; ++i) r[i+N] = T(v[i]);
+		return r;
+	}
+
+	template <class S>
+	Vec<N+1,T> concat(const S& s) const {
+		return Vec<N+1,T>(*this,s);
+	}
+
 	/// Apply circular shift to elements
 
 	/// Element i is moved to element (i+D)%N.
@@ -453,7 +467,7 @@ public:
 	template <int D>
 	Vec& cshift(){
 		constexpr auto Dp = const_mods(D,N);
-		return (*this) = concat(drop<N-Dp>(), drop<-Dp>());
+		return (*this) = drop<N-Dp>().concat(drop<-Dp>());
 	}
 
 	/// Swap elements within vector
@@ -842,15 +856,12 @@ inline Vec<N,T> operator / (const T& s, const Vec<N,T>& v){
 /// Returns concatenation of two vectors
 template <int N1, class T1, int N2, class T2>
 inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
-	Vec<N1+N2, T1> r;
-	r.set(a.elems());
-	for(int i=0; i<N2; ++i) r[i+N1] = T1(b[i]);
-	return r;
+	return a.concat(b);
 }
 
 template <int N, class T, class V>
 inline Vec<N+1, T> concat(const Vec<N,T>& v, const V& s){
-	return Vec<N+1,T>(v,s);
+	return v.concat(s);
 }
 
 template <int N, class T, class V>
