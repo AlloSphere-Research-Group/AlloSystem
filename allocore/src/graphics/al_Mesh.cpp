@@ -127,8 +127,7 @@ public:
 		vertices[0] = p0;
 		vertices[1] = p1;
 		vertices[2] = p2;
-		// calculate norm for this face:
-		normal<float>(norm, p0, p1, p2);
+		norm = normal<float>(p0, p1, p2);
 	}
 };
 void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {

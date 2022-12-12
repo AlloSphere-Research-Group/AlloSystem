@@ -1060,11 +1060,11 @@ inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
 	return (a-b).mag();
 }
 
-/// Return magnitude of vector (for GLSL compatibility)
+/// Return magnitude of vector (GLSL compatibility)
 template <int N, class T>
 inline T length(const Vec<N,T>& v){ return v.mag(); }
 
-/// Return normalized vector
+/// Return normalized vector (GLSL compatibility)
 template <int N, class T>
 inline Vec<N,T> normalize(const Vec<N,T>& v){ return v.normalized(); }
 
@@ -1073,17 +1073,12 @@ inline Vec<N,T> lerp(const Vec<N,T>& input, const Vec<N,T>& target, T amt){
 	return Vec<N,T>(input).lerp(target, amt);
 }
 
-/*! Get the normal to a triangle defined by three points
-	@param[out] n	Normal
-	@param[ in] p1	Point 1
-	@param[ in] p2	Point 2
-	@param[ in] p3	Point 3
-*/
+/// Get normal to triangle defined by three points in CCW order
 template <class T>
-inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Vec<3,T>& p3){
-	cross(n, p2-p1, p3-p1);
-	n.normalize();
+inline Vec<3,T> normal(const Vec<3,T>& p1, const Vec<3,T>& p2, const Vec<3,T>& p3){
+	return cross(p2-p1, p3-p1).normalize();
 }
+
 
 /// Get surface normal given 2D gradient (useful for terrain rendering)
 template <class T>
