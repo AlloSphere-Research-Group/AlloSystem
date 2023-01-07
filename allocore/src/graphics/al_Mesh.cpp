@@ -1895,7 +1895,7 @@ bool Mesh::debug(FILE * dst) const {
 
 	if(mIndices.size()){
 		for(auto i : mIndices){
-			if(i > Nv || i < 0){
+			if(i >= Nv){
 				DPRINTF("Index out of bounds: %d (must be in [0,%d))\n", i, Nv);
 				ok=false;
 				break;
