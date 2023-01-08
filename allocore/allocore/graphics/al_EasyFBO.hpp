@@ -109,7 +109,7 @@ private:
 	Texture mTexture; // for color buffer (read-write)
 	RBO mRBO; // for depth buffer (write-only)
 	Matrix4d mMV{1};
-	Matrix4d mProj = Matrix4d::ortho(-2, 2, -2, 2, 0.01, 100);
+	Matrix4d mProj = Matrix4d::ortho(-1,1, -1,1, -1,1);
 	Color mClearColor = Color(0,0,0,1);
 	bool mNeedsSync = false;
 
