@@ -1096,6 +1096,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	const unsigned Nn = m.mNormals.size();
 	const unsigned Nc = m.mColors.size();
 	const unsigned Nci= m.mColoris.size();
+	const unsigned Nt = m.mTexCoord2s.size();
 	const unsigned Ni = m.indices().size();
 	//const unsigned Bi = Nv<=65536 ? 2 : 4; // max bytes/index
 	const unsigned Bi = Nv<=32768 ? 2 : 4; // changed since assimp import not working with full ushort range up to 65536
@@ -1131,6 +1132,14 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		;
 	}
 
+	bool hasTexCoords = Nt >= Nv;
+	if(hasTexCoords){
+		s <<
+		"property float s\n"
+		"property float t\n"
+		;
+	}
+
 	bool hasColors = Nc >= Nv || Nci >= Nv;
 	if(hasColors){
 		s <<
@@ -1140,8 +1149,6 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		"property uchar alpha\n"
 		;
 	}
-
-	// TODO: texcoords (s,t)
 
 	if(Ni){
 		s << "element face " << Ni/3 << "\n";
@@ -1160,6 +1167,9 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 					short v=m.mNormals[i][k]*32767.;
 					s.write(reinterpret_cast<const char*>(&v), 2);
 				}
+			}
+			if(hasTexCoords){
+				s.write(reinterpret_cast<const char*>(&m.mTexCoord2s[i][0]), sizeof(Mesh::TexCoord2));
 			}
 			if(hasColors){
 				auto col = Nci >= Nv ? m.mColoris[i] : Colori(m.mColors[i]);
@@ -1195,6 +1205,10 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 			if(hasNormals){
 				auto nrm = m.mNormals[i];
 				s << " " << nrm.x << " " << nrm.y << " " << nrm.z;
+			}
+			if(hasTexCoords){
+				auto txc = m.mTexCoord2s[i];
+				s << " " << txc.x << " " << txc.y;
 			}
 			if(hasColors){
 				auto col = Nci >= Nv ? m.mColoris[i] : Colori(m.mColors[i]);
