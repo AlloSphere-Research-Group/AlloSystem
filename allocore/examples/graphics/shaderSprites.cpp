@@ -18,14 +18,14 @@ public:
 
 	static const int N = 16; // grid resolution
 	ShaderProgram shader;
-	Texture tex{16,16, Graphics::LUMINANCE, Graphics::FLOAT};
+	Texture tex{16,16, Graphics::LUMINANCE};
 	Mesh geom;
 	float angle = 0.;
 
 	MyApp(){
 
 		// Create sprite positions
-		geom.primitive(Graphics::POINTS);
+		geom.points();
 		for(int k=0; k<N; ++k){ float z = float(k)/(N-1)*2-1;
 		for(int j=0; j<N; ++j){ float y = float(j)/(N-1)*2-1;
 		for(int i=0; i<N; ++i){ float x = float(i)/(N-1)*2-1;
@@ -34,45 +34,36 @@ public:
 		}}}
 
 		// Create sprite texture
-		int Nx = tex.width();
-		int Ny = tex.height();
-		float * pix = tex.data<float>();
-
-		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
-		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
-			auto m = x*x + y*y;
+		tex.assignFromTexCoord<Color>([](float u, float v){
+			auto xy = toVec(u,v)*2.f - 1.f;
+			auto m = xy.magSqr();
 			if(m > 1.) m = 1.;
 			m = 1.-m;
-			pix[j*Nx + i] = m; // spherical looking
-			//pix[j*Nx + i] = m*m; // Gaussian-like
-			//pix[j*Nx + i] = pow(2, 1.-1./m); // bright bump
-		}}
+			return Color(m); // spherical looking
+			//return Color(m*m); // Gaussian-like
+			//return Color(pow(2, 1.-1./m)); // bright bump
+		});
 
-		nav().pullBack(6);
-		initWindow();
-	}
-
-	void onCreate(const ViewpointWindow& w) override {
-
+		// Build shader
 		// Geometry inputs/outputs must be specified BEFORE compiling shader
 		shader.setGeometryInputPrimitive(Graphics::POINTS);
 		shader.setGeometryOutputPrimitive(Graphics::TRIANGLE_STRIP);
 		shader.setGeometryOutputVertices(4);
 
-		// Compile vertex, fragment, and geometry shaders
-		shader.compile(
-		R"(
+		shader.version(120).compile(R"(
+			// Vertex program
 			void main(){
 				gl_FrontColor = gl_Color;
 				gl_Position = gl_Vertex;
 			}
 		)", R"(
-			uniform sampler2D texSampler0;
+			// Fragment program
+			uniform sampler2D tex;
 			void main(){
-				gl_FragColor = texture2D(texSampler0, gl_TexCoord[0].xy) * gl_Color;
+				gl_FragColor = texture2D(tex, gl_TexCoord[0].xy) * gl_Color;
 			}
 		)", R"(
-			#version 120
+			// Geometry program (runs after vertex)
 			#extension GL_EXT_geometry_shader4 : enable
 
 			uniform float spriteRadius;
@@ -117,10 +108,13 @@ public:
 				}
 
 				//EndPrimitive();
-				gl_Position = gl_PositionIn[0];
+				//gl_Position = gl_PositionIn[0];
 			}
 		)"
 		);
+
+		nav().pullBack(6);
+		initWindow();
 	}
 
 	void onAnimate(double dt) override {

@@ -18,7 +18,7 @@ public:
 
 	float angle = 0.;
 	Mesh data;
-	Texture spriteTex{16,16, Graphics::LUMINANCE, Graphics::FLOAT};
+	Texture tex{16,16, Graphics::LUMINANCE};
 
 	MyApp(){
 		// Generate a grid of points
@@ -33,15 +33,11 @@ public:
 		}}}
 
 		// Create a Gaussian "bump" function to use for the sprite
-		int Nx = spriteTex.width();
-		int Ny = spriteTex.height();
-		float * pixels = spriteTex.data<float>();
-
-		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
-		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
-			float m = exp(-3*(x*x + y*y));
-			pixels[j*Nx + i] = m;
-		}}
+		tex.assignFromTexCoord<Color>([](float u, float v){
+			auto xy = toVec(u,v)*2.f-1.f;
+			float m = exp(-3.*(xy.magSqr()));
+			return Color(m);
+		});
 
 		nav().pullBack(6);
 		initWindow();
@@ -49,7 +45,7 @@ public:
 
 	void onAnimate(double dt) override {
 		angle += 0.1;
-		if(angle>360) angle -= 360;
+		if(angle > 360.) angle -= 360.;
 	}
 
 	void onDraw(Graphics& g) override {
@@ -65,11 +61,11 @@ public:
 		g.blendAdd();
 
 		// We must bind our sprite texture before drawing the points
-		spriteTex.bind();
+		tex.bind();
 			g.rotate(angle*7, 0,1,0);
 			g.rotate(angle*3, 0,0,1);
 			g.draw(data);
-		spriteTex.unbind();
+		tex.unbind();
 
 		glDisable(GL_POINT_SPRITE);
 	}
