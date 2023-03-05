@@ -27,8 +27,6 @@ public:
 	MyApp(){
 
 		// Generate a texture with an alpha channel for transparency
-		tex.allocate();
-		
 		tex.assignFromTexCoord<Color>([](float u, float v){
 			float px = u*M_2PI;
 			float py = v*M_2PI;
@@ -43,7 +41,7 @@ public:
 		//Image img("myImage.png");
 		//tex.allocate(img.array());
 
-		mesh.primitive(Graphics::TRIANGLES);
+		mesh.triangles();
 		mesh.vertex(-1,-1,-1); mesh.color(RGB(1,0,0));
 		mesh.vertex( 1,-1,-1); mesh.color(RGB(1,1,0));
 		mesh.vertex( 0, 1,-1); mesh.color(RGB(0,1,1));

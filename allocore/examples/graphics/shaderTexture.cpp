@@ -21,16 +21,10 @@ public:
 
 	MyApp(){
 
-		// Set texture pixels
-		int Nx = tex.width();
-		int Ny = tex.height();
-		Colori * pix = tex.data<Colori>();
-
-		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1);
-		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1);
-			int idx = j*Nx + i;
-			pix[idx] = RGB(x,y,0);
-		}}
+		// Set texel colors
+		tex.assignFromTexCoord<Color>([](float u, float v){
+			return RGB(u,v,0);
+		});
 
 		// Compile the vertex and fragment shaders to display the texture
 		shader.compile(R"(
@@ -43,9 +37,9 @@ public:
 			}
 		)", R"(
 			// A "sampler" is used to fetch texels from the texture
-			uniform sampler2D texSampler;
+			uniform sampler2D tex;
 			void main(){
-				gl_FragColor = texture2D(texSampler, gl_TexCoord[0].xy);
+				gl_FragColor = texture2D(tex, gl_TexCoord[0].xy);
 			}
 		)");
 
