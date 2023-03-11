@@ -156,7 +156,7 @@ public:
 		}
 	}
 
-	void onMouseMove(const Mouse& m){
+	void onMouseMove(const Mouse& m) override {
 		mx = float(m.x()) / window().width();
 		my = float(m.y()) / window().height();
 	}
