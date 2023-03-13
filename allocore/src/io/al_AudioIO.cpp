@@ -276,14 +276,14 @@ struct AudioIO::Impl{
 	AudioIO::Device deviceFromImplID(int devID){
 		AudioIO::Device dev;
 		auto info = mRtAudio.getDeviceInfo(devID);
-		//printf("chansI/O/D:%d/%d/%d SR(curr):%d SR(pref):%d\n", info.inputChannels, info.outputChannels, info.duplexChannels, info.currentSampleRate, info.preferredSampleRate);
+		//printf("[%2d] chansI/O/D:%d/%d/%d SR(curr):%d SR(pref):%d\n", devID, info.inputChannels, info.outputChannels, info.duplexChannels, info.currentSampleRate, info.preferredSampleRate);
 		dev.id = devID;
 		dev.name = info.name;
 		//dev.frameRate = info.currentSampleRate;
 		dev.frameRate = info.preferredSampleRate;
 		dev.channelsIn  = info.inputChannels;
 		dev.channelsOut = info.outputChannels;
-		//for(auto sr : info.sampleRates) printf("%d ", sr); printf("\n");
+		//printf("[%2d] ",devID); for(auto sr : info.sampleRates) printf("%d ", sr); printf("\n");
 		return dev;
 	}
 
