@@ -51,8 +51,16 @@ int main(){
 	io.callback([](AudioIOData& io){
 		// Loop through the frames in the block
 		while(io()){
-			float s = io.in(0); // get input (line-in or mic)
+			//float s = io.in(0); // get input (line-in or mic)
 			// process samples here...
+			
+			//* Test tone
+			static float p = 0.;
+			p += 440.f/io.fps(); if(p>1.) --p;
+			auto saw = 2.*p - 1.;
+			float s = saw*saw*saw - saw;
+			//*/
+			
 			io.out(0) = s; // set left channel
 			io.out(1) = s; // set right channel
 		}
