@@ -184,8 +184,13 @@ static int rtCallback(
 ){
 	auto& io = *static_cast<AudioIO *>(userData);
 
+	const auto chanBufBytes = frameCount * sizeof(float);
+
 	// Copy input buffer to AudioIO
-	std::memcpy(io.bufferIn().data(), input, io.bufferIn().samples()*sizeof(float));
+	if(input){
+		int devChans = io.deviceIn().channelsIn;
+		std::memcpy(io.bufferIn().data(), input, chanBufBytes*devChans);
+	}
 
 	io.processAudio();
 
@@ -199,7 +204,10 @@ static int rtCallback(
 	//*/
 
 	// Copy AudioIO to output buffer
-	std::memcpy(output, io.bufferOut().data(), io.bufferOut().samples()*sizeof(float));
+	if(output){
+		int devChans = io.deviceOut().channelsOut;
+		std::memcpy(output, io.bufferOut().data(), chanBufBytes*devChans);
+	}
 
 	return 0;
 }
@@ -212,22 +220,18 @@ struct AudioIO::Impl{
 
 	bool open(){
 		RtAudio::StreamParameters pi, po;
-		{
-			const auto& dev = mAudioIO.mDevI;
-			/*dev.print();
-			if(mAudioIO.mDevI.channelsIn <= 0){
-				printf("Attempt to open input stream on device without input\n");
-			}*/
-			auto& P = pi;
+		auto configStream = [&](bool in){
+			const auto& dev = in ? mAudioIO.mDevI : mAudioIO.mDevO;
+			auto& P = in ? pi : po;
 			P.deviceId = dev.id;
-			P.nChannels = mAudioIO.mBufI.channels();
-		}
-		{
-			const auto& dev = mAudioIO.mDevO;
-			auto& P = po;
-			P.deviceId = dev.id;
-			P.nChannels = mAudioIO.mBufO.channels();
-		}
+			P.nChannels = (in ? mAudioIO.mBufI : mAudioIO.mBufO).channels();
+			// Do not try to open more channels than are available
+			auto devChans = in ? dev.channelsIn : dev.channelsOut;
+			//printf("want:%d have:%d\n", P.nChannels, devChans);
+			if(P.nChannels > devChans) P.nChannels = devChans;
+		};
+		configStream(true);
+		configStream(false);
 
 		// Must pass in nullptrs for input- or output-only streams.
 		// Stream will not be opened if no device or channel count is zero
@@ -259,6 +263,8 @@ struct AudioIO::Impl{
 			}
 			return true;
 		}
+
+		//printf("Error opening stream (err=%d)\n", err);
 
 		return false;
 	}
@@ -555,6 +561,7 @@ AudioIO& AudioIO::configure(int framesPerBuf, double framesPerSec, int chansOut,
 		}
 		#endif
 		mBufI.resize(framesPerBuf, chansIn);
+		mBufI.zero(); // zero in case device has fewer channels than requested
 		mBufO.resize(framesPerBuf, chansOut);
 		mFramesPerBuffer = framesPerBuf;
 		mFramesPerSecond = framesPerSec;
