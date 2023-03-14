@@ -183,13 +183,14 @@ static int rtCallback(
 	void * userData
 ){
 	auto& io = *static_cast<AudioIO *>(userData);
-
 	const auto chanBufBytes = frameCount * sizeof(float);
+	auto min = [](int a, int b){ return a<b?a:b; };
 
 	// Copy input buffer to AudioIO
 	if(input){
-		int devChans = io.deviceIn().channelsIn;
-		std::memcpy(io.bufferIn().data(), input, chanBufBytes*devChans);
+		auto& buf = io.bufferIn();
+		int procChans = min(io.deviceIn().channelsIn, buf.channels());
+		std::memcpy(buf.data(), input, chanBufBytes*procChans);
 	}
 
 	io.processAudio();
@@ -205,8 +206,9 @@ static int rtCallback(
 
 	// Copy AudioIO to output buffer
 	if(output){
-		int devChans = io.deviceOut().channelsOut;
-		std::memcpy(output, io.bufferOut().data(), chanBufBytes*devChans);
+		const auto& buf = io.bufferOut();
+		int procChans = min(io.deviceOut().channelsOut, buf.channels());
+		std::memcpy(output, buf.data(), chanBufBytes*procChans);
 	}
 
 	return 0;
