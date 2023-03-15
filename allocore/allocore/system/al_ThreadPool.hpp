@@ -83,6 +83,7 @@ public:
 
 	/// Runs function in parallel for a specified count; a parallel for loop
 	ThreadPool& pushRange(int count, std::function<void(int i)> func);
+	ThreadPool& pushRange(int count, std::function<void(int i, int threadID)> func);
 
 	/// Returns how many tasks are currently executing; does not block
 	unsigned busy();

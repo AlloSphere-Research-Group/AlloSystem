@@ -56,14 +56,18 @@ ThreadPool& ThreadPool::push(Task task){
 }
 
 ThreadPool& ThreadPool::pushRange(int count, std::function<void(int)> func){
+	return pushRange(count, [func](int i, int j){ func(i); });
+}
+
+ThreadPool& ThreadPool::pushRange(int count, std::function<void(int,int)> func){
 	int numTasks = size();
 	double di = double(count)/numTasks;
 	for(int j=0; j<numTasks; ++j){
 		int beg =  j   *di;
 		int end = (j+1)*di;
 		//printf("[%d, %d)\n", beg, end);
-		push([beg,end,func](){
-			for(int i=beg; i<end; ++i) func(i);
+		push([j,beg,end,func](){
+			for(int i=beg; i<end; ++i) func(i,j);
 		});
 	}
 	return *this;
