@@ -246,6 +246,19 @@ struct AudioIO::Impl{
 		//opts.priority = 4; // real-time thread priority: what should this be?
 
 		auto fps = (unsigned int)(mAudioIO.mFramesPerSecond+0.5);
+		{ // Use nearest supported FPS
+			auto rtDevInfo = mRtAudio.getDeviceInfo(mAudioIO.mDevO.id);
+			unsigned int fpsNearest = 0;
+			for(auto v : rtDevInfo.sampleRates){
+				fpsNearest = v;
+				if(fpsNearest >= fps) break;
+			}
+			//printf("Nearest FPS:%d\n", fpsNearest);
+			if(fpsNearest){
+				fps = fpsNearest;
+				mAudioIO.mFramesPerSecond = fps;
+			} 
+		}
 
 		auto err = mRtAudio.openStream(
 			ppo,			// RtAudio::StreamParameters * out
