@@ -60,8 +60,9 @@ namespace al{
 inline void wait(al_sec dt){ al_sleep(dt); }
 
 /// Get current system time in seconds
-inline al_sec walltime(){ return al_time(); }
-inline al_sec timeNow(){ return al_time(); }
+inline al_sec timeNow(){ return al_system_time(); }
+inline al_sec walltime(){ return timeNow(); }
+
 
 /// Convert nanoseconds to timecode string
 
