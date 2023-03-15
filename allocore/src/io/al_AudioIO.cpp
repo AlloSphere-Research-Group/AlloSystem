@@ -221,7 +221,9 @@ struct AudioIO::Impl{
 	{}
 
 	bool open(){
+		auto fps = (unsigned int)(mAudioIO.mFramesPerSecond+0.5);
 		RtAudio::StreamParameters pi, po;
+		
 		auto configStream = [&](bool in){
 			const auto& dev = in ? mAudioIO.mDevI : mAudioIO.mDevO;
 			auto& P = in ? pi : po;
@@ -231,9 +233,22 @@ struct AudioIO::Impl{
 			auto devChans = in ? dev.channelsIn : dev.channelsOut;
 			//printf("want:%d have:%d\n", P.nChannels, devChans);
 			if(P.nChannels > devChans) P.nChannels = devChans;
+			if(P.nChannels){
+				// Use nearest supported FPS
+				auto rtDevInfo = mRtAudio.getDeviceInfo(dev.id);
+				unsigned int fpsNearest = 0;
+				for(auto v : rtDevInfo.sampleRates){
+					fpsNearest = v;
+					if(fpsNearest >= fps) break;
+				}
+				//printf("Nearest FPS:%d\n", fpsNearest);
+				if(fpsNearest) fps = fpsNearest;
+			}
 		};
 		configStream(true);
 		configStream(false);
+		
+		mAudioIO.mFramesPerSecond = fps;
 
 		// Must pass in nullptrs for input- or output-only streams.
 		// Stream will not be opened if no device or channel count is zero
@@ -244,21 +259,6 @@ struct AudioIO::Impl{
 		RtAudio::StreamOptions opts;
 		opts.flags = RTAUDIO_SCHEDULE_REALTIME; // | RTAUDIO_MINIMIZE_LATENCY | RTAUDIO_NONINTERLEAVED
 		//opts.priority = 4; // real-time thread priority: what should this be?
-
-		auto fps = (unsigned int)(mAudioIO.mFramesPerSecond+0.5);
-		{ // Use nearest supported FPS
-			auto rtDevInfo = mRtAudio.getDeviceInfo(mAudioIO.mDevO.id);
-			unsigned int fpsNearest = 0;
-			for(auto v : rtDevInfo.sampleRates){
-				fpsNearest = v;
-				if(fpsNearest >= fps) break;
-			}
-			//printf("Nearest FPS:%d\n", fpsNearest);
-			if(fpsNearest){
-				fps = fpsNearest;
-				mAudioIO.mFramesPerSecond = fps;
-			} 
-		}
 
 		auto err = mRtAudio.openStream(
 			ppo,			// RtAudio::StreamParameters * out
