@@ -714,6 +714,15 @@ public:
 		return (*this) -= ((T(2) * dot(u)) * u);
 	}
 
+	/// Set from angle and magnitude
+	template <int Dim1=0, int Dim2=1>
+	Vec& fromPolar(double ang, double mag = 1.){
+		static_assert_dims<Dim1,Dim2>();
+		(*this)[Dim1] = mag * std::cos(ang);
+		(*this)[Dim2] = mag * std::sin(ang);
+		return *this;
+	}
+
 	Vec& rotate(double cosAng, double sinAng, int dim1, int dim2){
 		T t = (*this)[dim1];
 		T u = (*this)[dim2];
