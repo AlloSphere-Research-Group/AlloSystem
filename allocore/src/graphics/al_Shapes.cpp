@@ -594,19 +594,18 @@ int addSurface(
 
 	int Nv = m.vertices().size();
 
-	double du = width/(Nx-1);
-	double dv = height/(Ny-1);
-
 	// Generate positions
-	double v = y - height*0.5;
-	for(int j=0; j<Ny; ++j){
-		double u = x - width*0.5;
-		for(int i=0; i<Nx; ++i){
-			m.vertex(u, v);
-			u += du;
-		}
-		v += dv;
-	}
+	for(int j=0; j<Ny; ++j){ float v = float(j)/(Ny-1);
+	for(int i=0; i<Nx; ++i){ float u = float(i)/(Nx-1);
+		if(m.attribHint() | Mesh::TEXCOORD) m.texCoord(u,v);
+		if(m.attribHint() | Mesh::NORMAL  ) m.normal (0,0,1);
+		if(m.attribHint() | Mesh::TANGENT ) m.tangent(0,1,0);
+		m.vertex(
+			x + (u-0.5)*width,
+			y + (v-0.5)*height,
+			0.
+		);
+	}}
 
 	// Note: the start and end points of each row are duplicated to create
 	// degenerate triangles.
