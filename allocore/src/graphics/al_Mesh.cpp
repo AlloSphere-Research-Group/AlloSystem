@@ -1809,9 +1809,13 @@ bool Mesh::load(const std::string& filePath){
 	if(!fb.open(filePath, std::ios::in | std::ios::binary)) return false;
 	std::istream is(&fb);
 	auto ext = extension(filePath);
-	if("ply" == ext)		return al::loadPLY(*this, is);
-	else if("obj" == ext)	return al::loadOBJ(*this, is);
-	return false;
+	bool res = false;
+	if("ply" == ext)		res = al::loadPLY(*this, is);
+	else if("obj" == ext)	res = al::loadOBJ(*this, is);
+	if(res){
+		if(mAttribHint | Mesh::NORMAL) ensureNormals();
+	}
+	return res;
 }
 
 // Must subclass streambuf for reading raw bytes
