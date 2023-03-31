@@ -53,6 +53,7 @@
 		#define AL_GRAPHICS_USE_OPENGL
 	#endif
 	#ifdef AL_GRAPHICS_USE_OPENGL
+		#define GL_SILENCE_DEPRECATION
 		#include <OpenGL/OpenGL.h>
 		#include <OpenGL/gl.h>
 		#include <OpenGL/glext.h>
