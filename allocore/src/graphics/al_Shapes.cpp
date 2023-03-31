@@ -332,7 +332,7 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 	}
 	m.vertex(0,0,-radius);
 
-	if((m.attribHint() | Mesh::NORMAL) && (radius != 0.)){
+	if((m.attribHint() & Mesh::NORMAL) && (radius != 0.)){
 		float s = 1./radius;
 		for(auto& p : m.vertices()) m.normal(p * s);
 	}
@@ -602,9 +602,9 @@ int addSurface(
 	// Generate positions
 	for(int j=0; j<Ny; ++j){ float v = float(j)/(Ny-1);
 	for(int i=0; i<Nx; ++i){ float u = float(i)/(Nx-1);
-		if(m.attribHint() | Mesh::TEXCOORD) m.texCoord(u,v);
-		if(m.attribHint() | Mesh::NORMAL  ) m.normal (0,0,1);
-		if(m.attribHint() | Mesh::TANGENT ) m.tangent(0,1,0);
+		if(m.attribHint() & Mesh::TEXCOORD) m.texCoord(u,v);
+		if(m.attribHint() & Mesh::NORMAL  ) m.normal (0,0,1);
+		if(m.attribHint() & Mesh::TANGENT ) m.tangent(0,1,0);
 		m.vertex(
 			x + (u-0.5)*width,
 			y + (v-0.5)*height,

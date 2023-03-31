@@ -1813,7 +1813,7 @@ bool Mesh::load(const std::string& filePath){
 	if("ply" == ext)		res = al::loadPLY(*this, is);
 	else if("obj" == ext)	res = al::loadOBJ(*this, is);
 	if(res){
-		if(mAttribHint | Mesh::NORMAL) ensureNormals();
+		if(mAttribHint & Mesh::NORMAL) ensureNormals();
 	}
 	return res;
 }
