@@ -332,11 +332,16 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 	}
 	m.vertex(0,0,-radius);
 
+	if((m.attribHint() | Mesh::NORMAL) && (radius != 0.)){
+		float s = 1./radius;
+		for(auto& p : m.vertices()) m.normal(p * s);
+	}
+
 	return m.vertices().size()-Nv;
 }
 
 
-int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
+int addSphereWithTexcoords(Mesh& m, double radius, int bands){
 
 	m.triangles();
 
