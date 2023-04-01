@@ -479,10 +479,8 @@ R"(
 
 			if(mShader.linked()){
 				//printf("al::Graphics shader linked\n");
-				mLocPos       = mShader.attribute("posIn");
-				mLocColor     = mShader.attribute("colIn");
-				mLocNormal    = mShader.attribute("nrmIn");
-				mLocTexCoord2 = mShader.attribute("tcIn");
+				mAttribLocs.fromShader(mShader);
+				mDefaultAttribLocs = mAttribLocs;
 				mMatrixStacks[MODELVIEW].loc() = mShader.uniform("MV");
 				mMatrixStacks[PROJECTION].loc() = mShader.uniform("P");
 				mGraphics.mDoLighting.loc() = mShader.uniform("doLighting");
@@ -517,12 +515,14 @@ R"(
 			}
 		}
 
-		//printf("%d %d %d %d\n", mLocPos, mLocColor, mLocNormal, mLocTexCoord2);
-		// If negative, shader didn't compile
-		return mLocPos >= 0;
+		// If no position attribute, shader didn't compile
+		return mAttribLocs.pos;
 	}
 
 	bool prepareDraw(){
+
+		// If using custom shader, just return
+		if(&mShader != mDrawShader) return true;
 
 		if(!validateShader()) return false;
 
@@ -638,26 +638,30 @@ R"(
 
 		DRAW_BEGIN;
 
-		int Nci = m.Nci; // needed for strange OSX bug below
-
 		// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
-		glEnableVertexAttribArray(mLocPos);
-		glVertexAttribPointer(mLocPos, 3, GL_FLOAT, 0, 0, m.vertices);
+		glEnableVertexAttribArray(mAttribLocs.pos());
+		glVertexAttribPointer(mAttribLocs.pos(), 3, GL_FLOAT, 0, 0, m.vertices);
 
-		if(m.Nn >= m.Nv){
-			glEnableVertexAttribArray(mLocNormal);
-			glVertexAttribPointer(mLocNormal, 3, GL_FLOAT, 0, 0, m.normals);
+		const bool hasNrm = m.Nn >= m.Nv && mAttribLocs.nrm;
+		if(hasNrm){
+			glEnableVertexAttribArray(mAttribLocs.nrm());
+			glVertexAttribPointer(mAttribLocs.nrm(), 3, GL_FLOAT, 0, 0, m.normals);
 		}
 
 		Color singleColor(0,0,0,colorArrayAlpha); // if unchanged, triggers read from array
 
+		bool hasCol = false;
 		if(m.Nc >= m.Nv){
-			glEnableVertexAttribArray(mLocColor);
-			glVertexAttribPointer(mLocColor, 4, GL_FLOAT, 0, 0, m.colors);
+			if((hasCol = mAttribLocs.col)){
+				glEnableVertexAttribArray(mAttribLocs.col());
+				glVertexAttribPointer(mAttribLocs.col(), 4, GL_FLOAT, 0, 0, m.colors);
+			}
 		}
 		else if(m.Nci >= m.Nv){
-			glEnableVertexAttribArray(mLocColor);
-			glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, m.coloris);
+			if((hasCol = mAttribLocs.col)){
+				glEnableVertexAttribArray(mAttribLocs.col());
+				glVertexAttribPointer(mAttribLocs.col(), 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, m.coloris);
+			}
 		}
 		else if(0 == m.Nc && 0 == m.Nci){
 			singleColor = mCurrentColor;
@@ -667,8 +671,8 @@ R"(
 		}
 
 		// There is a strange bug on OSX where we cannot switch between single
-		// and array color reads in a shader.
-		// TODO: if VBO bound, must bind a separate color VBO
+		// and array color reads in a shader. Thus, we must create a separate
+		// color buffer if in single color mode.
 		#ifdef AL_OSX
 		if(singleColor.a != colorArrayAlpha){ // using single color
 			Colori col = singleColor;
@@ -679,30 +683,35 @@ R"(
 				for(int i=0; i<m.Nv; ++i) mColorArray.push_back(col);
 			}
 			if(currentGPUMesh && currentGPUMesh->bound()){
-			} else {
-				glEnableVertexAttribArray(mLocColor);
-				glVertexAttribPointer(mLocColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &mColorArray[0]);
+				// TODO: if VBO bound, must bind a separate color VBO
+			} else if((hasCol = mAttribLocs.col)){
+				glEnableVertexAttribArray(mAttribLocs.col());
+				glVertexAttribPointer(mAttribLocs.col(), 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &mColorArray[0]);
 			}
-			Nci = m.Nv;
 		}
 		#endif
 
-		if(m.Nt2 >= m.Nv){
-			glEnableVertexAttribArray(mLocTexCoord2);
-			glVertexAttribPointer(mLocTexCoord2, 2, GL_FLOAT, 0, 0, m.texCoord2s);
+		const bool hasTxc = m.Nt2 >= m.Nv && mAttribLocs.txc;
+		if(hasTxc){
+			glEnableVertexAttribArray(mAttribLocs.txc());
+			glVertexAttribPointer(mAttribLocs.txc(), 2, GL_FLOAT, 0, 0, m.texCoord2s);
 		}
 
-		mShader.begin();
-			mShader.uniform("singleColor", singleColor);
-			mShader.uniform("hasNormals", bool(m.Nn));
-			mShader.uniform("doTex2", m.Nt2 >= m.Nv);
+		auto& shader = *mDrawShader;
 
-			// Should go in prepareDraw, but only seems to work here???
-			if(mPointSize.handleUpdate()){
-				mShader.uniform(mPointSize.loc(), mPointSize.get());
-				#ifdef AL_GRAPHICS_USE_OPENGL
-				glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-				#endif
+		shader.begin();
+			if(&shader == &mShader){ // using built-in shader
+				shader.uniform("singleColor", singleColor);
+				shader.uniform("hasNormals", hasNrm);
+				shader.uniform("doTex2", hasTxc);
+	
+				// Should go in prepareDraw, but only seems to work here???
+				if(mPointSize.handleUpdate()){
+					shader.uniform(mPointSize.loc(), mPointSize.get());
+					#ifdef AL_GRAPHICS_USE_OPENGL
+					glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+					#endif
+				}
 			}
 
 			if(m.Ni){
@@ -712,12 +721,12 @@ R"(
 			else{
 				glDrawArrays(m.primitive, m.begin, m.count);
 			}
-		mShader.end();
+		shader.end();
 
-		glDisableVertexAttribArray(mLocPos);
-		if(m.Nc || Nci) glDisableVertexAttribArray(mLocColor);
-		if(m.Nn) glDisableVertexAttribArray(mLocNormal);
-		if(m.Nt2) glDisableVertexAttribArray(mLocTexCoord2);
+		glDisableVertexAttribArray(mAttribLocs.pos());
+		if(hasCol) glDisableVertexAttribArray(mAttribLocs.col());
+		if(hasNrm) glDisableVertexAttribArray(mAttribLocs.nrm());
+		if(hasTxc) glDisableVertexAttribArray(mAttribLocs.txc());
 	}
 
 	void draw(const Mesh& m, int count, int begin){
@@ -745,7 +754,24 @@ protected:
 	Mat4f& currentMatrix(){ return currentMatrixStack().var().top(); }
 	const Mat4f& currentMatrix() const { return currentMatrixStack().get().top(); }
 	ShaderProgram mShader;
-	int mLocPos=-1, mLocColor, mLocNormal, mLocTexCoord2;
+	ShaderProgram * mDrawShader = &mShader;
+	struct RemoteID{
+		int value = -1;
+		int operator()() const { return value; }
+		operator bool() const { return value >= 0; }
+		RemoteID& operator= (int v){ value=v; return *this; }
+	};
+	struct AttribLocs{
+		RemoteID pos, col, nrm, txc;
+		void fromShader(const ShaderProgram& s){
+			pos = s.attribute("posIn");
+			col = s.attribute("colIn");
+			nrm = s.attribute("nrmIn");
+			txc = s.attribute("tcIn");
+			//printf("%d %d %d %d\n", pos(), col(), nrm(), txc());
+		}
+	};
+	AttribLocs mDefaultAttribLocs, mAttribLocs;
 	std::string mPreamble, mOnVertex, mOnLight, mOnMaterial;
 	Color mCurrentColor;
 	ShaderData<float> mPointSize{1};
@@ -1028,7 +1054,7 @@ void Graphics::pipeline(Pipeline p){
 
 ShaderProgram& Graphics::shader(){
 	if(mBackends[PROG]){
-		auto * backend =  dynamic_cast<BackendProg *>(mBackends[PROG]);
+		auto * backend = dynamic_cast<BackendProg *>(mBackends[PROG]);
 		backend->validateShader();
 		return backend->mShader;
 	} else {
@@ -1060,6 +1086,25 @@ Graphics& Graphics::shaderOnMaterial(const std::string& s){
 		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnMaterial = s;
 	}
 	return *this;
+}
+
+Graphics& Graphics::setShader(ShaderProgram& shader, const std::function<void(void)>& onBind){
+	if(mBackends[PROG]){
+		auto * backend = dynamic_cast<BackendProg *>(mBackends[PROG]);
+		backend->mDrawShader = &shader;
+		if(&shader != &backend->mShader){
+			shader.begin();
+			backend->mAttribLocs.fromShader(shader);
+			onBind();
+			shader.end();
+		} else { // here for unsetShader
+			backend->mAttribLocs = backend->mDefaultAttribLocs;
+		}
+	}
+	return *this;
+}
+Graphics& Graphics::unsetShader(){
+	return setShader(shader());
 }
 
 void Graphics::setVertexBuffer(const Mesh& m, bool updateBuffer){

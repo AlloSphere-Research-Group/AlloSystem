@@ -659,6 +659,15 @@ public:
 	Graphics& shaderOnLight(const std::string& s);
 	Graphics& shaderOnMaterial(const std::string& s);
 
+	/// Set custom shader
+	Graphics& setShader(ShaderProgram& v, const std::function<void(void)>& onBind = [](){});
+	/// Set shader back to built-in
+	Graphics& unsetShader();
+	/// Set custom shader temporarily, then set back to built-in
+	Graphics& useShader(ShaderProgram& v, const std::function<void(void)>& onBind = [](){}){
+		return setShader(v, onBind).unsetShader();
+	}
+
 	/// Set current vertex buffer and optionally update
 
 	/// The buffer is automatically updated the first time a mesh is used.
