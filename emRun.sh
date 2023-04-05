@@ -6,10 +6,11 @@
 if [[ `echo $EM_CONFIG` ]]; then
 	# Assume PATH already configured via emsdk_env.sh
 	EM_DIR=
+elif [[ `echo $EMSDK` ]]; then
+	EM_DIR=${EMSDK}/upstream/emscripten/
 else
-	# EM_DIR will be something like */emsdk/emscripten/1.37.34
-	EM_DIR=`grep EMSCRIPTEN_ROOT ~/.emscripten | cut -d "=" -f 2 | sed -e s/^..// -e s/.$//`
-	EM_DIR+=/
+	echo "Emscripten directory not found"
+	exit
 fi
 
 #BROWSER=chrome
