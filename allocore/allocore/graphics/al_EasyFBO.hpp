@@ -149,7 +149,7 @@ private:
 	Matrix4d mMV{1};
 	Matrix4d mProj = Matrix4d::ortho(-1,1, -1,1, -1,1);
 	Color mClearColor = Color(0,0,0,1);
-	bool mUseDepth = false;
+	bool mUseDepth = true;
 	bool mNeedsSync = false;
 
 	void sync(){
