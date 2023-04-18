@@ -55,12 +55,37 @@ namespace al {
 struct EasyFBO {
 
 	EasyFBO(){}
-	EasyFBO(int w, int h){ resize(w,h); }
-	EasyFBO(int wh){ resize(wh,wh); }
+
+	/// @param[in] w		Width of buffer
+	/// @param[in] h		Height of buffer
+	/// @param[in] format	Texel format of color buffer
+	/// @param[in] type		Texel data type of color buffer
+	EasyFBO(
+		int w, int h,
+		Graphics::Format format = Graphics::RGBA,
+		Graphics::DataType type = Graphics::UBYTE
+	){
+		resize(w,h, format,type);
+	}
+
+	EasyFBO(
+		int wh,
+		Graphics::Format format = Graphics::RGBA,
+		Graphics::DataType type = Graphics::UBYTE	
+	){
+		resize(wh,wh, format,type);
+	}
+
+	EasyFBO& resize(
+		int w, int h,
+		Graphics::Format format,
+		Graphics::DataType type = Graphics::UBYTE
+	){
+		mTexture.format(format).type(type);
+		return resize(w,h);
+	}
 
 	EasyFBO& resize(int w, int h){
-		mTexture.format(Graphics::RGB);
-		mTexture.type(Graphics::UBYTE);
 		mTexture.resize(w,h);
 		mNeedsSync = true;
 		return *this;
@@ -77,9 +102,11 @@ struct EasyFBO {
 
 	EasyFBO& clearColor(const Color& c){ mClearColor=c; return *this; }
 
+	/// Get color buffer texture
 	const Texture& texture() const { return mTexture; }
 	Texture& texture(){ return mTexture; }
 
+	/// Call draw commands writing into FBO
 	template <class DrawFunc>
 	void draw(Graphics& g, const DrawFunc& drawFunc){
 
