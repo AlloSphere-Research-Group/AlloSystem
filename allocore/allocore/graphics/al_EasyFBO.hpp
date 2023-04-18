@@ -102,6 +102,15 @@ struct EasyFBO {
 
 	EasyFBO& clearColor(const Color& c){ mClearColor=c; return *this; }
 
+	/// Set whether to use depth buffer
+	EasyFBO& depth(bool v){
+		if(v != mUseDepth){
+			mUseDepth = v;
+			mNeedsSync = true;
+		}
+		return *this;
+	}
+
 	/// Get color buffer texture
 	const Texture& texture() const { return mTexture; }
 	Texture& texture(){ return mTexture; }
@@ -119,7 +128,9 @@ struct EasyFBO {
 		mFBO.begin();
 			g.viewport(0, 0, width(), height());
 			g.clearColor(mClearColor);
-			g.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+			auto clearBuffers = Graphics::COLOR_BUFFER_BIT;
+			if(mUseDepth) clearBuffers = clearBuffers | Graphics::DEPTH_BUFFER_BIT;
+			g.clear(clearBuffers);
 			g.projection(mProj);
 			g.modelView(mMV);
 			drawFunc();
@@ -138,6 +149,7 @@ private:
 	Matrix4d mMV{1};
 	Matrix4d mProj = Matrix4d::ortho(-1,1, -1,1, -1,1);
 	Color mClearColor = Color(0,0,0,1);
+	bool mUseDepth = false;
 	bool mNeedsSync = false;
 
 	void sync(){
@@ -145,9 +157,13 @@ private:
 			mNeedsSync = false;
 			// both depth and color attachees must be valid on the GPU before use:
 			mTexture.validate();
-			mRBO.resize(width(), height());
-			mFBO.attachRBO(mRBO, FBO::DEPTH_ATTACHMENT);
 			mFBO.attachTexture2D(mTexture, FBO::COLOR_ATTACHMENT0);
+			if(mUseDepth){
+				mRBO.resize(width(), height());
+				mFBO.attachRBO(mRBO, FBO::DEPTH_ATTACHMENT);
+			} else {
+				mFBO.detachRBO(FBO::DEPTH_ATTACHMENT);
+			}
 			//printf("fbo status %s\n", mFBO.statusString());
 		}
 	}
