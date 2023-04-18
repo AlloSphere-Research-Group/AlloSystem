@@ -246,6 +246,9 @@ public:
 		return *this;
 	}
 
+	/// Fill any deficit in normal buffer with value
+	Mesh& normalFill(const Normal& v);
+
 
 	/// Append tangent to tangent buffer
 	Mesh& tangent(float x, float y, float z=0){ return tangent(Tangent(x,y,z)); }
@@ -263,6 +266,9 @@ public:
 		for(int i=0; i<len; ++i) tangent(src[3*i+0], src[3*i+1], src[3*i+2]);
 		return *this;
 	}
+
+	/// Fill any deficit in tangent buffer with value
+	Mesh& tangentFill(const Tangent& v);
 
 
 	/// Append color to color buffer

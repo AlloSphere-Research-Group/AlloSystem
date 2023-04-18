@@ -821,17 +821,17 @@ Mesh& Mesh::toTriangles(){
 	return *this;
 }
 
-Mesh& Mesh::colorFill(const Color& v){
-	int N = mVertices.size() - mColors.size();
-	for(int i=0; i<N; ++i) color(v);
-	return *this;
+#define DEF_FILL(name, Type)\
+Mesh& Mesh::name##Fill(const Type& v){\
+	int N = mVertices.size() - name##s().size();\
+	for(int i=0; i<N; ++i) name(v);\
+	return *this;\
 }
 
-Mesh& Mesh::coloriFill(const Colori& v){
-	int N = mVertices.size() - mColoris.size();
-	for(int i=0; i<N; ++i) colori(v);
-	return *this;
-}
+DEF_FILL(normal, Normal)
+DEF_FILL(tangent, Tangent)
+DEF_FILL(color, Color)
+DEF_FILL(colori, Colori)
 
 Mesh& Mesh::forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace){
 	if(mIndices.size()){
