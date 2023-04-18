@@ -574,6 +574,8 @@ public:
 	/// Set hint for what attributes generators/loaders should produce
 	Mesh& attribHint(Attrib v){ mAttribHint = v; return *this; }
 	Attrib attribHint() const { return mAttribHint; }
+	/// Get whether mesh wants attribute(s)
+	bool wants(Attrib v) const { return mAttribHint & v; }
 
 	/// Print information about Mesh
 	void print(FILE * dst = stdout) const;
