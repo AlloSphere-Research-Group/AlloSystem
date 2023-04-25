@@ -1310,7 +1310,7 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 	else if(coloris().size()) col = coloris()[0];
 
 	std::string style = "style=\"fill:none";
-	style += ";stroke-width:" + std::to_string(int(stroke()+0.5));
+	style += ";stroke-width:" + std::to_string(int((stroke()>0.?stroke():1.f)+0.5));
 	style += ";stroke:" + rgbToHexString(col.components);
 	style += ";stroke-linecap:round";
 	style += ";stroke-linejoin:round";
