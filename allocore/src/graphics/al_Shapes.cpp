@@ -280,57 +280,81 @@ int addIcosphere(Mesh& m, double radius, int divisions){
 // The top is (0,0,radius) and the bottom is (0,0,-radius).
 int addSphere(Mesh& m, double radius, int slices, int stacks){
 
-	m.triangles();
-
 	int Nv = m.vertices().size();
 
-	CSin P( M_PI/stacks); P.r = P.dr*radius; P.i = P.di*radius;
+	CSin P( M_PI/stacks, radius);
 	CSin T(M_2PI/slices);
 
-	// Add top cap
-	// Triangles have one vertex at the north pole and the others on the first
-	// ring down.
-	m.vertex(0,0,radius);
-	for(int i=0; i<slices; ++i){
-		m.index(Nv+1 + i);
-		m.index(Nv+1 + ((i+1)%slices));
-		m.index(Nv);	// the north pole
-	}
+	if(!m.wants(Mesh::TEXCOORD)){
+		m.triangles();
 
-	// Add rings
-	for(int j=0; j<stacks-2; ++j){
-		int jp1 = j+1;
+		P.r *= P.dr; P.i = P.di; // due to cap
 
+		// Add top cap
+		// Triangles have one vertex at the north pole and the others on the first
+		// ring down.
+		m.vertex(0,0,radius);
 		for(int i=0; i<slices; ++i){
-			int ip1 = (i+1)%slices;
+			m.index(Nv+1 + i);
+			m.index(Nv+1 + ((i+1)%slices));
+			m.index(Nv);	// the north pole
+		}
 
-			int i00 = Nv+1 + j  *slices + i;
-			int i10 = Nv+1 + j  *slices + ip1;
-			int i01 = Nv+1 + jp1*slices + i;
-			int i11 = Nv+1 + jp1*slices + ip1;
+		// Add rings
+		for(int j=0; j<stacks-2; ++j){
+			int jp1 = j+1;
 
+			for(int i=0; i<slices; ++i){
+				int ip1 = (i+1)%slices;
+
+				int i00 = Nv+1 + j  *slices + i;
+				int i10 = Nv+1 + j  *slices + ip1;
+				int i01 = Nv+1 + jp1*slices + i;
+				int i11 = Nv+1 + jp1*slices + ip1;
+
+				m.vertex(T.r*P.i, T.i*P.i, P.r);
+				m.index(i00);
+				m.index(i01);
+				m.index(i10);
+				m.index(i10);
+				m.index(i01);
+				m.index(i11);
+				T();
+			}
+			P();
+		}
+
+		// Add bottom ring and cap
+		int icap = m.vertices().size() + slices;
+		for(int i=0; i<slices; ++i){
 			m.vertex(T.r*P.i, T.i*P.i, P.r);
-			m.index(i00);
-			m.index(i01);
-			m.index(i10);
-			m.index(i10);
-			m.index(i01);
-			m.index(i11);
+			m.index(icap - slices + ((i+1)%slices));
+			m.index(icap - slices + i);
+			m.index(icap);
 			T();
 		}
-		P();
-	}
+		m.vertex(0,0,-radius);
 
-	// Add bottom ring and cap
-	int icap = m.vertices().size() + slices;
-	for(int i=0; i<slices; ++i){
-		m.vertex(T.r*P.i, T.i*P.i, P.r);
-		m.index(icap - slices + ((i+1)%slices));
-		m.index(icap - slices + i);
-		m.index(icap);
-		T();
+	} else { // for texturing: edges must have duplicate vertices
+		addSurface(m, slices+1,stacks+1, 1,1, 0.5,0.5);
+
+		for(int i=Nv; i<m.vertices().size(); ++i){
+			auto& pos = m.vertices()[i];
+			/* slow way
+			auto t =     pos.x  * 2. * 355./113.;
+			auto p = (1.-pos.y) * 1. * 355./113.; // go S to N pole
+			float c1 = std::cos(t), s1 = std::sin(t);
+			float c2 = radius * std::cos(p), s2 = radius * std::sin(p);
+			pos.set(s2*c1, s2*s1, c2);
+			//*/
+			//* fast way
+			pos.set(T.r*P.i, T.i*P.i, -P.r); // go S to N pole
+			int j = i - Nv;
+			if((j % (slices+1)) < slices) T();
+			else P();
+			//*/
+		}
 	}
-	m.vertex(0,0,-radius);
 
 	if((m.attribHint() & Mesh::NORMAL) && (radius != 0.)){
 		float s = 1./radius;
