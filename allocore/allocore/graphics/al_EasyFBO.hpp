@@ -156,7 +156,7 @@ private:
 		if(mNeedsSync){
 			mNeedsSync = false;
 			// both depth and color attachees must be valid on the GPU before use:
-			mTexture.validate();
+			mTexture.submit();
 			mFBO.attachTexture2D(mTexture, FBO::COLOR_ATTACHMENT0);
 			if(mUseDepth){
 				mRBO.resize(width(), height());
