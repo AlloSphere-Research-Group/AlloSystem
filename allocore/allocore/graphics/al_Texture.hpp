@@ -440,6 +440,8 @@ public:
 	/// Deallocate any allocated client-side memory
 	void deallocate();
 
+	/// Copy pixels from server into client-side memory (calling allocate() if necessary)
+	void getRemoteData();
 
 	/// Print information about texture
 	void print();

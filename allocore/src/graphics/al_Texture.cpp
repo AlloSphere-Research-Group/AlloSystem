@@ -428,6 +428,17 @@ void Texture :: deallocate() {
 	mArray.dataFree();
 }
 
+void Texture::getRemoteData(){
+	if(!mArray.hasData()){
+		allocate();
+		mPixelsUpdated = false; // prevent overwriting server data
+	}
+	bind();
+	// Do not call array() here as it will flag texture as dirty on client
+	glGetTexImage(mTarget, 0, mFormat, mType, mArray.data.ptr);
+	unbind();
+}
+
 void Texture::sendParams(bool force){
 	if(mParamsUpdated || force){
 		glTexParameteri(target(), GL_TEXTURE_MAG_FILTER, filterMag());
