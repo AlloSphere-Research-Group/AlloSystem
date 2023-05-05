@@ -294,10 +294,12 @@ public:
 		Graphics& g, const Color& color = Color(1),
 		double w=2, double h=2, double x=-1, double y=-1, double z=0);
 
+	/// Get immutable reference to self (use to ensure getting read-only data)
+	const Texture& constant() const { return *this; }
 
 	/// Get mutable reference to the internal pixel data
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
-	Array& array() { mArrayDirty=true; return mArray; }
+	Array& array(){ mArrayDirty=true; return mArray; }
 
 	/// Get read-only reference to internal pixel data
 	const Array& array() const { return mArray; }
