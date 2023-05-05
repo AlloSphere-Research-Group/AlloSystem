@@ -174,12 +174,6 @@ public:
 protected:
 	virtual void onCreate();
 	virtual void onDestroy();
-
-public:
-	/// \deprecated
-	void begin(){ bind(); }
-	/// \deprecated
-	static void end();
 };
 
 #endif

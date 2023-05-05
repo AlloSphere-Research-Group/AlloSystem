@@ -96,9 +96,9 @@ void FBO::bind(){ validate(); bind(id()); }
 void FBO::unbind(){ bind(0); }
 
 GLenum FBO::status(){
-	begin();
+	bind();
 	int r=glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	end();
+	unbind();
 	return r;
 }
 
@@ -122,24 +122,18 @@ const char * FBO::statusString(GLenum stat){
 	};
 }
 
-// static functions
-void FBO::bind(unsigned fboID){
+
+/*static*/ void FBO::bind(unsigned fboID){
 	AL_GRAPHICS_ERROR("(before FBO::bind)", fboID);
 	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
 	AL_GRAPHICS_ERROR("binding FBO", fboID);
 }
 
-void FBO::end(){
-	AL_GRAPHICS_ERROR("(before FBO::end)",-1);
-	bind(0);
-	AL_GRAPHICS_ERROR("unbinding FBO",-1);
-}
-
-void FBO::renderBuffer(unsigned rboID, Attachment att){
+/*static*/ void FBO::renderBuffer(unsigned rboID, Attachment att){
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, att, GL_RENDERBUFFER, rboID);
 }
 
-void FBO::texture2D(GLuint texID, Attachment att, int level){
+/*static*/ void FBO::texture2D(GLuint texID, Attachment att, int level){
 	glFramebufferTexture2D(GL_FRAMEBUFFER, att, GL_TEXTURE_2D, texID, level);
 }
 
