@@ -102,7 +102,7 @@ void FBO::bind(int target){
 
 void FBO::unbind(){ bind(0, mTarget); }
 
-void FBO::copyTo(FBO& dst,
+FBO& FBO::copyTo(FBO& dst,
 	int srcX0, int srcY0, int srcX1, int srcY1,
 	int dstX0, int dstY0, int dstX1, int dstY1,
 	Graphics::AttributeBit mask, bool nicest
@@ -123,6 +123,15 @@ void FBO::copyTo(FBO& dst,
 
 	if(scissorTest) glEnable(GL_SCISSOR_TEST);
 	#endif
+	return *this;
+}
+
+FBO& FBO::copyTo(FBO& dst,
+	int srcW, int srcH,
+	int dstW, int dstH,
+	Graphics::AttributeBit mask, bool nicest
+){
+	return copyTo(dst, 0,0,srcW,srcH, 0,0,dstW,dstH, mask, nicest);
 }
 
 GLenum FBO::status(){
