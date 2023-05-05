@@ -157,6 +157,13 @@ public:
 	/// Unbind object
 	void unbind();
 
+	/// Copy data to another FBO
+	void copyTo(FBO& dst,
+		int srcX0, int srcY0, int srcX1, int srcY1,
+		int dstX0, int dstY0, int dstX1, int dstY1,
+		Graphics::AttributeBit mask = Graphics::COLOR_BUFFER_BIT, bool nicest=false
+	);
+
 	/// Get status of frame buffer object
 	GLenum status();
 	const char * statusString();

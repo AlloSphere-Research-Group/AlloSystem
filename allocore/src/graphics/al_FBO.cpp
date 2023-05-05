@@ -1,5 +1,5 @@
 #include "allocore/graphics/al_FBO.hpp"
-#include <stdio.h>
+#include <cstdio>
 
 #ifdef AL_GRAPHICS_SUPPORTS_FBO
 
@@ -101,6 +101,29 @@ void FBO::bind(int target){
 }
 
 void FBO::unbind(){ bind(0, mTarget); }
+
+void FBO::copyTo(FBO& dst,
+	int srcX0, int srcY0, int srcX1, int srcY1,
+	int dstX0, int dstY0, int dstX1, int dstY1,
+	Graphics::AttributeBit mask, bool nicest
+){
+	#ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
+	// Scissor test affects blit operation!
+	GLboolean scissorTest;
+	glGetBooleanv(GL_SCISSOR_TEST, &scissorTest);
+	if(scissorTest) glDisable(GL_SCISSOR_TEST);
+
+	bind(GL_READ_FRAMEBUFFER);
+	dst.bind(GL_DRAW_FRAMEBUFFER);
+	
+	glBlitFramebuffer(srcX0,srcY0,srcX1,srcY1, dstX0,dstY0,dstX1,dstY1, mask, nicest ? GL_LINEAR : GL_NEAREST);
+
+	unbind();
+	dst.unbind();
+
+	if(scissorTest) glEnable(GL_SCISSOR_TEST);
+	#endif
+}
 
 GLenum FBO::status(){
 	bind();

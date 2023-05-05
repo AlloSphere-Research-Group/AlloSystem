@@ -191,7 +191,7 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_SHADE_MODEL
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3)
 	#define AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
 #endif
 
