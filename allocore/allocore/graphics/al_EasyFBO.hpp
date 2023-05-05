@@ -129,7 +129,7 @@ struct EasyFBO {
 		g.pushMatrix(Graphics::MODELVIEW);
 		auto oldVP = g.viewport();
 
-		mFBO.begin();
+		mFBO.bind();
 			g.viewport(0, 0, width(), height());
 			g.clearColor(mClearColor);
 			auto clearBuffers = Graphics::COLOR_BUFFER_BIT;
@@ -138,7 +138,7 @@ struct EasyFBO {
 			g.projection(mProj);
 			g.modelView(mMV);
 			drawFunc();
-		mFBO.end();
+		mFBO.unbind();
 
 		g.popMatrix(Graphics::PROJECTION);
 		g.popMatrix(Graphics::MODELVIEW);
