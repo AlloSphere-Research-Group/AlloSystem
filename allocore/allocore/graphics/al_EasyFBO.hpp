@@ -115,6 +115,10 @@ struct EasyFBO {
 	const Texture& texture() const { return mTexture; }
 	Texture& texture(){ return mTexture; }
 
+	/// Get underlying FBO
+	const FBO& fbo() const { return mFBO; }
+	FBO& fbo(){ return mFBO; }
+
 	/// Call draw commands writing into FBO
 	template <class DrawFunc>
 	void draw(Graphics& g, const DrawFunc& drawFunc){
