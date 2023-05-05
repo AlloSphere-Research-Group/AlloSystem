@@ -82,7 +82,7 @@ Texture::Texture(AlloArrayHeader& header)
 	shapeFrom(header, true /*reallocate*/);
 }
 
-Texture::~Texture() {
+Texture::~Texture(){
 }
 
 void Texture::onCreate(){
@@ -280,7 +280,7 @@ void Texture::tryBind(const std::function<void(void)>& onPostBind){
 	}
 }
 
-void Texture :: bind() {
+void Texture::bind(){
 	AL_GRAPHICS_ERROR("(before Texture::bind)", id());
 
 	// Ensure texture is created
@@ -312,12 +312,12 @@ void Texture :: bind() {
 	});
 }
 
-void Texture :: bind(int texUnit) {
+void Texture::bind(int texUnit){
 	unit(texUnit);
 	bind();
 }
 
-void Texture :: unbind() {
+void Texture::unbind(){
 	// multitexturing:
 	glActiveTexture(GL_TEXTURE0 + mTexUnit);
 	glBindTexture(target(), 0);
@@ -326,47 +326,47 @@ void Texture :: unbind() {
 	#endif
 }
 
-void Texture :: resetArray(unsigned align) {
+void Texture::resetArray(unsigned align){
 	//printf("resetArray %p\n", this);
 	deallocate();
 
 	// reconfigure the internal array according to the current settings:
-	switch (mTarget) {
-		case TEXTURE_2D:
-		default:
-			mArray.header.type = Graphics::toAlloTy(mType);
-			mArray.header.components = Graphics::numComponents(mFormat);
-			mArray.header.dimcount = 2;
-			mArray.header.dim[0] = mWidth;
-			mArray.header.dim[1] = mHeight;
-			mArray.deriveStride(mArray.header, align);
-			break;
+	switch(mTarget){
+	case TEXTURE_2D:
+	default:
+		mArray.header.type = Graphics::toAlloTy(mType);
+		mArray.header.components = Graphics::numComponents(mFormat);
+		mArray.header.dimcount = 2;
+		mArray.header.dim[0] = mWidth;
+		mArray.header.dim[1] = mHeight;
+		mArray.deriveStride(mArray.header, align);
+		break;
 
-		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
-		case TEXTURE_1D:
-			mArray.header.type = Graphics::toAlloTy(mType);
-			mArray.header.components = Graphics::numComponents(mFormat);
-			mArray.header.dimcount = 1;
-			mArray.header.dim[0] = mWidth;
-			mArray.deriveStride(mArray.header, align);
-			break;
-		#endif
+	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
+	case TEXTURE_1D:
+		mArray.header.type = Graphics::toAlloTy(mType);
+		mArray.header.components = Graphics::numComponents(mFormat);
+		mArray.header.dimcount = 1;
+		mArray.header.dim[0] = mWidth;
+		mArray.deriveStride(mArray.header, align);
+		break;
+	#endif
 
-		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-		case TEXTURE_3D:
-			mArray.header.type = Graphics::toAlloTy(mType);
-			mArray.header.components = Graphics::numComponents(mFormat);
-			mArray.header.dimcount = 3;
-			mArray.header.dim[0] = mWidth;
-			mArray.header.dim[1] = mHeight;
-			mArray.header.dim[2] = mDepth;
-			mArray.deriveStride(mArray.header, align);
-			break;
-		#endif
+	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
+	case TEXTURE_3D:
+		mArray.header.type = Graphics::toAlloTy(mType);
+		mArray.header.components = Graphics::numComponents(mFormat);
+		mArray.header.dimcount = 3;
+		mArray.header.dim[0] = mWidth;
+		mArray.header.dim[1] = mHeight;
+		mArray.header.dim[2] = mDepth;
+		mArray.deriveStride(mArray.header, align);
+		break;
+	#endif
 	}
 }
 
-Texture& Texture :: allocate(unsigned align) {
+Texture& Texture::allocate(unsigned align){
 	deallocate();
 	resetArray(align);
 	mArray.dataCalloc();
@@ -374,10 +374,10 @@ Texture& Texture :: allocate(unsigned align) {
 	return *this;
 }
 
-Texture& Texture :: allocate(const Array& src, bool reconfigure) {
+Texture& Texture::allocate(const Array& src, bool reconfigure){
 
 	// Here we reconfigure the internal Array to match the passed in Array
-	if (reconfigure) {
+	if(reconfigure){
 		//printf("allocating & reconfiguring %p from\n", this); src.print();
 		shapeFrom(src.header, true /*reallocate*/);
 
@@ -404,7 +404,7 @@ Texture& Texture :: allocate(const Array& src, bool reconfigure) {
 		//printf("allocating without reconfiguring %p\n", this);
 
 		// ensure that array matches texture:
-		if (!src.isFormat(mArray.header)) {
+		if(!src.isFormat(mArray.header)){
 			AL_WARN("couldn't allocate array, mismatch format");
 			mArray.print();
 			src.print();
@@ -426,7 +426,7 @@ Texture& Texture :: allocate(const Array& src, bool reconfigure) {
 	return *this;
 }
 
-Texture& Texture :: deallocate() {
+Texture& Texture::deallocate(){
 	mArray.dataFree();
 	return *this;
 }
@@ -452,7 +452,7 @@ void Texture::sendParams(bool force){
 		#ifdef GL_TEXTURE_WRAP_R
 		glTexParameteri(target(), GL_TEXTURE_WRAP_R, mWrapR);
 		#endif
-		/*if (filterMin() != LINEAR && filterMin() != NEAREST) {
+		/*if(filterMin() != LINEAR && filterMin() != NEAREST){
 			// deprecated in OpenGL 3.0 and above
 			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 		}*/
@@ -597,7 +597,7 @@ void Texture::sendShape(bool force){
 }
 
 
-Texture& Texture :: submit(const void * pixels, uint32_t align) {
+Texture& Texture::submit(const void * pixels, uint32_t align){
 	AL_GRAPHICS_ERROR("(before Texture::submit)", id());
 
 	// This ensures that the texture is created on the GPU
@@ -619,7 +619,7 @@ Texture& Texture :: submit(const void * pixels, uint32_t align) {
 		/* OpenGL may have changed the internal format to one it supports:
 		GLint format;
 		glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
-		if (format != mInternalFormat) {
+		if(format != mInternalFormat){
 			printf("converted from %X to %X format\n", mInternalFormat, format);
 			mInternalFormat = format;
 		}
@@ -636,10 +636,10 @@ Texture& Texture :: submit(const void * pixels, uint32_t align) {
 }
 
 
-Texture& Texture :: submit(const Array& src, bool reconfigure) {
+Texture& Texture::submit(const Array& src, bool reconfigure){
 
 	// Here we basically do a deep copy of the passed in Array
-	if (reconfigure) {
+	if(reconfigure){
 		shapeFrom(src.header, true /*reallocate*/);
 		//printf("configured to target=%X(%dD), type=%X(%X), format=%X, align=(%d)\n", mTarget, src.dimcount(), type(), src.type(), mFormat, src.alignment());
 	}
@@ -647,54 +647,54 @@ Texture& Texture :: submit(const Array& src, bool reconfigure) {
 	// In this case, we simply do some sanity checks to make sure the passed
 	// in Array is compatible with our currently set texture parameters
 	else {
-		if (src.width() != width()) {
+		if(src.width() != width()){
 			AL_WARN("submit failed: source array width does not match");
 			goto end;
 		}
-		if (height() && src.height() != height()) {
+		if(height() && src.height() != height()){
 			AL_WARN("submit failed: source array height does not match");
 			goto end;
 		}
-		if (depth() && src.depth() != depth()) {
+		if(depth() && src.depth() != depth()){
 			AL_WARN("submit failed: source array depth does not match");
 			goto end;
 		}
 
-		if (Graphics::toDataType(src.type()) != type()) {
+		if(Graphics::toDataType(src.type()) != type()){
 			AL_WARN("submit failed: source array type does not match texture");
 			goto end;
 		}
 
-		switch (format()) {
-			case Graphics::LUMINANCE:
-			#ifdef AL_GRAPHICS_SUPPORTS_DEPTH_COMP
-			case Graphics::DEPTH_COMPONENT:
-			#endif
-			case Graphics::ALPHA:
-				if (src.components() != 1) {
-					AL_WARN("submit failed: source array component count does not match (got %d, should be 1)", src.components());
-					goto end;
-				}
-				break;
-			case Graphics::LUMINANCE_ALPHA:
-				if (src.components() != 2) {
-					AL_WARN("submit failed: source array component count does not match (got %d, should be 2)", src.components());
-					goto end;
-				}
-				break;
-			case Graphics::RGB:
-				if (src.components() != 3) {
-					AL_WARN("submit failed: source array component count does not match (got %d, should be 3)", src.components());
-					goto end;
-				}
-				break;
-			case Graphics::RGBA:
-				if (src.components() != 4) {
-					AL_WARN("submit failed: source array component count does not match (got %d, should be 4)", src.components());
-					goto end;
-				}
-				break;
-			default:;
+		switch(format()){
+		case Graphics::LUMINANCE:
+		#ifdef AL_GRAPHICS_SUPPORTS_DEPTH_COMP
+		case Graphics::DEPTH_COMPONENT:
+		#endif
+		case Graphics::ALPHA:
+			if(src.components() != 1){
+				AL_WARN("submit failed: source array component count does not match (got %d, should be 1)", src.components());
+				goto end;
+			}
+			break;
+		case Graphics::LUMINANCE_ALPHA:
+			if(src.components() != 2){
+				AL_WARN("submit failed: source array component count does not match (got %d, should be 2)", src.components());
+				goto end;
+			}
+			break;
+		case Graphics::RGB:
+			if(src.components() != 3){
+				AL_WARN("submit failed: source array component count does not match (got %d, should be 3)", src.components());
+				goto end;
+			}
+			break;
+		case Graphics::RGBA:
+			if(src.components() != 4){
+				AL_WARN("submit failed: source array component count does not match (got %d, should be 4)", src.components());
+				goto end;
+			}
+			break;
+		default:;
 		}
 	}
 
@@ -741,7 +741,7 @@ Texture& Texture::copyFrameBuffer(
 	return *this;
 }
 
-void Texture :: quad(Graphics& gl, double w, double h, double x, double y, double z){
+void Texture::quad(Graphics& gl, double w, double h, double x, double y, double z){
 	//Graphics::error(id(), "prebind quad texture");
 	bind();
 	Mesh& m = gl.mesh();
@@ -841,11 +841,11 @@ void Texture::assignFromTexCoord(const std::function<void(float s, float t, floa
 	assignFromTexCoord(onPixel, width(), height());
 }
 
-void Texture :: print() {
+void Texture::print(){
 
 	printf("Texture ");
 
-	switch (mTarget) {
+	switch(mTarget){
 		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		case TEXTURE_1D:
 			printf("target=%s, %d(%d)", toString(mTarget), width(), mArray.width());
@@ -877,7 +877,7 @@ void Texture :: print() {
 }
 
 
-void Texture :: configure(AlloArrayHeader& hdr) {
+void Texture::configure(AlloArrayHeader& hdr){
 	AL_WARN_ONCE("Texture::configure() deprecated, use Texture::shapeFrom()");
 	shapeFrom(hdr, false);
 }
