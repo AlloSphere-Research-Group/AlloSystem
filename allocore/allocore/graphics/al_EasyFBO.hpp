@@ -76,6 +76,7 @@ struct EasyFBO {
 		resize(wh,wh, format,type);
 	}
 
+	/// Resize and configure color buffer
 	EasyFBO& resize(
 		int w, int h,
 		Graphics::Format format,
@@ -85,22 +86,34 @@ struct EasyFBO {
 		return resize(w,h);
 	}
 
+	/// Resize
 	EasyFBO& resize(int w, int h){
 		mTexture.resize(w,h);
 		mNeedsSync = true;
 		return *this;
 	}
 
+	/// Get height
 	int width() const { return mTexture.width(); }
+	/// Get width
 	int height() const { return mTexture.height(); }
 
+	/// Get modelview matrix
 	const Matrix4d& modelView() const { return mMV; }
 	Matrix4d& modelView(){ return mMV; }
 
+	/// Get projection matrix
 	const Matrix4d& projection() const { return mProj; }
 	Matrix4d& projection(){ return mProj; }
 
+	/// Set clear color
 	EasyFBO& clearColor(const Color& c){ mClearColor=c; return *this; }
+
+	/// Set whether to clear buffer when calling draw()
+	EasyFBO& clear(bool v){
+		mDoClear = v;
+		return *this;
+	}
 
 	/// Set whether to use depth buffer
 	EasyFBO& depth(bool v){
@@ -110,6 +123,8 @@ struct EasyFBO {
 		}
 		return *this;
 	}
+
+
 
 	/// Get color buffer texture
 	const Texture& texture() const { return mTexture; }
@@ -131,10 +146,12 @@ struct EasyFBO {
 
 		mFBO.bind();
 			g.viewport(0, 0, width(), height());
-			g.clearColor(mClearColor);
-			auto clearBuffers = Graphics::COLOR_BUFFER_BIT;
-			if(mUseDepth) clearBuffers = clearBuffers | Graphics::DEPTH_BUFFER_BIT;
-			g.clear(clearBuffers);
+			if(mDoClear){
+				g.clearColor(mClearColor);
+				auto clearBuffers = Graphics::COLOR_BUFFER_BIT;
+				if(mUseDepth) clearBuffers = clearBuffers | Graphics::DEPTH_BUFFER_BIT;
+				g.clear(clearBuffers);
+			}
 			g.projection(mProj);
 			g.modelView(mMV);
 			drawFunc();
@@ -154,6 +171,7 @@ private:
 	Matrix4d mProj = Matrix4d::ortho(-1,1, -1,1, -1,1);
 	Color mClearColor = Color(0,0,0,1);
 	bool mUseDepth = true;
+	bool mDoClear = true;
 	bool mNeedsSync = false;
 
 	void sync(){
