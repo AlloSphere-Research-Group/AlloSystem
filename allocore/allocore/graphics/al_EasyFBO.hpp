@@ -117,7 +117,7 @@ struct EasyFBO {
 
 	/// Get underlying FBO
 	const FBO& fbo() const { return mFBO; }
-	FBO& fbo(){ return mFBO; }
+	FBO& fbo(){ sync(); return mFBO; }
 
 	/// Call draw commands writing into FBO
 	template <class DrawFunc>
