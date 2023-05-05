@@ -94,12 +94,6 @@ protected:
 
 	virtual void onCreate();
 	virtual void onDestroy();
-
-public:
-	/// \deprecated
-	void begin(){ bind(); }
-	/// \deprecated
-	static void end(){ bind(0); }
 };
 
 
@@ -158,6 +152,7 @@ public:
 
 	/// Bind object (start rendering to attached objects)
 	void bind();
+	void bind(int target);
 
 	/// Unbind object
 	void unbind();
@@ -167,11 +162,12 @@ public:
 	const char * statusString();
 	const char * statusString(GLenum stat);
 
-	static void bind(unsigned fboID);
+	static void bind(unsigned fboID, int target);
 	static void renderBuffer(unsigned rboID, Attachment attach);
 	static void texture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
 
 protected:
+	int mTarget;
 	virtual void onCreate();
 	virtual void onDestroy();
 };

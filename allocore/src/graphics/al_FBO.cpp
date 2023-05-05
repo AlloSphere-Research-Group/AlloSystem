@@ -35,16 +35,17 @@ bool RBO::resize(unsigned w, unsigned h){
 	return r;
 }
 
-// static functions
-unsigned RBO::maxSize(){
+/*static*/ unsigned RBO::maxSize(){
 	int s;
 	glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &s);
 	return s;
 }
 
-void RBO::bind(unsigned id){ glBindRenderbuffer(GL_RENDERBUFFER, id); }
+/*static*/ void RBO::bind(unsigned id){
+	glBindRenderbuffer(GL_RENDERBUFFER, id);
+}
 
-bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
+/*static*/ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 	unsigned mx = maxSize();
 	if(w > mx || h > mx) return false;
 	glRenderbufferStorage(GL_RENDERBUFFER, format, w, h);
@@ -91,13 +92,19 @@ FBO& FBO::detachTexture2D(Attachment att, int level){
 	return *this;
 }
 
-void FBO::bind(){ validate(); bind(id()); }
+void FBO::bind(){ bind(GL_FRAMEBUFFER); }
 
-void FBO::unbind(){ bind(0); }
+void FBO::bind(int target){
+	validate();
+	mTarget = target;
+	bind(id(), mTarget);
+}
+
+void FBO::unbind(){ bind(0, mTarget); }
 
 GLenum FBO::status(){
 	bind();
-	int r=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	int r = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	unbind();
 	return r;
 }
@@ -122,10 +129,9 @@ const char * FBO::statusString(GLenum stat){
 	};
 }
 
-
-/*static*/ void FBO::bind(unsigned fboID){
+/*static*/ void FBO::bind(unsigned fboID, int target){
 	AL_GRAPHICS_ERROR("(before FBO::bind)", fboID);
-	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
+	glBindFramebuffer(target, fboID);
 	AL_GRAPHICS_ERROR("binding FBO", fboID);
 }
 
