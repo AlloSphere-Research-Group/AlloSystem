@@ -366,14 +366,15 @@ void Texture :: resetArray(unsigned align) {
 	}
 }
 
-void Texture :: allocate(unsigned align) {
+Texture& Texture :: allocate(unsigned align) {
 	deallocate();
 	resetArray(align);
 	mArray.dataCalloc();
 	mPixelsUpdated = true;
+	return *this;
 }
 
-void Texture :: allocate(const Array& src, bool reconfigure) {
+Texture& Texture :: allocate(const Array& src, bool reconfigure) {
 
 	// Here we reconfigure the internal Array to match the passed in Array
 	if (reconfigure) {
@@ -407,7 +408,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 			AL_WARN("couldn't allocate array, mismatch format");
 			mArray.print();
 			src.print();
-			return;
+			return *this;
 		}
 
 		// re-allocate array:
@@ -422,13 +423,15 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	memcpy(mArray.data.ptr, src.data.ptr, src.size());
 
 	//printf("copied to mArray %p\n", this);
+	return *this;
 }
 
-void Texture :: deallocate() {
+Texture& Texture :: deallocate() {
 	mArray.dataFree();
+	return *this;
 }
 
-void Texture::getRemoteData(){
+Texture& Texture::getRemoteData(){
 	if(!mArray.hasData()){
 		allocate();
 		mPixelsUpdated = false; // prevent overwriting server data
@@ -437,6 +440,7 @@ void Texture::getRemoteData(){
 	// Do not call array() here as it will flag texture as dirty on client
 	glGetTexImage(mTarget, 0, mFormat, mType, mArray.data.ptr);
 	unbind();
+	return *this;
 }
 
 void Texture::sendParams(bool force){
@@ -593,7 +597,7 @@ void Texture::sendShape(bool force){
 }
 
 
-void Texture :: submit(const void * pixels, uint32_t align) {
+Texture& Texture :: submit(const void * pixels, uint32_t align) {
 	AL_GRAPHICS_ERROR("(before Texture::submit)", id());
 
 	// This ensures that the texture is created on the GPU
@@ -627,10 +631,12 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 		glBindTexture(target(), 0);
 			AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
 	});
+
+	return *this;
 }
 
 
-void Texture :: submit(const Array& src, bool reconfigure) {
+Texture& Texture :: submit(const Array& src, bool reconfigure) {
 
 	// Here we basically do a deep copy of the passed in Array
 	if (reconfigure) {
@@ -643,20 +649,20 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 	else {
 		if (src.width() != width()) {
 			AL_WARN("submit failed: source array width does not match");
-			return;
+			goto end;
 		}
 		if (height() && src.height() != height()) {
 			AL_WARN("submit failed: source array height does not match");
-			return;
+			goto end;
 		}
 		if (depth() && src.depth() != depth()) {
 			AL_WARN("submit failed: source array depth does not match");
-			return;
+			goto end;
 		}
 
 		if (Graphics::toDataType(src.type()) != type()) {
 			AL_WARN("submit failed: source array type does not match texture");
-			return;
+			goto end;
 		}
 
 		switch (format()) {
@@ -667,25 +673,25 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 			case Graphics::ALPHA:
 				if (src.components() != 1) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 1)", src.components());
-					return;
+					goto end;
 				}
 				break;
 			case Graphics::LUMINANCE_ALPHA:
 				if (src.components() != 2) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 2)", src.components());
-					return;
+					goto end;
 				}
 				break;
 			case Graphics::RGB:
 				if (src.components() != 3) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 3)", src.components());
-					return;
+					goto end;
 				}
 				break;
 			case Graphics::RGBA:
 				if (src.components() != 4) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 4)", src.components());
-					return;
+					goto end;
 				}
 				break;
 			default:;
@@ -693,14 +699,17 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 	}
 
 	submit(src.data.ptr, src.alignment());
+
+	end:
+	return *this;
 }
 
-void Texture::submit(){
+Texture& Texture::submit(){
 	// Note: not using array() as it may flag the array as dirty
-	submit(mArray.data.ptr, mArray.alignment());
+	return submit(mArray.data.ptr, mArray.alignment());
 }
 
-void Texture::copyFrameBuffer(
+Texture& Texture::copyFrameBuffer(
 	int w, int h, int fbx, int fby, int texx, int texy, int texz
 ){
 	if(w < 0){
@@ -728,6 +737,8 @@ void Texture::copyFrameBuffer(
 	default:;
 	}
 	unbind();
+
+	return *this;
 }
 
 void Texture :: quad(Graphics& gl, double w, double h, double x, double y, double z){

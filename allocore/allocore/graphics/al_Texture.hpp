@@ -384,20 +384,20 @@ public:
 	/// NOTE: the graphics context (e.g. Window) must have been created.
 	/// If reconfigure is true, it will attempt to derive size & layout from the
 	/// array.
-	void submit(const Array& src, bool reconfigure=false);
+	Texture& submit(const Array& src, bool reconfigure=false);
 
 	/// Copy client pixels to GPU texels
 
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
-	void submit(const void * pixels, uint32_t align=4);
+	Texture& submit(const void * pixels, uint32_t align=4);
 
 	/// Submit the client texture state to GPU
 
 	/// If the client pixels have been allocated, then they will be sent if
 	/// marked dirty. Otherwise, the texture is simply reconfigured on the GPU.
-	void submit();
+	Texture& submit();
 
 	/// Copy pixels from current frame buffer to texture texels
 
@@ -408,42 +408,42 @@ public:
 	/// @param[in] texx		texel offset in x direction
 	/// @param[in] texy		texel offset in y direction (2D/3D only)
 	/// @param[in] texz		texel offset in z direction (3D only)
-	void copyFrameBuffer(
+	Texture& copyFrameBuffer(
 		int w=-1, int h=-1,
 		int fbx=0, int fby=0,
 		int texx=0, int texy=0, int texz=0
 	);
 
 	/// Allocate the internal Array for a client-side cache, copying from src
-	void allocate(const Array& src, bool reconfigure=true);
+	Texture& allocate(const Array& src, bool reconfigure=true);
 
 	/// Allocate client-side texture memory using current shape
-	void allocate(unsigned align=1);
+	Texture& allocate(unsigned align=1);
 
 	/// Allocate client-side texture memory, copying from src
 	template <class T>
-	void allocate(const T * src, unsigned w, Graphics::Format format);
+	Texture& allocate(const T * src, unsigned w, Graphics::Format format);
 
 	/// Allocate client-side texture memory, copying from src
 	template <class T>
-	void allocate(const T * src, unsigned w, unsigned h, Graphics::Format format);
+	Texture& allocate(const T * src, unsigned w, unsigned h, Graphics::Format format);
 
 	/// Allocate client-side texture memory, copying from src
 	template <class T>
-	void allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format format);
+	Texture& allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format format);
 
 	template <class T>
-	void allocate(const T * src, unsigned w, unsigned c);
+	Texture& allocate(const T * src, unsigned w, unsigned c);
 	template <class T>
-	void allocate(const T * src, unsigned w, unsigned h, unsigned c);
+	Texture& allocate(const T * src, unsigned w, unsigned h, unsigned c);
 	template <class T>
-	void allocate(const T * src, unsigned w, unsigned h, unsigned d, unsigned c);
+	Texture& allocate(const T * src, unsigned w, unsigned h, unsigned d, unsigned c);
 
 	/// Deallocate any allocated client-side memory
-	void deallocate();
+	Texture& deallocate();
 
 	/// Copy pixels from server into client-side memory (calling allocate() if necessary)
-	void getRemoteData();
+	Texture& getRemoteData();
 
 	/// Print information about texture
 	void print();
@@ -518,35 +518,43 @@ const char * toString(Texture::Wrap v);
 const char * toString(Texture::Filter v);
 
 template <class T>
-void Texture::allocate(const T * src, unsigned w, Graphics::Format format_ ){
-	allocate(src, w,0,0, format_);
+Texture& Texture::allocate(const T * src, unsigned w, Graphics::Format fmt){
+	return allocate(src, w,0,0, fmt);
 }
 
 template <class T>
-void Texture::allocate(const T * src, unsigned w, unsigned h, Graphics::Format format_){
-	allocate(src, w,h,0, format_);
+Texture& Texture::allocate(const T * src, unsigned w, unsigned h, Graphics::Format fmt){
+	return allocate(src, w,h,0, fmt);
 }
 
 template <class T>
-void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format format_){
+Texture& Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format fmt){
 	type(Graphics::toDataType<T>());
-	format(format_);
+	format(fmt);
 	resize(w, h, d);
 	deriveTarget();
 	allocate();
 	memcpy(mArray.data.ptr, src, mArray.size());
+	return *this;
 }
 
 template <class T>
-void Texture::allocate(const T * src, unsigned w, unsigned c){ allocate(src, w,0,0,c); }
+Texture& Texture::allocate(const T * src, unsigned w, unsigned c){
+	return allocate(src, w,0,0,c);
+}
 
 template <class T>
-void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned c){ allocate(src, w,h,0,c); }
+Texture& Texture::allocate(const T * src, unsigned w, unsigned h, unsigned c){
+	return allocate(src, w,h,0,c);
+}
 
 template <class T>
-void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, unsigned c){
-	static Graphics::Format fmts[] = {Graphics::LUMINANCE, Graphics::LUMINANCE_ALPHA, Graphics::RGB, Graphics::RGBA};
+Texture& Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, unsigned c){
+	static Graphics::Format fmts[] = {
+		Graphics::LUMINANCE, Graphics::LUMINANCE_ALPHA, Graphics::RGB, Graphics::RGBA
+	};
 	if(1 <= c && c <= 4) allocate(src, w,h,d, fmts[c-1]);
+	return *this;
 }
 
 } // al::
