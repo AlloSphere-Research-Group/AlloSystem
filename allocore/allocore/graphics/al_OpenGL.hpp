@@ -222,7 +222,7 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_DRAW_RANGE
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
 	#define AL_GRAPHICS_SUPPORTS_FBO
 #endif
 
@@ -237,7 +237,13 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 #if defined(AL_GRAPHICS_USE_OPENGL)
 	#define AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	#define AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-	#define AL_GRAPHICS_SUPPORTS_WRAP_EXTRA
+	#define AL_GRAPHICS_SUPPORTS_WRAP_CLAMP_EXTRA
+	#define AL_GRAPHICS_SUPPORTS_WRAP_REPEAT_EXTRA
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGLES3)
+	#define AL_GRAPHICS_SUPPORTS_TEXTURE_3D
+	#define AL_GRAPHICS_SUPPORTS_WRAP_REPEAT_EXTRA
 #endif
 
 #if !defined(AL_GRAPHICS_USE_OPENGLES2) && !defined(AL_GRAPHICS_USE_OPENGLES3)
@@ -246,6 +252,10 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
 	#define AL_GRAPHICS_SUPPORTS_MIPMAP
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	#define AL_GRAPHICS_SUPPORTS_GET_TEX_IMAGE
 #endif
 
 #if defined(AL_GRAPHICS_USE_OPENGL)

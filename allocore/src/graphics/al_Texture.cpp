@@ -432,6 +432,7 @@ Texture& Texture::deallocate(){
 }
 
 Texture& Texture::getRemoteData(){
+	#ifdef AL_GRAPHICS_SUPPORTS_GET_TEX_IMAGE
 	if(!mArray.hasData()){
 		allocate();
 		mPixelsUpdated = false; // prevent overwriting server data
@@ -440,6 +441,21 @@ Texture& Texture::getRemoteData(){
 	// Do not call array() here as it will flag texture as dirty on client
 	glGetTexImage(mTarget, 0, mFormat, mType, mArray.data.ptr);
 	unbind();
+	#elif defined(AL_GRAPHICS_SUPPORTS_FBO)
+		// If no glGetTexImage, can do this through an FBO (e.g., with OpenGL ES 2)
+		// TODO: test this
+		/*
+		submit(); // texture must be created before binding to FBO
+		GLuint fbo;
+		glGenFramebuffers(1, &fbo); 
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, mTarget, id(), 0);
+		glReadPixels(0, 0, width(), height(), mFormat, mType, mArray.data.ptr);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDeleteFramebuffers(1, &fbo);
+		*/
+	#else
+	#endif
 	return *this;
 }
 
