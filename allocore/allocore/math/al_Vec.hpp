@@ -505,6 +505,10 @@ public:
 	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
 	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
 
+	/// Square vector
+	Vec& square(){ return (*this) *= (*this); }
+	/// Get squared vector
+	Vec squared() const { return dup().square(); }
 
 	/// Apply a function in-place on each element
 	template <class Func, class... Args>
