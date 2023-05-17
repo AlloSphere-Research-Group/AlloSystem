@@ -369,10 +369,10 @@ public:
 
 	/// @param[out] min		minimum corner of bounding box
 	/// @param[out] max		maximum corner of bounding box
-	void getBounds(Vec3f& min, Vec3f& max) const;
+	void bounds(Vec3f& min, Vec3f& max) const;
 
-	/// Get center of vertices
-	Vertex getCenter() const;
+	/// Get centroid (geometric mean) of vertices
+	Vertex centroid() const;
 
 	/// Scale all vertices
 	Mesh& scale(float x, float y, float z=1.f);

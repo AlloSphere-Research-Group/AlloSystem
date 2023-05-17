@@ -640,7 +640,7 @@ Mesh& Mesh::merge(const Mesh& src){
 }
 
 
-void Mesh::getBounds(Vertex& min, Vertex& max) const {
+void Mesh::bounds(Vertex& min, Vertex& max) const {
 	if(mVertices.size()){
 		min = mVertices[0];
 		max = min;
@@ -654,9 +654,9 @@ void Mesh::getBounds(Vertex& min, Vertex& max) const {
 	}
 }
 
-Mesh::Vertex Mesh::getCenter() const {
+Mesh::Vertex Mesh::centroid() const {
 	Vertex min(0), max(0);
-	getBounds(min, max);
+	bounds(min, max);
 	return min+(max-min)*0.5;
 }
 
@@ -677,7 +677,7 @@ Mesh& Mesh::fitToSphere(float radius){
 
 Mesh& Mesh::fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius, bool proportional){
 	Vertex min(0), max(0);
-	getBounds(min, max);
+	bounds(min, max);
 	// span of each axis:
 	auto span = max-min;	// positive only
 	// center of each axis:
@@ -1249,7 +1249,7 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 
 	// STL vertices must be in positive octant
 	Vec3f vmin, vmax;
-	m.getBounds(vmin, vmax);
+	m.bounds(vmin, vmax);
 
 	std::ofstream s(filePath);
 	if(s.fail()) return false;
@@ -1329,7 +1329,7 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 	const int e2 = 1;
 
 	Vec3f mn, mx;
-	getBounds(mn,mx);
+	bounds(mn,mx);
 	float vmul = w * 0.5 * opt.scale()/(max(mn.absVec(), mx.absVec()).get(e1,e2).max());
 
 	auto encodePos = [&](Vec3f pos){
