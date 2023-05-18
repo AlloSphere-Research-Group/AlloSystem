@@ -427,6 +427,37 @@ struct Colori {
 	/// Returns self linearly mixed with another color (0 = none)
 	Colori mix(const Colori& v, float amt=0.5f) const;
 
+	/// Map first N components through function into new color
+
+	/// Components are implicitly cast into a Tcol, mapped, clamped and then
+	/// cast back into a Colori to be returned.
+	/// Tcol should be an array that holds a type that is typically signed and 
+	/// has more than 8-bits like an int.
+	template <unsigned N, class Tcol, class Func, class... Args>
+	Colori mapN(Func f, Args... args) const {
+		typedef typename Tcol::value_type T;
+		static_assert(sizeof(Tcol)/sizeof(T) == N, "Size mismatch");
+		Tcol rgb;
+		for(int i=0; i<N; ++i) rgb[i] = components[i];
+		rgb = f(rgb, args...);
+		auto res = *this;
+		for(int i=0; i<N; ++i){
+			auto v = rgb[i];
+			if(v < T(0)) v = T(0);
+			else if(v > T(255)) v = T(255);
+			res[i] = v;
+		}
+		return res;
+	}
+
+	/// Map all components through function into new color
+	template <class Trgba, class Func, class... Args>
+	Colori map(Func f, Args... args) const { return mapN<4,Trgba>(f, args...); }
+
+	/// Map RGB components through function into new color
+	template <class Trgb, class Func, class... Args>
+	Colori mapRGB(Func f, Args... args) const { return mapN<3,Trgb>(f, args...); }
+
 private:
 	static uint8_t toi(float v);
 };
