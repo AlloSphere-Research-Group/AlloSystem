@@ -460,6 +460,19 @@ public:
 		return Vec<N+1,T>(*this,s);
 	}
 
+	/// Get vector as vector of vectors
+	template <int M>
+	const Vec<N/M, Vec<M,T>>& nest() const {
+		return const_cast<Vec*>(this)->nest<M>();  
+	}
+
+	template <int M>
+	Vec<N/M, Vec<M,T>>& nest(){
+		static constexpr auto N_M = N/M;
+		static_assert(N_M * M == N, "Invalid divisor: N/M must be an integer");
+		return as<Vec<N_M, Vec<M,T>>>();
+	}
+
 	/// Apply circular shift to elements
 
 	/// Element i is moved to element (i+D)%N.
