@@ -336,7 +336,10 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 		m.vertex(0,0,-radius);
 
 	} else { // for texturing: edges must have duplicate vertices
+		auto attribHint = m.attribHint();
+		m.attribHint(attribHint ^ (Mesh::NORMAL /*| Mesh::TANGENT*/));
 		addSurface(m, slices+1,stacks+1, 1,1, 0.5,0.5);
+		m.attribHint(attribHint);
 
 		for(int i=Nv; i<m.vertices().size(); ++i){
 			auto& pos = m.vertices()[i];
@@ -356,7 +359,7 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 		}
 	}
 
-	if((m.attribHint() & Mesh::NORMAL) && (radius != 0.)){
+	if(m.wants(Mesh::NORMAL) && (radius != 0.)){
 		float s = 1./radius;
 		for(auto& p : m.vertices()) m.normal(p * s);
 	}
