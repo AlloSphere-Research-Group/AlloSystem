@@ -606,6 +606,7 @@ protected:
 
 inline Mesh::Attrib operator& (Mesh::Attrib a, Mesh::Attrib b){ return Mesh::Attrib(+a & +b); }
 inline Mesh::Attrib operator| (Mesh::Attrib a, Mesh::Attrib b){ return Mesh::Attrib(+a | +b); }
+inline Mesh::Attrib operator^ (Mesh::Attrib a, Mesh::Attrib b){ return Mesh::Attrib(+a ^ +b); }
 
 } // al::
 
