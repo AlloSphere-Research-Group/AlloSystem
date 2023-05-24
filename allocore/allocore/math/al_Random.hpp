@@ -202,6 +202,28 @@ public:
 		return arr[uniform(N)];
 	}
 
+	/// Urn from which to pick random items
+	template <int N>
+	struct Urn{
+		Urn(Random& rng, int start, int step){
+			for(int i=0; i<N; ++i) data[i]=start+i*step;
+			rng.shuffle(data, N);
+		}
+		int data[N];
+		int tap = 0;
+		static constexpr int size(){ return N; }
+		/// Check for available items
+		operator bool() const { return tap < N; }
+		/// Get next item
+		int operator()(){
+			return data[tap++];
+		}
+	};
+
+	/// Get urn with N items
+	template <int N>
+	Urn<N> urn(int start=0, int step=1){ return {*this, start, step}; }
+
 protected:
 	RNG mRNG;
 
