@@ -997,6 +997,16 @@ void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
 	rotate(vec, normal, cos(angle), sin(angle));
 }
 
+template <class T>
+Vec<3,T> rotated(const Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng){
+	auto r = vec; rotate(r, normal, cosAng, sinAng); return r;
+}
+template <class T>
+Vec<3,T> rotated(const Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
+	return rotated(vec, normal, cos(angle), sin(angle));
+}
+
+
 /// Rotate a vector 90 degrees around a normal vector
 
 /// @param[in,out]	vec		Vector to rotate
@@ -1007,6 +1017,12 @@ void rotate90(Vec<3,T>& vec, const Vec<3,T>& normal){
 	//vec = vec*c + cross(normal, vec)*s + normal*(normal.dot(vec)*(T(1)-c));
 	vec = cross(normal, vec) + vec.projection(normal);
 }
+
+template <class T>
+Vec<3,T> rotated90(const Vec<3,T>& vec, const Vec<3,T>& normal){
+	auto r = vec; rotate90(r, normal); return r;
+}
+
 
 /// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
