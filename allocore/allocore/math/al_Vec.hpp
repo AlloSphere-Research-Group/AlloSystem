@@ -658,7 +658,7 @@ public:
 
 	/// Returns mean (average) of elements
 	T mean() const {
-		static const T invSize = 1./size();
+		static constexpr T invSize = 1./size();
 		return sum()*invSize;
 	}
 
