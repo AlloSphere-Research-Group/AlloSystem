@@ -73,17 +73,13 @@ std::istream& safeGetline(std::istream& is, std::string& t){
     }
 }
 
-bool CSVReader::readFile(std::string fileName) {
-	std::ifstream f(fileName);
-	if (!f.is_open()) {
-		std::cerr << "Could not open: " << fileName << std::endl;
-		return false;
-	}
+bool CSVReader::read(std::istream& is){
+	if(!is.good()) return false;
 
 	std::string line;
 
 	{	// Get column names (assuming they are the first row)
-		safeGetline(f, line);
+		safeGetline(is, line);
 		Tokenizer tk(line, mDelim);
 		mColumnNames.clear();
 		while(tk()){
@@ -102,12 +98,12 @@ bool CSVReader::readFile(std::string fileName) {
 
 	auto rowLength = calculateRowLength();
 
-	while (safeGetline(f, line)) {
-		if (line.size() == 0) {
+	while(safeGetline(is, line)){
+		if(line.size() == 0){
 			continue;
 		}
 
-		if (std::count(line.begin(), line.end(), mDelim) == int(mDataTypes.size() - 1)) { // Check that we have enough commas
+		if(std::count(line.begin(), line.end(), mDelim) == int(mDataTypes.size() - 1)){ // Check that we have enough commas
 			Tokenizer tk(line, mDelim);
 			char *row = new char[!derivingTypes() ? rowLength : mDataTypes.size()*maxStringSize];
 			mData.push_back(row);
@@ -155,12 +151,35 @@ bool CSVReader::readFile(std::string fileName) {
 			}
 		}
 	}
-	if (f.bad()) {
-		std::cerr << "Error reading: " << fileName << std::endl;
+	
+	return !is.bad();
+}
+
+bool CSVReader::read(const void * data, int size){
+	// Using a streamstring would be the most straightforward here, but then we
+	// must copy the data. Instead, we can stream directly from the data by 
+	// subclassing streambuf:
+	// https://stackoverflow.com/questions/7781898/get-an-istream-from-a-char
+	struct membuf : std::streambuf {
+		membuf(char* begin, char* end){
+			this->setg(begin, begin, end);
+		}
+	};
+
+	auto * sdata = (char *)(data);
+	membuf sbuf(sdata, sdata + size);
+	std::istream is(&sbuf);
+	return read(is);
+}
+
+bool CSVReader::readFile(std::string fileName) {
+	std::ifstream f(fileName);
+	if(!f.is_open()){
+		std::cerr << "CSVReader: Could not open: " << fileName << std::endl;
 		return false;
 	}
 
-	return true;
+	return read(f); // read using istream
 }
 
 size_t CSVReader::columnByteOffset(int col) const {

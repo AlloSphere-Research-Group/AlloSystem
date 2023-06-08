@@ -80,7 +80,7 @@ typedef struct {
 	bool b;
 } RowTypes;
 
-int main(int argc, char *argv[]) {
+int main() {
 
 	CSVReader reader;
 	reader.addType(CSVReader::STRING);
@@ -132,6 +132,13 @@ public:
 	 * the types.
 	 */
 	bool readFile(std::string fileName);
+
+	/// Read data from an input stream
+	bool read(std::istream& is);
+
+	/// Read data from memory
+	bool read(const void * data, int size);
+
 
 	/**
 	 * @brief Set the delimiter used by readFile for parsing values
