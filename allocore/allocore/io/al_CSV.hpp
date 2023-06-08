@@ -62,16 +62,15 @@ namespace al{
  * is used as a decimal separator, semicolon, TAB, or other characters are used 
  * instead. [Reference: https://en.wikipedia.org/wiki/Comma-separated_values].
  *
- * To use, first create a CSVReader object and call addType() to add the type of
- * a column. Then call readFile().
+ * To use, simply create a CSVReader object and then call one of the read*()
+ * functions. The parser will do its best to derive the data types and column
+ * names. If you known the column data types ahead of time, you may specify
+ * those using addType() BEFORE calling read*().
  *
- * Once the file is in memory it can be read as columns of floats using
- * getColumn(). Or the whole CSV data can be copied to memory by defining
- * a struct that will hold the values from each row from the csv file and 
- * calling copyToStruct() to create a vector with the data from the CSV file.
- *
- * This reader is currently very naive (but efficient) and might choke with
- * complex or malformed CSV files.
+ * Once the file is in memory it can be read as columns of a specified type.
+ * Alternatively, all the data can be copied to memory by defining a struct that
+ * will hold the values from each row and then calling copyToStruct() to create
+ * an array holding the row data.
  *
  * \code
 typedef struct {
@@ -100,7 +99,7 @@ int main() {
 		          << std::endl;
 	}
 
-	std::vector<double> column1 = reader.getColumn(1);
+	std::vector<double> column1 = reader.columnData(1);
 	for(auto value: column1) {
 		std::cout << value << std::endl;
 	}
@@ -110,6 +109,7 @@ int main() {
  */
 class CSVReader {
 public:
+
 	typedef enum {
 		STRING,
 		REAL,
@@ -118,46 +118,61 @@ public:
 		NONE
 	} DataType;
 
-	CSVReader(){}
 
+	CSVReader(){}
 	~CSVReader();
 
-	/**
-	 * @brief readFile reads the CSV file into internal memory
-	 * @param fileName the csv file name
-	 * \returns whether the file was successfully read.
-	 *
-	 * If the column data types have not been defined before calling this
-	 * function using addType, then the reader will do its best job to derive
-	 * the types.
-	 */
-	bool readFile(std::string fileName);
 
 	/// Read data from an input stream
+
+	/// If the column data types have not been defined before calling this
+	/// function using addType, then the reader will do its best job to derive
+	/// the types.
+	/// \returns whether the stream was successfully read.
 	bool read(std::istream& is);
 
-	/// Read data from memory
+	/// Read data from memory (\sa read(std::istream&) for further details)
 	bool read(const void * data, int size);
 
+	/// Read from CSV file (\sa read(std::istream&) for further details)
+	bool readFile(std::string fileName);
 
-	/**
-	 * @brief Set the delimiter used by readFile for parsing values
-	 */
+
+	/// Set the delimiter used for parsing values from input data sources
 	CSVReader& delim(char v){ mDelim=v; return *this; }
 
-	/**
-	 * @brief addType
-	 * @param type
-	 */
+	/// Add a new column with this data type
 	void addType(DataType type) {
 		mDataTypes.push_back(type);
 	}
 
-	/**
-	 * @brief Returns all columns from the csv file
-	 * @param index column index
-	 * @return vector with the data
-	 */
+
+	/// Get number of columns
+	int numColumns() const { return mDataTypes.size(); }
+	int width() const { return numColumns(); }
+
+	/// Get number of rows (excluding any detected column names in source)
+	int numRows() const { return mRowData.size(); }
+	int height() const { return numRows(); }
+
+	/// Get column names
+	const std::vector<std::string>& columnNames() const { return mColumnNames; }
+
+	/// Get data type of column
+	DataType columnType(int index) const { return mDataTypes[index]; }
+
+	/// Get array containing column data
+
+	/// Values are implicitly cast from their stored DataType to T.
+	///
+	template <class T>
+	std::vector<T> columnData(int index) const;
+
+	std::vector<double> columnData(int index) const {
+		return columnData<double>(index);
+	}
+
+	/// Get array containing all rows copied into a custom struct
 	template<class DataStruct>
 	std::vector<DataStruct> copyToStruct() const {
 		std::vector<DataStruct> output;
@@ -172,36 +187,6 @@ public:
 
 		return output;
 	}
-
-
-	/// Get number of columns
-	int numColumns() const { return mDataTypes.size(); }
-	int width() const { return numColumns(); }
-
-	/// Get number of rows
-	int numRows() const { return mRowData.size(); }
-	int height() const { return numRows(); }
-
-	/// Get column names
-	const std::vector<std::string>& columnNames() const { return mColumnNames; }
-
-	/**
-	 * @brief Returns a column from the csv file
-	 * @param index column index
-	 * @return vector with the data
-	 *
-	 * Values will be implicitly casted from their stored DataType to T.
-	 */
-	template <class T>
-	std::vector<T> columnData(int index) const;
-
-	std::vector<double> columnData(int index) const {
-		return columnData<double>(index);
-	}
-
-	/// Get data type of column
-	DataType columnType(int index) const { return mDataTypes[index]; }
-
 
 private:
 
