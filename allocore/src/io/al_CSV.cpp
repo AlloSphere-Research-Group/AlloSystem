@@ -31,10 +31,9 @@ private:
 
 
 CSVReader::~CSVReader() {
-	for (auto row: mData) {
+	for(auto row: mRowData){
 		delete[] row;
 	}
-	mData.clear();
 }
 
 size_t CSVReader::typeSize(CSVReader::DataType type) const{
@@ -106,8 +105,8 @@ bool CSVReader::read(std::istream& is){
 		if(std::count(line.begin(), line.end(), mDelim) == int(mDataTypes.size() - 1)){ // Check that we have enough commas
 			Tokenizer tk(line, mDelim);
 			char *row = new char[!derivingTypes() ? rowLength : mDataTypes.size()*maxStringSize];
-			mData.push_back(row);
-			char *data = mData.back();
+			mRowData.push_back(row);
+			char *data = mRowData.back();
 			int byteCount = 0;
 			for(auto& type : mDataTypes) {
 				if(!tk()) break; // Failed to get next token (CSV field)

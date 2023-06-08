@@ -161,10 +161,10 @@ public:
 	template<class DataStruct>
 	std::vector<DataStruct> copyToStruct() const {
 		std::vector<DataStruct> output;
-		if (sizeof(DataStruct) < calculateRowLength()) {
+		if(sizeof(DataStruct) < calculateRowLength()){
 			return output;
 		}
-		for (auto row: mData) {
+		for(auto row: mRowData){
 			DataStruct newValues;
 			memcpy(&newValues, row, sizeof(newValues));
 			output.push_back(newValues);
@@ -172,6 +172,18 @@ public:
 
 		return output;
 	}
+
+
+	/// Get number of columns
+	int numColumns() const { return mDataTypes.size(); }
+	int width() const { return numColumns(); }
+
+	/// Get number of rows
+	int numRows() const { return mRowData.size(); }
+	int height() const { return numRows(); }
+
+	/// Get column names
+	const std::vector<std::string>& columnNames() const { return mColumnNames; }
 
 	/**
 	 * @brief Returns a column from the csv file
@@ -181,15 +193,15 @@ public:
 	 * Values will be implicitly casted from their stored DataType to T.
 	 */
 	template <class T>
-	std::vector<T> getColumn(int index) const;
+	std::vector<T> columnData(int index) const;
 
-	std::vector<double> getColumn(int index) const {
-		return getColumn<double>(index);
+	std::vector<double> columnData(int index) const {
+		return columnData<double>(index);
 	}
 
+	/// Get data type of column
+	DataType columnType(int index) const { return mDataTypes[index]; }
 
-	/// Get column names
-	const std::vector<std::string>& columnNames() const { return mColumnNames; }
 
 private:
 
@@ -201,7 +213,7 @@ private:
 
 	std::vector<std::string> mColumnNames;
 	std::vector<DataType> mDataTypes;
-	std::vector<char *> mData;
+	std::vector<char *> mRowData;
 	char mDelim = ',';
 };
 
@@ -254,11 +266,11 @@ private:
 
 
 template <class T>
-std::vector<T> CSVReader::getColumn(int index) const {
+std::vector<T> CSVReader::columnData(int index) const {
 	std::vector<T> out;
 	auto offset = columnByteOffset(index);
 	auto type = mDataTypes[index];
-	for (auto row: mData) {
+	for(auto row: mRowData){
 		switch(type){
 		case REAL:
 			out.push_back(*(const double *)(row + offset));
@@ -276,11 +288,11 @@ std::vector<T> CSVReader::getColumn(int index) const {
 }
 
 template <>
-inline std::vector<std::string> CSVReader::getColumn<std::string>(int index) const {
+inline std::vector<std::string> CSVReader::columnData<std::string>(int index) const {
 	std::vector<std::string> out;
 	auto offset = columnByteOffset(index);
 	auto type = mDataTypes[index];
-	for (auto row: mData) {
+	for(auto row: mRowData){
 		switch(type){
 		case STRING:
 			out.emplace_back((const char *)(row + offset));
