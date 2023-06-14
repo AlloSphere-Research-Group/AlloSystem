@@ -358,9 +358,10 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 		}
 	}
 
-	if(m.wants(Mesh::NORMAL) && (radius != 0.)){
-		float s = 1./radius;
-		for(auto& p : m.vertices()) m.normal(p * s);
+	if(m.wants(Mesh::NORMAL)){
+		float s = radius!=0. ? 1.f/radius : 0.f;
+		for(int i=Nv; i<m.vertices().size(); ++i)
+			m.normal(m.vertices()[i] * s);
 	}
 
 	return m.vertices().size()-Nv;
