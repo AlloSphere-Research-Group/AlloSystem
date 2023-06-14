@@ -288,17 +288,15 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 	if(!m.wants(Mesh::TEXCOORD)){
 		m.triangles();
 
-		P.r *= P.dr; P.i = P.di; // due to cap
-
-		// Add top cap
-		// Triangles have one vertex at the north pole and the others on the first
-		// ring down.
+		// Add top cap (as triangle fan)
 		m.vertex(0,0,radius);
 		for(int i=0; i<slices; ++i){
 			m.index(Nv+1 + i);
 			m.index(Nv+1 + ((i+1)%slices));
-			m.index(Nv);	// the north pole
+			m.index(Nv); // N pole
 		}
+
+		P(); // increment since we added point at N pole
 
 		// Add rings
 		for(int j=0; j<stacks-2; ++j){
@@ -319,9 +317,10 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 				m.index(i10);
 				m.index(i01);
 				m.index(i11);
-				T();
+				T(); // rotate one step around pole
 			}
-			P();
+
+			P(); // rotate one step from N to S pole
 		}
 
 		// Add bottom ring and cap
