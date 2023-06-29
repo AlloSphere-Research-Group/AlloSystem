@@ -41,12 +41,7 @@ This will download and install all the core dependencies using apt-get, MacPorts
 
 ### 2.2 Building a Library
 
-#### Make (Linux, OS X)
-
-The following variables can be modified to customize where built files are placed:
-
-	BUILD_DIR		- location to build files into (default = ./build)
-	DESTDIR			- location to install built files into (default = /usr/local/)
+#### Make (Linux, OS X, MinGW)
 
 The following rules are available (to be run from the root directory):
 
@@ -62,8 +57,13 @@ To see all rules, simply run
 
 	$ make
 
+The following variables can be modified to customize where built files are placed:
 
-## 3. Program Execution Using Make
+	BUILD_DIR		- location to build files into (default = ./build)
+	DESTDIR			- location to install built files into (default = /usr/local/)
+
+
+## 3. Program Execution
 
 ### 3.1 Automatic "Build and Run"
 
@@ -85,7 +85,6 @@ Sometimes it is handy to build and run sources files from custom directories as 
 	RUN_SRC_DIRS	= directoryA directoryB ...
 
 RUN_DIRS is a list of directories that Make searches recursively for build-and-run source files.
-The directory ./examples is automatically added to this list.
 
 RUN_SRC_DIRS is a list of directories that contain source code for objects files that are to be linked with all build-and-run sources. The sources in RUN_SRC_DIRS can be thought of as your own library source code.
 
