@@ -32,13 +32,11 @@ The build folder (typically ./build/) is organized using a Unix-style hierarchy 
 
 ### 2.1 Installing Dependencies
 
-From the AlloSystem/ root directory, cd into a module directory and run the script install_dependencies.sh. For example, to install AlloCore dependencies, you would run these commands from AlloSystem/:
+From the AlloSystem/ root directory and run the script install_dependencies.sh:
 
-	$ cd allocore
 	$ ./install_dependencies.sh
-	$ cd ..
 
-This will download and install all the AlloCore dependencies using apt-get, MacPorts or homebrew.
+This will download and install all the core dependencies using apt-get, MacPorts or homebrew.
 
 
 ### 2.2 Building a Library
