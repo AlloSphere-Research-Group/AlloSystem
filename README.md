@@ -51,11 +51,16 @@ The following variables can be modified to customize where built files are place
 The following rules are available (to be run from the root directory):
 
 	make allocore		- build allocore module
-	make alloutil		- build utilities extension
+	make allocv		- build allocore-OpenCV bindings
+	make alloGLV		- build allocore-GLV bindings
 	make Gamma		- build Gamma external library
 	make GLV		- build GLV external library
 
 	make clean		- removes binaries from build folder
+
+To see all rules, simply run
+
+	$ make
 
 
 ## 3. Program Execution Using Make
