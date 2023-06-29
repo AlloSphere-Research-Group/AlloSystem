@@ -258,13 +258,13 @@ inline Vec4d Stereoscopic::toClipSpace(const Vec<4,T>& v) const {
 }
 
 inline Vec4d Stereoscopic::toClipSpace() const {
-	return modelViewProjection().col(3);
+	return modelViewProjection().col<3>();
 }
 
 template <class T>
 inline Vec3d Stereoscopic::toNDCSpace(const Vec<4,T>& v) const {
 	auto clipSpace = toClipSpace(v);
-	return clipSpace.get(0,1,2) / clipSpace[3];
+	return clipSpace.xyz() / clipSpace.w;
 }
 template <class T>
 inline Vec3d Stereoscopic::toNDCSpace(const Vec<3,T>& v) const {
@@ -272,8 +272,8 @@ inline Vec3d Stereoscopic::toNDCSpace(const Vec<3,T>& v) const {
 }
 
 inline Vec3d Stereoscopic::toNDCSpace() const {
-	Vec4d clipSpace = toClipSpace();
-	return clipSpace.get(0,1,2) / clipSpace[3];
+	auto clipSpace = toClipSpace();
+	return clipSpace.xyz() / clipSpace.w;
 }
 
 } // al::
