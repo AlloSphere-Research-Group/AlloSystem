@@ -61,10 +61,19 @@ public:
 	bool open(const std::string& path);
 
 	/// Extract file in archive to heap memory
-	bool extract(
+	bool extract(		
 		const std::string& fileName,
 		const std::function<void(const void * data, int size)>& onData
 	);
+
+	/// Extract all files in archive to heap memory
+
+	/// \returns number of files extracted
+	///
+	int extractAll(
+		const std::function<void(const std::string& fileName, const void * data, int size)>& onData
+	);
+
 
 	/// Extract file in zip archive to heap memory
 
@@ -75,6 +84,15 @@ public:
 		const std::string& zipPath,
 		const std::string& fileName,
 		const std::function<void(const void * data, int size)>& onData
+	);
+
+	/// Extract all files in archive to heap memory
+
+	/// \returns number of files extracted
+	///
+	static int extractAll(
+		const std::string& zipPath,
+		const std::function<void(const std::string& fileName, const void * data, int size)>& onData
 	);
 
 	/// Get file paths contained in archive

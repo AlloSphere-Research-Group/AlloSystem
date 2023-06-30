@@ -36,7 +36,7 @@ bool ZipReader::open(const std::string& path){
 
 bool ZipReader::extract(
 	const std::string& fileName,
-	const std::function<void(const void * data, int size)>& onData
+	const std::function<void(const void *, int)>& onData
 ){
 	size_t size;
 	void * data = mz_zip_reader_extract_file_to_heap(&mImpl->zip, fileName.c_str(), &size, 0);
@@ -49,15 +49,34 @@ bool ZipReader::extract(
 	return false;
 }
 
+int ZipReader::extractAll(
+	const std::function<void(const std::string&, const void *, int)>& onData
+){
+	int count = 0;
+	for(const auto& fileName : mFilePaths){
+		count += (int)extract(fileName, [&](const void * data, int size){
+			onData(fileName, data,size);
+		});
+	}
+	return count;
+}
+
 /*static*/ bool ZipReader::extract(
 	const std::string& zipPath,
 	const std::string& fileName,
-	const std::function<void(const void * data, int size)>& onData
+	const std::function<void(const void *, int)>& onData
 ){
 	ZipReader zip;
 	return zip.open(zipPath) && zip.extract(fileName, onData);
 }
 
+/*static*/ int ZipReader::extractAll(
+	const std::string& zipPath,
+	const std::function<void(const std::string&, const void *, int)>& onData
+){
+	ZipReader zip;
+	return zip.open(zipPath) ? zip.extractAll(onData) : 0;
+}
 
 
 
