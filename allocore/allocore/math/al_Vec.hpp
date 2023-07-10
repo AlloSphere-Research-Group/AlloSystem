@@ -830,11 +830,12 @@ public:
 	}
 
 	/// Get minimum value
-	const T& min() const { return (*this)[indexOfMin()]; }
+	const T& min() const { return const_cast<Vec*>(this)->min(); }
+	T& min(){ return (*this)[indexOfMin()]; }
 
 	/// Get maximum value
-	const T& max() const { return (*this)[indexOfMax()]; }
-
+	const T& max() const { return const_cast<Vec*>(this)->max(); }
+	T& max(){ return (*this)[indexOfMax()]; }
 
 	/// debug printing
 	void print(FILE * out=stdout, const char * append="") const;
@@ -1127,34 +1128,6 @@ template <class T>
 inline Vec<3,T> gradToNormal(const Vec<2,T>& g){
 	// result is normalized (-g.x, -g.y, 1)
 	return g.template take<3>(T(-1)).normalized(T(-1));
-}
-
-/// Returns element with minimum value
-template <int N, class T>
-inline const T& min(const Vec<N,T>& v){
-	int j = 0;
-	for(int i=1; i<N; ++i){
-		if(v[i] < v[j]) j=i;
-	}
-	return v[j];
-}
-template <int N, class T>
-inline T& min(Vec<N,T>& v){
-	return const_cast<T&>(min(static_cast<const Vec<N,T>&>(v)));
-}
-
-/// Returns element with maximum value
-template <int N, class T>
-inline const T& max(const Vec<N,T>& v){
-	int j = 0;
-	for(int i=1; i<N; ++i){
-		if(v[i] > v[j]) j=i;
-	}
-	return v[j];
-}
-template <int N, class T>
-inline T& max(Vec<N,T>& v){
-	return const_cast<T&>(max(static_cast<const Vec<N,T>&>(v)));
 }
 
 /// Returns vector containing element-wise minimum between two vectors
