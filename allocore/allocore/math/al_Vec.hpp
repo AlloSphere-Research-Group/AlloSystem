@@ -319,7 +319,7 @@ public:
 	/// vector components.
 	Vec& set(std::initializer_list<T> v){
 		if(v.size() == 1){
-			(*this) = v.begin()[0];
+			*this = v.begin()[0];
 		} else {
 			const int M = N<v.size() ? N : int(v.size());
 			for(int i=0; i<M; ++i) (*this)[i] = v.begin()[i];
@@ -339,7 +339,7 @@ public:
 
 	/// Set to axis-aligned vector
 	Vec& setAA(int axis, T val = T(1)){
-		(*this) = T(0);
+		*this = T(0);
 		(*this)[axis] = val;
 		return *this;
 	}
@@ -488,7 +488,7 @@ public:
 	template <int D>
 	Vec& cshift(){
 		constexpr auto Dp = const_mods(D,N);
-		return (*this) = drop<N-Dp>().concat(drop<-Dp>());
+		return *this = drop<N-Dp>().concat(drop<-Dp>());
 	}
 
 	/// Swap elements within vector
@@ -527,7 +527,7 @@ public:
 	bool operator < (const Vec& v) const { return magSqr() < v.magSqr(); }
 
 	/// Square vector
-	Vec& square(){ return (*this) *= (*this); }
+	Vec& square(){ return *this *= *this; }
 	/// Get squared vector
 	Vec squared() const { return dup().square(); }
 
@@ -672,7 +672,7 @@ public:
 
 	/// Linearly interpolate towards some target
 	Vec& lerp(const Vec& target, T amt){
-		return (*this) += (target-(*this))*amt;
+		return *this += (target-*this)*amt;
 	}
 
 	/// Set magnitude (preserving direction)
@@ -684,7 +684,7 @@ public:
 	/// is equal to some value without changing the direction of the vector.
 	Vec& norm1(T v){
 		auto n1 = sumAbs();
-		if(n1 > T(0)) (*this) *= (v/n1);
+		if(n1 > T(0)) *this *= v/n1;
 		return *this;
 	}
 
@@ -718,7 +718,7 @@ public:
 	/// This also gives the projection onto a plane defined by normal 'u'.
 	///
 	Vec rejection(const Vec& u) const {
-		return (*this) - projection(u);
+		return *this - projection(u);
 	}
 
 	/// Returns whether this is inside sphere
@@ -756,12 +756,12 @@ public:
 	/// @param[in] p		center of sphere
 	/// @param[in] radius	radius of sphere
 	Vec projSphere(const Vec& p, T radius) const {
-		return ((*this)-p).normalize(radius) + p;
+		return (*this-p).normalize(radius) + p;
 	}
 
 	/// Reflect vector around a unit vector
 	Vec& reflect(const Vec& u){
-		return (*this) -= ((T(2) * dot(u)) * u);
+		return *this -= ((T(2) * dot(u)) * u);
 	}
 
 	/// Set from angle and magnitude
@@ -1203,7 +1203,7 @@ template <int N, class T>
 Vec<N,T>& Vec<N,T>::mag(T v){
 	T m = mag();
 	if(m > T(1e-20)){
-		(*this) *= (v/m);
+		*this *= v/m;
 	}
 	else{
 		*this = T(0);
