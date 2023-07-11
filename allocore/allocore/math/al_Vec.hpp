@@ -257,9 +257,14 @@ public:
 		return const_cast<Vec*>(this)->at<i>();
 	}
 
+	/// Access first element
+	T& front(){ return at<0>(); }
+	const T& front() const { return const_cast<Vec*>(this)->front(); }
+
 	/// Access last element
 	T& back(){ return at<N-1>(); }
 	const T& back() const { return const_cast<Vec*>(this)->back(); }
+
 
 	Vec& operator = (const T& v){ IT(N) at(i) = v; return *this; }
 
@@ -272,10 +277,10 @@ public:
 
 	/// Set elements from another vector and scalar
 	template <class Tv, class Ts>
-	Vec& set(const Vec<N-1, Tv>& v, const Ts& s){ at<N-1>()=s; return (*this = v); }
+	Vec& set(const Vec<N-1, Tv>& v, const Ts& s){ back()=s; return (*this = v); }
 
 	template <class Ts, class Tv>
-	Vec& set(const Ts& s, const Vec<N-1, Tv>& v){ at<0>()=s; sub<N-1,1>()=v; return *this; }
+	Vec& set(const Ts& s, const Vec<N-1, Tv>& v){ front()=s; sub<N-1,1>()=v; return *this; }
 
 	/// Set elements from (strided) raw C-pointer
 	template <class T2>
@@ -606,7 +611,7 @@ public:
 	/// Returns dot (inner) product between vectors
 	template <class U>
 	T dot(const Vec<N,U>& v) const {
-		T r = at<0>() * v[0];
+		T r = front() * v.front();
 		for(int i=1; i<N; ++i){ r += at(i) * v[i]; }
 		return r;
 	}
@@ -652,14 +657,14 @@ public:
 
 	/// Returns product of elements
 	T product() const {
-		T r = at<0>();
+		T r = front();
 		for(int i=1; i<N; ++i){ r *= at(i); }
 		return r;
 	}
 
 	/// Returns sum of elements
 	T sum() const {
-		T r = at<0>();
+		T r = front();
 		for(int i=1; i<N; ++i){ r += at(i); }
 		return r;
 	}
@@ -1210,7 +1215,7 @@ Vec<N,T>& Vec<N,T>::mag(T v){
 	}
 	else{
 		*this = T(0);
-		at<0>() = v;
+		front() = v;
 	}
 	return *this;
 }
@@ -1219,7 +1224,7 @@ template<int N, class T>
 void Vec<N,T>::print(FILE * out, const char * append) const {
 	fprintf(out, "{");
 	if(size()){
-		fprintf(out, "%g", (double)(at<0>()));
+		fprintf(out, "%g", (double)(front()));
 		for (int i=1; i<N; ++i)
 			fprintf(out, ", %g", (double)(at(i)));
 	}
