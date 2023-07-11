@@ -153,6 +153,14 @@ public:
 	int dx() const;				///< Get change in x position, in pixels
 	int dy() const;				///< Get change in y position, in pixels
 
+	/// Get position as n-vector
+	template <class Vec>
+	Vec pos() const {
+		static_assert(sizeof(Vec)/sizeof(typename Vec::value_type) >= 2, "Vec requires at least two elements");
+		Vec p; p[0]=x(); p[1]=y();
+		return p;
+	}
+
 	int button() const;			///< Get last clicked button
 	bool down() const;			///< Get state of last clicked button
 	bool down(int button) const;///< Get state of a button
