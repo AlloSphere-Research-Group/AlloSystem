@@ -241,11 +241,14 @@ public:
 	/// Get element at index with no bounds checking
 	const T& operator[](int i) const { return elems()[i]; }
 
+	T& at(int i){ return (*this)[i]; }
+	const T& at(int i) const { return (*this)[i]; }
+
 	/// Set element at index with compile-time bounds checking
 	template <int i>
 	T& at(){
 		static_assert(0<=i && i<N, "Index out of bounds");
-		return (*this)[i];
+		return at(i);
 	}
 
 	/// Get element at index with compile-time bounds checking
@@ -258,10 +261,10 @@ public:
 	T& back(){ return at<N-1>(); }
 	const T& back() const { return const_cast<Vec*>(this)->back(); }
 
-	Vec& operator = (const T& v){ IT(N) (*this)[i] = v; return *this; }
+	Vec& operator = (const T& v){ IT(N) at(i) = v; return *this; }
 
 	template <int N2, class T2>
-	Vec& operator = (const Vec<N2,T2>& v){ IT(N<N2?N:N2) (*this)[i] = T(v[i]); return *this; }
+	Vec& operator = (const Vec<N2,T2>& v){ IT(N<N2?N:N2) at(i) = T(v[i]); return *this; }
 
 	/// Set element at index (a chainable version of at())
 	template <int i>
@@ -269,14 +272,14 @@ public:
 
 	/// Set elements from another vector and scalar
 	template <class Tv, class Ts>
-	Vec& set(const Vec<N-1, Tv>& v, const Ts& s){ (*this)[N-1]=s; return (*this = v); }
+	Vec& set(const Vec<N-1, Tv>& v, const Ts& s){ at<N-1>()=s; return (*this = v); }
 
 	template <class Ts, class Tv>
-	Vec& set(const Ts& s, const Vec<N-1, Tv>& v){ (*this)[0]=s; sub<N-1,1>()=v; return *this; }
+	Vec& set(const Ts& s, const Vec<N-1, Tv>& v){ at<0>()=s; sub<N-1,1>()=v; return *this; }
 
 	/// Set elements from (strided) raw C-pointer
 	template <class T2>
-	Vec& set(const T2 * const v, int stride=1){ IT(N) (*this)[i] = T(v[i*stride]); return *this; }
+	Vec& set(const T2 * const v, int stride=1){ IT(N) at(i) = T(v[i*stride]); return *this; }
 
 	/// Set first 2 elements
 	Vec& set(const T& v1, const T& v2){
@@ -322,15 +325,15 @@ public:
 			*this = v.begin()[0];
 		} else {
 			const int M = N<v.size() ? N : int(v.size());
-			for(int i=0; i<M; ++i) (*this)[i] = v.begin()[i];
-			for(int i=M; i<N; ++i) (*this)[i] = T();
+			for(int i=0; i<M; ++i) at(i) = v.begin()[i];
+			for(int i=M; i<N; ++i) at(i) = T();
 		}
 		return *this;
 	}
 
 	/// Fill subrange of elements with value
 	Vec& fill(const T& v, int count, int begin=0){
-		for(int i=begin; i<begin+count; ++i) (*this)[i] = v;
+		for(int i=begin; i<begin+count; ++i) at(i) = v;
 		return *this;
 	}
 
@@ -340,7 +343,7 @@ public:
 	/// Set to axis-aligned vector
 	Vec& setAA(int axis, T val = T(1)){
 		*this = T(0);
-		(*this)[axis] = val;
+		at(axis) = val;
 		return *this;
 	}
 	template <int Axis>
@@ -350,10 +353,10 @@ public:
 	}
 
 	/// Return true if objects are element-wise equal, false otherwise
-	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
+	bool operator ==(const Vec& v) const { IT(N){ if(at(i) != v[i]) return false; } return true; }
 
 	/// Return true if all elements are equal to value, false otherwise
-	bool operator ==(const   T& v) const { IT(N){ if((*this)[i] != v   ) return false; } return true; }
+	bool operator ==(const   T& v) const { IT(N){ if(at(i) != v   ) return false; } return true; }
 
 	/// Return true if objects are not element-wise equal, false otherwise
 	bool operator !=(const Vec& v) const { return !(*this == v); }
@@ -363,15 +366,15 @@ public:
 
 	/// Get a vector comprised of indexed elements
 	Vec<2,T> get(int i0, int i1) const {
-		return Vec<2,T>((*this)[i0], (*this)[i1]); }
+		return Vec<2,T>(at(i0), at(i1)); }
 
 	/// Get a vector comprised of indexed elements
 	Vec<3,T> get(int i0, int i1, int i2) const {
-		return Vec<3,T>((*this)[i0], (*this)[i1], (*this)[i2]); }
+		return Vec<3,T>(at(i0), at(i1), at(i2)); }
 
 	/// Get a vector comprised of indexed elements
 	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
-		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
+		return Vec<4,T>(at(i0), at(i1), at(i2), at(i3)); }
 
 	/// Get a vector comprised of indexed elements (compile-time checked)
 	template <int... Indices>
@@ -407,8 +410,8 @@ public:
 	/// Return new vector with one element erased
 	Vec<N-1,T> erase(int index){
 		Vec<N-1,T> r(VEC_NO_INIT);
-		for(int i=0;     i<index;    ++i) r[i] = (*this)[i];
-		for(int i=index; i<r.size(); ++i) r[i] = (*this)[i+1];
+		for(int i=0;     i<index;    ++i) r[i] = at(i);
+		for(int i=index; i<r.size(); ++i) r[i] = at(i+1);
 		return r;
 	}
 
@@ -449,7 +452,7 @@ public:
 		constexpr auto Ef = Bf + Nf;
 
 		Vec<L,T> r(VEC_NO_INIT);
-		for(int i=Bc; i<Ec; ++i) r[i] = (*this)[i-Oc];
+		for(int i=Bc; i<Ec; ++i) r[i] = at(i-Oc);
 		for(int i=Bf; i<Ef; ++i) r[i] = fill;
 		return r;
 	}
@@ -492,26 +495,26 @@ public:
 	}
 
 	/// Swap elements within vector
-	Vec& swap(int i, int j){ std::swap((*this)[i], (*this)[j]); return *this; }
+	Vec& swap(int i, int j){ std::swap(at(i), at(j)); return *this; }
 
 	template <int i=0, int j=1>
 	Vec& swap(){ std::swap(at<i>(), at<j>()); return *this; }
 
 	/// Swap elements with another vector
-	Vec& swap(Vec& v){ IT(N) std::swap((*this)[i], v[i]); return *this; }
+	Vec& swap(Vec& v){ IT(N) std::swap(at(i), v[i]); return *this; }
 
 
 	//--------------------------------------------------------------------------
 	// Basic Arithmetic Operations
 
-	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
-	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
-	Vec& operator -=(const Vec& v){ IT(N) (*this)[i] -= v[i]; return *this; }
-	Vec& operator -=(const   T& v){ IT(N) (*this)[i] -= v;    return *this; }
-	Vec& operator *=(const Vec& v){ IT(N) (*this)[i] *= v[i]; return *this; }
-	Vec& operator *=(const   T& v){ IT(N) (*this)[i] *= v;    return *this; }
-	Vec& operator /=(const Vec& v){ IT(N) (*this)[i] /= v[i]; return *this; }
-	Vec& operator /=(const   T& v){ IT(N) (*this)[i] /= v;    return *this; }
+	Vec& operator +=(const Vec& v){ IT(N) at(i) += v[i]; return *this; }
+	Vec& operator +=(const   T& v){ IT(N) at(i) += v;    return *this; }
+	Vec& operator -=(const Vec& v){ IT(N) at(i) -= v[i]; return *this; }
+	Vec& operator -=(const   T& v){ IT(N) at(i) -= v;    return *this; }
+	Vec& operator *=(const Vec& v){ IT(N) at(i) *= v[i]; return *this; }
+	Vec& operator *=(const   T& v){ IT(N) at(i) *= v;    return *this; }
+	Vec& operator /=(const Vec& v){ IT(N) at(i) /= v[i]; return *this; }
+	Vec& operator /=(const   T& v){ IT(N) at(i) /= v;    return *this; }
 
 	Vec operator + (const Vec& v) const { return dup() += v; }
 	Vec operator + (const   T& v) const { return dup() += v; }
@@ -541,7 +544,7 @@ public:
 	template <class V, class Func, class... Args>
 	Vec<N,V> map(Func func, Args... args) const {
 		Vec<N,V> r(VEC_NO_INIT);
-		for(int i=0; i<size(); ++i) r[i] = func((*this)[i], args...);
+		for(int i=0; i<size(); ++i) r[i] = func(at(i), args...);
 		return r;
 	}
 
@@ -603,8 +606,8 @@ public:
 	/// Returns dot (inner) product between vectors
 	template <class U>
 	T dot(const Vec<N,U>& v) const {
-		T r = (*this)[0] * v[0];
-		for(int i=1; i<N; ++i){ r += (*this)[i] * v[i]; }
+		T r = at<0>() * v[0];
+		for(int i=1; i<N; ++i){ r += at(i) * v[i]; }
 		return r;
 	}
 
@@ -626,7 +629,7 @@ public:
 	Vec sgn(T mag=T(1)) const {
 		Vec s;
 		for(int i=0; i<N; ++i){
-			const auto& v = (*this)[i];
+			const auto& v = at(i);
 			s[i] = v<T(0) ? -mag : v>T(0) ? mag : T(0);
 		}
 		return s;
@@ -649,15 +652,15 @@ public:
 
 	/// Returns product of elements
 	T product() const {
-		T r = (*this)[0];
-		for(int i=1; i<N; ++i){ r *= (*this)[i]; }
+		T r = at<0>();
+		for(int i=1; i<N; ++i){ r *= at(i); }
 		return r;
 	}
 
 	/// Returns sum of elements
 	T sum() const {
-		T r = (*this)[0];
-		for(int i=1; i<N; ++i){ r += (*this)[i]; }
+		T r = at<0>();
+		for(int i=1; i<N; ++i){ r += at(i); }
 		return r;
 	}
 
@@ -768,16 +771,16 @@ public:
 	template <int Dim1=0, int Dim2=1>
 	Vec& fromPolar(double ang, double mag = 1.){
 		static_assert_dims<Dim1,Dim2>();
-		(*this)[Dim1] = mag * std::cos(ang);
-		(*this)[Dim2] = mag * std::sin(ang);
+		at<Dim1>() = mag * std::cos(ang);
+		at<Dim2>() = mag * std::sin(ang);
 		return *this;
 	}
 
 	Vec& rotate(double cosAng, double sinAng, int dim1, int dim2){
-		T t = (*this)[dim1];
-		T u = (*this)[dim2];
-		(*this)[dim1] = t*cosAng - u*sinAng;
-		(*this)[dim2] = t*sinAng + u*cosAng;
+		T t = at(dim1);
+		T u = at(dim2);
+		at(dim1) = t*cosAng - u*sinAng;
+		at(dim2) = t*sinAng + u*cosAng;
 		return *this;
 	}
 
@@ -808,7 +811,7 @@ public:
 	/// @param[in] dim2		dimension to rotate towards
 	/// To rotate -90 degrees, swap the two dimensions.
 	Vec& rotate90(int dim1, int dim2){
-		(*this)[dim2] = -(*this)[dim2];
+		at(dim2) = -at(dim2);
 		return swap(dim1, dim2);
 	}
 
@@ -823,8 +826,8 @@ public:
 	/// @param[in] dim1		dimension to rotate from
 	/// @param[in] dim2		dimension to rotate towards
 	Vec& rotate180(int dim1, int dim2){
-		(*this)[dim1] = -(*this)[dim1];
-		(*this)[dim2] = -(*this)[dim2];
+		at(dim1) = -at(dim1);
+		at(dim2) = -at(dim2);
 		return *this;
 	}
 
@@ -840,7 +843,7 @@ public:
 
 	/// Returns index of first occurrence of value or -1 if no match
 	int find(const T& v) const {
-		for(int i=0; i<N; ++i){ if((*this)[i] == v) return i; }
+		for(int i=0; i<N; ++i){ if(v == at(i)) return i; }
 		return -1;
 	}
 
@@ -848,7 +851,7 @@ public:
 	int indexOfMin() const {
 		int j = 0;
 		for(int i=1; i<N; ++i){
-			if((*this)[i] < (*this)[j]) j=i;
+			if(at(i) < at(j)) j=i;
 		}
 		return j;
 	}
@@ -857,18 +860,18 @@ public:
 	int indexOfMax() const {
 		int j = 0;
 		for(int i=1; i<N; ++i){
-			if((*this)[i] > (*this)[j]) j=i;
+			if(at(i) > at(j)) j=i;
 		}
 		return j;
 	}
 
 	/// Get minimum value
 	const T& min() const { return const_cast<Vec*>(this)->min(); }
-	T& min(){ return (*this)[indexOfMin()]; }
+	T& min(){ return at(indexOfMin()); }
 
 	/// Get maximum value
 	const T& max() const { return const_cast<Vec*>(this)->max(); }
-	T& max(){ return (*this)[indexOfMax()]; }
+	T& max(){ return at(indexOfMax()); }
 
 	/// debug printing
 	void print(FILE * out=stdout, const char * append="") const;
@@ -878,7 +881,7 @@ private:
 	// set last N-M elements to default value
 	template <int M>
 	void initTail(){
-		for(int i=M; i<size(); ++i) (*this)[i] = T();
+		for(int i=M; i<size(); ++i) at(i) = T();
 	}
 
 	template <unsigned Dim1, unsigned Dim2>
@@ -1207,7 +1210,7 @@ Vec<N,T>& Vec<N,T>::mag(T v){
 	}
 	else{
 		*this = T(0);
-		(*this)[0] = v;
+		at<0>() = v;
 	}
 	return *this;
 }
@@ -1216,9 +1219,9 @@ template<int N, class T>
 void Vec<N,T>::print(FILE * out, const char * append) const {
 	fprintf(out, "{");
 	if(size()){
-		fprintf(out, "%g", (double)((*this)[0]));
+		fprintf(out, "%g", (double)(at<0>()));
 		for (int i=1; i<N; ++i)
-			fprintf(out, ", %g", (double)((*this)[i]));
+			fprintf(out, ", %g", (double)(at(i)));
 	}
 	fprintf(out, "}%s", append);
 }
