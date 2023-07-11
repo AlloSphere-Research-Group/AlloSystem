@@ -734,6 +734,15 @@ public:
 	template <int Rnum=1, int Rden=1>
 	bool outsideSphere(){ return !insideSphere<Rnum,Rden>(); }
 
+	/// Get projection onto sphere
+
+	/// This function is useful for applying distance-based constraints.
+	/// @param[in] p		center of sphere
+	/// @param[in] radius	radius of sphere
+	Vec projSphere(const Vec& p, T radius) const {
+		return ((*this)-p).normalize(radius) + p;
+	}
+
 	/// Reflect vector around a unit vector
 	Vec& reflect(const Vec& u){
 		return (*this) -= ((T(2) * dot(u)) * u);
