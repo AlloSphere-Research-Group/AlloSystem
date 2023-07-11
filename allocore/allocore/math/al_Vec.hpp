@@ -723,7 +723,7 @@ public:
 
 	/// Returns whether point is inside sphere
 	template <int Rnum=1, int Rden=1>
-	bool insideSphere(){
+	bool insideSphere() const {
 		static_assert(Rden != 0, "Divide by zero");
 		static constexpr T R = T(Rnum)/Rden;
 		static constexpr T Rsqr = R*R;
@@ -732,7 +732,7 @@ public:
 
 	/// Returns whether point is outside sphere
 	template <int Rnum=1, int Rden=1>
-	bool outsideSphere(){ return !insideSphere<Rnum,Rden>(); }
+	bool outsideSphere() const { return !insideSphere<Rnum,Rden>(); }
 
 	/// Get projection onto sphere
 
