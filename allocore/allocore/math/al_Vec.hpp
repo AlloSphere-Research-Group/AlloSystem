@@ -721,7 +721,23 @@ public:
 		return (*this) - projection(u);
 	}
 
-	/// Returns whether point is inside sphere
+	/// Returns whether this is inside sphere
+
+	/// @param[in] p		center of sphere
+	/// @param[in] radius	radius of sphere
+	bool insideSphere(const Vec& p, T radius) const {
+		return (*this-p).magSqr() < radius*radius;
+	}
+
+	/// Returns whether this is outside sphere
+
+	/// @param[in] p		center of sphere
+	/// @param[in] radius	radius of sphere
+	bool outsideSphere(const Vec& p, T radius) const {
+		return !insideSphere(p, radius);
+	}
+
+	/// Returns whether point is inside sphere centered at origin
 	template <int Rnum=1, int Rden=1>
 	bool insideSphere() const {
 		static_assert(Rden != 0, "Divide by zero");
@@ -730,7 +746,7 @@ public:
 		return magSqr() < Rsqr;
 	}
 
-	/// Returns whether point is outside sphere
+	/// Returns whether point is outside sphere centered at origin
 	template <int Rnum=1, int Rden=1>
 	bool outsideSphere() const { return !insideSphere<Rnum,Rden>(); }
 
