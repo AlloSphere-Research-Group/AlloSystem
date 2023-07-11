@@ -266,7 +266,7 @@ public:
 	const T& back() const { return const_cast<Vec*>(this)->back(); }
 
 
-	Vec& operator = (const T& v){ IT(N) at(i) = v; return *this; }
+	Vec& operator = (const T& v){ return fill(v); }
 
 	template <int N2, class T2>
 	Vec& operator = (const Vec<N2,T2>& v){ IT(N<N2?N:N2) at(i) = T(v[i]); return *this; }
@@ -337,7 +337,7 @@ public:
 	}
 
 	/// Fill subrange of elements with value
-	Vec& fill(const T& v, int count, int begin=0){
+	Vec& fill(const T& v, int count=N, int begin=0){
 		for(int i=begin; i<begin+count; ++i) at(i) = v;
 		return *this;
 	}
