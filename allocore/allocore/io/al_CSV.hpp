@@ -43,164 +43,88 @@
 	Lance Putnam 2022
 */
 
-#include <vector>
+#include <functional>
 #include <sstream>
 #include <string>
-#include <cstring> // memcpy
+#include <vector>
 
 namespace al{
 
 /// @addtogroup allocore
 /// @{
 
-/**
- * @brief The CSVReader class reads simple CSV files
- *
- * CSV is a delimited data format that has fields/columns separated by the comma
- * character and records/rows terminated by newlines. "CSV" formats vary greatly
- * in choice of separator character. In particular, in locales where the comma
- * is used as a decimal separator, semicolon, TAB, or other characters are used 
- * instead. [Reference: https://en.wikipedia.org/wiki/Comma-separated_values].
- *
- * To use, simply create a CSVReader object and then call one of the read*()
- * functions. The parser will do its best to derive the data types and column
- * names. If you known the column data types ahead of time, you may specify
- * those using addType() BEFORE calling read*().
- *
- * Once the file is in memory it can be read as columns of a specified type.
- * Alternatively, all the data can be copied to memory by defining a struct that
- * will hold the values from each row and then calling copyToStruct() to create
- * an array holding the row data.
- *
- * \code
-typedef struct {
-	char s[32];
-	double val1, val2, val3;
-	bool b;
-} RowTypes;
+/// CSV (comma-separated value) reader
 
-int main() {
-
-	CSVReader reader;
-	reader.addType(CSVReader::STRING);
-	reader.addType(CSVReader::REAL);
-	reader.addType(CSVReader::REAL);
-	reader.addType(CSVReader::REAL);
-	reader.addType(CSVReader::BOOLEAN);
-	reader.readFile("examples/csv/I13893-gm-21DIV-0001.csv");
-
-	std::vector<RowTypes> rows = reader.copyToStruct<RowTypes>();
-	for(auto row: rows) {
-		std::cout << std::string(row.s) << " : "
-		          << row.val1 << "   "
-		          << row.val2 << "   "
-		          << row.val3 << "   "
-		          << (row.b ? "+" : "-")
-		          << std::endl;
-	}
-
-	std::vector<double> column1 = reader.columnData(1);
-	for(auto value: column1) {
-		std::cout << value << std::endl;
-	}
-	std::cout << " Num rows:" << rows.size() << std::endl;
-	return 0;
-	\endcode
- */
+/// This implementation uses "lazy" evaluation to obtain numerical values.
+/// All fields are stored internally as strings and converted to numerical 
+/// values when required. Double-quoted fields (containing zero or more 
+/// delimiters) and a custom delimiter are supported.
 class CSVReader {
 public:
 
-	typedef enum {
-		STRING,
-		REAL,
-		INTEGER,
-		BOOLEAN,
-		NONE
-	} DataType;
+	/// A field (value) as a raw character string
+	struct Field{
+		const char * ptr = nullptr;
+		unsigned size = 0;
+
+		/// Get C-string (null-terminated character array)
+		const char * c_str() const { return ptr; }
+
+		/// Convert field to specified type
+		template <class T> T to() const;
+
+		float toFloat() const;
+		double toDouble() const;
+		int toInt() const;
+	};
+
+	typedef std::vector<Field> Fields;
 
 
-	CSVReader(){}
-	~CSVReader();
-
-
-	/// Read data from an input stream
-
-	/// If the column data types have not been defined before calling this
-	/// function using addType, then the reader will do its best job to derive
-	/// the types.
-	/// \returns whether the stream was successfully read.
+	/// Read in raw CSV data
 	bool read(std::istream& is);
 
-	/// Read data from memory (\sa read(std::istream&) for further details)
-	bool read(const void * data, int size);
+	/// Read in raw CSV data from memory
+	bool read(const void * src, unsigned len);
 
-	/// Read from CSV file (\sa read(std::istream&) for further details)
-	bool readFile(std::string fileName);
+	/// Read data from file
+	bool readFile(const std::string& path);
 
 
-	/// Set the delimiter used for parsing values from input data sources
+	/// Set delimiter
 	CSVReader& delim(char v){ mDelim=v; return *this; }
 
-	/// Add a new column with this data type
-	void addType(DataType type) {
-		mDataTypes.push_back(type);
-	}
-
+	/// Set whether the first row should be treated as column headings
+	CSVReader& hasHeader(bool v){ mHasHeader=v; return *this; }
 
 	/// Get number of columns
-	int numColumns() const { return mDataTypes.size(); }
-	int width() const { return numColumns(); }
+	unsigned numCols() const { return mNumCols; }
+	unsigned width() const { return numCols(); }
 
-	/// Get number of rows (excluding any detected column names in source)
-	int numRows() const { return mRowData.size(); }
-	int height() const { return numRows(); }
+	/// Get number of rows (excluding header)
+	unsigned numRows() const { return mData.size()/numCols(); }
+	unsigned height() const { return numRows(); }
 
-	/// Get column names
-	const std::vector<std::string>& columnNames() const { return mColumnNames; }
+	const Fields& data() const { return mData; }
+	const Fields& header() const { return mHeader; }
 
-	/// Get data type of column
-	DataType columnType(int index) const { return mDataTypes[index]; }
+	/// Iterate over all data fields
 
-	/// Get array containing column data
-
-	/// Values are implicitly cast from their stored DataType to T.
-	///
-	template <class T>
-	std::vector<T> columnData(int index) const;
-
-	std::vector<double> columnData(int index) const {
-		return columnData<double>(index);
-	}
-
-	/// Get array containing all rows copied into a custom struct
-	template<class DataStruct>
-	std::vector<DataStruct> copyToStruct() const {
-		std::vector<DataStruct> output;
-		if(sizeof(DataStruct) < calculateRowLength()){
-			return output;
-		}
-		for(auto row: mRowData){
-			DataStruct newValues;
-			memcpy(&newValues, row, sizeof(newValues));
-			output.push_back(newValues);
-		}
-
-		return output;
-	}
+	/// Use this to extract numerical values from the field strings.
+	/// onField arguments are the current field, its column and its row.
+	CSVReader& iterate(const std::function<void(Field, int, int)>& onField);
 
 private:
-
-	size_t columnByteOffset(int col) const;
-	size_t calculateRowLength() const;
-	size_t typeSize(CSVReader::DataType type) const;
-
-	const size_t maxStringSize = 32;
-
-	std::vector<std::string> mColumnNames;
-	std::vector<DataType> mDataTypes;
-	std::vector<char *> mRowData;
+	std::vector<char> mRawData;
+	Fields mData;
+	Fields mHeader;
+	unsigned mNumCols = 0;
 	char mDelim = ',';
+	bool mHasHeader = true;
+	
+	bool parseFields(); // parse raw data into fields
 };
+
 
 
 /// Simple CSV writer
@@ -248,45 +172,6 @@ private:
 };
 
 /// @} // end allocore group
-
-
-template <class T>
-std::vector<T> CSVReader::columnData(int index) const {
-	std::vector<T> out;
-	auto offset = columnByteOffset(index);
-	auto type = mDataTypes[index];
-	for(auto row: mRowData){
-		switch(type){
-		case REAL:
-			out.push_back(*(const double *)(row + offset));
-			break;
-		case INTEGER:
-			out.push_back(*(const int32_t *)(row + offset));
-			break;
-		case BOOLEAN:
-			out.push_back(*(const bool *)(row + offset));
-			break;
-		default:;
-		}
-	}
-	return out;
-}
-
-template <>
-inline std::vector<std::string> CSVReader::columnData<std::string>(int index) const {
-	std::vector<std::string> out;
-	auto offset = columnByteOffset(index);
-	auto type = mDataTypes[index];
-	for(auto row: mRowData){
-		switch(type){
-		case STRING:
-			out.emplace_back((const char *)(row + offset));
-			break;
-		default:;
-		}
-	}
-	return out;
-}
 
 } //al::
 

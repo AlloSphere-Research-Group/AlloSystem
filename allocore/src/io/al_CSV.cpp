@@ -1,198 +1,118 @@
-#include <iostream>
+#include <cstdlib> // atoi, atof
+#include <cstring> // memcpy
 #include <fstream>
-#include <algorithm> // count, min
-#include <cstdlib> // atoi, atof, strtod
-#include <cstdint> // int32_t
 #include "allocore/io/al_CSV.hpp"
 
 using namespace al;
 
-class Tokenizer{
-public:
-	Tokenizer(const std::string& src, char delim=',')
-	:	mStream(src), mDelim(delim)
-	{}
-
-	bool operator()(){
-		if(mStream.good()){
-			getline(mStream, mToken, mDelim);
-			return true;
-		}
-		return false;
-	}
-
-	const std::string& token() const { return mToken; }
-
-private:
-	std::stringstream mStream;
-	std::string mToken;
-	char mDelim;
-};
-
-
-CSVReader::~CSVReader() {
-	for(auto row: mRowData){
-		delete[] row;
-	}
-}
-
-size_t CSVReader::typeSize(CSVReader::DataType type) const{
-	switch(type){
-		case STRING:  return sizeof(char)*maxStringSize;
-		case INTEGER: return sizeof(int32_t);
-		case REAL:    return sizeof(double);
-		case BOOLEAN: return sizeof(bool);
-		default:      return 0;
-	}
-}
-
-// getline() may not handle newlines correctly, esp. \r, hence the following:
-// https://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
-std::istream& safeGetline(std::istream& is, std::string& t){
-    t.clear();
-    std::istream::sentry se(is, true);
-    std::streambuf* sb = is.rdbuf();
-    for(;;) {
-        int c = sb->sbumpc();
-        switch (c) {
-        case '\n':
-            return is;
-        case '\r':
-            if(sb->sgetc() == '\n')
-                sb->sbumpc();
-            return is;
-        case std::streambuf::traits_type::eof():
-            // Also handle the case when the last line has no line ending
-            if(t.empty())
-                is.setstate(std::ios::eofbit);
-            return is;
-        default:
-            t += (char)c;
-        }
-    }
-}
+template<> double CSVReader::Field::to<double>() const { return std::atof(c_str()); }
+template<> float CSVReader::Field::to<float>() const { return to<double>(); }
+template<> int CSVReader::Field::to<int>() const { return std::atoi(c_str()); }
+template<> std::string CSVReader::Field::to<std::string>() const { return c_str(); }
+float CSVReader::Field::toFloat() const { return to<float>(); }
+double CSVReader::Field::toDouble() const { return to<double>(); }
+int CSVReader::Field::toInt() const { return to<int>(); }
 
 bool CSVReader::read(std::istream& is){
-	if(!is.good()) return false;
+	is.seekg(0, is.end);
+	unsigned numBytes = is.tellg();
+	is.seekg(0, is.beg);
+	mRawData.resize(numBytes + 1);
+	mRawData.back() = '\0';
+	is.read(mRawData.data(), numBytes);
+	return parseFields();
+}
 
-	std::string line;
+bool CSVReader::read(const void * src, unsigned len){
+	mRawData.resize(len + 1);
+	mRawData.back() = '\0';
+	std::memcpy(&mRawData[0], src, len);
+	return parseFields();
+}
 
-	{	// Get column names (assuming they are the first row)
-		safeGetline(is, line);
-		Tokenizer tk(line, mDelim);
-		mColumnNames.clear();
-		while(tk()){
-			mColumnNames.push_back(tk.token());
+bool CSVReader::readFile(const std::string& path){
+	std::ifstream f(path);
+	if(f.is_open()){
+		return read(f); // read using istream
+	}
+	return false;
+}
+
+CSVReader& CSVReader::iterate(const std::function<void(Field, int, int)>& onField){
+	int row = 0;
+	int col = 0;
+	for(const auto& field : mData){
+		onField(field, col, row);
+		if(++col == mNumCols){
+			col = 0;
+			++row;
+			// catch spurious fields (like new lines) at end
+			if(row == numRows()) break;
 		}
 	}
+	return *this;
+}
 
-	auto derivingTypeIndex = mDataTypes.size();
+bool CSVReader::parseFields(){
+	mHeader.clear();
+	mData.clear();
 
-	// No data types defined, so use a default
-	if(mDataTypes.empty()){
-		for(unsigned i=0; i<mColumnNames.size(); ++i) addType(REAL);
-	}
+	Field field;
+	field.ptr = mRawData.data();
+	mNumCols = 0;
+	bool inFirstRow = true;
+	bool inNewLine = false; // for handling different line endings \n, \n\r, ...
+	bool inString = false; // reading a double-quoted field?
 
-	auto derivingTypes = [&](){ return derivingTypeIndex < mDataTypes.size(); };
+	for(unsigned i=0; i<(mRawData.size()-1); ++i){
+		auto& c = mRawData[i];
 
-	auto rowLength = calculateRowLength();
+		auto setFieldBeg = [&](){
+			c = '\0'; // so C-strings work
+			field.ptr = mRawData.data() + i+1;
+		};
 
-	while(safeGetline(is, line)){
-		if(line.size() == 0){
-			continue;
-		}
-
-		if(std::count(line.begin(), line.end(), mDelim) == int(mDataTypes.size() - 1)){ // Check that we have enough commas
-			Tokenizer tk(line, mDelim);
-			char *row = new char[!derivingTypes() ? rowLength : mDataTypes.size()*maxStringSize];
-			mRowData.push_back(row);
-			char *data = mRowData.back();
-			int byteCount = 0;
-			for(auto& type : mDataTypes) {
-				if(!tk()) break; // Failed to get next token (CSV field)
-				const auto& field = tk.token();
-
-				if(derivingTypes()){
-					char * pEnd;
-					std::strtod(field.c_str(), &pEnd);
-					// pEnd == '\0' if number parse successful
-					if(*pEnd != '\0') type = STRING;
-					//printf("Column %u derived as %s\n", derivingTypeIndex, type==STRING?"string":"real");
-					++derivingTypeIndex;
-					if(!derivingTypes()){ // hit last column
-						rowLength = calculateRowLength();
-					}
+		auto addField = [&](){
+			if(inFirstRow) ++mNumCols;
+			auto * beg = (char *)field.ptr;
+			auto * end = mRawData.data() + i;
+			field.size = end - beg;
+			if(field.size >= 2){
+				auto& c1 = beg[0];
+				auto& c2 = end[-1];
+				if('\"'==c1 && '\"'==c2){
+					c1 = c2 = '\0'; // so C-strings work
+					++field.ptr;
+					field.size -= 2;
 				}
+			}
+			if(mHasHeader && inFirstRow){
+				mHeader.push_back(field);
+			} else {
+				mData.push_back(field);
+			}
+		};
 
-				switch (type){
-				case STRING:{
-					auto stringLen = std::min(maxStringSize-1, field.size());
-					std::memcpy(data + byteCount, field.data(), stringLen * sizeof(char));
-					data[byteCount + stringLen] = '\0';
-					} break;
-				case INTEGER:{
-					int32_t val = std::atoi(field.data());
-					std::memcpy(data + byteCount, &val, typeSize(type));
-					} break;
-				case REAL:{
-					double val = std::atof(field.data());
-					std::memcpy(data + byteCount, &val, typeSize(type));
-					} break;
-				case BOOLEAN:{
-					bool val = field == "True" || field == "true";
-					std::memcpy(data + byteCount, &val, typeSize(type));
-					} break;
-				case NONE:
-					break;
+		if('\"' == c){
+			inNewLine = false;
+			inString ^= true;
+		} else if(!inString){ // if in double-quotes, ignore parsing rules
+			if('\n' == c || '\r' == c){ // at end of row
+				if(!inNewLine) addField();
+				setFieldBeg();
+				inFirstRow = false;
+				inNewLine = true;
+			} else { // in row
+				inNewLine = false;
+				if(mDelim == c){
+					addField();
+					setFieldBeg();
 				}
-
-				byteCount += typeSize(type);
 			}
 		}
 	}
-	
-	return !is.bad();
+	return true;
 }
-
-bool CSVReader::read(const void * data, int size){
-	// Using a streamstring would be the most straightforward here, but then we
-	// must copy the data. Instead, we can stream directly from the data by 
-	// subclassing streambuf:
-	// https://stackoverflow.com/questions/7781898/get-an-istream-from-a-char
-	struct membuf : std::streambuf {
-		membuf(char* begin, char* end){
-			this->setg(begin, begin, end);
-		}
-	};
-
-	auto * sdata = (char *)(data);
-	membuf sbuf(sdata, sdata + size);
-	std::istream is(&sbuf);
-	return read(is);
-}
-
-bool CSVReader::readFile(std::string fileName) {
-	std::ifstream f(fileName);
-	if(!f.is_open()){
-		std::cerr << "CSVReader: Could not open: " << fileName << std::endl;
-		return false;
-	}
-
-	return read(f); // read using istream
-}
-
-size_t CSVReader::columnByteOffset(int col) const {
-	int offset = 0;
-	for(int i = 0; i < col; i++){
-		offset += typeSize(mDataTypes[i]);
-	}
-	return offset;
-}
-
-size_t CSVReader::calculateRowLength() const {
-	return columnByteOffset(mColumnNames.size());
-}
-
 
 
 CSVWriter& CSVWriter::beginRow(){ mWriteDelim=false; return *this; }

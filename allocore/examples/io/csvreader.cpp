@@ -11,38 +11,40 @@ Lance Putnam
 #include <iostream>
 #include "allocore/io/al_CSV.hpp"
 
-typedef struct {
-	char s[32];
-	double val1, val2, val3;
-	bool b;
-} RowTypes;
-
 
 int main() {
 	using namespace al;
 
-	CSVReader reader;
-	reader.addType(CSVReader::STRING);
-	reader.addType(CSVReader::REAL);
-	reader.addType(CSVReader::REAL);
-	reader.addType(CSVReader::REAL);
-	reader.addType(CSVReader::BOOLEAN);
-	reader.readFile("allocore/share/data/test.csv");
+	CSVReader r;
 
-	std::vector<RowTypes> rows = reader.copyToStruct<RowTypes>();
-	for(auto row: rows) {
-		std::cout << std::string(row.s) << " : "
-		          << row.val1 << "   "
-		          << row.val2 << "   "
-		          << row.val3 << "   "
-		          << (row.b ? "+" : "-")
-		          << std::endl;
-	}
-	std::cout << " ---------- Num rows:" << rows.size() << std::endl;
+	// Indicate the first row should be treated as a header
+	r.hasHeader(true);
 
-	std::vector<double> column1 = reader.getColumn(1);
-	for(auto value: column1) {
-		std::cout << value << std::endl;
+	if(r.readFile(RUN_MAIN_SOURCE_DIR "../../share/data/test.csv")){
+
+		std::cout << "Read " << r.numRows() << " rows, " << r.numCols() << " cols and " << r.data().size() << " data fields\n";
+
+		// Print out column names
+		for(auto field : r.header()){
+			std::cout << field.c_str() << " ";
+		}
+		std::cout << std::endl;
+
+		// Iterate over data fields, printing them out
+		// This is where you convert strings to numbers (deserialize).
+		r.iterate([&](auto field, int col, int row){
+			switch(col){
+			case 1: case 2: case 3:
+				std::cout << field.toDouble() << " ";
+				break;
+			default:
+				std::cout << field.c_str() << " ";
+			}
+			
+			if(r.numCols() == col+1) std::cout << "\n";
+		});
+
+	} else {
+		std::cout << "Error reading file\n";
 	}
-	return 0;
 }
