@@ -465,8 +465,8 @@ public:
 	/// Returns self concatenated with other
 	template <int M, class U>
 	Vec<N+M,T> concat(const Vec<M,U>& v) const {
-		Vec<N+M,T> r;
-		r.set(this->elems());
+		Vec<N+M,T> r(VEC_NO_INIT);
+		for(int i=0; i<N; ++i) r[i  ] = at(i);
 		for(int i=0; i<M; ++i) r[i+N] = T(v[i]);
 		return r;
 	}
