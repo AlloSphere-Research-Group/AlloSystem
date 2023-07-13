@@ -996,6 +996,34 @@ inline Vec<M,T>& sub(Vec<N,T>& v){
 	return sub<M,0>(v);
 }
 
+/// Returns vector containing element-wise minimum between two vectors
+template <int N, class T>
+inline Vec<N,T> min(const Vec<N,T>& a, const Vec<N,T>& b){
+	return a.mapIndex([&](int i){ return a[i] < b[i] ? a[i] : b[i]; });
+}
+template <int N, class T>
+inline Vec<N,T> min(const Vec<N,T>& a, const T& b){
+	return min(a, Vec<N,T>(b));
+}
+template <int N, class T>
+inline Vec<N,T> min(const T& a, const Vec<N,T>& b){
+	return min(b, a);
+}
+
+/// Returns vector containing element-wise maximum between two vectors
+template <int N, class T>
+inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
+	return a.mapIndex([&](int i){ return a[i] > b[i] ? a[i] : b[i]; });
+}
+template <int N, class T>
+inline Vec<N,T> max(const Vec<N,T>& a, const T& b){
+	return max(a, Vec<N,T>(b));
+}
+template <int N, class T>
+inline Vec<N,T> max(const T& a, const Vec<N,T>& b){
+	return max(b, a);
+}
+
 /// Get vector with absolute value of each element
 template <int N, class T>
 inline Vec<N,T> abs(const Vec<N,T>& v){
@@ -1201,22 +1229,6 @@ template <class T>
 inline Vec<3,T> gradToNormal(const Vec<2,T>& g){
 	// result is normalized (-g.x, -g.y, 1)
 	return g.template take<3>(T(-1)).normalized(T(-1));
-}
-
-/// Returns vector containing element-wise minimum between two vectors
-template <int N, class T>
-inline Vec<N,T> min(const Vec<N,T>& a, const Vec<N,T>& b){
-	Vec<N,T> r;
-	IT(N){ r[i] = a[i] > b[i] ? b[i] : a[i]; }
-	return r;
-}
-
-/// Returns vector containing element-wise maximum between two vectors
-template <int N, class T>
-inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
-	Vec<N,T> r;
-	IT(N){ r[i] = a[i] < b[i] ? b[i] : a[i]; }
-	return r;
 }
 
 /// Swap elements between vectors
