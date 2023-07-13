@@ -462,6 +462,25 @@ public:
 		return r;
 	}
 
+	/// Returns self with other vector inserted
+
+	/// \tparam I	Position in vector before which new elements are inserted
+	///
+	template <int I, int M, class U>
+	Vec<N+M,T> insert(const Vec<M,U>& v) const {
+		static constexpr auto J = I>=0 ? I : N+I+1;
+		static_assert(J>=0 && J<=N, "Invalid insertion position");
+		Vec<N+M,T> r(VEC_NO_INIT);
+		for(int i=0  ; i<J  ; ++i) r[i] = at(i);
+		for(int i=J  ; i<J+M; ++i) r[i] = v[i-J];
+		for(int i=J+M; i<N+M; ++i) r[i] = at(i-M);
+		return r;
+	}
+	template <int I, class S>
+	Vec<N+1,T> insert(const S& s) const {
+		return insert<I>(Vec<1,T>(s));
+	}
+
 	/// Returns self concatenated with other
 	template <int M, class U>
 	Vec<N+M,T> concat(const Vec<M,U>& v) const {
@@ -478,7 +497,7 @@ public:
 
 	/// Returns self interleaved with other
 	template <int SelfOffset = 0>
-	Vec<N+N,T> interleave(const Vec<N,T>& v){
+	Vec<N+N,T> interleave(const Vec<N,T>& v) const {
 		static_assert(SelfOffset==0 || SelfOffset==1, "Offset must be 0 or 1");
 		static constexpr auto OtherOffset = 1-SelfOffset;
 		Vec<N+N,T> r(VEC_NO_INIT);
