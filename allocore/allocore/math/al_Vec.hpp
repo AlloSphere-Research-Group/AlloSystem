@@ -521,6 +521,13 @@ public:
 		return as<Vec<N_M, Vec<M,T>>>();
 	}
 
+	/// Reverse element order
+	Vec& reverse(){
+		static constexpr auto N_2 = N/2;
+		for(int i=0; i<N_2; ++i) swap(i, N-1-i);
+		return *this;
+	}
+
 	/// Apply circular shift to elements
 
 	/// Element i is moved to element (i+D)%N.
