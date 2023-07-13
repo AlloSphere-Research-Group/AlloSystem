@@ -476,6 +476,19 @@ public:
 		return Vec<N+1,T>(*this,s);
 	}
 
+	/// Returns self interleaved with other
+	template <int SelfOffset = 0>
+	Vec<N+N,T> interleave(const Vec<N,T>& v){
+		static_assert(SelfOffset==0 || SelfOffset==1, "Offset must be 0 or 1");
+		static constexpr auto OtherOffset = 1-SelfOffset;
+		Vec<N+N,T> r(VEC_NO_INIT);
+		for(int i=0; i<N; ++i){
+			r[2*i+ SelfOffset] = at(i);
+			r[2*i+OtherOffset] = v[i];
+		}
+		return r;
+	}
+
 	/// Get vector as vector of vectors
 	template <int M>
 	const Vec<N/M, Vec<M,T>>& nest() const {
