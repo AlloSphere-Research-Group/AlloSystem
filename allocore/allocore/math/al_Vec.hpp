@@ -551,23 +551,21 @@ public:
 	//--------------------------------------------------------------------------
 	// Basic Arithmetic Operations
 
-	Vec& operator +=(const Vec& v){ IT(N) at(i) += v[i]; return *this; }
-	Vec& operator +=(const   T& v){ IT(N) at(i) += v;    return *this; }
-	Vec& operator -=(const Vec& v){ IT(N) at(i) -= v[i]; return *this; }
-	Vec& operator -=(const   T& v){ IT(N) at(i) -= v;    return *this; }
-	Vec& operator *=(const Vec& v){ IT(N) at(i) *= v[i]; return *this; }
-	Vec& operator *=(const   T& v){ IT(N) at(i) *= v;    return *this; }
-	Vec& operator /=(const Vec& v){ IT(N) at(i) /= v[i]; return *this; }
-	Vec& operator /=(const   T& v){ IT(N) at(i) /= v;    return *this; }
+	#define DEF_VEC_OP(op)\
+	template <class U>\
+	Vec& operator op##=(const Vec<N,U>& v){ IT(N) at(i) op##= v[i]; return *this; }\
+	Vec& operator op##=(const        T& v){ IT(N) at(i) op##= v;    return *this; }\
+	template <class U>\
+	Vec operator op (const Vec<N,U>& v) const { return dup() op##= v; }\
+	Vec operator op (const        T& v) const { return dup() op##= v; }
+	
+	DEF_VEC_OP(+)
+	DEF_VEC_OP(-)
+	DEF_VEC_OP(*)
+	DEF_VEC_OP(/)
 
-	Vec operator + (const Vec& v) const { return dup() += v; }
-	Vec operator + (const   T& v) const { return dup() += v; }
-	Vec operator - (const Vec& v) const { return dup() -= v; }
-	Vec operator - (const   T& v) const { return dup() -= v; }
-	Vec operator * (const Vec& v) const { return dup() *= v; }
-	Vec operator * (const   T& v) const { return dup() *= v; }
-	Vec operator / (const Vec& v) const { return dup() /= v; }
-	Vec operator / (const   T& v) const { return dup() /= v; }
+	#undef DEF_VEC_OP
+
 	Vec operator - () const { return dup().negate(); }
 	Vec operator + () const { return *this; }
 	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
