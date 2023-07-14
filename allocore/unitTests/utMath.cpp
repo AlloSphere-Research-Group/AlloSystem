@@ -221,7 +221,7 @@ int utMath(){
 		auto r = centroid(Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(0,0,1));
 		assert(eq(r, Vec3d(1/3.)));
 
-		normal(r, Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(-1,0,0));
+		r = normal(Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(-1,0,0));
 		assert(eq(r, Vec3d(0,0,1)));
 		}
 

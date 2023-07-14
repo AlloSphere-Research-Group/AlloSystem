@@ -51,7 +51,7 @@ int utIOAudioIO(){
 	// Make sure parameters match those passed to constructor
 	io.open();
 	assert(io.framesPerBuffer() == blockSize);
-	assert(io.fps() == SR);
+	//assert(io.fps() == SR); // can select closest match to request
 	assert(io.channelsOut() == chansO);
 	assert(io.channelsIn() == chansI);
 	io.close();
