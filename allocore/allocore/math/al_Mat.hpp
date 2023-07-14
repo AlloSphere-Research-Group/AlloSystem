@@ -411,8 +411,23 @@ public:
 		return inv;
 	}
 
-	/// Return matrix punned as a vector
-	Vec<N*N,T>& vec(){ return *(Vec<N*N,T>*)(this); }
+	/// Get reference to self as another type
+	template <class V>
+	V& as(){
+		static_assert(sizeof(V) <= sizeof(*this), "Cannot pun to object of larger size");
+		return *(V *)(elems());
+	}
+
+	template <class V>
+	const V& as() const {
+		return const_cast<Mat*>(this)->as<V>();
+	}
+
+	/// Return self punned as flat vector
+	Vec<N*N,T>& vec(){ return as<Vec<N*N,T>>(); }
+
+	/// Return self punned as vector of column vectors
+	Vec<N,Vec<N,T>>& nest(){ return as<Vec<N,Vec<N,T>>>(); }
 
 
 	//--------------------------------------------------------------------------
