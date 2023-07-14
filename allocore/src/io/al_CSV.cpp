@@ -1,17 +1,25 @@
-#include <cstdlib> // atoi, atof
+#include <cstdlib> // strtof, ...
 #include <cstring> // memcpy
 #include <fstream>
 #include "allocore/io/al_CSV.hpp"
 
 using namespace al;
 
-template<> double CSVReader::Field::to<double>() const { return std::atof(c_str()); }
-template<> float CSVReader::Field::to<float>() const { return to<double>(); }
-template<> int CSVReader::Field::to<int>() const { return std::atoi(c_str()); }
-template<> std::string CSVReader::Field::to<std::string>() const { return c_str(); }
+#define DEF_FIELD_TO(T, ...)\
+template<> T CSVReader::Field::to<T>() const { return __VA_ARGS__; }
+
+DEF_FIELD_TO(float, std::strtof(c_str(), nullptr))
+DEF_FIELD_TO(double, std::strtod(c_str(), nullptr))
+DEF_FIELD_TO(int, std::strtol(c_str(), nullptr, 10))
+DEF_FIELD_TO(unsigned, std::strtoul(c_str(), nullptr, 10))
+DEF_FIELD_TO(long long, std::strtoll(c_str(), nullptr, 10)) // usually handles int64_t
+DEF_FIELD_TO(unsigned long long, std::strtoull(c_str(), nullptr, 10)) // usually handles uint64_t
+DEF_FIELD_TO(std::string, c_str())
+
 float CSVReader::Field::toFloat() const { return to<float>(); }
 double CSVReader::Field::toDouble() const { return to<double>(); }
 int CSVReader::Field::toInt() const { return to<int>(); }
+
 
 bool CSVReader::read(std::istream& is){
 	is.seekg(0, is.end);
