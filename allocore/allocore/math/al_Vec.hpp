@@ -413,7 +413,7 @@ public:
 	Vec<3,T>& yzw(){ return sub<3,1>(); }
 
 	/// Return new vector with one element erased
-	Vec<N-1,T> erase(int index){
+	Vec<N-1,T> erase(int index) const {
 		Vec<N-1,T> r(VEC_NO_INIT);
 		for(int i=0;     i<index;    ++i) r[i] = at(i);
 		for(int i=index; i<r.size(); ++i) r[i] = at(i+1);
