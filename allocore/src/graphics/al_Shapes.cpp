@@ -629,9 +629,9 @@ int addSurface(
 	// Generate positions
 	for(int j=0; j<Ny; ++j){ float v = float(j)/(Ny-1);
 	for(int i=0; i<Nx; ++i){ float u = float(i)/(Nx-1);
-		if(m.attribHint() & Mesh::TEXCOORD) m.texCoord(u,v);
-		if(m.attribHint() & Mesh::NORMAL  ) m.normal (0,0,1);
-		if(m.attribHint() & Mesh::TANGENT ) m.tangent(0,1,0);
+		if(m.wants(Mesh::TEXCOORD)) m.texCoord(u,v);
+		if(m.wants(Mesh::NORMAL  )) m.normal (0,0,1);
+		if(m.wants(Mesh::TANGENT )) m.tangent(0,1,0);
 		m.vertex(
 			x + (u-0.5)*width,
 			y + (v-0.5)*height,
@@ -670,11 +670,13 @@ int addSurfaceLoop(
 	double du = width/Nx;
 	double dv = height/My;
 
-	// Generate positions
+	// Generate vertices
 	double v = y - height*0.5;
 	for(int j=0; j<Ny; ++j){
 		double u = x - width*0.5;
 		for(int i=0; i<Nx; ++i){
+			if(m.wants(Mesh::NORMAL )) m.normal (0,0,1);
+			if(m.wants(Mesh::TANGENT)) m.tangent(0,1,0);
 			m.vertex(u, v);
 			u += du;
 		}
@@ -730,11 +732,16 @@ int addTorus(
 
 	for(int i=beg; i<beg+Nv; ++i){
 		auto& p = m.vertices()[i];
+		auto cs1 = std::cos(p.x), sn1 = std::sin(p.x);
+		auto cs2 = std::cos(p.y), sn2 = std::sin(p.y);
 		p = Mesh::Vertex(
-			(majRadius + minRadius*::cos(p.y)) * ::cos(p.x),
-			(majRadius + minRadius*::cos(p.y)) * ::sin(p.x),
-			minRadius*::sin(p.y)
+			(majRadius + minRadius*cs2) * cs1,
+			(majRadius + minRadius*cs2) * sn1,
+			minRadius*sn2
 		);
+		if(m.wants(Mesh::NORMAL)){ // addSurfaceLoop added normals
+			m.normals()[i] = { cs2 * cs1, cs2 * sn1, sn2 };
+		}
 	}
 
 	return Nv;
@@ -750,8 +757,8 @@ int addVoxels(
 	int numVertIn = m.vertices().size();
 	m.triangles();
 	float n = 1.; // 1 normals point out, -1 normals point in
-	bool wantsTan = m.attribHint() & Mesh::TANGENT;
-	bool wantsTxc = m.attribHint() & Mesh::TEXCOORD;
+	bool wantsTan = m.wants(Mesh::TANGENT);
+	bool wantsTxc = m.wants(Mesh::TEXCOORD);
 	for(int k=0; k<Nz+1; ++k){
 	for(int j=0; j<Ny+1; ++j){
 	for(int i=0; i<Nx+1; ++i){
