@@ -134,6 +134,7 @@ public:
 	bool isLineLoop() const;
 	bool isTriangles() const;
 	bool isTriangleStrip() const;
+	bool isTriangleType() const;
 
 	/// Set stroke size
 

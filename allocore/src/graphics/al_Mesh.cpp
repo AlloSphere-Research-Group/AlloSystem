@@ -62,6 +62,7 @@ bool Mesh::isLineStrip() const { return primitive() == Graphics::LINE_STRIP; }
 bool Mesh::isLineLoop() const { return primitive() == Graphics::LINE_LOOP; }
 bool Mesh::isTriangles() const { return primitive() == Graphics::TRIANGLES; }
 bool Mesh::isTriangleStrip() const { return primitive() == Graphics::TRIANGLE_STRIP; }
+bool Mesh::isTriangleType() const { return isTriangles() || isTriangleStrip(); }
 
 Mesh& Mesh::decompress(){
 	if(mIndices.size()){ // only makes sense for indexed mesh
