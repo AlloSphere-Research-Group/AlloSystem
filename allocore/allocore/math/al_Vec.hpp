@@ -659,6 +659,20 @@ public:
 	/// Returns magnitude squared
 	T magSqr() const { return dot(*this); }
 
+	/// Get polar angle on plane, in [-pi,pi] radians
+	template <int Dim1=0, int Dim2=1>
+	T angle() const {
+		static_assert_dims<Dim1,Dim2>();
+		return std::atan2(at<Dim2>(), at<Dim1>());
+	}
+
+	/// Get polar angle on plane, in [0,1]
+	template <int Dim1=0, int Dim2=1>
+	T angleUnit() const {
+		auto a = angle<Dim1,Dim2>() * 0.1591549430919;
+		return a >= 0. ? a : a + 1.;
+	}
+
 	/// Returns vector filled with absolute values of elements
 	Vec absVec() const {
 		using namespace std;
