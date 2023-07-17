@@ -154,6 +154,9 @@ int utMath(){
 		a -= 3;					assert(a == 0);
 		a += 3;					assert(a == 3);
 
+		assert(a++ == 3);		assert(a == 4);
+		assert(--a == 3);		assert(a == 3);
+
 		a *= b;					assert(a == 9);
 		a /= b;					assert(a == 3);
 		a *= 3;					assert(a == 9);

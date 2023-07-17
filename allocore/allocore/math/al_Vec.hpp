@@ -566,6 +566,15 @@ public:
 
 	#undef DEF_VEC_OP
 
+	#define DEF_VEC_ONESIES(op)\
+	Vec& operator op##op (){ return *this op##= T(1); }\
+	Vec operator op##op (int){ auto t = *this; op##op*this; return t; }
+
+	DEF_VEC_ONESIES(+)
+	DEF_VEC_ONESIES(-)
+
+	#undef DEF_VEC_ONESIES
+
 	Vec operator - () const { return dup().negate(); }
 	Vec operator + () const { return *this; }
 	bool operator > (const Vec& v) const { return magSqr() > v.magSqr(); }
