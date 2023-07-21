@@ -111,6 +111,9 @@ public:
 	/// Copy constructor
 	Mesh(const Mesh& cpy);
 
+	/// Callback constructor (default constructs, then calls function passing self)
+	Mesh(const std::function<void(Mesh&)>& f);
+
 
 	/// Set geometric primitive
 	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }

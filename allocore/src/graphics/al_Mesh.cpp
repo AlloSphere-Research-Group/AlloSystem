@@ -32,6 +32,12 @@ Mesh::Mesh(const Mesh& cpy)
 	mPrimitive(cpy.mPrimitive)
 {}
 
+Mesh::Mesh(const std::function<void(Mesh&)>& f)
+:	Mesh()
+{
+	f(*this);
+}
+
 Mesh& Mesh::reset() {
 	mVertices.reset();
 	mNormals.reset();
