@@ -870,6 +870,30 @@ public:
 		return rotate(angle, Dim1,Dim2);
 	}
 
+	/// Rotate vector 45 degrees on a global plane
+
+	/// @param[in] dim1		dimension to rotate from
+	/// @param[in] dim2		dimension to rotate towards
+	/// To rotate -45 degrees, swap the two dimensions.
+	Vec& rotate45(int dim1, int dim2){
+		/*	    | c -c |
+			R = | c  c | where c = sqrt(2)/2
+
+			R p = { ax - ay, ax + ay } */
+		float c = 0.7071067811865475244; // sqrt(2)/2
+		auto x = at(dim1) * c;
+		auto y = at(dim2) * c;
+		at(dim1) = x-y;
+		at(dim2) = x+y;
+		return *this;
+	}
+
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	Vec& rotate45(){
+		static_assert_dims<Dim1,Dim2>();
+		return rotate45(Dim1,Dim2);
+	}
+
 	/// Rotate vector 90 degrees on a global plane
 
 	/// @param[in] dim1		dimension to rotate from
