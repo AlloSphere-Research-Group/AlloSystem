@@ -88,7 +88,7 @@ public:
 	/// Returns how many tasks are currently executing; does not block
 	unsigned busy();
 
-	/// Block until all task are finished
+	/// Block until all tasks are finished
 	void wait();
 
 
@@ -103,6 +103,14 @@ private:
 	std::atomic<unsigned> mBusy{0};
 	bool mTerminate = false;
 };
+
+
+/// Helper macro for parallel for loop
+#define AL_PARALLEL_FOR(index_name, count, ...)\
+	ThreadPool::get().pushRange(count, [&](int index_name){\
+		__VA_ARGS__\
+	}).wait();
+
 
 /// @} // end allocore group
 
