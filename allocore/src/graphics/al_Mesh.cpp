@@ -1887,20 +1887,22 @@ void Mesh::print(FILE * dst) const {
 
 bool Mesh::debug(FILE * dst) const {
 
-	#define DPRINTF(...) if(dst){ fprintf(dst, __VA_ARGS__); }
-
 	bool ok = true;
-	int Nv = mVertices.size();
-	if(!Nv){ DPRINTF("No vertices\n"); ok=false; }
+	#define ALERT(...) if(dst){ fprintf(dst, __VA_ARGS__); ok=false; }
+
+	const int Nv = mVertices.size();
+	if(!Nv){ ALERT("No vertices\n"); }
+
+	const int Ni = mIndices.size();
 
 	#define CHECK_ARR(arr, oneOkay)\
 	if(arr.size() && arr.size() != Nv){\
 		if(!oneOkay || arr.size()!=1){\
-			DPRINTF("%d " #arr ", but %d vertices\n", (int)arr.size(), Nv);\
-			ok=false;\
+			ALERT("%d " #arr ", but %d vertices\n", (int)arr.size(), Nv);\
 		}\
 	}
 	CHECK_ARR(mNormals, false);
+	CHECK_ARR(mTangents, false);
 	CHECK_ARR(mColors, true);
 	CHECK_ARR(mColoris, true);
 	CHECK_ARR(mTexCoord1s, false);
@@ -1908,21 +1910,71 @@ bool Mesh::debug(FILE * dst) const {
 	CHECK_ARR(mTexCoord3s, false);
 	#undef CHECK_ARR
 
+	// Check for clashing attributes
 	if(mColors.size() && mColoris.size()){
-		DPRINTF("More than one color array populated\n");
-		ok=false;
+		ALERT("More than one color array populated\n");
+	}
+	{
+		int Nt1 = mTexCoord1s.size();
+		int Nt2 = mTexCoord2s.size();
+		int Nt3 = mTexCoord3s.size();
+		int n = (Nt1?1:0) + (Nt2?1:0) + (Nt3?1:0);
+		if(n > 1){
+			ALERT("More than one tex coord array populated: %d %d %d\n", Nt1, Nt2, Nt3);
+		}
 	}
 
-	if(mTexCoord1s.size() && mTexCoord2s.size() && mTexCoord3s.size()){
-		DPRINTF("More than one texture coordinate array populated\n");
-		ok=false;
-	}
-
-	if(mIndices.size()){
+	// Check integrity of any indices
+	if(Ni){
 		for(auto i : mIndices){
 			if(i >= Nv){
-				DPRINTF("Index out of bounds: %d (must be in [0,%d))\n", i, Nv);
-				ok=false;
+				ALERT("Index out of bounds: %d (must be in [0,%d))\n", i, Nv);
+				break;
+			}
+		}
+		// Check for unused verts? This could be intentional for LOD, multi-meshes, etc.
+	}
+
+	// Misc primitive specific checks
+	if(isPoints()){
+		if(Ni){
+			ALERT("Using indexed points: did you forget to set the primitive?\n");
+		}
+	} else if(isLines()){
+		auto extra = (Ni ? Ni : Nv) % 2;
+		if(extra){
+			ALERT("%s count not multiple of 2 for lines\n", Ni ? "Index" : "Vertex");
+		}
+	} else if(isTriangles()){
+		auto extra = (Ni ? Ni : Nv) % 3;
+		if(extra){
+			ALERT("%s count not multiple of 3 for triangles (%d extra)\n", Ni ? "Index" : "Vertex", extra);
+		}
+	}
+
+	// Geometric checks
+	#define CHECK_UNIT_VEC(arr)\
+	if(arr.size()){\
+		static constexpr float eps = 0.001;\
+		static constexpr auto lo = (1.-eps)*(1.-eps);\
+		static constexpr auto hi = (1.+eps)*(1.+eps);\
+		for(int i=0; i<arr.size(); ++i){\
+			auto mm = arr[i].magSqr();\
+			if(mm < lo || mm > hi){\
+				ALERT(#arr " vector not unit magnitude: %d is %f\n", i, std::sqrt(mm));\
+				break;\
+			}\
+		}\
+	}
+	CHECK_UNIT_VEC(mNormals)
+	CHECK_UNIT_VEC(mTangents)
+	#undef CHECK_UNIT_VEC
+
+	if(mNormals.size() == mTangents.size()){
+		for(int i=0; i<mNormals.size(); ++i){
+			auto d = std::abs(dot(mNormals[i], mTangents[i]));
+			if(d > 0.001){
+				ALERT("Normal and tangent not orthogonal: %d\n", i);
 				break;
 			}
 		}
