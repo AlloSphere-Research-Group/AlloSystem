@@ -142,7 +142,9 @@ bool SceneWindowHandler::onFrame(){
 		//app.nav().step(1.);
 	}
 
-	if(app.clockAnimate() == &win){
+	const auto isAnimateClock = app.clockAnimate() == &win;
+
+	if(isAnimateClock){
 		app.mAnimateTime = app.appTime();
 		app.onAnimateWrapper(win.spfActual());
 	}
@@ -232,6 +234,8 @@ bool SceneWindowHandler::onFrame(){
 		app.mCurrViewpoint = &vp;
 		stereo.draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc, doClear);
 		stereo.clearColor(defaultClearColor);
+
+		app.mFrameCount += int(isAnimateClock);
 	}
 
 	win.mResized = false;
@@ -263,12 +267,16 @@ void App::initAudio(
 			nav().step(1./4);
 		}
 
-		if(clockAnimate() == &audioIO()){
+		const auto isAnimateClock = clockAnimate() == &audioIO();
+
+		if(isAnimateClock){
 			mAnimateTime = appTime();
 			onAnimateWrapper(io.secondsPerBuffer());
 		}
 
 		onSoundWrapper(audioIO());
+
+		mFrameCount += int(isAnimateClock) * io.framesPerBuffer();
 	},
 		audioBlockSize, audioRate, audioOutputs, audioInputs
 	);

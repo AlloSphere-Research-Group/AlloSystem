@@ -295,6 +295,12 @@ public:
 	/// clock cycle and thus is the correct time to use for any animation.
 	double animateTime() const { return mAnimateTime; }
 
+	/// Get frame count since app start of current animation clock
+
+	/// This is incremented after the clock cycle, so will be zero throughout
+	/// the first cycle.
+	unsigned frameCount() const { return mFrameCount; }
+
 
 	/// Get navigation pose (position/orientation)
 	Nav& nav(){ return mNav; }
@@ -392,6 +398,7 @@ private:
 	double mStartTime = 0.;
 	friend class SceneWindowHandler;
 	double mAnimateTime = 0.;
+	unsigned mFrameCount = 0;
 
 	// graphics
 	Windows mWindows;
