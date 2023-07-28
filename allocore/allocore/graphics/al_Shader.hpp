@@ -243,9 +243,12 @@ public:
 	void end();
 
 	/// Call a function wrapped inside begin/end calls
+
+	/// The function should have one argument---a mutable reference to a 
+	/// ShaderProgram (which will receive *this).
 	template <class Func>
 	ShaderProgram& scope(const Func& f){
-		begin(); f(); end();
+		begin(); f(*this); end();
 		return *this;
 	}
 
@@ -263,9 +266,12 @@ public:
 	bool once() const { return mOnce; }
 
 	/// Call a function wrapped inside begin/end calls once after compile
+
+	/// The function should have one argument---a mutable reference to a 
+	/// ShaderProgram (which will receive *this).
 	template <class Func>
 	ShaderProgram& scopeOnce(const Func& f){
-		if(once()){ scope([&f](){ f(); }); }
+		if(once()){ scope([&f](auto& s){ f(s); }); }
 		return *this;
 	}
 
