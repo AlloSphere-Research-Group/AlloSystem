@@ -387,6 +387,12 @@ public:
 		return toVec(at<Indices>()...);
 	}
 
+	/// Get a vector comprised of elements indexed from argument (like APL Index)
+	template <int M>
+	Vec<M,T> get(const Vec<M,int>& indices) const {
+		return indices.template map<T>([this](int i){ return at(i); });
+	}
+
 	/// Get temp copy
 	Vec dup() const { return *this; }
 
@@ -954,6 +960,16 @@ public:
 		return j;
 	}
 
+	/// Get indices of minimum and maximum values
+	Vec<2,int> indicesOfExtrema() const {
+		int j = 0, J = 0;
+		for(int i=1; i<N; ++i){
+			if(at(i) < at(j)) j=i;
+			if(at(i) > at(J)) J=i;
+		}
+		return {j, J};
+	}
+
 	/// Get minimum value
 	const T& min() const { return const_cast<Vec*>(this)->min(); }
 	T& min(){ return at(indexOfMin()); }
@@ -961,6 +977,9 @@ public:
 	/// Get maximum value
 	const T& max() const { return const_cast<Vec*>(this)->max(); }
 	T& max(){ return at(indexOfMax()); }
+
+	/// Get minimum and maximum values
+	Vec<2,T> extrema() const { return get(indicesOfExtrema()); }
 
 	/// debug printing
 	void print(FILE * out=stdout, const char * append="") const;
