@@ -1,5 +1,5 @@
 #include <algorithm> // find
-#include <cstdio>
+#include <cstdio> // printf
 #include "allocore/io/al_Window.hpp"
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/system/al_Time.h" // al_steady_time
@@ -102,6 +102,22 @@ void WindowEventHandler::removeFromWindow(){
 	}
 }
 
+
+Window::Dim::Dim(int v):Window::Dim(v,v){}
+Window::Dim::Dim(int w, int h): Window::Dim(0,0,w,h){}
+Window::Dim::Dim(int l_, int t_, int w_, int h_): l(l_), t(t_), w(w_), h(h_){}
+
+void Window::Dim::set(int l_, int t_, int w_, int h_){
+	l=l_; t=t_; w=w_; h=h_;
+}
+
+float Window::Dim::aspect() const {
+	return (w!=0 && h!=0) ? double(w)/h : 1;
+}
+
+void Window::Dim::print() const {
+	printf("Dim: %4d x %4d @ (%4d, %4d)\n", w,h, l,t);
+}
 
 
 Window::Window()

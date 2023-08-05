@@ -45,7 +45,6 @@
 */
 
 #include "allocore/graphics/al_GPUObject.hpp"
-#include <cstdio>
 #include <deque>
 #include <string>
 #include <vector>
@@ -196,23 +195,23 @@ public:
 
 
 	/// Called when a keyboard key is pressed
-	virtual bool onKeyDown(const Keyboard& k){return true;}
+	virtual bool onKeyDown(const Keyboard& k){ return true; }
 
 	/// Called when a keyboard key is released
-	virtual bool onKeyUp(const Keyboard& k){return true;}
+	virtual bool onKeyUp(const Keyboard& k){ return true; }
 
 
 	/// Called when a mouse button is pressed
-	virtual bool onMouseDown(const Mouse& m){return true;}
+	virtual bool onMouseDown(const Mouse& m){ return true; }
 
 	/// Called when the mouse moves while a button is down
-	virtual bool onMouseDrag(const Mouse& m){return true;}
+	virtual bool onMouseDrag(const Mouse& m){ return true; }
 
 	/// Called when the mouse moves
-	virtual bool onMouseMove(const Mouse& m){return true;}
+	virtual bool onMouseMove(const Mouse& m){ return true; }
 
 	/// Called when a mouse button is released
-	virtual bool onMouseUp(const Mouse& m){return true;}
+	virtual bool onMouseUp(const Mouse& m){ return true; }
 
 
 	/// Return self
@@ -310,13 +309,17 @@ public:
 	/// Window pixel dimensions
 	struct Dim{
 		int l,t,w,h;
-		Dim(int v=0): l(0), t(0), w(v), h(v){}
-		Dim(int w_, int h_): l(0), t(0), w(w_), h(h_){}
-		Dim(int l_, int t_, int w_, int h_): l(l_), t(t_), w(w_), h(h_){}
-		void set(int l_, int t_, int w_, int h_){l=l_;t=t_;w=w_;h=h_;}
 
-		float aspect() const { return (w!=0 && h!=0) ? double(w)/h : 1; }
-		void print() const {printf("Dim: %4d x %4d @ (%4d, %4d)\n", w,h, l,t); }
+		Dim(int v=0);
+		Dim(int w, int h);
+		Dim(int l, int t, int w, int h);
+
+		void set(int l, int t, int w, int h);
+
+		/// Get aspect ratio as width/height
+		float aspect() const;
+
+		void print() const;
 	};
 
 
