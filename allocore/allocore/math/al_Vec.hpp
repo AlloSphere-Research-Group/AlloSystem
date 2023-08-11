@@ -265,7 +265,6 @@ public:
 	T& back(){ return at<N-1>(); }
 	const T& back() const { return const_cast<Vec*>(this)->back(); }
 
-
 	Vec& operator = (const T& v){ return fill(v); }
 
 	template <int N2, class T2>
@@ -357,6 +356,7 @@ public:
 		return setAA(Axis, val);
 	}
 
+
 	/// Return true if objects are element-wise equal, false otherwise
 	bool operator ==(const Vec& v) const { IT(N){ if(at(i) != v[i]) return false; } return true; }
 
@@ -392,6 +392,10 @@ public:
 	Vec<M,T> get(const Vec<M,int>& indices) const {
 		return indices.template map<T>([this](int i){ return at(i); });
 	}
+
+	/// Get new vector with element set to value
+	template <int i>
+	Vec with(T v = T()) const { return dup().set<i>(v); }
 
 	/// Get temp copy
 	Vec dup() const { return *this; }
