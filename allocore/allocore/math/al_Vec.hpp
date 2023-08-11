@@ -395,7 +395,7 @@ public:
 
 	/// Get new vector with element set to value
 	template <int i>
-	Vec with(T v = T()) const { return dup().set<i>(v); }
+	Vec with(T v = T()) const { return dup().template set<i>(v); }
 
 	/// Get temp copy
 	Vec dup() const { return *this; }
