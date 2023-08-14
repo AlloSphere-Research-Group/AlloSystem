@@ -142,14 +142,15 @@ public:
 	/// Sometimes, boxes that are really outside will not be detected as so,
 	/// thus returning a false positive.
 	///
+	/// @param[in] min	minimum corner of box
+	/// @param[in] ext	extents (diameters) of box
 	/// \returns OUTSIDE, INTERSECT or INSIDE
-	int testBox(const vec& xyz, const vec& dim) const;
+	int testBox(const vec& min, const vec& ext) const;
 	int testBoxMinMax(const vec& min, const vec& max) const;
 
 	/// Get axis-aligned bounding box
 	template <class Vec3>
 	void boundingBox(Vec3& xyz, Vec3& dim) const;
-
 
 
 	/// Compute planes based on frustum corners (planes face to inside)
@@ -267,8 +268,8 @@ int Frustum<T>::testBoxMinMax(const vec& min, const vec& max) const {
 }
 
 template <class T>
-int Frustum<T>::testBox(const vec& xyz, const vec& dim) const {
-	return testBoxMinMax(xyz, xyz+dim);
+int Frustum<T>::testBox(const vec& min, const vec& ext) const {
+	return testBoxMinMax(min, min+ext);
 }
 
 } // al::
