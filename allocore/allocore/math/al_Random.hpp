@@ -194,12 +194,24 @@ public:
 	template <class Array>
 	Array shuffle(const Array& a){ auto t=a; return shuffle(t); }
 
+	/// Randomly pick an element from a raw array
+	template <class T>
+	const auto& pickFrom(const T * arr, uint32_t len){ return arr[uniform(len)]; }
+	template <class T>
+	auto& pickFrom(T * arr, uint32_t len){ return arr[uniform(len)]; }
+
+	/// Randomly pick an element from an array object
+	template <class Array>
+	const auto& pickFrom(const Array& a){ return pickFrom(&a[0], a.size()); }
+	template <class Array>
+	auto& pickFrom(Array& a){ return pickFrom(&a[0], a.size()); }
+
 	/// Randomly pick and return one of the arguments
 	template <class T, class... Ts>
 	T pick(const T& v, const Ts&... vals){
 		constexpr int N = 1+sizeof...(vals);
 		T arr[] = {v, vals...};
-		return arr[uniform(N)];
+		return pickFrom(arr, N);
 	}
 
 	/// Urn from which to pick random items
