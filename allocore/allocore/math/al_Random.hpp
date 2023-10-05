@@ -236,6 +236,49 @@ public:
 	template <int N>
 	Urn<N> urn(int start=0, int step=1){ return {*this, start, step}; }
 
+
+	/// Weighted die
+	template <int N>
+	struct Die{
+		Random& rng;
+		float cdf[N];
+
+		template <class... Weights>
+		Die(Random& r, const Weights... ws): rng(r), cdf{static_cast<float>(ws)...}{
+			PDF2CDF();
+		}
+		/// Roll die and get a side in [0,N)
+		int operator()(){
+			float r = rng.uniform();
+			for(int i=0; i<N; ++i){
+				if(r < cdf[i]) return i;
+			}
+			return 0;
+		}
+	private:
+		void PDF2CDF(){
+			float sum = cdf[0];
+			for(int i=1; i<N; ++i) sum += cdf[i];
+			if(sum > 0.f){
+				float nrm = 1.f/sum;
+				for(int i=0; i<N; ++i){
+					cdf[i] *= nrm;
+					if(i) cdf[i] += cdf[i-1];
+				}
+			}
+			//for(int i=0; i<N; ++i) printf("%f ", cdf[i]); printf("\n"); fflush(stdout);
+		}
+	};
+
+	/// Get a weighted die with specified weights
+
+	/// @param[in] ws	List of weights for each side; must be positive 
+	/// 				with at least one non-zero weight
+	template <class... Weights>
+	Die<sizeof...(Weights)> die(const Weights... ws){
+		return {*this, ws...};
+	}
+
 protected:
 	RNG mRNG;
 
