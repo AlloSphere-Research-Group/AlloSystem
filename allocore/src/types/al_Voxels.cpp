@@ -1,7 +1,7 @@
 //#include <cassert>
 #include <algorithm> // min,max
-#include <cmath> //pow
-#include <cstring> //memcpy
+#include <cmath> // ceil, pow, sqrt
+#include <cstring> // memcpy
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -613,12 +613,12 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
   if (P.size() > 1){
     Vec2f *p2D = new Vec2f[P.size()];
     p2D[0] = Vec2f(0,0);
-    float x = sqrt(std::pow(P[1].x-P[0].x,2.0)+std::pow(P[1].y-P[0].y,2.0)+std::pow(P[1].z-P[0].z,2.0));
+    float x = std::sqrt(std::pow(P[1].x-P[0].x,2.0)+std::pow(P[1].y-P[0].y,2.0)+std::pow(P[1].z-P[0].z,2.0));
     std::cout << x << "\n";
     p2D[1] = Vec2f(x,0);
     if(P.size() == 2){
       //super easy, it's just a line :)
-      x = ceil(x);
+      x = std::ceil(x);
       result.format(1, type(), x);
       std::vector<Vec3f> space = linspace(P[0], P[1], x);
       for (unsigned j = 0; j < space.size(); j++){
@@ -648,8 +648,8 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
         maxO2D = std::max(maxO2D, t_2);
         p2D[i] = Vec2f(t_1, t_2);
       }
-      int aDirection = ceil(maxA2D - minA2D);
-      int oDirection = ceil(maxO2D - minO2D);
+      int aDirection = std::ceil(maxA2D - minA2D);
+      int oDirection = std::ceil(maxO2D - minO2D);
       //http://math.stackexchange.com/questions/525829/how-to-find-the-3d-coordinate-of-a-2d-point-on-a-known-plane
       result.format(1, type(), aDirection, oDirection);
       Vec3f p0 = point2Dto3D(planeCenter,y_axis,z_axis,minA2D,minO2D);
