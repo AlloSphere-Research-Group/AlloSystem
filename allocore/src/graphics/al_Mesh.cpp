@@ -118,63 +118,43 @@ Mesh& Mesh::equalizeBuffers() {
 	return *this;
 }
 
-class TriFace {
-public:
-	Mesh::Vertex vertices[3];
-	Vec3f norm;
-
-	TriFace(const TriFace& cpy)
-	: norm(cpy.norm) {
-		vertices[0] = cpy.vertices[0];
-		vertices[1] = cpy.vertices[1];
-		vertices[2] = cpy.vertices[2];
-	}
-	TriFace(Mesh::Vertex p0, Mesh::Vertex p1, Mesh::Vertex p2)
-	{
-		vertices[0] = p0;
-		vertices[1] = p1;
-		vertices[2] = p2;
-		norm = normal<float>(p0, p1, p2);
-	}
-};
 void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
 
-	auto initMesh = [](Mesh& m, int n){
-		m.mVertices.resize(n*2);
+	auto initMesh = [](Mesh& m, int numNormals){
+		m.mVertices.resize(numNormals*2);
 		m.reset();
 		m.lines();
 	};
 
+	// Generate normal lines based on faces (ignoring existing normals)
 	if(perFace){
-		// compute vertex based normals
-		if(mIndices.size()){
+		if(isTriangleType()){
+			int Nn = std::max(mVertices.size(), mIndices.size())/3;
+			initMesh(mesh, Nn);
 
-			int Ni = mIndices.size();
-			Ni = Ni - (Ni%3); // must be multiple of 3
-			initMesh(mesh, (Ni/3)*2);
+			forEachFace([&](int i1, int i2, int i3){
+				if(i1==i2 || i2==i3 || i3==i1) return; // skip degenerate
 
-			for(int i=0; i<Ni; i+=3){
-				auto i1 = mIndices[i+0];
-				auto i2 = mIndices[i+1];
-				auto i3 = mIndices[i+2];
-				auto& v1 = mVertices[i1];
-				auto& v2 = mVertices[i2];
-				auto& v3 = mVertices[i3];
+				auto v1 = mVertices[i1];
+				auto v2 = mVertices[i2];
+				auto v3 = mVertices[i3];
 
-				auto mean = (v1 + v2 + v3)/3.f;
+				auto ctr = (v1 + v2 + v3)*0.33333f;
 				auto dN = cross(v2-v1, v3-v1).normalize(length);
 
-				mesh.vertex(mean);
-				mesh.vertex(mean + dN);
-			}
+				mesh.vertex(ctr);
+				mesh.vertex(ctr + dN);
+			});
 		} else {
-			AL_WARN_ONCE("createNormalsMesh only valid for indexed meshes");
+			AL_WARN_ONCE("createNormalsMesh: per-face option only valid for triangle meshes");
 		}
-	} else {
-		int Ni = std::min(mVertices.size(), mNormals.size());
-		initMesh(mesh, Ni*2);
 
-		for(int i=0; i<Ni; ++i){
+	// Generate normal lines based on existing normals in mesh (if any)
+	} else {
+		int Nn = std::min(mVertices.size(), mNormals.size());
+		initMesh(mesh, Nn);
+
+		for(int i=0; i<Nn; ++i){
 			auto& v = mVertices[i];
 			mesh.vertex(v);
 			mesh.vertex(v + mNormals[i]*length);
@@ -249,6 +229,27 @@ Mesh& Mesh::compress(){
 
 	return *this;
 }
+
+
+class TriFace {
+public:
+	Mesh::Vertex vertices[3];
+	Vec3f norm;
+
+	TriFace(const TriFace& cpy)
+	: norm(cpy.norm) {
+		vertices[0] = cpy.vertices[0];
+		vertices[1] = cpy.vertices[1];
+		vertices[2] = cpy.vertices[2];
+	}
+	TriFace(Mesh::Vertex p0, Mesh::Vertex p1, Mesh::Vertex p2)
+	{
+		vertices[0] = p0;
+		vertices[1] = p1;
+		vertices[2] = p2;
+		norm = normal<float>(p0, p1, p2);
+	}
+};
 
 Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 //	/*

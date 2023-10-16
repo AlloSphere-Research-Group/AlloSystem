@@ -459,8 +459,8 @@ public:
 	/// triangles only, face normals are generated if no indices are present.
 	/// This will replace any normals currently in use.
 	///
-	/// @param[in] normalize			whether to normalize normals
-	/// @param[in] equalWeightPerFace	whether to use an equal weighting of
+	/// @param[in] normalize			Whether to normalize normals
+	/// @param[in] equalWeightPerFace	Whether to use an equal weighting of
 	///									face normals rather than a weighting
 	///									based on face areas
 	Mesh& generateNormals(bool normalize=true, bool equalWeightPerFace=false);
@@ -473,10 +473,12 @@ public:
 
 	/// Creates a mesh filled with lines for each normal of the source
 
-	/// @param[out] mesh		normal lines
-	/// @param[in]  length		length of normals
-	/// @param[in]  perFace		whether normals line should be generated per
-	///							face rather than per vertex
+	/// @param[out] mesh		Mesh to be filled with normal lines
+	/// @param[in]  length		Length of normals
+	/// @param[in]  perFace		Whether normal lines should be generated per
+	///							face rather than per vertex. Per-face generation
+	///							ignores any existing normals in the mesh and is
+	///							only valid for triangle (-strip) meshes.
 	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false) const;
 
 	Mesh& normalsMesh(Mesh& mesh, float length=0.1, bool perFace=false) const {
