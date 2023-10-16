@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cmath> // abs, ceil
 #include <iostream>
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/math/al_Constants.hpp"
@@ -68,7 +69,53 @@ SoundSource::SoundSource(double nearClip, double farClip,
 }
 
 int SoundSource::bufferSize(double samplerate, double speedOfSound, double distance){
-	return (int)ceil(samplerate * distance / speedOfSound);
+	return (int)std::ceil(samplerate * distance / speedOfSound);
+}
+
+float SoundSource::getNextSample(const Pose& listeningPose) {
+
+	float s = 0.0f;
+	auto dist = listeningPose.vec().mag(); //Compute distance in world-space units
+	auto relDirection = posHistory()[0] - listeningPose.vec();
+
+	auto srcRot = listeningPose.quat();
+	relDirection = srcRot.rotate(relDirection);
+	float distanceToSample = 0;
+	float samplesAgo = 1024; // TODO how can we set a better default
+	if(dopplerType() == DOPPLER_SYMMETRICAL) {
+		distanceToSample = mSampleRate / mSpeedOfSound;
+		samplesAgo = dist * distanceToSample;
+	} else if(dopplerType() == DOPPLER_PHYSICAL) {
+		// FIXME AC Can we use the current pose here for distance or should we calculate from listener history?
+		auto prevDistance = (posHistory()[1] - listeningPose.vec()).mag();
+		auto sourceVel = (dist - prevDistance)*mSampleRate; //positive when moving away, negative moving toward
+//			if(sourceVel == -mSpeedOfSound) sourceVel -= 0.001; //prevent divide by 0 / inf freq
+		auto sumSpeed = mSpeedOfSound + sourceVel;
+		if (sumSpeed < 0.001) { sumSpeed = 0.001; }
+
+		distanceToSample = std::abs(mSampleRate / sumSpeed);
+		samplesAgo = dist * distanceToSample;
+	}
+	updateHistory();
+
+//		// Add on time delay (in samples) - only needed if the source is rendered per buffer
+	if(!usePerSampleProcessing()) {
+		samplesAgo -= mFrameCounter++;
+	}
+
+	// Is our delay line big enough?
+	if(samplesAgo <= maxIndex()){
+		auto gain = attenuation(dist);
+
+		//reading samplesAgo-i causes a discontinuity
+		s = readSample(samplesAgo) * gain;
+
+		// s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
+
+	} else {
+		std::cout << "Delay line exceeded in SoundSource" << std::endl;
+	}
+	return s;
 }
 
 

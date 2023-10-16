@@ -44,11 +44,9 @@
 	Ryan McGee, 2012, ryanmichaelmcgee@gmail.com
 */
 
-#include <cmath>
 #include <cstring>
 #include <vector>
 #include <list>
-#include <iostream>
 
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/math/al_Interpolation.hpp"
@@ -194,64 +192,20 @@ public:
 
 	virtual ~SoundSource(){}
 
-	float getNextSample(Pose listeningPose) {
+	float getNextSample(const Pose& listeningPose);
 
-		float s = 0.0f;
-		double dist = listeningPose.vec().mag(); //Compute distance in world-space units
-		Vec3d relDirection = posHistory()[0] - listeningPose.vec();
-
-		Quatd srcRot = listeningPose.quat();
-		relDirection = srcRot.rotate(relDirection);
-		double distanceToSample = 0;
-		double samplesAgo = 1024; // TODO how can we set a better default
-		if(dopplerType() == DOPPLER_SYMMETRICAL) {
-			distanceToSample = mSampleRate / mSpeedOfSound;
-			samplesAgo = dist * distanceToSample;
-		} else if(dopplerType() == DOPPLER_PHYSICAL) {
-			// FIXME AC Can we use the current pose here for distance or should we calculate from listener history?
-			double prevDistance = (posHistory()[1] - listeningPose.vec()).mag();
-			double sourceVel = (dist - prevDistance)*mSampleRate; //positive when moving away, negative moving toward
-//			if(sourceVel == -mSpeedOfSound) sourceVel -= 0.001; //prevent divide by 0 / inf freq
-			double sumSpeed = mSpeedOfSound + sourceVel;
-			if (sumSpeed < 0.001) { sumSpeed = 0.001; }
-
-			distanceToSample = fabs(mSampleRate / sumSpeed);
-			samplesAgo = dist * distanceToSample;
-		}
-		updateHistory();
-
-//		// Add on time delay (in samples) - only needed if the source is rendered per buffer
-		if(!usePerSampleProcessing()) {
-			samplesAgo -= mFrameCounter++;
-		}
-
-		// Is our delay line big enough?
-		if(samplesAgo <= maxIndex()){
-			double gain = attenuation(dist);
-
-			//reading samplesAgo-i causes a discontinuity
-			s = readSample(samplesAgo) * gain;
-
-			// s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
-
-		} else {
-			std::cout << "Delay line exceeded in SoundSource" << std::endl;
-		}
-		return s;
-	}
-
-	float getNextSample(Listener &l) {
+	float getNextSample(const Listener& l) {
 		return getNextSample(l.pose());
 	}
 
-	void getBuffer(Listener &l, float *buffer, const int size) {
+	void getBuffer(const Listener& l, float * buffer, int size) {
 		frame(0);
 		for (int i = 0; i < size; i++) {
 			*buffer++ = getNextSample(l);
 		}
 	}
 
-	void getBuffer(Pose listeningPose, float *buffer, const int size) {
+	void getBuffer(const Pose& listeningPose, float * buffer, int size) {
 		frame(0);
 		for (int i = 0; i < size; i++) {
 			*buffer++ = getNextSample(listeningPose);
