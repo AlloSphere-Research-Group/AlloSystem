@@ -1120,6 +1120,24 @@ inline Vec<N,T> pow(const T& base, const Vec<N,T>& powers){
 	return r;
 }
 
+template <int N, class T>
+inline Vec<N,T> ceil(const Vec<N,T>& v){ return v.map([](T x){ return std::ceil(x); }); }
+
+template <int N, class T>
+inline Vec<N,T> ceil(const Vec<N,T>& v, const Vec<N,T>& step){ return ceil(v/step)*step; }
+
+template <int N, class T>
+inline Vec<N,T> ceil(const Vec<N,T>& v, const T& step){ return ceil(v/step)*step; }
+
+template <int N, class T>
+inline Vec<N,T> floor(const Vec<N,T>& v){ return v.map([](T x){ return std::floor(x); }); }
+
+template <int N, class T>
+inline Vec<N,T> floor(const Vec<N,T>& v, const Vec<N,T>& step){ return floor(v/step)*step; }
+
+template <int N, class T>
+inline Vec<N,T> floor(const Vec<N,T>& v, const T& step){ return floor(v/step)*step; }
+
 /// Get real-valued vector rounded to nearest integer vector
 template <int N, class T>
 inline Vec<N,int> roundi(const Vec<N,T>& v){ return v + v.sgn(T(0.5)); }
