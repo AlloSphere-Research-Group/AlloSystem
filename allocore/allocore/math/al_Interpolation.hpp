@@ -77,8 +77,22 @@ template <class Tf, class Tv>
 Tv casteljau(const Tf& frac, const Tv& a, const Tv& b, const Tv& c, const Tv& d);
 
 /// Hermite interpolation
+
+/// Cubic interpolation with controllable tension and bias of interpolant.
+/// The interpolant lies between x and y.
+/// From https://paulbourke.net/miscellaneous/interpolation/ (Paul Bourke).
+///
+/// @param[in] frac		Interpolation fraction in [0,1]
+/// @param[in] x		First value (previous value)
+/// @param[in] y		Second value (lower bound of interpolated value)
+/// @param[in] z		Third value (upper bound of interpolated value)
+/// @param[in] w		Fourth value (next value)
+/// @param[in] tension	Tightness of the interpolation function:
+///						1 is high (linear), 0 normal (cubic), -1 is low.
+/// @param[in] bias		Tension bias: 0 is even, >0 is towards first segment
+///						<0 is towards second segment.
 template <class Tp, class Tv>
-Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension, Tp bias);
+Tv hermite(Tp frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension, Tp bias);
 
 
 /// Computes FIR coefficients for Waring-Lagrange interpolation
@@ -316,13 +330,6 @@ inline Tv cubic2(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 	return ((c3 * f + c2) * f + c1) * f + x;
 }
 
-// From http://astronomy.swin.edu.au/~pbourke/other/interpolation/ (Paul Bourke)
-/*
-   Tension: 1 is high, 0 normal, -1 is low
-   Bias: 0 is even,
-         positive is towards first segment,
-         negative towards the other
-*/
 template <class Tp, class Tv>
 inline Tv hermite(Tp f,
 	const Tv& w, const Tv& x, const Tv& y, const Tv& z,
@@ -333,16 +340,11 @@ inline Tv hermite(Tp f,
 	// compute endpoint tangents
 	//Tv m0 = ((x-w)*(1+bias) + (y-x)*(1-bias))*tension;
 	//Tv m1 = ((y-x)*(1+bias) + (z-y)*(1-bias))*tension;
-	Tv m0 = ((x*Tv(2) - w - y)*bias + y - w)*tension;
-	Tv m1 = ((y*Tv(2) - x - z)*bias + z - x)*tension;
-
-//	x - w + x b - w b + y - x - y b + x b
-//	-w + 2x b - w b + y - y b
-//	b(2x - w - y) + y - w
-//
-//	y - x + y b - x b + z - y - z b + y b
-//	-x + 2y b - x b + z - z b
-//	b(2y - x - z) + z - x
+	//	x - w + x b - w b + y - x - y b + x b
+	//	-w + 2x b - w b + y - y b
+	//	b(2x - w - y) + y - w
+	Tv m0 = ((x+x - w - y)*bias + y - w)*tension;
+	Tv m1 = ((y+y - x - z)*bias + z - x)*tension;
 
 	Tp f2 = f  * f;
 	Tp f3 = f2 * f;
