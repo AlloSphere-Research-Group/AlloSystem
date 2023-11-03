@@ -43,8 +43,9 @@
 */
 
 #include "allocore/system/al_Config.h" // uint32_t
-#include <time.h> // time()
 #include <cmath>
+#include <ctime> // time
+#include <type_traits> // is_polymorphic
 
 namespace al {
 
@@ -120,8 +121,11 @@ public:
 	void ball(T * point);
 
 	/// Returns point within a unit ball
-	template <template<int,class> class VecType, int N, class T>
-	void ball(VecType<N,T>& point){ ball<N>(&point[0]); }
+	template <class Vec>
+	void ball(Vec& point){
+		static_assert(!std::is_polymorphic<Vec>::value);
+		ball<sizeof(Vec)/sizeof(typename Vec::value_type)>(&point[0]);
+	}
 
 	/// Returns point within a unit ball
 	template <class VecType>
@@ -135,8 +139,11 @@ public:
 	void cube(T * point);
 
 	/// Returns point within a unit n-cube
-	template <template<int,class> class VecType, int N, class T>
-	void cube(VecType<N,T>& point){ cube<N>(&point[0]); }
+	template <class Vec>
+	void cube(Vec& point){
+		static_assert(!std::is_polymorphic<Vec>::value);
+		cube<sizeof(Vec)/sizeof(typename Vec::value_type)>(&point[0]);
+	}
 
 	/// Returns point within a unit n-cube
 	template <class VecType>
