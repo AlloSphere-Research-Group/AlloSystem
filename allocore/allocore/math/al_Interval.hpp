@@ -64,18 +64,20 @@ public:
 	Interval(const T& min, const T& max)
 	{ endpoints(min,max); }
 
+	T diameter() const { return max()-min(); }		///< Returns absolute difference of endpoints
+	T size() const { return diameter(); }			///< Returns absolute difference of endpoints
+	T radius() const { return diameter()/T(2); }	///< Returns one-half the diameter
+	const T& max() const { return mMax; }			///< Get maximum endpoint
+	const T& min() const { return mMin; }			///< Get minimum endpoint
 	T center() const { return (max()+min())/T(2); }	///< Returns center point
+	bool proper() const { return min()!=max(); }	///< Returns true if diameter is non-zero
+	bool degenerate() const { return min()==max(); }///< Returns true if diameter is zero
+
+	/// Get absolute value of interval
+	Interval abs() const { return {abs(min()), abs(max())}; }
 
 	/// Returns true if value is in interval
 	bool contains(const T& v) const { return v>=min() && v<=max(); }
-
-	bool degenerate() const { return min()==max(); }///< Returns true if diameter is zero
-	T diameter() const { return max()-min(); }		///< Returns absolute difference of endpoints
-	T size() const { return diameter(); }			///< Returns absolute difference of endpoints
-	const T& max() const { return mMax; }			///< Get maximum endpoint
-	const T& min() const { return mMin; }			///< Get minimum endpoint
-	bool proper() const { return min()!=max(); }	///< Returns true if diameter is non-zero
-	T radius() const { return diameter()/T(2); }	///< Returns one-half the diameter
 
 	/// Linearly map point in interval to point in the unit interval [0,1]
 	T toUnit(const T& v) const { return (v-min())/diameter(); }
@@ -140,11 +142,27 @@ public:
 	/// Set minimum endpoint
 	Interval& min(const T& v){ return endpoints(v, max()); }
 
+
+	/// Initialize interval for fitting to input values
+	Interval& resetForFitting(T extrema = 3e38){
+		mMin = extrema;
+		mMax = -mMin;
+		return *this;
+	}
+
+	/// Adjust interval to include value
+	Interval& adjust(const T& v){
+		if(v < mMin) mMin = v;
+		if(v > mMax) mMax = v;
+		return *this;
+	}
+
 private:
 	T mMin, mMax;
 
-	const T& min(const T& a, const T& b){ return a<b?a:b; }
-	const T& max(const T& a, const T& b){ return a>b?a:b; }
+	static const T& min(const T& a, const T& b){ return a<b?a:b; }
+	static const T& max(const T& a, const T& b){ return a>b?a:b; }
+	static T abs(const T& x){ return x>=T(0)?x:-x; }
 };
 
 } // ::al::
