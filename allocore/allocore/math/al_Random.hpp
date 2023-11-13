@@ -122,14 +122,15 @@ public:
 
 	/// Returns point within a unit ball
 	template <class Vec>
-	void ball(Vec& point){
+	Vec& ball(Vec& point){
 		static_assert(!std::is_polymorphic<Vec>::value);
 		ball<sizeof(Vec)/sizeof(typename Vec::value_type)>(&point[0]);
+		return point;
 	}
 
 	/// Returns point within a unit ball
-	template <class VecType>
-	VecType ball(){ VecType v; ball(v); return v; }
+	template <class Vec>
+	Vec ball(){ Vec v; return ball(v); }
 
 	/// Returns point within a unit n-cube
 
@@ -140,14 +141,15 @@ public:
 
 	/// Returns point within a unit n-cube
 	template <class Vec>
-	void cube(Vec& point){
+	Vec& cube(Vec& point){
 		static_assert(!std::is_polymorphic<Vec>::value);
 		cube<sizeof(Vec)/sizeof(typename Vec::value_type)>(&point[0]);
+		return point;
 	}
 
 	/// Returns point within a unit n-cube
-	template <class VecType>
-	VecType cube(){ VecType v; cube(v); return v; }
+	template <class Vec>
+	Vec cube(){ Vec v; cube(v); return v; }
 
 	/// Returns standard normal variate
 	float normal(){ float r; normal(r,r); return r; }
@@ -460,12 +462,12 @@ template <int N, class T>
 inline void ball(T * point){ global().ball<N>(point); }
 
 /// Returns point within a unit ball
-template <template<int,class> class VecType, int N, class T>
-inline void ball(VecType<N,T>& point){ global().ball(point); }
+template <class Vec>
+inline Vec& ball(Vec& point){ return global().ball(point); }
 
 /// Returns point within a unit ball
-template <class VecType>
-inline VecType ball(){ return global().ball<VecType>(); }
+template <class Vec>
+inline Vec ball(){ return global().ball<Vec>(); }
 
 /// Returns point within a unit n-cube
 
@@ -475,12 +477,12 @@ template <int N, class T>
 inline void cube(T * point){ global().cube<N>(point); }
 
 /// Returns point within a unit n-cube
-template <template<int,class> class VecType, int N, class T>
-inline void cube(VecType<N,T>& point){ global().cube(point); }
+template <class Vec>
+inline Vec& cube(Vec& point){ return global().cube(point); }
 
 /// Returns point within a unit n-cube
-template <class VecType>
-inline VecType cube(){ return global().cube<VecType>(); }
+template <class Vec>
+inline Vec cube(){ return global().cube<Vec>(); }
 
 /// Returns standard normal variate
 inline float normal(){ return global().normal(); }
