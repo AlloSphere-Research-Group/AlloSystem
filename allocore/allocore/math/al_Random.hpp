@@ -306,15 +306,15 @@ protected:
 	al::rnd::Random<> rng(initSeed ? initSeed : al::rnd::seed());\
 	auto P = [&](float p=0.5){ return rng.prob(p); };\
 	auto Bs= [&](float p=0.5, float v=1.){ return P(p)?v:-v; };\
-	auto U = [&](){ return rng.uniform(1.); };\
-	auto Us= [&](){ return rng.uniform(1.,-1.); };\
-	auto Ui= [&](int n){ return rng.uniform(n); };\
-	auto L0= [&](){ return std::min(U(), U()); }; /* more 0 than 1 */ \
-	auto L1= [&](){ return std::max(U(), U()); }; /* more 1 than 0 */ \
-	auto T = [&](){ return (U()+U())*0.5; };\
-	auto Ts= [&](){ return U()-U(); };\
-	auto Vs= [&](){ return rng.sign(L1()); }; /* [-1,1] */\
-	auto V = [&](){ return Vs()*0.5+0.5; }; /* [0,1] */
+	auto U = [&](){ return rng.uniform(1.); };		/* uniform real in [ 0,1) */\
+	auto Us= [&](){ return rng.uniform(1.,-1.); };	/* uniform real in [-1,1] */\
+	auto Ui= [&](int n){ return rng.uniform(n); };	/* uniform int in [0,n) */\
+	auto L0= [&](){ return std::min(U(), U()); };	/* more 0 than 1 */ \
+	auto L1= [&](){ return std::max(U(), U()); };	/* more 1 than 0 */ \
+	auto T = [&](){ return (U()+U())*0.5; };		/* triangle in [ 0,1) */\
+	auto Ts= [&](){ return U()-U(); };				/* triangle in [-1,1] */\
+	auto Vs= [&](){ return rng.sign(L1()); };		/* flipped triangle in [-1,1] */\
+	auto V = [&](){ return Vs()*0.5+0.5; };			/* flipped triangle in [ 0,1] */
 
 
 /// Linear congruential uniform pseudo-random number generator.
