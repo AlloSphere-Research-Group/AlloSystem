@@ -794,6 +794,14 @@ void Texture::quadViewport(
 	g.popMatrix(g.MODELVIEW);
 }
 
+void Texture::iterate(const std::function<void(int i, int j, int k)>& onPixel){
+	for(int k=0; k< depth(); ++k){
+	for(int j=0; j<height(); ++j){
+	for(int i=0; i< width(); ++i){
+		onPixel(i,j,k);
+	}}}
+}
+
 void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPixel, int w, int h, int xoffset, int yoffset){
 	if(mTarget == TEXTURE_2D){
 		auto& arr = array();

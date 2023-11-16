@@ -318,6 +318,12 @@ public:
 	template<class T> T& at(unsigned x, unsigned y){ return array().as<T>(x,y); }
 	template<class T> const T& at(unsigned x, unsigned y) const { return array().as<T>(x,y); }
 
+	/// Iterate through pixel indices
+	void iterate(const std::function<void(int i, int j, int k)>& onPixel);
+	void iterate(const std::function<void(int i, int j, int k)>& onPixel) const {
+		const_cast<Texture*>(this)->iterate(onPixel);
+	}
+
 	/// Assign pixel values using a visitor function
 
 	/// onPixel is called for each pixel in the texture.
