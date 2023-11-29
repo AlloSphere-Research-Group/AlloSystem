@@ -710,6 +710,16 @@ public:
 		return s;
 	}
 
+	/// Get vector filled with differences between successive elements
+	Vec delta(T endVal = T(1)) const {
+		Vec r(VEC_NO_INIT);
+		for(int i=0; i<N-1; ++i){
+			r[i] = at(i+1) - at(i);
+		}
+		r.back() = endVal - back();
+		return r;
+	}
+
 	/// Returns p-norm of elements
 
 	/// The p-norm is pth root of the sum of the absolute value of the elements
