@@ -1340,16 +1340,16 @@ inline void swap(Vec<N,T>& a, Vec<N,T>& b){ a.swap(b); }
 
 /// Pun uniform POD into vector
 template <class T, class UniformPOD>
-auto punToVec(const UniformPOD& v) -> const Vec<sizeof(UniformPOD)/sizeof(T),T>& {
-	static_assert(!std::is_polymorphic<UniformPOD>::value, "Punning polymorphic class disallowed");
-	return std::remove_reference<decltype(punToVec<T>(v))>::type::pun((const T*)&v);
-}
-
-template <class T, class UniformPOD>
 auto punToVec(UniformPOD& v) -> Vec<sizeof(UniformPOD)/sizeof(T),T>& {
 	static_assert(!std::is_polymorphic<UniformPOD>::value, "Punning polymorphic class disallowed");
 	return std::remove_reference<decltype(punToVec<T>(v))>::type::pun((T*)&v);
 }
+
+template <class T, class UniformPOD>
+auto punToVec(const UniformPOD& v) -> const Vec<sizeof(UniformPOD)/sizeof(T),T>& {
+	return punToVec<T>(const_cast<UniformPOD&>(v));
+}
+
 
 
 // Implementation --------------------------------------------------------------
