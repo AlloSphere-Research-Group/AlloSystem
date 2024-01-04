@@ -134,7 +134,7 @@ Tv cubic(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 template <class Tf, class Tv>
 Tv cubic2(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 
-/// Linear interpolation.  Identical to first order Lagrange.
+/// Linear interpolation (first-order Lagrange)
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y);
 
@@ -149,6 +149,16 @@ Tv linear(Tf frac, const std::initializer_list<Tv>& src);
 /// Cyclic linear interpolation between three elements
 template <class Tf, class Tv>
 Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z);
+
+/// Cyclic linear interpolation between array elements
+
+/// \tparam T			Sample type
+/// \tparam OnElem		Function that returns element i; signature T(int)
+/// @param[in] f		Fraction in [0,1)
+/// @param[in] len		Length of array
+/// @param[in] onElem	Array element accessor
+template <class T, class OnElem>
+T linearCyclic(float f, int len, OnElem onElem);
 
 /// Element-wise linear interpolation between two arrays of values
 template <class Tf, class Tv>
@@ -438,6 +448,15 @@ inline Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 	if(frac <= Tf(1))		return ipl::linear(frac, x,y);
 	else if(frac >= Tf(2))	return ipl::linear(frac-Tf(2), z,x);
 							return ipl::linear(frac-Tf(1), y,z);
+}
+
+template <class T, class OnElem>
+T linearCyclic(float f, int len, OnElem onElem){
+	float ir = len*f;
+	int i = int(ir);
+	int j = (i+1)%len;
+	f = ir - i;
+	return ipl::linear(f, onElem(i), onElem(j));
 }
 
 template <class Tf, class Tv>
