@@ -362,6 +362,13 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 		float s = radius!=0. ? 1.f/radius : 0.f;
 		for(int i=Nv; i<m.vertices().size(); ++i)
 			m.normal(m.vertices()[i] * s);
+
+		if(m.wants(Mesh::TANGENT)){
+			for(int i=Nv; i<m.vertices().size(); ++i){
+				auto B = m.vertices()[i].with<2>(0.f).normalize().rotate90();
+				m.tangent(cross(m.normals()[i], B));
+			}
+		}
 	}
 
 	return m.vertices().size()-Nv;
