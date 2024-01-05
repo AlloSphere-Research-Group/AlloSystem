@@ -724,27 +724,24 @@ Mesh& Mesh::scale(float x, float y, float z){
 
 template <class T>
 Mesh& Mesh::transform(const Mat<4,T>& m, int begin, int end){
-	if(begin<0) begin += vertices().size();
-	if(  end<0)   end += vertices().size()+1; // negative index wraps to end of array
-	for(int i=begin; i<end; ++i){
-		vertices()[i] = m * Vec<4,T>(vertices()[i], T(1));
+	if(begin<0) begin += mVertices.size();
+	if(  end<0)   end += mVertices.size()+1; // negative index wraps to end of array
+
+	#define LOOP for(int i=begin; i<end; ++i)
+
+	LOOP mVertices[i] = m.transformPoint(mVertices[i]);
+
+	if(mTangents.size() >= mVertices.size()){
+		LOOP mTangents[i] = m.transformVector(mTangents[i]).normalize();
 	}
 
-	Mat3f nmat(MAT_NO_INIT);
-	bool nmatInvalid = true;
+	// normals must be transformed by (A^-1)^T
+	if(mNormals.size() >= mVertices.size()){
+		auto n = normalMatrix(m);
+		LOOP mNormals[i] = (n * mNormals[i]).normalize();
+	}
 
-	auto xfmOriVec = [&](Buffer<UnitVector>& buf){
-		if(buf.size() >= mVertices.size()){
-			if(nmatInvalid){ nmat = normalMatrix(m); nmatInvalid=false; }
-			for(int i=begin; i<end; ++i){
-				buf[i] = nmat * buf[i];
-				buf[i].normalize(); // since xfm may have scaling
-			}
-		}	
-	};
-
-	xfmOriVec(mNormals);
-	xfmOriVec(mTangents);
+	#undef LOOP
 
 	return *this;
 }
