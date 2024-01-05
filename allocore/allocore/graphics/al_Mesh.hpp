@@ -362,7 +362,7 @@ public:
 	const Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace) const;
 	Mesh& forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace);
 
-	/// Call function for each vertex (position)
+	/// Call function for each vertex (position, normal, etc.)
 
 	/// A less error-prone way of writing
 	/// 	for(int i=0; i<mesh.vertices().size(); ++i) ...
