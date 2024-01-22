@@ -995,6 +995,22 @@ public:
 	/// Get minimum and maximum values
 	Vec<2,T> extrema() const { return get(indicesOfExtrema()); }
 
+
+	struct PSeq{
+		T * data;
+		unsigned index = N-1;
+
+		PSeq(T * ptr): data(ptr){}
+
+		T& operator()(){
+			index = (index+1) % N;
+			return data[index];
+		}
+	};
+
+	PSeq pseq(){ return PSeq(elems()); }
+
+
 	/// debug printing
 	void print(FILE * out=stdout, const char * append="") const;
 	void println(FILE * out=stdout) const;
