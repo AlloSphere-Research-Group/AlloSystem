@@ -123,7 +123,7 @@ public:
 	/// Returns point within a unit ball
 	template <class Vec>
 	Vec& ball(Vec& point){
-		static_assert(!std::is_polymorphic<Vec>::value);
+		static_assert(!std::is_polymorphic<Vec>::value, "Polymorphic types not supported");
 		ball<sizeof(Vec)/sizeof(typename Vec::value_type)>(&point[0]);
 		return point;
 	}
@@ -142,7 +142,7 @@ public:
 	/// Returns point within a unit n-cube
 	template <class Vec>
 	Vec& cube(Vec& point){
-		static_assert(!std::is_polymorphic<Vec>::value);
+		static_assert(!std::is_polymorphic<Vec>::value, "Polymorphic types not supported");
 		cube<sizeof(Vec)/sizeof(typename Vec::value_type)>(&point[0]);
 		return point;
 	}
