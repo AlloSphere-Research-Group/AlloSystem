@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_BufferObject.hpp"
+#include "allocore/graphics/al_Viewport.hpp"
 
 #ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 	#include <stack> // matrix stack
@@ -1365,6 +1366,10 @@ void Graphics::viewport(int x, int y, int width, int height) {
 	glViewport(x, y, width, height);
 	enable(SCISSOR_TEST);
 	glScissor(x, y, width, height);
+}
+
+void Graphics::viewport(const Viewport& v){
+	viewport(v.l,v.b,v.w,v.h);
 }
 
 Viewport Graphics::viewport() const {

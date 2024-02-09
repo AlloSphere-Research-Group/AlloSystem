@@ -43,6 +43,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
+#include "allocore/graphics/al_Viewport.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/math/al_Vec.hpp"

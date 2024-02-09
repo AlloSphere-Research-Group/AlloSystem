@@ -81,33 +81,8 @@
 
 namespace al {
 
+class Viewport;
 class ShaderProgram;
-
-
-/// A framed area on a display screen
-/// @ingroup allocore
-struct Viewport {
-	float l, b, w, h;	///< left, bottom, width, height
-
-	/// @param[in] w	width
-	/// @param[in] h	height
-	Viewport(float w=800, float h=600): l(0), b(0), w(w), h(h) {}
-
-	/// @param[in] l	left edge coordinate
-	/// @param[in] b	bottom edge coordinate
-	/// @param[in] w	width
-	/// @param[in] h	height
-	Viewport(float l, float b, float w, float h): l(l), b(b), w(w), h(h) {}
-
-	///
-	Viewport(const Viewport& cpy): l(cpy.l), b(cpy.b), w(cpy.w), h(cpy.h) {}
-
-	/// Get aspect ratio (width divided by height)
-	float aspect() const { return (h!=0 && w!=0) ? float(w)/h : 1; }
-
-	/// Set dimensions
-	void set(float l_, float b_, float w_, float h_){ l=l_; b=b_; w=w_; h=h_; }
-};
 
 
 /// Interface for setting graphics state and rendering Mesh
@@ -414,7 +389,7 @@ public:
 	void viewport(int left, int bottom, int width, int height);
 
 	/// Set viewport
-	void viewport(const Viewport& v){ viewport(v.l,v.b,v.w,v.h); }
+	void viewport(const Viewport& v);
 
 	/// Get current viewport
 	Viewport viewport() const;
