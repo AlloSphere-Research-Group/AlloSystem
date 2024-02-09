@@ -563,9 +563,6 @@ public:
 		return *this;
 	}
 
-	/// Get vector sorted
-	Vec<N,T> sorted() const { return dup().sort(); }
-
 	/// Swap elements within vector
 	Vec& swap(int i, int j){ std::swap(at(i), at(j)); return *this; }
 
