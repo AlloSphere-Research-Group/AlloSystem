@@ -548,17 +548,23 @@ public:
 		return *this = drop<N-Dp>().concat(drop<-Dp>());
 	}
 
-	template <int M = N>
-	typename std::enable_if_t<M==1,Vec<M,T>> sorted() const { return *this; }
-
-	/// Get vector sorted
-	template <int M = N>
-	typename std::enable_if_t<M!=1,Vec<M,T>> sorted() const {
-		// selection sort: not the most efficient, but simple to implement
-		auto i = indexOfMin();
-		return Vec<1,T>(at(i)).concat(erase(i).sorted());
+	/// Sort elements in ascending order
+	Vec& sort(){
+		// insertion sort: O(n^2) time, but in-place and O(1) memory overhead
+		for(int j=1; j<size(); ++j){
+			const auto val = at(j); // next value to insert
+			int i=j-1;
+			for(; i>=0; --i){ // reverse search sorted partition for smaller value
+				if(val >= at(i)) break;
+				at(i+1) = at(i); // shift elem right
+			}
+			at(i+1) = val;
+		}
+		return *this;
 	}
 
+	/// Get vector sorted
+	Vec<N,T> sorted() const { return dup().sort(); }
 
 	/// Swap elements within vector
 	Vec& swap(int i, int j){ std::swap(at(i), at(j)); return *this; }
