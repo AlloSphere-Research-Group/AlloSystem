@@ -63,23 +63,22 @@ public:
 
 	/// @param[in] size			Initial size
 	explicit Buffer(size_t size=0)
-	: Buffer(size,size) { }
+	:	Buffer(size,size)
+	{}
 
 	/// @param[in] size			Initial size
 	/// @param[in] capacity		Initial capacity
-	Buffer(size_t size, size_t capacity)
-	{
+	Buffer(size_t size, size_t capacity){
 		reserve(capacity);
 		resize(size);
 	}
 
-	Buffer(const Buffer& other)
-	{
-		(*this) = other;
+	Buffer(const Buffer& other){
+		*this = other;
 	}
 
-	Buffer& operator=(const Buffer& other){
-		if(this!=(&other)){
+	Buffer& operator= (const Buffer& other){
+		if(this != &other){
 			resize(0);
 			append(other);
 		}
@@ -154,45 +153,40 @@ public:
 
 	/// Resize buffer
 
-	/// If n is smaller than the current size the buffer is truncated, 
+	/// If the new size is smaller than the current size the buffer is truncated, 
 	/// otherwise the buffer is extended and new elements are default-constructed.
 	/// If n is also larger than the capacity, then the capacity is increased.
 	void resize(size_t n){
 		resize(n, value_type());
 	}
 
-	/// This will set both the size and capacity of the buffer to the requested
-	/// size. If the number is smaller than the current size the buffer is
-	/// truncated, otherwise the buffer is extended and new elements are
-	/// copy-constructed from the provided val.
-
 	/// Resize buffer
 
-	/// If n is smaller than the current size the buffer is truncated, 
-	/// otherwise the buffer is extended and new elements are copy-constructed
+	/// If the new size is smaller than the current size the buffer is truncated,
+	/// otherwise the buffer is extended and new elements are copy-constructed 
 	/// from the provided val.
 	/// If n is also larger than the capacity, then the capacity is increased.
 	void resize(size_t n, const value_type& val){
-		if(n > size()){
+		if(n > size()){ // sizing up
 			reserve(n);
-			//When sizing up
-			for (auto it = mEnd; it != mData+n; ++it)
-			{
+			// construct new elements
+			for(auto it = mEnd; it != mData+n; ++it){
 				new(it) value_type(val);
 			}
 		}
-		else{
-			//When sizing down
-			for (auto it = mData+n; it != mEnd; ++it)
-			{
+		else{ // sizing down
+			// destruct removed elements
+			for(auto it = mData+n; it != mEnd; ++it){
 				it->~value_type();
 			}
 		}
 		mEnd = mData+n;
 	}
 
-	/// If the size of the buffer is smaller than its capacity then shrinks the
-	/// capacity of the buffer to match the size.
+	/// Match capacity to size
+
+	/// If the size of the buffer is smaller than its capacity, then the
+	/// capacity is shrunk to match its size.
 	void shrink(){
 		if(size() < capacity()){
 			size_t shrinkTo = size() > 2 ? size() : 2;
@@ -254,32 +248,20 @@ public:
 			if(newSize > capacity()){
 				T* oldData = mData;
 				alloc(newSize);
-				for (size_t i = 0, iExp = 0; i < size(); i++, iExp+=n)
-				{
+				for (size_t i = 0, iExp = 0; i < size(); i++, iExp+=n){
 					mData[iExp] = std::move(oldData[i]);
-					for (size_t j = 1; j < n; j++)
-					{
-						if(dup){
-							new(mData+(iExp +j)) value_type(mData[iExp]);
-						}
-						else{
-							new(mData+(iExp +j)) value_type();
-						}
+					for (size_t j = 1; j < n; j++){
+						if(dup)	new(mData+(iExp +j)) value_type(mData[iExp]);
+						else	new(mData+(iExp +j)) value_type();
 					}
 				}
 				delete[] oldData;
 			}
 			else{
-				for (size_t i = size()-1, iExp = newSize-1; i != static_cast<size_t>(-1); i--)
-				{
-					for (size_t k = 0; k < n; k++, iExp--)
-					{
-						if(k==n-1 || dup){
-							new(mData+iExp) value_type(mData[i]);
-						}
-						else{
-							new(mData+iExp) value_type();
-						}
+				for (size_t i = size()-1, iExp = newSize-1; i != static_cast<size_t>(-1); i--){
+					for (size_t k = 0; k < n; k++, iExp--){
+						if(k==n-1 || dup)	new(mData+iExp) value_type(mData[i]);
+						else				new(mData+iExp) value_type();
 					}
 				}
 			}
@@ -291,6 +273,7 @@ private:
 	T* mData = nullptr;
 	T* mEnd = nullptr;
 	T* mCapEnd = nullptr;
+
 	void alloc(size_t newCapacity){
 		if(newCapacity<=0){ newCapacity = 2; }
 		auto tmpSize = size();
