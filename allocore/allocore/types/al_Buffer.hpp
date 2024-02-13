@@ -93,16 +93,11 @@ public:
 		mCapEnd = nullptr;
 	}
 
-	size_t capacity() const { return mCapEnd-mData; }	///< Returns total capacity
-	size_t size() const { return mEnd-mData; }					///< Returns size
+	size_t capacity() const { return mCapEnd-mData; }	///< Get total capacity
+	size_t size() const { return mEnd-mData; }			///< Get size
 	bool empty() const { return mData==mEnd; }			///< Whether buffer is empty
-	const T * data() const { return mData; }		///< Returns C pointer to elements
-	T * data(){ return mData; }					///< Returns C pointer to elements
-
-	[[deprecated("elems is deprecated, use data instead")]]
-	const T * elems() const { return mData; }		///< Returns C pointer to elements
-	[[deprecated("elems is deprecated, use data instead")]]
-	T * elems(){ return mData; }					///< Returns C pointer to elements
+	const T * data() const { return mData; }			///< Get raw pointer to data
+	T * data(){ return mData; }							///< Get raw pointer to data
 
 	T * begin(){ return mData; }
 	const T * begin() const { return mData; }
