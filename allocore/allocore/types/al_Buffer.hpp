@@ -329,7 +329,7 @@ public:
 
 
 	/// Get number of elements
-	int size() const { return mElems.size(); }
+	int size() const { return mData.size(); }
 
 	/// Get absolute index of most recently written element
 	int pos() const { return mPos; }
@@ -347,10 +347,10 @@ public:
 	bool empty() const { return 0 == mFill; }
 
 	/// Get element at absolute index
-	T& operator[](int i){ return mElems[i]; }
+	T& operator[](int i){ return mData[i]; }
 
 	/// Get element at absolute index (read-only)
-	const T& operator[](int i) const { return mElems[i]; }
+	const T& operator[](int i) const { return mData[i]; }
 
 
 	/// Obtain next element in buffer
@@ -383,12 +383,12 @@ public:
 		return const_cast<RingBuffer*>(this)->readFrom(from,dist);
 	}
 	T& readFrom(int from, int dist){
-		return mElems[wrapOnce(from-dist, size())];
+		return mData[wrapOnce(from-dist, size())];
 	}
 
 	/// \returns reference to newest (last in) element
 	const T& newest() const { return const_cast<RingBuffer*>(this)->newest(); }
-	T& newest(){ return mElems[pos()]; }
+	T& newest(){ return mData[pos()]; }
 
 	/// \returns reference to oldest (first in) element
 	const T& oldest() const { return const_cast<RingBuffer*>(this)->oldest(); }
@@ -413,7 +413,7 @@ public:
 	/// @param[in] n	number of elements
 	/// @param[in] v	initialization value of newly allocated elements
 	void resize(int n, const T& v=T()){
-		mElems.resize(n,v);
+		mData.resize(n,v);
 		if(mPos >=n) mPos = n-1;
 	}
 
@@ -440,11 +440,11 @@ public:
 	};
 
 	/// @param[in] i	start index past oldest element
-	iterator begin(int i=0){ return iterator(&mElems[0], mElems.size(), posOldest(), i); }
-	iterator   end(){ return iterator(&mElems[0], mElems.size(), posOldest(), fill()); }
+	iterator begin(int i=0){ return iterator(&mData[0], mData.size(), posOldest(), i); }
+	iterator   end(){ return iterator(&mData[0], mData.size(), posOldest(), fill()); }
 
 protected:
-	Buffer<T> mElems;
+	Buffer<T> mData;
 	int mPos;
 	int mFill = 0;
 
@@ -476,34 +476,34 @@ public:
 	/// Get number of elements
 	static int size(){ return N; }
 
-	/// Get pointer to elements (read-only)
-	const T * elems() const { return &mElems[0]; }
+	/// Get pointer to data (read-only)
+	const T * data() const { return mData; }
 
-	/// Get pointer to elements
-	T * elems(){ return &mElems[0]; }
+	/// Get pointer to data
+	T * data(){ return mData; }
 
 	/// Get reference to element at index
-	T& operator[](int i){ return mElems[i];}
+	T& operator[](int i){ return mData[i];}
 
 	/// Get reference to element at index (read-only)
-	const T& operator[](int i) const { return mElems[i]; }
+	const T& operator[](int i) const { return mData[i]; }
 
 
 	/// Push new element onto buffer. Newest element is at index 0.
 	void operator()(const T& v){
-		for(int i=N-1; i>0; --i) mElems[i] = mElems[i-1];
-		mElems[0]=v;
+		for(int i=N-1; i>0; --i) mData[i] = mData[i-1];
+		mData[0]=v;
 	}
 
 
 	/// Set all elements to argument
-	void assign(const T& v){ for(int i=0;i<N;++i) mElems[i]=v; }
+	void assign(const T& v){ for(int i=0;i<N;++i) mData[i]=v; }
 
 	/// Zero bytes of all elements
-	void zero(){ memset(mElems, 0, N * sizeof(T)); }
+	void zero(){ memset(mData, 0, N * sizeof(T)); }
 
 protected:
-	T mElems[N];
+	T mData[N];
 };
 
 /// @} // end allocore group
