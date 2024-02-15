@@ -382,10 +382,7 @@ public:
 		assignFromTexCoord<Trgba>(onPixel, width(), height());
 	}
 
-	/// Flags resubmission of pixel data upon next bind
-
-	/// Calling this ensures that pixels get submitted on the next bind().
-	///
+	/// Flags resubmission of any client-side pixel data upon next bind
 	Texture& dirty(){ mPixelsUpdated=true; return *this; }
 
 	/// Submit the texture to GPU using an Array as source
@@ -450,6 +447,17 @@ public:
 
 	/// Deallocate any allocated client-side memory
 	Texture& deallocate();
+
+	/// Reference client-side texture memory
+
+	/// If the referenced data changes, you must call dirty() to update the
+	/// remote buffer.
+	template <class T>
+	Texture& ref(T * src, unsigned w, unsigned h, unsigned d, Graphics::Format fmt);
+	template <class T>
+	Texture& ref(T * src, unsigned w, Graphics::Format fmt);
+	template <class T>
+	Texture& ref(T * src, unsigned w, unsigned h, Graphics::Format fmt);
 
 	/// Copy pixels from server into client-side memory (calling allocate() if necessary)
 	Texture& getRemoteData();
@@ -540,8 +548,7 @@ template <class T>
 Texture& Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format fmt){
 	type(Graphics::toDataType<T>());
 	format(fmt);
-	resize(w, h, d);
-	deriveTarget();
+	resize(w, h, d); // will derive target (1D, 2D or 3D)
 	allocate();
 	memcpy(mArray.data.ptr, src, mArray.size());
 	return *this;
@@ -563,6 +570,27 @@ Texture& Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, un
 		Graphics::LUMINANCE, Graphics::LUMINANCE_ALPHA, Graphics::RGB, Graphics::RGBA
 	};
 	if(1 <= c && c <= 4) allocate(src, w,h,d, fmts[c-1]);
+	return *this;
+}
+
+template <class T>
+Texture& Texture::ref(T * src, unsigned w, Graphics::Format fmt){
+	return ref(src, w,0,0, fmt);
+}
+
+template <class T>
+Texture& Texture::ref(T * src, unsigned w, unsigned h, Graphics::Format fmt){
+	return ref(src, w,h,0, fmt);
+}
+
+template <class T>
+Texture& Texture::ref(T * src, unsigned w, unsigned h, unsigned d, Graphics::Format fmt){
+	mArray.ref(src, Graphics::numComponents(fmt), w, h);
+	type(Graphics::toDataType<T>());
+	format(fmt);
+	resize(w, h, d); // will derive target (1D, 2D or 3D)
+	dirty();
+	//mArrayDirty = true; // not necessary since we configure everything here
 	return *this;
 }
 
