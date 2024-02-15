@@ -51,7 +51,10 @@ class Screenshot{
 public:
 
 	/// Set directory for output file (must include trailing slash)
-	Screenshot& path(const std::string& v){ mPath=v; return *this; }
+	Screenshot& dir(const std::string& v){ mDir=v; return *this; }
+
+	/// Get output directory
+	const std::string& dir() const { return mDir; }
 
 	/// Set format of image file
 	//Screenshot& imageFormat(const std::string& ext){ mExt=ext; return *this; }
@@ -60,7 +63,8 @@ public:
 
 	/// @param[in] w			width of capture, in pixels
 	/// @param[in] h			height of capture, in pixels
-	/// @param[in] filePath		if not empty, the file path to the saved image
+	/// @param[in] filePath		if not empty, the file path to the saved image;
+	///							if empty, an automatically generated file under dir()
 	/// \returns whether the save was successful
 	bool save(unsigned w, unsigned h, const std::string& filePath="");
 
@@ -68,7 +72,8 @@ public:
 
 	/// @param[in] rect			dimensions of capture;
 	///							any object with width() and height() member functions
-	/// @param[in] filePath		if not empty, the file path to the saved image
+	/// @param[in] filePath		if not empty, the file path to the saved image;
+	///							if empty, an automatically generated file under dir()
 	/// \returns whether the save was successful
 	template <class Rect>
 	bool save(const Rect& rect, const std::string& filePath=""){
@@ -77,13 +82,14 @@ public:
 
 	/// Save screen pixels in curent viewport to an image file
 
-	/// @param[in] filePath		if not empty, the file path to the saved image
+	/// @param[in] filePath		if not empty, the file path to the saved image;
+	///							if empty, an automatically generated file under dir()
 	/// \returns whether the save was successful
 	bool save(const std::string& filePath="");
 
 private:
 	std::string mExt = "tga";
-	std::string mPath = "";
+	std::string mDir = "";
 };
 
 } // al::

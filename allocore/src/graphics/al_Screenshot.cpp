@@ -9,7 +9,7 @@ namespace al{
 bool Screenshot::save(unsigned w, unsigned h, const std::string& filePath){
 	auto derivedFilePath = filePath;
 	if(derivedFilePath.empty()){
-		derivedFilePath = mPath + "screenshot_" + timecodeNow("D_HMS") + "." + mExt;
+		derivedFilePath = mDir + "screenshot_" + timecodeNow("D_HMS") + "." + mExt;
 	}
 
 	std::ofstream fs(derivedFilePath, std::ofstream::out | std::ofstream::binary);
