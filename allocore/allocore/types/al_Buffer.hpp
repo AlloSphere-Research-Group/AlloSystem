@@ -248,9 +248,9 @@ public:
 			if(newSize > capacity()){
 				T* oldData = mData;
 				alloc(newSize);
-				for (size_t i = 0, iExp = 0; i < size(); i++, iExp+=n){
+				for(size_t i = 0, iExp = 0; i < size(); i++, iExp+=n){
 					mData[iExp] = std::move(oldData[i]);
-					for (size_t j = 1; j < n; j++){
+					for(size_t j = 1; j < n; j++){
 						if(dup)	new(mData+(iExp +j)) value_type(mData[iExp]);
 						else	new(mData+(iExp +j)) value_type();
 					}
@@ -258,8 +258,8 @@ public:
 				delete[] oldData;
 			}
 			else{
-				for (size_t i = size()-1, iExp = newSize-1; i != static_cast<size_t>(-1); i--){
-					for (size_t k = 0; k < n; k++, iExp--){
+				for(size_t i = size()-1, iExp = newSize-1; i != static_cast<size_t>(-1); i--){
+					for(size_t k = 0; k < n; k++, iExp--){
 						if(k==n-1 || dup)	new(mData+iExp) value_type(mData[i]);
 						else				new(mData+iExp) value_type();
 					}
@@ -283,6 +283,8 @@ private:
 		else{ mEnd = mData + tmpSize; }
 	}
 };
+
+
 
 /// Ring buffer
 
@@ -420,6 +422,9 @@ public:
 	/// @param[in] i	start index past oldest element
 	iterator begin(int i=0){ return iterator(&mData[0], mData.size(), posOldest(), i); }
 	iterator   end(){ return iterator(&mData[0], mData.size(), posOldest(), fill()); }
+
+	const T * data() const { return mData.data(); }
+	T * data(){ return mData.data(); }
 
 protected:
 	Buffer<T> mData;
