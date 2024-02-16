@@ -136,6 +136,29 @@ public:
 	/// Set stop time to current time
 	Timer& stop(){ mStop = getTime(); return *this; }
 
+	/// Time a function
+
+	/// @param[in] blockSize	number of function calls within one timing block
+	/// @param[in] trials		number of blocks to trial to get lowest time
+	/// @param[in] func			function to time, takes call count as input
+	///							(to vary function arguments)
+	///
+	/// \returns the lowest time in nanoseconds to execute one block
+	template <class Func>
+	al_nsec timeFunc(int blockSize, int trials, const Func& func){
+		auto bestTime = al_nsec(1)<<(sizeof(al_nsec)*8-2); // a big value
+		for(int j=0; j<trials; ++j){
+			start();
+			for(int i=0; i<blockSize; ++i){
+				volatile auto res = func(i);
+			}
+			stop();
+			auto time = elapsed();
+			if(time < bestTime) bestTime = time;
+		}
+		return bestTime;
+	}
+
 	/// Print current elapsed time
 	void print() const;
 
@@ -143,6 +166,26 @@ private:
 	al_nsec mStart=0, mStop=0;	// start and stop times
 	static al_nsec getTime(){ return al_steady_time_nsec(); }
 };
+
+
+/// Helper macro to print timing of an expression
+
+/// @param[in] blockSize	size of test block
+/// @param[in] trials		number of blocks to measure for lowest time
+/// @param[in] unit			'n' for nanoseconds,
+///							'u' for microseconds,
+///							'm' for milliseconds
+/// @param[in] ...			expression to time
+#define AL_PRINT_EXPR_TIME(blockSize, trials, unit, ...){\
+	unsigned long unitDiv = 1;\
+	const char * unitStr = "ns";\
+	switch(unit){\
+	case 'u': unitDiv=   1000; unitStr="us"; break;\
+	case 'm': unitDiv=1000000; unitStr="ms"; break;\
+	default:;\
+	}\
+	std::cout << #__VA_ARGS__ ": " << Timer().timeFunc(blockSize,trials, [&](int i){ return __VA_ARGS__; })/unitDiv << " " << unitStr << "\n";\
+}
 
 
 /// Interval timer
