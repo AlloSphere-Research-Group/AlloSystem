@@ -67,9 +67,12 @@ inline static uint32_t seed(){
 	return val = val*1664525UL + 1013904223UL;
 }
 
+#ifndef AL_DEFAULT_RNG
+#define AL_DEFAULT_RNG al::rnd::Tausworthe
+#endif
 
 /// Random distribution generator
-template <class RNG=al::rnd::Tausworthe>
+template <class RNG=AL_DEFAULT_RNG>
 class Random{
 public:
 
@@ -420,8 +423,7 @@ private:
 /// Combined Tausworthe uniform pseudo-random number generator.
 
 /// This generator produces highly random numbers, but is more expensive than
-/// than a linear congruential RNG.
-/// It is based on the paper
+/// than a linear congruential RNG. It is based on the paper
 /// P. L'Ecuyer, "Maximally Equidistributed Combined Tausworthe Generators",
 /// Mathematics of Computation, 65, 213 (1996), 203--213.
 /// http://www.iro.umontreal.ca/~lecuyer/papers.html
@@ -629,4 +631,3 @@ void Random<RNG>::shuffle(T * arr, uint32_t len){
 } // al::rnd::
 } // al::
 #endif
-
