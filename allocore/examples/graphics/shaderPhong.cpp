@@ -92,7 +92,7 @@ public:
 		g.light().dir(1,1,1);
 
 		// Render
-		shader.scope([&](){
+		shader.scope([&](auto&){
 			g.pushMatrix();
 			g.rotate(angle  , 1,0,0);
 			g.rotate(angle*8, 0,1,0);

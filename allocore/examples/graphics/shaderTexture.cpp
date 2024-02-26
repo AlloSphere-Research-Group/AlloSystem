@@ -49,7 +49,7 @@ public:
 
 	void onDraw(Graphics& g) override {
 		
-		shader.scope([&](){
+		shader.scope([&](auto&){
 			tex.bind();
 			auto& m = g.mesh();
 			m.reset().triangleStrip();

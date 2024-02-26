@@ -125,7 +125,7 @@ public:
 
 		g.blendAdd();
 
-		shader.scope([&](){
+		shader.scope([&](auto&){
 			tex.bind();
 				shader.uniform("spriteRadius", 1./N);
 				g.matrixScope([&](){

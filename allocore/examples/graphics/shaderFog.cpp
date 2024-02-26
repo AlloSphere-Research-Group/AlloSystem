@@ -89,7 +89,7 @@ public:
 		g.fog(lens().far(), lens().near()+2, background());
 
 		// Render
-		shader.scope([&](){
+		shader.scope([&](auto&){
 			shader.uniform("fogCurve", 4*cos(8*phase*6.2832));
 			g.draw(geom);
 		});
