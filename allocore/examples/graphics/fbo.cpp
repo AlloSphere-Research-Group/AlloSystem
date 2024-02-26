@@ -44,7 +44,7 @@ struct MyApp : App {
 
 	void onDraw(Graphics& g) override {
 
-		fbo.begin();
+		fbo.bind();
 			// capture green-world to texture:
 			g.viewport(0, 0, fbotex.width(), fbotex.height());
 			g.clearColor(0, 0.5, 0, 0);
@@ -59,7 +59,7 @@ struct MyApp : App {
 				g.vertex(rnd::uniformS()*0.5, rnd::uniformS()*0.5, -5);
 				g.vertex(rnd::uniformS()*0.5, rnd::uniformS()*0.5, -5);
 			g.end();
-		fbo.end();
+		fbo.unbind();
 
 		// generation of Mipmaps must be done manually for FBO-bound textures:
 		// (to see why, comment this code out and then make the window very small).
