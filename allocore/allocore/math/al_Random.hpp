@@ -56,7 +56,7 @@ namespace al {
 namespace rnd{
 
 class LinCon;
-class MulLinCon;
+class MulCon;
 class Tausworthe;
 template<class RNG> class Random;
 
@@ -376,16 +376,16 @@ private:
 /// quality (less "random") results than LinCon. Because of this, it is really
 /// not appropriate for simulations, but due to its speed it is very useful for
 /// synthesizing noise for audio and graphics.
-class MulLinCon{
+class MulCon{
 public:
 	/// Default constructor uses a randomly generated seed
-	MulLinCon(){
+	MulCon(){
 		seed(al::rnd::seed());
 		type(0);
 	}
 
 	/// @param[in] seed	Initial seed value
-	MulLinCon(uint32_t seed)
+	MulCon(uint32_t seed)
 	:	mVal(seed)
 	{	type(0); }
 
