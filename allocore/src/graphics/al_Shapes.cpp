@@ -52,24 +52,42 @@ int addCuboid(Mesh& m, float rx, float ry, float rz){
 	4 5       l +--r
 	6 7       f b       */
 
-	int Nv = 8;
-	m.vertex(-rx, ry,-rz);	m.vertex( rx, ry,-rz);
-	m.vertex(-rx,-ry,-rz);	m.vertex( rx,-ry,-rz);
-	m.vertex(-rx, ry, rz);	m.vertex( rx, ry, rz);
-	m.vertex(-rx,-ry, rz);	m.vertex( rx,-ry, rz);
+	if(m.wants(Mesh::NORMAL | Mesh::TEXCOORD)){
+		Mesh::Vertex v[2][2][2] = {
+			{
+				{{-rx,-ry,-rz}, { rx,-ry,-rz}},
+				{{-rx, ry,-rz}, { rx, ry,-rz}}
+			},{
+				{{-rx,-ry, rz}, { rx,-ry, rz}},
+				{{-rx, ry, rz}, { rx, ry, rz}}
+			}
+		}; // index as [z][y][x]
 
-	static const int indices[] = {
+		addQuad(m, v[0][0][1], v[0][0][0], v[0][1][0], v[0][1][1]); // back
+		addQuad(m, v[1][0][0], v[1][0][1], v[1][1][1], v[1][1][0]); // front
+		addQuad(m, v[0][0][0], v[1][0][0], v[1][1][0], v[0][1][0]); // left
+		addQuad(m, v[1][0][1], v[0][0][1], v[0][1][1], v[1][1][1]); // right
+		addQuad(m, v[0][0][0], v[0][0][1], v[1][0][1], v[1][0][0]); // bottom
+		addQuad(m, v[1][1][0], v[1][1][1], v[0][1][1], v[0][1][0]); // top
+
+		return 4*6;
+	}
+	
+	m.indexRel(
 		6,5,4, 6,7,5, // front
 		7,1,5, 7,3,1, // right
 		3,0,1, 3,2,0, // back
 		2,4,0, 2,6,4, // left
 		4,1,0, 4,5,1, // top
 		2,3,6, 3,7,6  // bottom
-	};
+	);
 
-	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
+	m.vertex(-rx, ry,-rz); m.vertex( rx, ry,-rz);
+	m.vertex(-rx,-ry,-rz); m.vertex( rx,-ry,-rz);
+	m.vertex(-rx, ry, rz); m.vertex( rx, ry, rz);
+	m.vertex(-rx,-ry, rz); m.vertex( rx,-ry, rz);
 
-	return Nv;
+	return 8;
 }
 
 
@@ -545,7 +563,15 @@ int addQuad(Mesh& m,
 ){
 	m.triangles();
 	m.indexRel(0,1,3, 3,1,2);
-	m.vertex(x1,y1,z1).vertex(x2,y2,z2).vertex(x3,y3,z3).vertex(x4,y4,z4);
+	Mesh::Vertex a(x1,y1,z1), b(x2,y2,z2), c(x3,y3,z3), d(x4,y4,z4);
+	m.vertex(a).vertex(b).vertex(c).vertex(d);
+	if(m.wants(Mesh::NORMAL)){
+		auto N = normalize(cross(b-a, c-a));
+		m.normalFill(N);
+	}
+	if(m.wants(Mesh::TEXCOORD)){
+		m.texCoord(0,0).texCoord(1,0).texCoord(1,1).texCoord(0,1);
+	}
 	return 4;
 }
 
