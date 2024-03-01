@@ -121,7 +121,6 @@ int addIcosphere(Mesh& m, double radius=1, int divisions=2);
 /// @param[in]		stacks	Number of stacks on xy plane
 /// \returns number of vertices added
 int addSphere(Mesh& m, double radius=1, int slices=16, int stacks=16);
-int addSphereWithTexcoords(Mesh& m, double radius=1, int bands=16 );
 
 
 /// Add wireframe box as indexed lines
