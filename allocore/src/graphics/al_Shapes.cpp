@@ -289,6 +289,12 @@ int addIcosphere(Mesh& m, double radius, int divisions){
 	int Nv = m.vertices().size();
 	addIcosahedron(m, radius);
 	subdivide(m, divisions, true);
+	if(m.wants(Mesh::NORMAL) && m.normals().size() < m.vertices().size()){
+		auto scale = radius>0. ? 1./radius : 1.;
+		for(int i=Nv; i<m.vertices().size(); ++i){
+			m.normal(m.vertices()[i]*scale);
+		}
+	}
 	return m.vertices().size() - Nv;
 }
 
