@@ -320,10 +320,10 @@ protected:
 	auto V = [&](){ return Vs()*0.5+0.5; };			/* flipped triangle in [ 0,1] */
 
 
-/// Linear congruential uniform pseudo-random number generator.
+/// Linear congruential uniform pseudo-random number generator
 
 ///	This generator is very fast requiring only a single integer multiply and add
-/// per iteration.  However, the least significant bits of the numbers are less
+/// per iteration. The period is 2^32. The least significant bits are less
 /// random; the most extreme case being the LSB which at best flips between
 /// 0 and 1. This generator also exhibits poor dimensional distribution,
 /// therefore it is best to have a different generator for each dimension,
@@ -369,13 +369,11 @@ private:
 
 
 
-/// Multiplicative linear congruential uniform pseudo-random number generator.
+/// Multiplicative linear congruential uniform pseudo-random number generator
 
 ///	This generator is faster than LinCon requiring only a single integer
-/// multiply per iteration. However, the downside is that it produces lower
-/// quality (less "random") results than LinCon. Because of this, it is really
-/// not appropriate for simulations, but due to its speed it is very useful for
-/// synthesizing noise for audio and graphics.
+/// multiply per iteration. However, it produces lower quality (less "random")
+/// results than LinCon and has a smaller (optimal) period of 2^30.
 class MulCon{
 public:
 	/// Default constructor uses a randomly generated seed
@@ -420,10 +418,11 @@ private:
 
 
 
-/// Combined Tausworthe uniform pseudo-random number generator.
+/// Combined Tausworthe uniform pseudo-random number generator
 
 /// This generator produces highly random numbers, but is more expensive than
-/// than a linear congruential RNG. It is based on the paper
+/// than a linear congruential RNG. The period is ~2^113. The operating
+/// principle is a combination of linear feedback shift registers. From
 /// P. L'Ecuyer, "Maximally Equidistributed Combined Tausworthe Generators",
 /// Mathematics of Computation, 65, 213 (1996), 203--213.
 /// http://www.iro.umontreal.ca/~lecuyer/papers.html
@@ -431,25 +430,39 @@ class Tausworthe{
 public:
 
 	/// Default constructor uses a randomly generated seed
-	Tausworthe();
+	Tausworthe(){ seed(al::rnd::seed()); }
 
-	/// @param[in] seed		Initial seed value
-	Tausworthe(uint32_t seed);
-
+	/// @param[in] s		Initial seed value
+	Tausworthe(uint32_t s){ seed(sd); }
 
 	/// Generate next uniform random integer in [0, 2^32)
-	uint32_t operator()();
+	uint32_t operator()(){
+		s1 = ((s1 & 0xfffffffe) << 18) ^ (((s1 <<  6) ^ s1) >> 13);
+		s2 = ((s2 & 0xfffffff8) <<  2) ^ (((s2 <<  2) ^ s2) >> 27);
+		s3 = ((s3 & 0xfffffff0) <<  7) ^ (((s3 << 13) ^ s3) >> 21);
+		s4 = ((s4 & 0xffffff80) << 13) ^ (((s4 <<  3) ^ s4) >> 12);
+		return s1 ^ s2 ^ s3 ^ s4;
+	}
 
 	/// Set seed
-	void seed(uint32_t v);
+	void seed(uint32_t v){
+		al::rnd::LinCon g(v);
+		g();
+		seed(g(), g(), g(), g());
+	}
 
 	/// Set seed
-	void seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4);
+	void seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4){
+		s1 = v1 & 0xffffffe ? v1 : ~v1;
+		s2 = v2 & 0xffffff8 ? v2 : ~v2;
+		s3 = v3 & 0xffffff0 ? v3 : ~v3;
+		s4 = v4 & 0xfffff80 ? v4 : ~v4;
+	}
 
 private:
 	uint32_t s1, s2, s3, s4;
-	void iterate();
 };
+
 
 
 /// Get global random number generator
@@ -535,36 +548,6 @@ Array shuffle(const Array& a){ return global().shuffle(a); }
 
 
 // Implementation
-
-inline Tausworthe::Tausworthe(){ seed(al::rnd::seed()); }
-inline Tausworthe::Tausworthe(uint32_t sd){ seed(sd); }
-
-inline uint32_t Tausworthe::operator()(){
-	iterate();
-	return s1 ^ s2 ^ s3 ^ s4;
-}
-
-inline void Tausworthe::seed(uint32_t v){
-	al::rnd::LinCon g(v);
-	g();
-	seed(g(), g(), g(), g());
-}
-
-inline void Tausworthe::seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4){
-	//printf("%u %u %u %u\n", v1, v2, v3, v4);
-	v1 & 0xffffffe ? s1 = v1 : s1 = ~v1;
-	v2 & 0xffffff8 ? s2 = v2 : s2 = ~v2;
-	v3 & 0xffffff0 ? s3 = v3 : s3 = ~v3;
-	v4 & 0xfffff80 ? s4 = v4 : s4 = ~v4;
-}
-
-inline void Tausworthe::iterate(){
-	s1 = ((s1 & 0xfffffffe) << 18) ^ (((s1 <<  6) ^ s1) >> 13);
-	s2 = ((s2 & 0xfffffff8) <<  2) ^ (((s2 <<  2) ^ s2) >> 27);
-	s3 = ((s3 & 0xfffffff0) <<  7) ^ (((s3 << 13) ^ s3) >> 21);
-	s4 = ((s4 & 0xffffff80) << 13) ^ (((s4 <<  3) ^ s4) >> 12);
-}
-
 
 template <class RNG>
 template <int N, class T>
