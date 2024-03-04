@@ -432,8 +432,8 @@ public:
 	/// Default constructor uses a randomly generated seed
 	Tausworthe(){ seed(al::rnd::seed()); }
 
-	/// @param[in] s		Initial seed value
-	Tausworthe(uint32_t s){ seed(sd); }
+	/// @param[in] seed		Initial seed value
+	Tausworthe(uint32_t seed){ this->seed(seed); }
 
 	/// Generate next uniform random integer in [0, 2^32)
 	uint32_t operator()(){
