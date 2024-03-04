@@ -382,7 +382,7 @@ public:
 		type(0);
 	}
 
-	/// @param[in] seed	Initial seed value
+	/// @param[in] seed		Initial seed value
 	MulCon(uint32_t seed)
 	:	mVal(seed)
 	{	type(0); }
