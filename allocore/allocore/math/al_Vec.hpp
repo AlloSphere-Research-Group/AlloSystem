@@ -257,6 +257,14 @@ public:
 		return const_cast<Vec*>(this)->at<i>();
 	}
 
+	/// Get element using unit domain rather than index
+
+	/// @param[in] v	Location in [0,1).
+	///					The element index is computed from floor(v N).
+	///					For efficiency, no bounds checking is performed.
+	T& at01(float v){ return at(int(v*float(N))); }
+	const T& at01(float v) const { return const_cast<Vec*>(this)->at01(v); }
+
 	/// Access first element
 	T& front(){ return at<0>(); }
 	const T& front() const { return const_cast<Vec*>(this)->front(); }
