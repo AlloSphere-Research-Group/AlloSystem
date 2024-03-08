@@ -162,6 +162,10 @@ std::map<const Mesh *, std::unique_ptr<GPUMesh>> gpuMeshes;
 //std::map<const MeshNew *, GPUMesh *> gpuMeshes;
 GPUMesh * currentGPUMesh = NULL;
 
+void Graphics::Backend::draw(const Mesh& m, int count, int begin){
+	draw(RawMeshData(m, count, begin));
+}
+
 
 #ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 
@@ -180,29 +184,33 @@ public:
 		g.material(); // touch so shader uniforms get inited
 	}
 
-	void enable(Capability v){
+	void enable(Capability v) override {
 		switch(v){
 		case FOG: mGraphics.mDoFog=true; mGraphics.mFog.update(); break;
 		case LIGHTING: mGraphics.mDoLighting=true; break;
 		default: glEnable(v);
 		}
 	}
-	void disable(Capability v){
+	void disable(Capability v) override {
 		switch(v){
 		case FOG: mGraphics.mDoFog=false; mGraphics.mFog.update(); break;
 		case LIGHTING: mGraphics.mDoLighting=false; break;
 		default: glDisable(v);
 		}
 	}
-	void currentColor(float r, float g, float b, float a){
+	void currentColor(float r, float g, float b, float a) override {
 		mCurrentColor.set(r,g,b,a);
 	}
 
-	const Mat4f& modelView() const { return mMatrixStacks[MODELVIEW].get().top(); }
-	const Mat4f& projection() const { return mMatrixStacks[PROJECTION].get().top(); }
+	const Mat4f& modelView() const override {
+		return mMatrixStacks[MODELVIEW].get().top();
+	}
+	const Mat4f& projection() const override {
+		return mMatrixStacks[PROJECTION].get().top();
+	}
 
-	void matrixMode(MatrixMode mode){ mMatrixMode=mode; }
-	void pushMatrix(){
+	void matrixMode(MatrixMode mode) override { mMatrixMode=mode; }
+	void pushMatrix() override {
 		//printf("push %s (%d/%d)\n", mMatrixMode==MODELVIEW?"MV":"Proj", (int)currentMatrixStack().get().size(), (int)maxStackSize(mMatrixMode));
 		if(currentMatrixStack().get().size() < maxStackSize(mMatrixMode)){
 			currentMatrixStack().var().emplace(currentMatrix());
@@ -210,30 +218,29 @@ public:
 			AL_WARN_ONCE("%s matrix stack overflow", mMatrixMode==MODELVIEW?"MV":"Proj");
 		}
 	}
-	void popMatrix(){
+	void popMatrix() override {
 		if(currentMatrixStack().get().size() > 1){
 			currentMatrixStack().var().pop();
 		} else {
 			AL_WARN_ONCE("%s matrix stack underflow", mMatrixMode==MODELVIEW?"MV":"Proj");
 		}
 	}
-	void loadIdentity(){ currentMatrix().setIdentity(); }
-	void loadMatrix(const Mat4d& m){ currentMatrix() = m; }
-	void loadMatrix(const Mat4f& m){ currentMatrix() = m; }
-	void multMatrix(const Mat4d& m){ currentMatrix() *= m; }
-	void multMatrix(const Mat4f& m){ currentMatrix() *= m; }
-	void translate(float x, float y, float z){
+	void loadIdentity() override { currentMatrix().setIdentity(); }
+	void loadMatrix(const Mat4d& m) override { currentMatrix() = m; }
+	void loadMatrix(const Mat4f& m) override { currentMatrix() = m; }
+	void multMatrix(const Mat4d& m) override { currentMatrix() *= m; }
+	void multMatrix(const Mat4f& m) override { currentMatrix() *= m; }
+	void translate(float x, float y, float z) override {
 		multMatrix(Mat4f::translation(x,y,z));
 	}
-	void rotate(float angle, float x, float y, float z){
+	void rotate(float angle, float x, float y, float z) override {
 		multMatrix(Mat4f::rotation(angle*0.01745329251994, Vec3f(x,y,z).normalize()));
 	}
-	void scale(float s){ scale(s,s,s); }
-	void scale(float x, float y, float z){
+	void scale(float x, float y, float z) override {
 		multMatrix(Mat4f::scaling(x,y,z));
 	}
 
-	void pointSize(float v){ mPointSize = v; }
+	void pointSize(float v) override { mPointSize = v; }
 	//void pointAtten(float c2, float c1, float c0){}
 
 	// Compile/link shader once and return whether successful
@@ -520,7 +527,7 @@ R"(
 		return mAttribLocs.pos;
 	}
 
-	bool prepareDraw(){
+	bool prepareDraw() override {
 
 		// If using custom shader, just return
 		if(&mShader != mDrawShader) return true;
@@ -635,7 +642,7 @@ R"(
 		return true;
 	}
 
-	void draw(const RawMeshData& m){
+	void draw(const RawMeshData& m) override {
 
 		DRAW_BEGIN;
 
@@ -730,10 +737,6 @@ R"(
 		if(hasTxc) glDisableVertexAttribArray(mAttribLocs.txc());
 	}
 
-	void draw(const Mesh& m, int count, int begin){
-		draw(RawMeshData(m,count,begin));
-	}
-
 protected:
 	friend class Graphics;
 	typedef ShaderData<std::stack<Mat4f>> MatrixStack;
@@ -789,7 +792,7 @@ public:
 	:	Graphics::Backend(g)
 	{}
 
-	void enable(Capability v){
+	void enable(Capability v) override {
 		switch(v){
 		case FOG:				glEnable(GL_FOG); break;
 		case LIGHTING:			glEnable(GL_LIGHTING); break;
@@ -797,7 +800,7 @@ public:
 		default:				glEnable(v);
 		}
 	}
-	void disable(Capability v){
+	void disable(Capability v) override {
 		switch(v){
 		case FOG:				glDisable(GL_FOG); break;
 		case LIGHTING:
@@ -809,47 +812,47 @@ public:
 		default:				glDisable(v);
 		}
 	}
-	void currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
-	void pointSize(float v){ glPointSize(v); }
+	void currentColor(float r, float g, float b, float a) override { glColor4f(r,g,b,a); }
+	void pointSize(float v) override { glPointSize(v); }
 
-	const Mat4f& modelView() const {
+	const Mat4f& modelView() const override {
 		glGetFloatv(GL_MODELVIEW_MATRIX, &mModelViewTemp[0]);
 		return mModelViewTemp;
 	}
-	const Mat4f& projection() const { 
+	const Mat4f& projection() const override { 
 		glGetFloatv(GL_PROJECTION_MATRIX, &mProjectionTemp[0]);
 		return mProjectionTemp;
 	}
 	
-	void matrixMode(MatrixMode mode){
+	void matrixMode(MatrixMode mode) override {
 		switch(mode){
 		case MODELVIEW:		glMatrixMode(GL_MODELVIEW); break;
 		case PROJECTION:	glMatrixMode(GL_PROJECTION); break;
 		default:			glMatrixMode(mode); break;
 		}
 	}
-	void pushMatrix(){ glPushMatrix(); }
-	void popMatrix(){ glPopMatrix(); }
-	void loadIdentity(){ glLoadIdentity(); }
-	void loadMatrix(const Mat4f& m){ glLoadMatrixf(m.elems()); }
-	void multMatrix(const Mat4f& m){ glMultMatrixf(m.elems()); }
+	void pushMatrix() override { glPushMatrix(); }
+	void popMatrix() override { glPopMatrix(); }
+	void loadIdentity() override { glLoadIdentity(); }
+	void loadMatrix(const Mat4f& m) override { glLoadMatrixf(m.elems()); }
+	void multMatrix(const Mat4f& m) override { glMultMatrixf(m.elems()); }
 		#ifdef AL_GRAPHICS_SUPPORTS_DOUBLE
-		void loadMatrix(const Mat4d& m){ glLoadMatrixd(m.elems()); }
-		void multMatrix(const Mat4d& m){ glMultMatrixd(m.elems()); }
+		void loadMatrix(const Mat4d& m) override { glLoadMatrixd(m.elems()); }
+		void multMatrix(const Mat4d& m) override { glMultMatrixd(m.elems()); }
 		#else
-		void loadMatrix(const Mat4d& m){ loadMatrix(Mat4f(m)); }
-		void multMatrix(const Mat4d& m){ multMatrix(Mat4f(m)); }
+		void loadMatrix(const Mat4d& m) override { loadMatrix(Mat4f(m)); }
+		void multMatrix(const Mat4d& m) override { multMatrix(Mat4f(m)); }
 		#endif
-	void translate(float x, float y, float z){ glTranslatef(x,y,z); }
-	void rotate(float angle, float x, float y, float z){ glRotatef(angle,x,y,z); }
-	void scale(float s){
+	void translate(float x, float y, float z) override { glTranslatef(x,y,z); }
+	void rotate(float angle, float x, float y, float z) override { glRotatef(angle,x,y,z); }
+	void scale(float s) override {
 		if(mRescaleNormal < 1){
 			mRescaleNormal = 1;
 			enable(RESCALE_NORMAL);
 		}
 		glScalef(s, s, s);
 	}
-	void scale(float x, float y, float z){
+	void scale(float x, float y, float z) override {
 		if(mRescaleNormal < 3){
 			mRescaleNormal = 3;
 			disable(RESCALE_NORMAL);
@@ -857,12 +860,12 @@ public:
 		}
 		glScalef(x, y, z);
 	}
-	void pointAtten(float c2, float c1, float c0){
+	void pointAtten(float c2, float c1, float c0) override {
 		GLfloat att[3] = {c0, c1, c2};
 		glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
 	}
 
-	bool prepareDraw(){
+	bool prepareDraw() override {
 		auto& mLights = mGraphics.mLights;
 		auto& mMaterials = mGraphics.mMaterials;
 		auto& mFog = mGraphics.mFog;
@@ -914,7 +917,7 @@ public:
 		return true;
 	}
 
-	void draw(const RawMeshData& m){
+	void draw(const RawMeshData& m) override {
 
 		DRAW_BEGIN;
 
@@ -986,10 +989,6 @@ public:
 		if(m.Nn)					glDisableClientState(GL_NORMAL_ARRAY);
 		if(m.Nc || m.Nci)			glDisableClientState(GL_COLOR_ARRAY);
 		if(m.Nt1 || m.Nt2 || m.Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	}
-
-	void draw(const Mesh& m, int count, int begin){
-		draw(RawMeshData(m, count, begin));
 	}
 
 private:

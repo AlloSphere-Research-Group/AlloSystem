@@ -686,9 +686,7 @@ protected:
 
 		virtual bool prepareDraw(){ return true; }
 		virtual void draw(const RawMeshData& m){}
-		virtual void draw(const Mesh& m, int count=-1, int begin=0){}
-
-		virtual void drawVertexBuffer(){}
+		void draw(const Mesh& m, int count=-1, int begin=0);
 
 	protected:
 		Graphics& mGraphics;
@@ -755,7 +753,7 @@ class Drawable {
 public:
 
 	/// Place drawing code here
-	virtual void onDraw(Graphics& gl) = 0;
+	virtual void onDraw(Graphics&) = 0;
 
 	virtual ~Drawable(){}
 };
