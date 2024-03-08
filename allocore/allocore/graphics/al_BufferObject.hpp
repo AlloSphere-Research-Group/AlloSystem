@@ -120,7 +120,7 @@ public:
 	/// @param[in] bufUsage	buffer usage (stream, static, etc.)
 	BufferObject(BufferType bufType = ARRAY_BUFFER, BufferUsage bufUsage = DYNAMIC_DRAW);
 
-	virtual ~BufferObject();
+	~BufferObject() override;
 
 
 	/// Get buffer store size, in bytes
@@ -233,8 +233,8 @@ protected:
 	bool mDataChanged = false;
 	bool mSubDataChanged = false;
 
-	virtual void onCreate();
-	virtual void onDestroy();
+	void onCreate() override;
+	void onDestroy() override;
 	virtual void onAction(){};
 };
 
@@ -248,7 +248,7 @@ public:
 	static void disable();
 
 protected:
-	virtual void onAction();
+	void onAction() override;
 };
 
 
@@ -261,7 +261,7 @@ public:
 	static void disable();
 
 protected:
-	virtual void onAction();
+	void onAction() override;
 };
 
 #ifdef AL_GRAPHICS_SUPPORTS_PBO
@@ -271,7 +271,7 @@ public:
 	PBO(bool packMode, BufferUsage usage=DYNAMIC_DRAW);
 
 protected:
-	virtual void onAction();
+	void onAction() override;
 };
 #endif
 
@@ -296,7 +296,7 @@ protected:
 	Graphics::Primitive mPrim;
 	int mStart=0, mEnd=0, mCount=-1;
 
-	virtual void onAction();
+	void onAction() override;
 };
 
 const char * toString(BufferObject::BufferType v);

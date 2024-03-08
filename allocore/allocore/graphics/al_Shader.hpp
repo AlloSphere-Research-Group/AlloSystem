@@ -99,7 +99,7 @@ public:
 
 	/// This will automatically delete the shader object when it is no longer
 	/// attached to any program object.
-	virtual ~Shader(){ destroy(); }
+	~Shader() override;
 
 	Shader& source(const std::string& v);
 	Shader& source(const std::string& v, Shader::Type type);
@@ -116,11 +116,11 @@ private:
 	Shader::Type mType;
 	void sendSource();
 
-	virtual void get(int pname, void * params) const;
-	virtual void getLog(char * buf) const;
+	void get(int pname, void * params) const override;
+	void getLog(char * buf) const override;
 
-	virtual void onCreate();
-	virtual void onDestroy();
+	void onCreate() override;
+	void onDestroy() override;
 };
 
 
@@ -165,7 +165,7 @@ public:
 	
 
 	/// Any attached shaders will automatically be detached, but not deleted.
-	virtual ~ShaderProgram();
+	~ShaderProgram() override;
 
 
 	/// Attach shader to program
@@ -426,11 +426,11 @@ protected:
 
 	std::string idString() const;
 	
-	virtual void get(int pname, void * params) const;
-	virtual void getLog(char * buf) const;
+	void get(int pname, void * params) const override;
+	void getLog(char * buf) const override;
 
-	virtual void onCreate();
-	virtual void onDestroy();
+	void onCreate() override;
+	void onDestroy() override;
 };
 
 } // ::al

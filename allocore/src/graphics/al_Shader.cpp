@@ -78,7 +78,12 @@ void ShaderProgram::getLog(char * buf) const {
 
 
 Shader::Shader(const std::string& source, Shader::Type type)
-:	mSource(source), mType(type){}
+:	mSource(source), mType(type)
+{}
+
+Shader::~Shader(){
+	destroy();
+}
 
 Shader& Shader::compile(){
 	AL_GRAPHICS_ERROR("(before Shader::compile)", id());

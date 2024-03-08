@@ -231,7 +231,7 @@ public:
 
 
 	Graphics();
-	virtual ~Graphics();
+	~Graphics() override;
 
 
 	/// Get the temporary mesh
@@ -740,8 +740,8 @@ protected:
 	Mesh mMesh;				// used for immediate mode style rendering
 	bool mInImmediateMode;	// flag for whether or not in immediate mode
 
-	virtual void onCreate(); // GPUObject
-	virtual void onDestroy(); // GPUObject
+	void onCreate() override; // GPUObject
+	void onDestroy() override; // GPUObject
 
 public:
 	/// \deprecated

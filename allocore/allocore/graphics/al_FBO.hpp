@@ -180,8 +180,8 @@ public:
 
 protected:
 	int mTarget;
-	virtual void onCreate();
-	virtual void onDestroy();
+	void onCreate() override;
+	void onDestroy() override;
 };
 
 #endif

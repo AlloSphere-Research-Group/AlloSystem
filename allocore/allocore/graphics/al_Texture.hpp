@@ -149,7 +149,7 @@ public:
 	/// Construct a Texture object from an Array header
 	Texture(AlloArrayHeader& header);
 
-	virtual ~Texture();
+	~Texture() override;
 
 
 	/// Set shape (size, format, type, etc.) from array header
@@ -493,8 +493,8 @@ protected:
 	bool mMipmap;
 	bool mTexelClamp=true;
 
-	virtual void onCreate();
-	virtual void onDestroy();
+	void onCreate() override;
+	void onDestroy() override;
 
 	void init();
 	void deriveTarget();

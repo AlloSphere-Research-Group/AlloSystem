@@ -65,11 +65,11 @@ public:
 	void draw(){ glCallList(id()); }
 
 protected:
-	virtual void onCreate(){
+	void onCreate() override {
 		mID = glGenLists(1);
 	}
 
-	virtual void onDestroy(){
+	void onDestroy() override {
 		glDeleteLists(mID, 1);
 	}
 };
