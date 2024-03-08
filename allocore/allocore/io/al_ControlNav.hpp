@@ -58,11 +58,11 @@ public:
 
 	NavInputControl(Nav& nav, float vscale = 0.125, float tscale = 2., float mouseSens=0.3);
 
-	virtual ~NavInputControl(){}
+	~NavInputControl() override {}
 
-	virtual bool onKeyDown(const Keyboard& k) override;
-	virtual bool onKeyUp(const Keyboard& k) override;
-	virtual bool onMouseDrag(const Mouse& m) override;
+	bool onKeyDown(const Keyboard& k) override;
+	bool onKeyUp(const Keyboard& k) override;
+	bool onMouseDrag(const Mouse& m) override;
 
 	Nav& nav(){ return *mNav; }
 	const Nav& nav() const { return *mNav; }
@@ -94,9 +94,9 @@ protected:
 
 class NavInputControlCosm : public NavInputControl {
 public:
-	virtual bool onKeyDown(const Keyboard& k) override;
-	virtual bool onKeyUp(const Keyboard& k) override;
-	virtual bool onMouseDrag(const Mouse& m) override;
+	bool onKeyDown(const Keyboard& k) override;
+	bool onKeyUp(const Keyboard& k) override;
+	bool onMouseDrag(const Mouse& m) override;
 };
 
 /// @} // end allocore group

@@ -86,7 +86,7 @@ struct SceneInputHandler : public InputEventHandler{
 
 	SceneInputHandler(ViewpointWindow& w, App& a): win(w), app(a){}
 
-	bool onKeyDown(const Keyboard& k){
+	bool onKeyDown(const Keyboard& k) override {
 		app.onKeyDown(win, k);
 		switch(k.key()){
 			case Keyboard::TAB:
@@ -96,11 +96,11 @@ struct SceneInputHandler : public InputEventHandler{
 		}
 		return true;
 	}
-	bool onKeyUp(const Keyboard& k){ app.onKeyUp(win,k); return true;}
-	bool onMouseDown(const Mouse& m){ app.onMouseDown(win,m); return true;}
-	bool onMouseUp(const Mouse& m){ app.onMouseUp(win,m); return true;}
-	bool onMouseDrag(const Mouse& m){ app.onMouseDrag(win,m); return true;}
-	bool onMouseMove(const Mouse& m){ app.onMouseMove(win,m); return true;}
+	bool onKeyUp(const Keyboard& k) override { app.onKeyUp(win,k); return true;}
+	bool onMouseDown(const Mouse& m) override { app.onMouseDown(win,m); return true;}
+	bool onMouseUp(const Mouse& m) override { app.onMouseUp(win,m); return true;}
+	bool onMouseDrag(const Mouse& m) override { app.onMouseDrag(win,m); return true;}
+	bool onMouseMove(const Mouse& m) override { app.onMouseMove(win,m); return true;}
 };
 
 // attached to each ViewpointWindow
@@ -110,7 +110,7 @@ struct SceneWindowHandler : public WindowEventHandler{
 
 	SceneWindowHandler(ViewpointWindow& w, App& a): win(w), app(a){}
 
-	bool onCreate(){
+	bool onCreate() override {
 
 		// FIXME: only do this if actually using fixed pipeline
 		#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
@@ -125,10 +125,10 @@ struct SceneWindowHandler : public WindowEventHandler{
 		app.onCreate(win);
 		return true;
 	}
-	bool onDestroy(){ app.onDestroy(win); return true; }
-	bool onResize(int w, int h){ app.onResize(win, w,h); return true; }
+	bool onDestroy() override { app.onDestroy(win); return true; }
+	bool onResize(int w, int h) override { app.onResize(win, w,h); return true; }
 
-	virtual bool onFrame();
+	bool onFrame() override;
 };
 
 bool SceneWindowHandler::onFrame(){
@@ -345,7 +345,7 @@ void App::start(){
 		App& app;
 		AppMainHandler(App& a): app(a){}
 
-		void onExit(){
+		void onExit() override {
 			//printf("App exiting\n");
 			app.audioIO().close();
 
@@ -447,30 +447,4 @@ Rayd App::getPickRay(const ViewpointWindow& w, int screenX, int screenY){
 	return r;
 }
 
-
-//class Clocked{
-//public:
-//	virtual void onUpdate(double dt){}
-//protected:
-//};
-//
-//
-//class Clock{
-//public:
-//
-//	void add(Clocked& v){ mListeners.push_back(&v); }
-//
-//	void update(double dt){
-//		Listeners::iterator it = mListeners.begin();
-//		while(it != mListeners.end()){
-//			(*it)->onUpdate(dt);
-//		}
-//	}
-//
-//protected:
-//	typedef std::vector<Clocked *> Listeners;
-//	Listeners mListeners;
-//};
-
 } // al::
-

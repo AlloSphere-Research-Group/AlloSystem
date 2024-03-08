@@ -324,7 +324,7 @@ public:
 
 
 	Window();
-	virtual ~Window();
+	~Window() override;
 
 
 	/// Create window and its associated graphics context using current settings
@@ -396,7 +396,7 @@ public:
 	Window& hide();						///< Hide window (if showing)
 	Window& iconify();					///< Iconify window
 	Window& show();						///< Show window (if hidden)
-	Window& title(const std::string& v); ///< Set title
+	Window& title(const std::string&);	///< Set title
 	Window& vsync(bool v);				///< Set whether to sync the frame rate to the monitor's refresh rate
 	Window& asap(bool v);				///< Set whether window renders as fast as possible
 
@@ -412,31 +412,31 @@ public:
 
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& append(InputEventHandler& v);
+	Window& append(InputEventHandler&);
 
 	/// Append handler to window event handler list
 
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& append(WindowEventHandler& v);
+	Window& append(WindowEventHandler&);
 
 	/// Prepend handler to input event handler list
 
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& prepend(InputEventHandler& v);
+	Window& prepend(InputEventHandler&);
 
 	/// Prepend handler to window event handler list
 
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& prepend(WindowEventHandler& v);
+	Window& prepend(WindowEventHandler&);
 
 	/// Remove all input event handlers matching argument
-	Window& remove(InputEventHandler& v);
+	Window& remove(InputEventHandler&);
 
 	/// Remove all window event handlers matching argument
-	Window& remove(WindowEventHandler& v);
+	Window& remove(WindowEventHandler&);
 
 
 	/// Destroy all created windows

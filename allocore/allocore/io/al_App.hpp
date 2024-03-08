@@ -175,7 +175,7 @@ protected:
 	Viewpoints mViewpoints;
 	std::vector<std::function<void(void)>> mDrawCalls;
 
-	virtual bool onResize(int w, int h);
+	bool onResize(int w, int h) override;
 
 private:
 	friend class SceneWindowHandler;
@@ -419,8 +419,8 @@ private:
 	std::unique_ptr<osc::Send> mOSCSend;
 
 	std::string mName;
-	void * mClockAnimate = NULL;
-	void * mClockNav = NULL;
+	void * mClockAnimate = nullptr;
+	void * mClockNav = nullptr;
 };
 
 /// @} // end allocore group

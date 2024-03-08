@@ -72,24 +72,24 @@ class GLVInputControl : public GLVControl, public InputEventHandler {
 public:
 	///
 	GLVInputControl(glv::GLV& v);
-	virtual ~GLVInputControl(){}
+	~GLVInputControl() override {}
 
-	virtual bool onMouseDown(const Mouse& m);
-	virtual bool onMouseUp(const al::Mouse& m);
+	bool onMouseDown(const Mouse& m) override;
+	bool onMouseUp(const al::Mouse& m) override;
 
-	virtual bool onMouseDrag(const Mouse& m){
+	bool onMouseDrag(const Mouse& m) override {
 		return !motionToGLV(m, glv::Event::MouseDrag);
 	}
 
-	virtual bool onMouseMove(const al::Mouse& m){
+	bool onMouseMove(const al::Mouse& m) override {
 		return !motionToGLV(m, glv::Event::MouseMove);
 	}
 
-	virtual bool onKeyDown(const Keyboard& k){
+	bool onKeyDown(const Keyboard& k) override {
 		return !keyToGLV(k, true);
 	}
 
-	virtual bool onKeyUp(const al::Keyboard& k){
+	bool onKeyUp(const al::Keyboard& k) override {
 		return !keyToGLV(k, false);
 	}
 
@@ -105,14 +105,13 @@ class GLVWindowControl : public GLVControl, public WindowEventHandler {
 public:
 	///
 	GLVWindowControl(glv::GLV& v);
-	virtual ~GLVWindowControl(){}
+	~GLVWindowControl() override {}
 
-	virtual bool onCreate();
-	virtual bool onDestroy();
-	virtual bool onResize(int w, int h);
-	//virtual bool onVisibility(bool v){ return true; }
+	bool onCreate() override;
+	bool onDestroy() override;
+	bool onResize(int w, int h) override;
 
-	virtual bool onFrame();
+	bool onFrame() override;
 };
 
 
@@ -190,10 +189,10 @@ struct PoseModel : public glv::Model{
 	///
 	PoseModel(Pose& p);
 
-	virtual ~PoseModel(){}
+	~PoseModel() override {}
 
-	virtual const glv::Data& getData(glv::Data& d) const;
-	virtual void setData(const glv::Data& d);
+	const glv::Data& getData(glv::Data& d) const override;
+	void setData(const glv::Data& d) override;
 
 	Pose& pose;
 };
@@ -205,10 +204,10 @@ struct NavModel : public glv::Model{
 	///
 	NavModel(Nav& n);
 
-	virtual ~NavModel(){}
+	~NavModel() override {}
 
-	virtual const glv::Data& getData(glv::Data& d) const;
-	virtual void setData(const glv::Data& d);
+	const glv::Data& getData(glv::Data& d) const override;
+	void setData(const glv::Data& d) override;
 
 	Nav& nav;
 };
