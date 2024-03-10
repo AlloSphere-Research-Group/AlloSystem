@@ -56,7 +56,7 @@ class Mesh;
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
 /// @param[in]		radius	Radius of enclosing sphere
-/// \returns number of vertices added (4)
+/// \returns number of vertices added
 int addTetrahedron(Mesh& m, float radius=1);
 
 /// Add rectangular cuboid as indexed triangles
@@ -65,7 +65,7 @@ int addTetrahedron(Mesh& m, float radius=1);
 /// @param[in]		rx		Center to face along x
 /// @param[in]		ry		Center to face along y
 /// @param[in]		rz		Center to face along z
-/// \returns number of vertices added (8)
+/// \returns number of vertices added
 int addCuboid(Mesh& m, float rx, float ry, float rz);
 inline int addCuboid(Mesh& m, float radius=1){ return addCuboid(m,radius,radius,radius); }
 inline int addCuboid(Mesh& m, const Vec3f& radii){ return addCuboid(m,radii[0],radii[1],radii[2]); }
@@ -75,14 +75,14 @@ inline int addCuboid(Mesh& m, const Vec3f& radii){ return addCuboid(m,radii[0],r
 /// @param[in,out]	m		Mesh to add vertices and indices to
 /// @param[in]		radius	Radius of cube from center to faces;
 ///							sqrt(1/3)~=0.57735 gives cube inscribed in unit sphere
-/// \returns number of vertices added (8)
+/// \returns number of vertices added
 inline int addCube(Mesh& m, float radius=0.57735026919){ return addCuboid(m,radius); }
 
 /// Add octahedron as triangle vertices and indices
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
 /// @param[in]		radius	Radius of enclosing sphere
-/// \returns number of vertices added (6)
+/// \returns number of vertices added
 int addOctahedron(Mesh& m, float radius=1);
 
 /// Add dodecahedron as indexed triangles
@@ -96,7 +96,7 @@ int addDodecahedron(Mesh& m, float radius=1);
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
 /// @param[in]		radius	Radius of enclosing sphere
-/// \returns number of vertices added (12)
+/// \returns number of vertices added
 int addIcosahedron(Mesh& m, float radius=1);
 
 
