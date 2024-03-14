@@ -817,7 +817,11 @@ public:
 	/// @param[in] magVal	magnitude (1 is a standard normalization)
 	///
 	Vec normalized(T magVal=T(1)) const {
-		return dup().normalize(magVal); }
+		return dup().normalize(magVal);
+	}
+
+	/// Get direction (unit) vector
+	Vec dir(T scale=T(1)) const { return normalized(scale); }
 
 	/// Get projection of vector onto a unit vector
 	Vec projection(const Vec& u) const {
