@@ -218,12 +218,12 @@ public:
 		T tx = t*x, ty = t*y, tz = t*z;
 		T sx = s*x, sy = s*y, sz = s*z;
 
-		return Mat<4,T>(
+		return {
 			tx*x + c , tx*y - sz, tx*z + sy, T(0),
 			tx*y + sz, ty*y + c , ty*z - sx, T(0),
 			tx*z - sy, ty*z + sx, tz*z + c , T(0),
 			T(0),T(0),T(0),T(1)
-		);
+		};
 	}
 
 	/// Get a scaling transform matrix
