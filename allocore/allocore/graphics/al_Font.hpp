@@ -43,6 +43,7 @@
 */
 
 #include <string>
+#include "allocore/system/al_Pimpl.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 
@@ -73,8 +74,6 @@ public:
 	/// \param[in] fontSize		size of font
 	/// \param[in] antialias	whether to apply antialiasing
 	Font(const std::string& filename, int fontSize=10, bool antialias=true);
-
-	~Font();
 
 
 	/// Load font from file
@@ -139,18 +138,18 @@ public:
 	Texture& texture() { return mTex; }
 
 protected:
-	// makes sure that the texture has been filled with data:
-	void ensureTexture(Graphics& g);
-
 	class Impl;
-	Impl * mImpl = nullptr;
+	Pimpl<Impl> mImpl;
 
-	Texture mTex; //Bitmap of the font's ASCII characters in a 16x16 grid
+	Texture mTex; // bitmap of the font's ASCII characters in a 16x16 grid
 	Mesh mMesh;
 	FontCharacter mChars[ASCII_SIZE];
 	unsigned int mFontSize;
 	float mAlign[2];
 	bool mAntiAliased;
+
+	// makes sure that the texture has been filled with data:
+	void ensureTexture(Graphics& g);
 };
 
 } // al::

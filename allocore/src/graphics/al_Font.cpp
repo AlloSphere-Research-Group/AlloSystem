@@ -2,85 +2,77 @@
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Font.hpp"
 
+#define GLYPHS_PER_ROW 16	// number of glyphs to pack in a row
+#define PIX_TO_EM 64.f
+
+namespace al{
+
+#define AL_FONT_FREETYPE
+
+#ifdef AL_FONT_FREETYPE
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_OUTLINE_H
 #include FT_GLYPH_H
 
-extern "C" {
-	#include <stdlib.h>
-	extern FT_Library front_freetype_library;
-}
-
-FT_Library front_freetype_library = 0;
-
-#define GLYPHS_PER_ROW 16	// number of glyphs to pack in a row
-#define PIX_TO_EM (64.f)
-
-namespace al{
-
 struct Font::Impl {
 public:
 
-	static Impl * create(){
-		static bool initialized = false;
-		if (!initialized) {
-			if(!front_freetype_library) {
-				FT_Error err = FT_Init_FreeType(&front_freetype_library);
-				if(err) {
-					AL_WARN("error initializing FreeType library");
-					return nullptr;
-				}
+	static FT_Library& ftlib(){
+		static FT_Library lib = 0;
+		if(!lib){
+			auto err = FT_Init_FreeType(&lib);
+			if(err){
+				AL_WARN_ONCE("Could not initialize FreeType library");
 			}
-			initialized = true;
 		}
-
-		return new Impl;
+		return lib;
 	}
 
-	~Impl() {
-		FT_Done_Face(mFace);
-	}
 
 	// returns the "above-line" height of the font in pixels
-	float ascender() {
-		return mFace->size->metrics.ascender/PIX_TO_EM;
-	}
+	float ascender() const { return mAscender; }
 
 	// returns the "below-line" height of the font in pixels
-	float descender() {
-		return mFace->size->metrics.descender/PIX_TO_EM;
-	}
+	float descender() const { return mDescender; }
 
-	unsigned textureWidth(unsigned fontSize) {
+	unsigned textureWidth(unsigned fontSize) const {
 		return (fontSize+2)*GLYPHS_PER_ROW;
 	}
 
-	unsigned textureHeight(unsigned fontSize) {
+	unsigned textureHeight(unsigned fontSize) const {
 		return (fontSize+2)*(ASCII_SIZE/GLYPHS_PER_ROW);
 	}
 
 	bool load(Font& font, const char * filename, int fontSize, bool antialias){
 
-		FT_Face face; // preserve mFace member
-		FT_Error err = FT_New_Face(front_freetype_library, filename, 0, &face);
-		if(err) {
+		FT_Face face;
+
+		auto cleanup = [&](){
+			FT_Done_Face(face);
+		};
+
+		auto err = FT_New_Face(ftlib(), filename, 0, &face);
+
+		if(err){
 			AL_WARN("could not load font face %s", filename);
 			return false;
 		}
 		if(FT_Set_Pixel_Sizes(face, 0, fontSize)) {
 			AL_WARN("could not set font size");
-			FT_Done_Face(face);
+			cleanup();
 			return false;
 		}
 
-		mFace = face;
+		mAscender = face->size->metrics.ascender/PIX_TO_EM;
+		mDescender = face->size->metrics.descender/PIX_TO_EM;
 
 		font.mTex.width(textureWidth(fontSize));
 		font.mTex.height(textureHeight(fontSize));
 		font.mTex.allocate();
 
-		Array& arr = font.mTex.array();
+		auto& arr = font.mTex.array();
 
 		const int rowstride = arr.header.stride[1];
 		char * optr = arr.data.ptr;
@@ -92,14 +84,14 @@ public:
 		for(int i=0; i < ASCII_SIZE; i++) {
 
 			// load glyph:
-			int glyph_index = FT_Get_Char_Index(mFace, i);
-			FT_GlyphSlot glyph = mFace->glyph;
+			int glyph_index = FT_Get_Char_Index(face, i);
+			FT_GlyphSlot glyph = face->glyph;
 			if(antialias) {
-				FT_Load_Glyph(mFace, glyph_index, FT_LOAD_DEFAULT);
+				FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
 				FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL);
 			}
 			else {
-				FT_Load_Glyph(mFace, glyph_index, FT_LOAD_MONOCHROME);
+				FT_Load_Glyph(face, glyph_index, FT_LOAD_MONOCHROME);
 				FT_Render_Glyph(glyph, FT_RENDER_MODE_MONO);
 			}
 
@@ -125,25 +117,25 @@ public:
 			int offset = (padding_y + yidx*glyph_height)*rowstride +
 						 (padding_x + xidx*glyph_width );
 
-			unsigned char * image = (unsigned char *)(optr + offset);
+			auto * image = (unsigned char *)(optr + offset);
 
 			// write glyph bitmap into texture:
-			FT_Bitmap *bitmap = &glyph->bitmap;
-			if(antialias) {
-				for(int j=0; j < int(bitmap->rows); j++) {
+			FT_Bitmap& bitmap = glyph->bitmap;
+			if(antialias){
+				for(int j=0; j < int(bitmap.rows); j++) {
 					unsigned char *pix = image + j*rowstride;
-					unsigned char *font_pix = bitmap->buffer + j*bitmap->width;
-					for(int k=0; k < int(bitmap->width); k++) {
+					unsigned char *font_pix = bitmap.buffer + j*bitmap.width;
+					for(int k=0; k < int(bitmap.width); k++) {
 						*pix++ = *font_pix++;
 					}
 				}
 			}
 			else{
 				// Pixels are 1-bit each in bitmap
-				for(int j=0; j < int(bitmap->rows); j++) {
+				for(int j=0; j < int(bitmap.rows); j++){
 					unsigned char *pix = image + j*rowstride;
-					unsigned char *font_pix = bitmap->buffer + j*bitmap->pitch;
-					for(int k=0; k < int(bitmap->width); k++) {
+					unsigned char *font_pix = bitmap.buffer + j*bitmap.pitch;
+					for(int k=0; k < int(bitmap.width); k++){
 						int byteIdx = k/8; // byte index in bitmap
 						int bitIdx  = k&7; // bit index in byte
 						*pix++ = ((font_pix[byteIdx] >> (7-bitIdx)) & 1)*255;
@@ -152,15 +144,16 @@ public:
 			}
 		}
 
+		cleanup();
 		return true;
 	}
 
 protected:
-	// factory pattern; use Impl::create()
-	Impl(): mFace(0){}
-
-	FT_Face mFace;
+	float mDescender = 0.f;
+	float mAscender = 0.f;
 };
+
+#endif // AL_FONT_FREETYPE
 
 
 Font::Font()
@@ -169,9 +162,7 @@ Font::Font()
 	mTex(0, 0, Graphics::LUMINANCE, Graphics::UBYTE)
 {
 	align(0,0);
-	mImpl = Impl::create();
 }
-
 
 Font::Font(const std::string& filename, int fontSize, bool antialias)
 :	mFontSize(fontSize),
@@ -179,17 +170,9 @@ Font::Font(const std::string& filename, int fontSize, bool antialias)
 	mTex(0, 0, Graphics::LUMINANCE, Graphics::UBYTE)
 {
 	align(0,0);
-	mImpl = Impl::create();
-	if(mImpl){
-		if(!load(filename, fontSize, antialias)){
-			delete mImpl;
-			mImpl = nullptr;
-		}
-	}
-}
 
-Font::~Font() {
-	if(mImpl) delete mImpl;
+	// Hmmm, no way to indicate error from constructor
+	load(filename, fontSize, antialias);
 }
 
 bool Font::load(const std::string& filename, int fontSize, bool antialias){
@@ -210,7 +193,7 @@ void Font::align(float xfrac, float yfrac){
 	mAlign[1] = yfrac;
 }
 
-void Font::write(Mesh& mesh, const std::string& text) {
+void Font::write(Mesh& mesh, const std::string& text){
 
 	mesh.reset();
 	mesh.primitive(Graphics::TRIANGLES);
@@ -267,14 +250,14 @@ void Font::write(Mesh& mesh, const std::string& text) {
 	}
 }
 
-void Font::render(Graphics& g, const std::string& text) {
+void Font::render(Graphics& g, const std::string& text){
 	write(mMesh, text);
 	mTex.bind();
 	g.draw(mMesh);
 	mTex.unbind();
 }
 
-void Font::renderf(Graphics& g, const char * fmt, ...) {
+void Font::renderf(Graphics& g, const char * fmt, ...){
 	static char line[1024];
 	va_list args;
 	va_start(args, fmt);
