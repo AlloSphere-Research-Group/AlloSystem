@@ -156,21 +156,18 @@ protected:
 #endif // AL_FONT_FREETYPE
 
 
+#define TEX_FORMAT Graphics::LUMINANCE, Graphics::UBYTE
+
 Font::Font()
-:	mFontSize(12),
-	mAntiAliased(true),
-	mTex(0, 0, Graphics::LUMINANCE, Graphics::UBYTE)
+:	mTex(0, 0, TEX_FORMAT)
 {
-	align(0,0);
 }
 
 Font::Font(const std::string& filename, int fontSize, bool antialias)
 :	mFontSize(fontSize),
 	mAntiAliased(antialias),
-	mTex(0, 0, Graphics::LUMINANCE, Graphics::UBYTE)
+	mTex(0, 0, TEX_FORMAT)
 {
-	align(0,0);
-
 	// Hmmm, no way to indicate error from constructor
 	load(filename, fontSize, antialias);
 }

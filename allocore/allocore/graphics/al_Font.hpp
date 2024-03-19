@@ -146,9 +146,9 @@ protected:
 	Texture mTex; // bitmap of the font's ASCII characters in a 16x16 grid
 	Mesh mMesh;
 	FontCharacter mChars[AL_FONT_ASCII_SIZE];
-	unsigned int mFontSize;
-	float mAlign[2];
-	bool mAntiAliased;
+	unsigned int mFontSize = 12;
+	float mAlign[2] = {0.f, 0.f};
+	bool mAntiAliased = true;
 };
 
 } // al::
