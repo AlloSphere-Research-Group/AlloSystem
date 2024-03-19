@@ -42,7 +42,7 @@ public:
 	}
 
 	unsigned textureHeight(unsigned fontSize) const {
-		return (fontSize+2)*(ASCII_SIZE/GLYPHS_PER_ROW);
+		return (fontSize+2)*(AL_FONT_ASCII_SIZE/GLYPHS_PER_ROW);
 	}
 
 	bool load(Font& font, const char * filename, int fontSize, bool antialias){
@@ -81,7 +81,7 @@ public:
 		const int glyph_width = fontSize+2*padding_x;
 		const int glyph_height = fontSize+2*padding_y;
 
-		for(int i=0; i < ASCII_SIZE; i++) {
+		for(int i=0; i < AL_FONT_ASCII_SIZE; i++) {
 
 			// load glyph:
 			int glyph_index = FT_Get_Char_Index(face, i);

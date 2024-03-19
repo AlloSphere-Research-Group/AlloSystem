@@ -47,7 +47,9 @@
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 
-#define ASCII_SIZE 256	// number of characters to use
+#ifndef AL_FONT_ASCII_SIZE
+#define AL_FONT_ASCII_SIZE 256	// number of characters to use
+#endif
 
 namespace al{
 
@@ -143,7 +145,7 @@ protected:
 
 	Texture mTex; // bitmap of the font's ASCII characters in a 16x16 grid
 	Mesh mMesh;
-	FontCharacter mChars[ASCII_SIZE];
+	FontCharacter mChars[AL_FONT_ASCII_SIZE];
 	unsigned int mFontSize;
 	float mAlign[2];
 	bool mAntiAliased;
