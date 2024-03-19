@@ -147,9 +147,6 @@ protected:
 	unsigned int mFontSize;
 	float mAlign[2];
 	bool mAntiAliased;
-
-	// makes sure that the texture has been filled with data:
-	void ensureTexture(Graphics& g);
 };
 
 } // al::
