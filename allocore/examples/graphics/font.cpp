@@ -27,7 +27,7 @@ public:
 
 		// Args: font path, font size, anti-alias (default: true)
 		bool good = true;
-		good &= font1.load(fontDir + "VeraMdoIt.ttf", 20);
+		good &= font1.load(fontDir + "VeraMoIt.ttf", 20);
 		good &= font2.load(fontDir + "VeraMoBd.ttf", 14);
 		good &= font3.load(fontDir + "VeraMono.ttf", 10);
 		if(!good){
