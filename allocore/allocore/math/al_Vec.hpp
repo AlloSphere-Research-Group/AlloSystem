@@ -823,18 +823,32 @@ public:
 	/// Get direction (unit) vector
 	Vec dir(T scale=T(1)) const { return normalized(scale); }
 
+	/// Get projection of vector onto another vector
+	Vec projection(const Vec& v) const {
+		static const T eps = T(1e-30);
+		float vDotv = v.dot(v); // mag squared
+		return vDotv > eps ? dot(v)/vDotv * v : Vec(T(0));
+	}
+
 	/// Get projection of vector onto a unit vector
-	Vec projection(const Vec& u) const {
+
+	/// This is the same as proj, but optimized to remove a division.
+	///
+	Vec projection1(const Vec& u) const {
 		return dot(u) * u;
 	}
 
+	/// Get rejection of vector from another vector
+
+	/// Returns a vector orthogonal to 'v' that lies on the same  plane as this
+	/// and 'v'. Used in Gram-Schmidt process to orthogonalize vectors.
+	Vec rejection(const Vec& v) const { return *this - projection(v); }
+
 	/// Get rejection of vector from a unit vector
 
-	/// This also gives the projection onto a plane defined by normal 'u'.
-	///
-	Vec rejection(const Vec& u) const {
-		return *this - projection(u);
-	}
+	/// This can be used to get the vector projected onto a plane defined by
+	/// normal 'u'.
+	Vec rejection1(const Vec& u) const { return *this - projection1(u); }
 
 	/// Returns whether this is inside sphere
 
