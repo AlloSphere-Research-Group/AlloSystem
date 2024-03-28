@@ -36,9 +36,10 @@
 
 
 	File description:
-	Abstraction over the FreeType library
+	Font loader and renderer
 
 	File author(s):
+	Lance Putnam, 2024
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
@@ -48,7 +49,7 @@
 #include "allocore/graphics/al_Texture.hpp"
 
 #ifndef AL_FONT_ASCII_SIZE
-#define AL_FONT_ASCII_SIZE 256	// number of characters to use
+#define AL_FONT_ASCII_SIZE 128	// number of characters to use
 #endif
 
 namespace al{
@@ -61,19 +62,18 @@ class Graphics;
 class Font {
 public:
 
-	/// Metrics of a single font character
-	struct FontCharacter{
-		FontCharacter() : width(10), x_offset(0), y_offset(0) {}
-		int width;
-		int x_offset;
-		int y_offset;
+	/// Metrics of a single glyph
+	struct GlyphMetric{
+		float width;			///< width
+		float xoffset, yoffset;	///< position offsets
+		float u0, v0, u1, v1;	///< texture (UV) coords
 	};
 
 
 	Font();
 
 	/// \param[in] filename		path to font file
-	/// \param[in] fontSize		size of font
+	/// \param[in] fontSize		size of font, in pixels
 	/// \param[in] antialias	whether to apply antialiasing
 	Font(const std::string& filename, int fontSize=10, bool antialias=true);
 
@@ -81,29 +81,29 @@ public:
 	/// Load font from file
 
 	/// \param[in] filename		path to font file
-	/// \param[in] fontSize		size of font
+	/// \param[in] fontSize		size of font, in pixels
 	/// \param[in] antialias	whether to apply antialiasing
 	/// \returns whether font loaded successfully
 	bool load(const std::string& filename, int fontSize=10, bool antialias=true);
 
 
-	/// Get metrics of a particular character (idx 0..255)
-	const FontCharacter& character(int idx) const { return mChars[idx & 255]; }
+	/// Get metrics of a particular character
+	const GlyphMetric& glyphMetric(int i) const;
 
-	/// Returns the width of a text string, in pixels
-	float width(const std::string& text) const;
+	/// Returns the bounds of a text string
+	void bounds(float& w, float& h, const std::string& text) const;
 
-	/// Returns the width of a character, in pixels
-	float width(unsigned char c) const { return mChars[int(c)].width; }
+	/// Returns the width of a character
+	float width(unsigned char c) const;
 
-	/// Returns the "above-line" height of the font, in pixels
-	float ascender() const;
-
-	/// Returns the "below-line" height of the font, in pixels
-	float descender() const;
-
-	/// Returns the total height of the font, in pixels
+	/// Returns the x-height (height of lowercase x)
 	float size() const { return mFontSize; }
+
+	/// Returns the "above-line" height
+	float ascender() const { return mAscender; }
+
+	/// Returns the "below-line" height of the font
+	float descender() const { return mDescender; }
 
 
 	/// Set alignment of rendered text strings
@@ -111,8 +111,11 @@ public:
 	/// \param[in] xfrac	Fraction along text width to render at x=0;
 	///						0 is left-aligned, 0.5 is centered, 1 is right-aligned
 	/// \param[in] yfrac	Fraction along text height to render at y=0
-	void align(float xfrac, float yfrac);
+	Font& align(float xfrac, float yfrac);
 
+	/// Set spacing between lines of text as multiple of x-height
+	Font& lineSpacing(float v){ mLineSpacing=v; return *this; }
+	float lineSpacing() const { return mLineSpacing; }
 
 	/*! Write text geometry to mesh
 
@@ -125,7 +128,6 @@ public:
 			gl.draw(mesh);
 			font.texture().unbind();
 		</pre>
-
 	*/
 	void write(Mesh& mesh, const std::string& text);
 
@@ -136,7 +138,7 @@ public:
 	void render(Graphics& g, const std::string& text);
 	void renderf(Graphics& g, const char * fmt, ...);
 
-	// accessor so that the font texture can be bound separately:
+	// Accessor so that the font texture can be bound separately
 	Texture& texture() { return mTex; }
 
 protected:
@@ -145,8 +147,11 @@ protected:
 
 	Texture mTex; // bitmap of the font's ASCII characters in a 16x16 grid
 	Mesh mMesh;
-	FontCharacter mChars[AL_FONT_ASCII_SIZE];
-	unsigned int mFontSize = 12;
+	GlyphMetric mMetrics[AL_FONT_ASCII_SIZE];
+	float mFontSize = 12.f; // x-height in pixels
+	float mAscender = 0.f;
+	float mDescender = 0.f;
+	float mLineSpacing = 1.25f;
 	float mAlign[2] = {0.f, 0.f};
 	bool mAntiAliased = true;
 };

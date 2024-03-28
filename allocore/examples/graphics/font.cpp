@@ -27,7 +27,7 @@ public:
 
 		// Args: font path, font size, anti-alias (default: true)
 		bool good = true;
-		good &= font1.load(fontDir + "VeraMoIt.ttf", 20);
+		good &= font1.load(fontDir + "Sansation.ttf", 20);
 		good &= font2.load(fontDir + "VeraMoBd.ttf", 14);
 		good &= font3.load(fontDir + "VeraMono.ttf", 10);
 		if(!good){
@@ -54,21 +54,29 @@ public:
 
 		// Render text in the top-left corner
 		g.loadIdentity();
-		g.translate(8, H - (font1.size() + 8));
+		g.translate(8, H - 8);
 		g.currentColor(1,1,0,1);
+		font1.lineSpacing(1);
 		font1.render(g, "Top-left text");
 
 		// Render text in the bottom-left corner
 		g.loadIdentity();
-		g.translate(8, 8);
+		g.translate(8, font3.size() + 8);
 		g.currentColor(1,0,1,1);
 		font3.render(g, "Bottom-left text");
 
 		// Render text centered on the screen
 		g.loadIdentity();
-		std::string str = "Centered text";
-		// Note that dimensions must be integers to avoid blurred text
-		g.translate(int(W/2 - font2.width(str)/2), int(H/2 - font2.size()/2));
+		std::string str =
+			  " !\"#$%&'()*+,-./0123456789:;<=>?"
+			"\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+			"\n`abcdefghijklmnopqrstuvwxyz{|}~ "
+			"\nThe quick brown fox jumps over the lazy dog."
+			"\nfor(int i=0; i<128; ++i){\n    printf(\"%d\\n\", i);\n}"
+		;
+		float bbw, bbh; font2.bounds(bbw,bbh, str);
+		// Note that positions must integer to avoid blurred text
+		g.translate(int(W/2 - bbw/2), int(H/2 + bbh/2));
 		g.currentColor(0,1,1,1);
 		font2.render(g, str);
 

@@ -2,9 +2,6 @@
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Font.hpp"
 
-#define GLYPHS_PER_ROW 16	// number of glyphs to pack in a row
-#define PIX_TO_EM 64.f
-
 namespace al{
 
 #define AL_FONT_FREETYPE
@@ -17,7 +14,8 @@ namespace al{
 #include FT_GLYPH_H
 
 struct Font::Impl {
-public:
+
+	// FreeType tutorial: http://freetype.org/freetype2/docs/tutorial/step1.html
 
 	static FT_Library& ftlib(){
 		static FT_Library lib = 0;
@@ -30,21 +28,6 @@ public:
 		return lib;
 	}
 
-
-	// returns the "above-line" height of the font in pixels
-	float ascender() const { return mAscender; }
-
-	// returns the "below-line" height of the font in pixels
-	float descender() const { return mDescender; }
-
-	unsigned textureWidth(unsigned fontSize) const {
-		return (fontSize+2)*GLYPHS_PER_ROW;
-	}
-
-	unsigned textureHeight(unsigned fontSize) const {
-		return (fontSize+2)*(AL_FONT_ASCII_SIZE/GLYPHS_PER_ROW);
-	}
-
 	bool load(Font& font, const char * filename, int fontSize, bool antialias){
 
 		FT_Face face;
@@ -55,38 +38,47 @@ public:
 
 		auto err = FT_New_Face(ftlib(), filename, 0, &face);
 
-		if(err){
-			AL_WARN("could not load font face %s", filename);
+		if(FT_Err_Unknown_File_Format == err){
+			AL_WARN("Unsupported font %s", filename);
+			return false;
+		} else if(err){
+			AL_WARN("Could not load font %s", filename);
 			return false;
 		}
-		if(FT_Set_Pixel_Sizes(face, 0, fontSize)) {
-			AL_WARN("could not set font size");
+
+		if(FT_Set_Pixel_Sizes(face, 0, fontSize)){
+			AL_WARN("Could not set font size to %d", fontSize);
 			cleanup();
 			return false;
 		}
 
-		mAscender = face->size->metrics.ascender/PIX_TO_EM;
-		mDescender = face->size->metrics.descender/PIX_TO_EM;
+		constexpr float fixed26_6toFloat = 1.f/64.f;
 
-		font.mTex.width(textureWidth(fontSize));
-		font.mTex.height(textureHeight(fontSize));
-		font.mTex.allocate();
+		// https://freetype.org/freetype2/docs/reference/ft2-sizing_and_scaling.html
+		{
+			const auto& faceMetrics = face->size->metrics;
+			font.mAscender = faceMetrics.ascender * fixed26_6toFloat;
+			font.mDescender = faceMetrics.descender * fixed26_6toFloat;
 
-		auto& arr = font.mTex.array();
+			//printf("asc:%g desc:%g\n", font.mAscender, font.mDescender);
+			//printf("x_ppem:%u y_ppem:%u x_scale:%g y_scale:%g height:%g\n", faceMetrics.x_ppem, faceMetrics.y_ppem, faceMetrics.x_scale/65536., faceMetrics.y_scale/65536., faceMetrics.height/64.);
+		}
 
-		const int rowstride = arr.header.stride[1];
-		char * optr = arr.data.ptr;
-		const int padding_x = 1;
-		const int padding_y = 1;
-		const int glyph_width = fontSize+2*padding_x;
-		const int glyph_height = fontSize+2*padding_y;
+		int padding = 1;
+		int glyphsPerRow = 16;
+		const int glyphW = fontSize + 2*padding;
+		const int glyphH = fontSize + 2*padding;
+		int texW = glyphW*glyphsPerRow;
+		int texH = glyphH*(AL_FONT_ASCII_SIZE/glyphsPerRow);
 
-		for(int i=0; i < AL_FONT_ASCII_SIZE; i++) {
+		font.mTex.resize(texW, texH).allocate();
+
+		for(int i=0; i < AL_FONT_ASCII_SIZE; i++){
 
 			// load glyph:
 			int glyph_index = FT_Get_Char_Index(face, i);
 			FT_GlyphSlot glyph = face->glyph;
-			if(antialias) {
+			if(antialias){
 				FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
 				FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL);
 			}
@@ -95,11 +87,6 @@ public:
 				FT_Render_Glyph(glyph, FT_RENDER_MODE_MONO);
 			}
 
-			// store metrics:
-			font.mChars[i].width = glyph->advance.x/PIX_TO_EM;
-			font.mChars[i].x_offset = glyph->bitmap_left;
-			font.mChars[i].y_offset = glyph->bitmap_top;
-
 			/*switch(glyph->format){
 			case FT_GLYPH_FORMAT_BITMAP: printf("FT_GLYPH_FORMAT_BITMAP\n"); break;
 			case FT_GLYPH_FORMAT_OUTLINE: printf("FT_GLYPH_FORMAT_OUTLINE\n"); break;
@@ -107,38 +94,59 @@ public:
 			default:;
 			}*/
 
-			//printf("%c: advance (%d %d), bitmap_left %d\n", (char)i, (int)glyph->advance.x, (int)glyph->advance.y, glyph->bitmap_left);
-			//printf("char %i %c %i %i\n", i, i, font.mChars[i].width, font.mChars[i].y_offset);
-			//printf("bitmap.pitch %d\n", glyph->bitmap.pitch);
+			//if(i>='!' && i<='~')\
+				printf("%c bitmap_left:%d bitmap_top:%d\n", i, glyph->bitmap_left, glyph->bitmap_top);
 
 			// calculate texture pointer offset:
-			int xidx = i % GLYPHS_PER_ROW;
-			int yidx = (int)((float)i/(float)GLYPHS_PER_ROW);
-			int offset = (padding_y + yidx*glyph_height)*rowstride +
-						 (padding_x + xidx*glyph_width );
+			int xidx = i % glyphsPerRow;
+			int yidx = int(float(i)/glyphsPerRow);
 
-			auto * image = (unsigned char *)(optr + offset);
+			// FT glyph retrieval:
+			// https://freetype.org/freetype2/docs/reference/ft2-glyph_retrieval.html
+			// Notes: Some FT glyph pixel coordinates in 26.6 fixed-point. After much head scratching, I've given up trying to make the char map right-side up.
+			{	auto& c = font.mMetrics[i];
+				// These in pixels
+				c.width = glyph->advance.x * fixed26_6toFloat;
+				float height = glyph->metrics.height * fixed26_6toFloat;
+				c.xoffset = glyph->bitmap_left;
+				c.yoffset = glyph->bitmap_top - height - fontSize;
+				// These in normalized coords [0,1]
+				c.u0 = float(padding + xidx*glyphW)/texW;
+				c.u1 = c.u0 + c.width/texW;
 
-			// write glyph bitmap into texture:
-			FT_Bitmap& bitmap = glyph->bitmap;
+				// v1 top of glyph as FT glyphs are upside-down!
+				c.v1 = float(padding + yidx*glyphH)/texH;
+				c.v0 = c.v1 + float(height)/texH;
+			}
+
+			auto& arr = font.mTex.array();
+			const int rowstride = arr.header.stride[1];
+			int offset = (padding + yidx*glyphH)*rowstride +
+						 (padding + xidx*glyphW);
+			auto * dstData = (unsigned char *)(arr.data.ptr + offset);
+
+			// Copy glyph bitmap into texture
+			// Note that in FreeType the top is row 0, so we flip y
+			FT_Bitmap& srcData = glyph->bitmap;
 			if(antialias){
-				for(int j=0; j < int(bitmap.rows); j++) {
-					unsigned char *pix = image + j*rowstride;
-					unsigned char *font_pix = bitmap.buffer + j*bitmap.width;
-					for(int k=0; k < int(bitmap.width); k++) {
-						*pix++ = *font_pix++;
+				for(int j=0; j < int(srcData.rows); j++) {
+					unsigned char * dst = dstData + j*rowstride;
+					//unsigned char * src = srcData.buffer + (srcData.rows-1-j)*srcData.width;
+					unsigned char * src = srcData.buffer + j*srcData.width;
+					for(int k=0; k < int(srcData.width); k++) {
+						*dst++ = *src++;
 					}
 				}
-			}
-			else{
+			} else {
 				// Pixels are 1-bit each in bitmap
-				for(int j=0; j < int(bitmap.rows); j++){
-					unsigned char *pix = image + j*rowstride;
-					unsigned char *font_pix = bitmap.buffer + j*bitmap.pitch;
-					for(int k=0; k < int(bitmap.width); k++){
+				for(int j=0; j < int(srcData.rows); j++){
+					unsigned char * dst = dstData + j*rowstride;
+					//unsigned char * src = srcData.buffer + (srcData.rows-1-j)*srcData.pitch;
+					unsigned char * src = srcData.buffer + j*srcData.pitch;
+					for(int k=0; k < int(srcData.width); k++){
 						int byteIdx = k/8; // byte index in bitmap
 						int bitIdx  = k&7; // bit index in byte
-						*pix++ = ((font_pix[byteIdx] >> (7-bitIdx)) & 1)*255;
+						*dst++ = ((src[byteIdx] >> (7-bitIdx)) & 1)*255;
 					}
 				}
 			}
@@ -147,13 +155,11 @@ public:
 		cleanup();
 		return true;
 	}
-
-protected:
-	float mDescender = 0.f;
-	float mAscender = 0.f;
 };
 
-#endif // AL_FONT_FREETYPE
+// AL_FONT_FREETYPE
+#endif
+
 
 
 #define TEX_FORMAT Graphics::LUMINANCE, Graphics::UBYTE
@@ -181,13 +187,19 @@ bool Font::load(const std::string& filename, int fontSize, bool antialias){
 	return false;
 }
 
-float Font::ascender() const { return mImpl->ascender(); }
+const Font::GlyphMetric& Font::glyphMetric(int i) const {
+	// TODO: check index bounds?
+	return mMetrics[i];
+}
 
-float Font::descender() const { return mImpl->descender(); }
+float Font::width(unsigned char c) const {
+	return glyphMetric(c).width;
+}
 
-void Font::align(float xfrac, float yfrac){
+Font& Font::align(float xfrac, float yfrac){
 	mAlign[0] = xfrac;
 	mAlign[1] = yfrac;
+	return *this;
 }
 
 void Font::write(Mesh& mesh, const std::string& text){
@@ -195,55 +207,57 @@ void Font::write(Mesh& mesh, const std::string& text){
 	mesh.reset();
 	mesh.primitive(Graphics::TRIANGLES);
 
-	int nchars = text.size();
-	float margin = 2.;
-	float csz = (float)mFontSize;
-	float cdim = csz+margin;
-	float tdim = cdim*GLYPHS_PER_ROW;
-	float tcdim = ((float)cdim)/((float)tdim);
+	float xstart = 0.f, ystart = mFontSize - ascender();
 
-	float pos[] = {0., ascender() * mAlign[1]};
-
-	if(mAlign[0] != 0){
-		pos[0] = -width(text) * mAlign[0];
+	if(mAlign[0] != 0.f || mAlign[1] != 0.f){
+		float w,h; bounds(w,h, text);
+		xstart = -w * mAlign[0];
+		ystart =  h * mAlign[1];
 	}
 
-	for(int i=0; i < nchars; i++) {
-		int idx = text[i];
-		const FontCharacter &c = mChars[idx];
-		/*int margin = 1;*/
+	float pos[2] = {xstart, ystart};
+	float dx = width(' '); // default x advance
+	float dy = -mFontSize*mLineSpacing;
+	float v2pix = mTex.height();
 
-		int xidx = idx % GLYPHS_PER_ROW;
-		int yidx = idx / GLYPHS_PER_ROW;
-		float yy = c.y_offset;
+	// Using functions as positions must be integer to avoid blur
+	auto setPos = [&](int i, float v){ pos[i] = std::floor(v+0.5); };
+	auto incPos = [&](int i, float d){ setPos(i, pos[i] + d); };
 
-		float tc_x0	= ((float)(xidx))*tcdim;
-		float tc_y0	= ((float)(yidx))*tcdim;
-		float tc_x1	= tc_x0+tcdim;
-		float tc_y1	= tc_y0+tcdim;
+	auto printable = [](int c){
+		return (c >= '!' && c <= '~') || (c >= 128 && c <= 254);
+	};
 
-		float v_x0  = pos[0] + c.x_offset;
-		float v_x1	= v_x0+cdim;
-		float v_y0	= margin+yy-pos[1];
-		float v_y1	= yy-csz-pos[1];
+	for(int c : text){
+		if(c < AL_FONT_ASCII_SIZE && printable(c)){
 
-		// draw character quad:
-		mesh.texCoord(	tc_x0,	tc_y0);
-		mesh.vertex(	v_x0,	v_y0,	0);
+			auto& metric = mMetrics[c];
 
-		mesh.texCoord(	tc_x1,	tc_y0);
-		mesh.vertex(	v_x1,	v_y0,	0);
+			// tri-strip pattern: xy, Xy, xY, XY
+			mesh.indexRel(0,1,2, 2,1,3);
+			float x = pos[0] + metric.xoffset;
+			float X = x + metric.width;
+			float h = std::abs(metric.v1 - metric.v0)*v2pix; // glyph height in pixels
+			float y = pos[1] + metric.yoffset;
+			float Y = y + h;
+			mesh.vertex(x,y);
+			mesh.vertex(X,y);
+			mesh.vertex(x,Y);
+			mesh.vertex(X,Y);
+			mesh.texCoord(metric.u0, metric.v0);
+			mesh.texCoord(metric.u1, metric.v0);
+			mesh.texCoord(metric.u0, metric.v1);
+			mesh.texCoord(metric.u1, metric.v1);
 
-		mesh.texCoord(	tc_x1,	tc_y1);
-		mesh.vertex(	v_x1,	v_y1,	0);
+			incPos(0, metric.width);
 
-		mesh.texCoord(	tc_x0,	tc_y1);
-		mesh.vertex(	v_x0,	v_y1,	0);
+		} else if('\n' == c){
+			setPos(0, xstart);
+			incPos(1, dy);
 
-		int j = i*4;
-		mesh.index(j,j+1,j+2, j+2,j+3,j);
-
-		pos[0] += (float)c.width;
+		} else { // unknown/non-printable character, just advance along x
+			incPos(0, dx);
+		}
 	}
 }
 
@@ -258,17 +272,28 @@ void Font::renderf(Graphics& g, const char * fmt, ...){
 	static char line[1024];
 	va_list args;
 	va_start(args, fmt);
-	AL_VSNPRINTF(line, 1024, fmt, args);
+	AL_VSNPRINTF(line, sizeof line, fmt, args);
 	va_end(args);
 	render(g, line);
 }
 
-float Font::width(const std::string& text) const {
-	float total = 0.f;
-	for (unsigned i=0; i < text.size(); i++) {
-		total += mChars[ (int)text[i] ].width;
+void Font::bounds(float& w, float& h, const std::string& text) const {
+	if(text.empty()){
+		w = h = 0.f;
+		return;
 	}
-	return total;
+	w = 0.f;
+	h = ascender();
+	float wsum = 0.f;
+	for(auto c : text){
+		if('\n' == c){
+			wsum = 0.f;
+			h += mFontSize*mLineSpacing;
+		} else {
+			wsum += width(c);
+			if(wsum > w) w = wsum;
+		}
+	}
 }
 
 } // al::
