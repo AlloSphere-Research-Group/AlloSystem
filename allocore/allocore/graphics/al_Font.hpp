@@ -64,7 +64,7 @@ public:
 
 	/// Metrics of a single glyph
 	struct GlyphMetric{
-		float width;			///< width
+		float xadvance;			///< effective width (can include padding)
 		float xoffset, yoffset;	///< position offsets
 		float u0, v0, u1, v1;	///< texture (UV) coords
 	};

@@ -2,7 +2,7 @@
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Font.hpp"
 
-namespace al{
+using namespace al;
 
 #define AL_FONT_FREETYPE
 
@@ -106,17 +106,18 @@ struct Font::Impl {
 			// Notes: Some FT glyph pixel coordinates in 26.6 fixed-point. After much head scratching, I've given up trying to make the char map right-side up.
 			{	auto& c = font.mMetrics[i];
 				// These in pixels
-				c.width = glyph->advance.x * fixed26_6toFloat;
+				c.xadvance = glyph->advance.x * fixed26_6toFloat;
+				float width = glyph->metrics.width * fixed26_6toFloat;
 				float height = glyph->metrics.height * fixed26_6toFloat;
 				c.xoffset = glyph->bitmap_left;
 				c.yoffset = glyph->bitmap_top - height - fontSize;
 				// These in normalized coords [0,1]
 				c.u0 = float(padding + xidx*glyphW)/texW;
-				c.u1 = c.u0 + c.width/texW;
+				c.u1 = c.u0 + width/texW;
 
 				// v1 top of glyph as FT glyphs are upside-down!
 				c.v1 = float(padding + yidx*glyphH)/texH;
-				c.v0 = c.v1 + float(height)/texH;
+				c.v0 = c.v1 + height/texH;
 			}
 
 			auto& arr = font.mTex.array();
@@ -161,7 +162,6 @@ struct Font::Impl {
 #endif
 
 
-
 #define TEX_FORMAT Graphics::LUMINANCE, Graphics::UBYTE
 
 Font::Font()
@@ -193,7 +193,7 @@ const Font::GlyphMetric& Font::glyphMetric(int i) const {
 }
 
 float Font::width(unsigned char c) const {
-	return glyphMetric(c).width;
+	return glyphMetric(c).xadvance;
 }
 
 Font& Font::align(float xfrac, float yfrac){
@@ -218,6 +218,7 @@ void Font::write(Mesh& mesh, const std::string& text){
 	float pos[2] = {xstart, ystart};
 	float dx = width(' '); // default x advance
 	float dy = -mFontSize*mLineSpacing;
+	float u2pix = mTex.width();
 	float v2pix = mTex.height();
 
 	// Using functions as positions must be integer to avoid blur
@@ -235,8 +236,10 @@ void Font::write(Mesh& mesh, const std::string& text){
 
 			// tri-strip pattern: xy, Xy, xY, XY
 			mesh.indexRel(0,1,2, 2,1,3);
+			float w = std::abs(metric.u1 - metric.u0)*u2pix;
 			float x = pos[0] + metric.xoffset;
-			float X = x + metric.width;
+			//float X = x + metric.width;
+			float X = x + w;
 			float h = std::abs(metric.v1 - metric.v0)*v2pix; // glyph height in pixels
 			float y = pos[1] + metric.yoffset;
 			float Y = y + h;
@@ -249,7 +252,7 @@ void Font::write(Mesh& mesh, const std::string& text){
 			mesh.texCoord(metric.u0, metric.v1);
 			mesh.texCoord(metric.u1, metric.v1);
 
-			incPos(0, metric.width);
+			incPos(0, metric.xadvance);
 
 		} else if('\n' == c){
 			setPos(0, xstart);
@@ -295,5 +298,3 @@ void Font::bounds(float& w, float& h, const std::string& text) const {
 		}
 	}
 }
-
-} // al::
