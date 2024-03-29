@@ -69,14 +69,16 @@ struct Font::Impl {
 		const int glyphW = fontSize + 2*padding;
 		const int glyphH = fontSize + 2*padding;
 		int texW = glyphW*glyphsPerRow;
-		int texH = glyphH*(AL_FONT_ASCII_SIZE/glyphsPerRow);
+		int texH = glyphH*(glyphCount/glyphsPerRow);
 
 		font.mTex.resize(texW, texH).allocate();
 
-		for(int i=0; i < AL_FONT_ASCII_SIZE; i++){
+		for(int i=0; i<glyphCount; ++i){
+
+			const auto c = glyphBegin + i;
 
 			// load glyph:
-			int glyph_index = FT_Get_Char_Index(face, i);
+			int glyph_index = FT_Get_Char_Index(face, c);
 			FT_GlyphSlot glyph = face->glyph;
 			if(antialias){
 				FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
@@ -104,20 +106,20 @@ struct Font::Impl {
 			// FT glyph retrieval:
 			// https://freetype.org/freetype2/docs/reference/ft2-glyph_retrieval.html
 			// Notes: Some FT glyph pixel coordinates in 26.6 fixed-point. After much head scratching, I've given up trying to make the char map right-side up.
-			{	auto& c = font.mMetrics[i];
+			{	auto& dst = font.glyphMetric(c);
 				// These in pixels
-				c.xadvance = glyph->advance.x * fixed26_6toFloat;
+				dst.xadvance = glyph->advance.x * fixed26_6toFloat;
 				float width = glyph->metrics.width * fixed26_6toFloat;
 				float height = glyph->metrics.height * fixed26_6toFloat;
-				c.xoffset = glyph->bitmap_left;
-				c.yoffset = glyph->bitmap_top - height - fontSize;
+				dst.xoffset = glyph->bitmap_left;
+				dst.yoffset = glyph->bitmap_top - height - fontSize;
 				// These in normalized coords [0,1]
-				c.u0 = float(padding + xidx*glyphW)/texW;
-				c.u1 = c.u0 + width/texW;
+				dst.u0 = float(padding + xidx*glyphW)/texW;
+				dst.u1 = dst.u0 + width/texW;
 
 				// v1 top of glyph as FT glyphs are upside-down!
-				c.v1 = float(padding + yidx*glyphH)/texH;
-				c.v0 = c.v1 + height/texH;
+				dst.v1 = float(padding + yidx*glyphH)/texH;
+				dst.v0 = dst.v1 + height/texH;
 			}
 
 			auto& arr = font.mTex.array();
@@ -157,8 +159,101 @@ struct Font::Impl {
 		return true;
 	}
 };
+// end AL_FONT_FREETYPE
 
-// AL_FONT_FREETYPE
+#else
+
+#define STB_TRUETYPE_IMPLEMENTATION
+#define STBTT_STATIC // private to this file
+#include "external/stb_truetype.h"
+#include "allocore/io/al_File.hpp"
+
+struct Font::Impl {
+
+	bool load(Font& font, const char * filename, int fontSize, bool antialias){
+		auto fontData = File::read(filename);
+		static_assert(sizeof(decltype(fontData)::value_type)==1, "File data must be 1-byte type");
+		if(fontData.empty()){
+			AL_WARN("Could not load font face %s", filename);
+			return false;
+		}
+
+		int glyphsPerRow = 16;
+		int glyphW = fontSize;
+		int glyphH = fontSize;
+		int texW = glyphW * glyphsPerRow;
+		int texH = glyphH * glyphCount/glyphsPerRow;
+
+		// Guess to how efficiently STB packs glyphs in char map.
+		// Increase or disable if glyphs do not fit.
+		texH *= 0.7;
+
+		font.mTex.resize(texW, texH).allocate();
+
+		{
+			stbtt_fontinfo f;
+			stbtt_InitFont(&f, (unsigned char *)(fontData.data()), 0);
+			float scale = stbtt_ScaleForPixelHeight(&f, fontSize);
+			int asc, desc, lineGap;
+			stbtt_GetFontVMetrics(&f, &asc, &desc, &lineGap);
+			font.mAscender = std::floor(asc * scale + 0.5);
+			font.mDescender = std::floor(desc * scale + 0.5);
+			//printf("ascent:%d descent:%d numGlyphs:%d\n", asc, desc, f.numGlyphs);
+		}
+
+		/*
+		typedef struct
+		{
+		   unsigned short x0,y0,x1,y1; // coordinates of bbox in bitmap
+		   float xoff,yoff,xadvance;
+		} stbtt_bakedchar;
+
+		STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,  // font location (use offset=0 for plain .ttf)
+										float pixel_height,                     // height of font in pixels
+										unsigned char *pixels, int pw, int ph,  // bitmap to be filled in
+										int first_char, int num_chars,          // characters to bake
+										stbtt_bakedchar *chardata);             // you allocate this, it's num_chars long
+		// if return is positive, the first unused row of the bitmap
+		// if return is negative, returns the negative of the number of characters that fit
+		// if return is 0, no characters fit and no rows were used
+		// This uses a very crappy packing.
+		*/
+
+		auto * charMetrics = new stbtt_bakedchar[glyphCount];
+
+		auto res = stbtt_BakeFontBitmap(
+			(unsigned char *)(fontData.data()),
+			0, // font location (use offset=0 for plain .ttf)
+			fontSize,
+			font.mTex.data<unsigned char>(), texW, texH,
+			glyphBegin, glyphCount,
+			charMetrics
+		);
+
+		//printf("stbtt_BakeFontBitmap returned %d\n", res);
+
+		// TODO: crop texture rows based on stbtt_BakeFontBitmap result?
+
+		for(int i=0; i<glyphCount; ++i){
+			const auto& src = charMetrics[i];
+			auto& dst = font.glyphMetric(glyphBegin + i);
+			dst.xadvance = src.xadvance;
+			float height = src.y1 - src.y0;
+			dst.xoffset = src.xoff;
+			dst.yoffset = -src.yoff - height - fontSize;
+			dst.u0 = float(src.x0)/texW;
+			dst.u1 = float(src.x1)/texW;
+			dst.v0 = float(src.y1)/texH;
+			dst.v1 = float(src.y0)/texH;
+		}
+
+		delete[] charMetrics;
+
+		return true;
+	}
+};
+
+// AL_FONT_STB_TRUETYPE
 #endif
 
 
@@ -187,12 +282,16 @@ bool Font::load(const std::string& filename, int fontSize, bool antialias){
 	return false;
 }
 
-const Font::GlyphMetric& Font::glyphMetric(int i) const {
+Font::GlyphMetric& Font::glyphMetric(int c){
 	// TODO: check index bounds?
-	return mMetrics[i];
+	return mMetrics[c - glyphBegin];
 }
 
-float Font::width(unsigned char c) const {
+const Font::GlyphMetric& Font::glyphMetric(int c) const {
+	return const_cast<Font*>(this)->glyphMetric(c);
+}
+
+float Font::width(int c) const {
 	return glyphMetric(c).xadvance;
 }
 
@@ -230,9 +329,9 @@ void Font::write(Mesh& mesh, const std::string& text){
 	};
 
 	for(int c : text){
-		if(c < AL_FONT_ASCII_SIZE && printable(c)){
+		if(c >= glyphBegin && c < glyphEnd && printable(c)){
 
-			auto& metric = mMetrics[c];
+			auto& metric = glyphMetric(c);
 
 			// tri-strip pattern: xy, Xy, xY, XY
 			mesh.indexRel(0,1,2, 2,1,3);

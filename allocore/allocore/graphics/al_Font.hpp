@@ -88,13 +88,13 @@ public:
 
 
 	/// Get metrics of a particular character
-	const GlyphMetric& glyphMetric(int i) const;
+	const GlyphMetric& glyphMetric(int c) const;
 
 	/// Returns the bounds of a text string
 	void bounds(float& w, float& h, const std::string& text) const;
 
 	/// Returns the width of a character
-	float width(unsigned char c) const;
+	float width(int c) const;
 
 	/// Returns the x-height (height of lowercase x)
 	float size() const { return mFontSize; }
@@ -145,15 +145,22 @@ protected:
 	class Impl;
 	Pimpl<Impl> mImpl;
 
+	static constexpr int glyphBegin = 32;
+	static constexpr int glyphEnd = AL_FONT_ASCII_SIZE;
+	static constexpr int glyphCount = glyphEnd - glyphBegin;
+	static_assert(glyphEnd > glyphBegin, "AL_FONT_ASCII_SIZE must be greater than glyphBegin");
+
 	Texture mTex; // bitmap of the font's ASCII characters in a 16x16 grid
 	Mesh mMesh;
-	GlyphMetric mMetrics[AL_FONT_ASCII_SIZE];
+	GlyphMetric mMetrics[glyphCount];
 	float mFontSize = 12.f; // x-height in pixels
 	float mAscender = 0.f;
 	float mDescender = 0.f;
 	float mLineSpacing = 1.25f;
 	float mAlign[2] = {0.f, 0.f};
 	bool mAntiAliased = true;
+
+	GlyphMetric& glyphMetric(int c);
 };
 
 } // al::
