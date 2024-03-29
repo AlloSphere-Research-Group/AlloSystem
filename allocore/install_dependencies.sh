@@ -22,7 +22,6 @@ if binary_exists "apt-get"; then
 		libavahi-client-dev \
 		libbluetooth-dev \
 		libudev-dev \
-		libfreetype6-dev \
 		libxi-dev libxmu-dev
 
 # It's important to check for Homebrew before MacPorts,
@@ -30,12 +29,12 @@ if binary_exists "apt-get"; then
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
 	brew update
-	brew install glew freetype
+	brew install glew
 
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
-	sudo port install glew freetype
+	sudo port install glew
 
 elif uname -o | grep -q "Msys"; then
 
@@ -62,26 +61,6 @@ elif uname -o | grep -q "Msys"; then
 			# We just make a local copy to avoid disturbing Windows...
 			cp /c/Windows/System32/bthprops.cpl $DESTDIR/bin/bthprops.dll
 			#cp win32/*.h $DESTDIR/include/
-		fi
-
-		if files_exist $DESTDIR/lib/*freetype*; then
-			echo 'Found FreeType'
-		else
-			PKG=freetype-2.3.5-1-bin
-			DIR=$PWD
-			cd /tmp
-				$DOWNLOAD http://downloads.sourceforge.net/project/gnuwin32/freetype/2.3.5-1/$PKG.zip
-				unzip -q $PKG -d $PKG
-				cp $PKG/bin/freetype*.dll $DESTDIR/bin/
-				cp $PKG/lib/libfreetype.dll.a $DESTDIR/lib/
-				cp $PKG/lib/freetype*.def $DESTDIR/lib/
-				cp $PKG/lib/freetype.lib $DESTDIR/lib/
-				cp -r $PKG/include/* $DESTDIR/include/
-
-				# Cleanup.
-				rm -rf $PKG
-				rm $PKG.*
-			cd $DIR
 		fi
 
 		if files_exist $DESTDIR/lib/libglew32*; then
@@ -133,15 +112,12 @@ elif uname -o | grep -q "Msys"; then
 	# MSYS2
 	else
 		echo 'Found MinGW-w64 / MSYS2'
-		LIBS="gcc gdb glew freeglut freetype libusb"
+		LIBS="gcc gdb glew freeglut libusb"
 		PKGS=
 		for L in $LIBS
 		do
 			PKGS=$PKGS" $MINGW_PACKAGE_PREFIX-$L"
 		done
-
-		# Libs with deps (other then gcc-libs):
-		# freetype: bzip2 harfbuzz libpng zlib
 
 		#echo $PKGS
 		pacman -Syu

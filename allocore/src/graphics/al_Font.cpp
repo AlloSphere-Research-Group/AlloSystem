@@ -4,9 +4,19 @@
 
 using namespace al;
 
-#define AL_FONT_FREETYPE
+//#define AL_FONT_FREETYPE
 
 #ifdef AL_FONT_FREETYPE
+
+/*
+Dependency installation:
+Linux: sudo apt-get install libfreetype6-dev
+Mac / Homebrew: brew install freetype
+Mac / MacPorts: sudo port install freetype
+Win / MinGW-w64 / MSYS2: pacman -S freetype
+
+Link with -lfreetype
+*/
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
