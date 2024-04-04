@@ -1047,6 +1047,9 @@ public:
 			index = (index+1) % N;
 			return data[index];
 		}
+
+		const T& operator[](unsigned i) const { return data[i%N]; }
+		T& operator[](unsigned i){ return data[i%N]; }
 	};
 
 	PSeq pseq(){ return PSeq(elems()); }
