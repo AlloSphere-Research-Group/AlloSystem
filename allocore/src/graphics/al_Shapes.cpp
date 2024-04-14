@@ -446,11 +446,18 @@ int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned 
 	// Note: leaving base on xy plane makes it easy to construct a bicone
 	m.vertex(apex);
 
+	if(m.wants(Mesh::NORMAL)){
+		m.normal(Vec3f(0,0,apex.z>=0.f ? 1.f : -1.f));
+	}
+	if(m.wants(Mesh::TEXCOORD)){
+		m.texCoord(0.5, 0.5);
+	}
+
 	for(unsigned i=0; i<stacks; ++i){
 
 		float h = float(i+1)/stacks;
 
-		CSin csin(cycles * 2*M_PI/slices, h*radius);
+		CSin csin(cycles * 2*M_PI/slices, h);
 
 		for(unsigned j=0; j<slices; ++j){
 			float x = csin.r;
@@ -472,7 +479,20 @@ int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned 
 				if(lastSlice){ v3-=slices; v4-=slices; }
 				m.indexRel(v1,v2,v3, v3,v2,v4);
 			}
-			m.vertex(Vec3f(x,y,0.) + apex*(1.-h));
+
+			auto pos = Vec3f(x,y,0.)*radius + apex*(1.-h);
+
+			m.vertex(pos);
+
+			if(m.wants(Mesh::NORMAL)){
+				auto t1 = pos - apex;
+				auto t2 = Vec3f(-y,x,0.f);
+				auto N = cross(t1,t2).dir();
+				m.normal(N);
+			}
+			if(m.wants(Mesh::TEXCOORD)){
+				m.texCoord(x*0.5f+0.5f, y*0.5f+0.5f);
+			}
 		}
 	}
 
