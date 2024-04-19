@@ -354,6 +354,12 @@ void RenderToDisk::saveImage(
 
 	bool readPixels = false;
 
+	auto downloadPixels = [=](void * ptr){
+		glPixelStorei(GL_PACK_ALIGNMENT, 1); // req'd for reading 3-component pixels
+		glReadPixels(l,b,w,h, GL_RGB, GL_UNSIGNED_BYTE, ptr);
+		glPixelStorei(GL_PACK_ALIGNMENT, 4); // back to default
+	};
+
 	#ifdef AL_GRAPHICS_SUPPORTS_PBO
 	/* Copy pixels out of framebuffer into client memory.
 	A PBO FIFO is used to avoid stalling on glReadPixels. See:
@@ -388,7 +394,7 @@ void RenderToDisk::saveImage(
 		}
 
 		// This will perform asynchronously into the bound PBO
-		glReadPixels(l,b,w,h, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		downloadPixels(0);
 
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
@@ -398,10 +404,9 @@ void RenderToDisk::saveImage(
 	else
 	#endif
 	{	// This will block until all draw commands finish
-		glReadPixels(l,b,w,h, GL_RGB, GL_UNSIGNED_BYTE, pixs);
+		downloadPixels(pixs);
 		readPixels = true;
 	}
-
 
 	// Launch thread to write pixels out to an image file
 	if(readPixels){
