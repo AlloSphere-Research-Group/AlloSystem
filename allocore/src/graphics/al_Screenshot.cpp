@@ -17,7 +17,9 @@ bool Screenshot::save(unsigned w, unsigned h, const std::string& filePath){
 	if(!fs.is_open()) return false;
 
 	std::vector<unsigned char> pix(w*h*3, 0);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1); // req'd for reading 3-component pixels
 	glReadPixels(0,0, w,h, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)&pix[0]);
+	glPixelStorei(GL_PACK_ALIGNMENT, 4); // back to default
 	//printf("%d %d %d\n", pix[0], pix[1], pix[2]);
 
 	auto lsB = [](unsigned x){ return (unsigned char)(x&255); };
