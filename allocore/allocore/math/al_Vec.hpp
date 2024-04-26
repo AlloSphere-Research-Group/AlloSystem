@@ -135,7 +135,8 @@ public:
 
 	/// @param[in] v		values to initialize elements to
 	/// If the initializer list has one element, then it is assigned to all
-	/// vector components.
+	/// vector components. If the initializer list is empty, then no elements
+	/// are assigned to.
 	Vec(std::initializer_list<T> v){ set(v); }
 
 	/// @param[in] v		vector to initialize elements to
@@ -158,6 +159,10 @@ public:
 	Vec(const T2 * v, int stride=1){ set(v,stride); }
 
 	/// Non-initializing constructor
+
+	/// Elements will not be initialized (copy-assigned to), but non-trivial 
+	/// types will have their default constructor called. The rules are the same
+	/// as for a non-initializing C-style array declaration.
 	Vec(VecNoInit){}
 
 
@@ -331,9 +336,12 @@ public:
 	/// Set elements from initializer list {a,b,...}
 
 	/// If the initializer list has one element, then it is assigned to all
-	/// vector components.
+	/// vector components. If the initializer list is empty, then no elements
+	/// are assigned to.
 	Vec& set(std::initializer_list<T> v){
-		if(v.size() == 1){
+		if(v.size() == 0){
+			// no-op
+		} else if(v.size() == 1){
 			*this = v.begin()[0];
 		} else {
 			const int M = N<v.size() ? N : int(v.size());
