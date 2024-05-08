@@ -240,6 +240,21 @@ public:
 	T * end(){ return elems() + N; }
 	const T * end() const { return elems() + N; }
 
+	/// Iterate through all elements
+
+	/// \param[in] f	Function called for each element with first arg the
+	///					value and second arg the index.
+	template <class Func>
+	Vec& forEach(const Func& f){
+		for(int i=0; i<size(); ++i) f(at(i), i);
+		return *this;
+	}
+
+	template <class Func>
+	const Vec& forEach(const Func& f) const {
+		return const_cast<Vec*>(this)->forEach(f);
+	}
+
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems()[i];}
 
