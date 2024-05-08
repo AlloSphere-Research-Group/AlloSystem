@@ -4,6 +4,7 @@
 #ifdef AL_WINDOWS
 #include <windows.h> // SetThreadExecutionState
 #elif AL_OSX
+#include <IOKit/pwr_mgt/IOPMLib.h>
 #else
 #endif
 
@@ -19,7 +20,18 @@ void requiresDisplay(bool whether, bool continuous){
 		SetThreadExecutionState(ES_CONTINUOUS);
 	}
 #elif AL_OSX
-    
+	// Code valid for macOS 10.6+
+	// https://developer.apple.com/library/archive/qa/qa1340/_index.html
+	CFStringRef reason = CFSTR("Application requires display");
+	static IOPMAssertionID ID = 0;
+	if(whether && !ID){
+		auto res = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reason, &ID);
+		//if(kIOReturnSuccess != res){}
+		//printf("ID:%u\n", ID);
+	} else if(ID){
+		IOPMAssertionRelease(ID);
+		ID = 0;
+	}
 #else
 
 #endif
