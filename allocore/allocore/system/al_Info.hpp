@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_SYSTEM_INFO_H
-#define INCLUDE_AL_SYSTEM_INFO_H
+#ifndef INCLUDE_AL_SYSTEM_INFO_HPP
+#define INCLUDE_AL_SYSTEM_INFO_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
