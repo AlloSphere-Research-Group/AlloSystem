@@ -57,6 +57,7 @@ namespace rnd{
 
 class LinCon;
 class MulCon;
+class Xoshiro;
 class Tausworthe;
 template<class RNG> class Random;
 
@@ -341,7 +342,6 @@ public:
 	:	mVal(seed)
 	{	type(0); }
 
-
 	/// Generate next uniform random integer in [0, 2^32)
 	uint32_t operator()(){
 		return mVal = mVal*mMul + mAdd;
@@ -387,7 +387,6 @@ public:
 	:	mVal(seed)
 	{	type(0); }
 
-
 	/// Generate next uniform random integer in [0, 2^32)
 	uint32_t operator()(){
 		return mVal *= mMul;
@@ -417,6 +416,59 @@ private:
 };
 
 
+/// xoshiro128+ uniform pseudo-random number generator
+
+/// "xoshiro" is short for "xor, shift, rotate". This PRNG produces very high
+/// quality output and competes in speed with linear congruential generators.
+/// The period is 2^128. It passes BigCrush except linearity tests (binary rank 
+/// and linear complexity). It is advised not to use the lower 4 bits which have
+/// low linear complexity.
+/// References and further information:
+/// Blackman, D. and Vigna, S. (2021). Scrambled linear pseudorandom number generators. ACM Trans. Math. Softw., 47:1−32.  http://vigna.di.unimi.it/ftp/papers/ScrambledLinear.pdf
+/// xoshiro / xoroshiro generators and the PRNG shootout: https://prng.di.unimi.it/
+/// Reference implementation: https://prng.di.unimi.it/xoshiro128plus.c
+class Xoshiro{
+public:
+	/// Default constructor uses a randomly generated seed
+	Xoshiro(): Xoshiro(al::rnd::seed()){}
+
+	/// @param[in] seed		Initial seed value
+	Xoshiro(uint64_t seed){ this->seed(seed); }
+
+	/// Generate next uniform random integer in [0, 2^32)
+    uint32_t operator()(){
+		auto rotl = [](uint32_t x, uint32_t k){ return (x << k) | (x >> (32 - k)); };
+		auto res = a + d;
+		//auto res = rotl(a + d, 7) + a; // xoshiro128++ passes all BigCrush tests
+		//auto res = rotl(b * 5, 7) * 9; // xoshiro128** passes all BigCrush tests
+		auto t = b << 9;
+		c ^= a;
+		d ^= b;
+		b ^= c;
+		a ^= d;
+		c ^= t;
+		d = rotl(d, 11);
+		return res;
+    }
+
+	/// Set seed
+	void seed(uint64_t v){
+		// use SplitMix64 generator to avoid degenerate all-zero state
+		v = splitmix(v); a = v; b = v>>32;
+		v = splitmix(v); c = v; d = v>>32;
+	}
+
+private:
+    uint32_t a,b,c,d;
+
+    static uint64_t splitmix(uint64_t s) {
+		auto r = (s += 0x9E3779B97f4A7C15ULL);
+		r = (r ^ (r >> 30)) * 0xBF58476D1CE4E5B9ULL;
+		r = (r ^ (r >> 27)) * 0x94D049BB133111EBULL;
+		return r ^ (r >> 31);
+	}
+};
+
 
 /// Combined Tausworthe uniform pseudo-random number generator
 
@@ -428,7 +480,6 @@ private:
 /// http://www.iro.umontreal.ca/~lecuyer/papers.html
 class Tausworthe{
 public:
-
 	/// Default constructor uses a randomly generated seed
 	Tausworthe(){ seed(al::rnd::seed()); }
 
