@@ -1,8 +1,8 @@
+#include <cstdio> // fprintf, printf, vsnprintf
+#include <cstdarg> // va_list etc.
+#include <cstdlib> // exit
 #include <map>
 #include <string>
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
 #include "allocore/system/al_Printing.hpp"
 
 namespace al{
@@ -73,7 +73,7 @@ void _warnOnce(const char * fileName, int lineNumber, const char * fmt, ...){
 
 	va_list arg;
 	va_start(arg, fmt);
-	vsprintf(buf, fmt, arg);
+	vsnprintf(buf, sizeof buf, fmt, arg);
 	va_end(arg);
 
 	msg = buf;
