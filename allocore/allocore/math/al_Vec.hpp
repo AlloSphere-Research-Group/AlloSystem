@@ -419,8 +419,9 @@ public:
 	}
 
 	/// Get a vector comprised of elements indexed from argument (like APL Index)
-	template <int M>
-	Vec<M,T> get(const Vec<M,int>& indices) const {
+	template <int M, class Int>
+	Vec<M,T> get(const Vec<M,Int>& indices) const {
+		static_assert(std::is_integral<Int>::value, "Indices must be integral type");
 		return indices.template map<T>([this](int i){ return at(i); });
 	}
 
