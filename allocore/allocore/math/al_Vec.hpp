@@ -1239,6 +1239,10 @@ inline Vec<N,T> floor(const Vec<N,T>& v, const T& step){ return floor(v/step)*st
 template <int N, class T>
 inline Vec<N,int> roundi(const Vec<N,T>& v){ return v + v.sgn(T(0.5)); }
 
+/// Get fractional part of values
+template <int N, class T>
+inline Vec<N,T> fract(const Vec<N,T>& v){ return v - floor(v); }
+
 /// Returns sum of elements
 template <int N, class T>
 inline T sum(const Vec<N,T>& v){ return v.sum(); }
