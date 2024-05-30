@@ -114,6 +114,9 @@ public:
 
 	typedef T value_type;
 
+	/// Vector with same size, but different type
+	template <class U> using Type = Vec<N,U>;
+
 
 	/// @param[in] v		value to initialize all elements to
 	Vec(const T& v=T()){ *this = v; }
