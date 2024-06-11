@@ -284,7 +284,13 @@ public:
 	App& name(const std::string& v){ mName=v; return *this; }
 
 	/// Get application name
-	const std::string&	name() const { return mName; }
+	const std::string& name() const { return mName; }
+
+	/// Set the directory for application resources
+	App& resourceDir(const std::string& dir){ mResourceDir=dir; return *this; }
+
+	/// Get resource directory
+	const std::string& resourceDir() const { return mResourceDir; }
 
 	/// Get seconds since application start
 	double appTime() const;
@@ -419,6 +425,7 @@ private:
 	std::unique_ptr<osc::Send> mOSCSend;
 
 	std::string mName;
+	std::string mResourceDir = "./";
 	void * mClockAnimate = nullptr;
 	void * mClockNav = nullptr;
 };

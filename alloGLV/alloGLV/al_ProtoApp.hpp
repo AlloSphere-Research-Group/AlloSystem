@@ -75,10 +75,8 @@ public:
 	);
 
 	/// Set the directory for application resources
-	ProtoApp& resourceDir(const std::string& dir, bool searchBack=true);
-
-	/// Get resource directory
-	const std::string& resourceDir() const { return mResourceDir; }
+	ProtoApp& resourceDir(const std::string& dir, bool searchBack = true);
+	const std::string& resourceDir() const { return App::resourceDir(); }
 
 	/// Get GUI
 	GLVDetachable& gui(){ return mGUI; }
@@ -108,7 +106,6 @@ protected:
 	glv::ParamPanel mParamPanel;
 	glv::Table mTopBar;
 	glv::Label mAppLabel;
-	std::string mResourceDir = ".";
 	bool mShowAxes = false;
 };
 
