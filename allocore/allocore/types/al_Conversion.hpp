@@ -84,8 +84,14 @@ std::string toBase64(const T& v){
 void fromBase64(void * dst, const std::string& src, unsigned numDstBytes);
 
 template <class T>
+T& fromBase64(T& dst, const std::string& src){
+	fromBase64(&dst, src, sizeof(T));
+	return dst;
+}
+
+template <class T>
 T fromBase64(const std::string& s){
-	T v; fromBase64(&v, s, sizeof(T)); return v;
+	T v; return fromBase64(v, s);
 }
 
 /// Convert a string of 1s and 0s to an integer.
@@ -101,6 +107,11 @@ uint32_t bitsToUInt(const char * strBin);
 template <class T>
 T clone(const T& obj){ return T(obj); }
 
+enum{
+	ENDIAN_BIG		= 0,	///< Word bytes ordered so MSB has lowest address
+	ENDIAN_LITTLE	= 1		///< Word bytes ordered so MSB has highest address
+};
+
 /// Returns 1 if little endian, 0 if big endian
 int endian();
 
@@ -111,6 +122,25 @@ void swapBytes(T& word);
 /// Swap the bytes of the words in an array in-place
 template <typename T>
 void swapBytes(T * data, unsigned count);
+
+/// Convert word from machine-endian to specified endian
+
+/// \param[in] word		Word to convert (in machine-endian)
+/// \param[in] endi		Endianness of result
+template <typename T>
+T toEndian(T word, int endi = ENDIAN_BIG){
+	if(endian() != endi) swapBytes(word);
+	return word;
+}
+
+/// Convert word from specified endian to machine-endian
+
+/// \param[in] word		Word to convert (in specified endian)
+/// \param[in] endi		Endianness of input
+template <typename T>
+T fromEndian(T word, int endi = ENDIAN_BIG){
+	return toEndian(word, endi); // yes, the same
+}
 
 /// Returns string with all characters converted to lowercase
 std::string toLower(const std::string& s);
