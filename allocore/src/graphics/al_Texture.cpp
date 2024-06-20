@@ -854,8 +854,9 @@ void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPi
 }
 
 void Texture::assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel, int w, int h, int xoffset, int yoffset){
-	const float rw = 1.f/(w-1);
-	const float rh = 1.f/(h-1);
+	auto noRepeat = [](Wrap w){ return int(REPEAT != w); };
+	const float rw = 1.f/(w-noRepeat(mWrapS));
+	const float rh = 1.f/(h-noRepeat(mWrapT));
 	assign([&](int i, int j, float * rgba){
 		onPixel(float(i-xoffset)*rw, float(j-yoffset)*rh, rgba);
 	}, w, h, xoffset, yoffset);

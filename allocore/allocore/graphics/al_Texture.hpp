@@ -359,8 +359,8 @@ public:
 
 	/// Assign pixel values to subregion using a visitor function
 
-	/// Texture coordinates span [0,1] and are relative to subregion.
-	///
+	/// Texture coords are relative to the subregion and span [0,1] or [0,1)
+	/// for non-repeating (clamped) or repeating wrap modes, respectively.
 	void assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel, int w, int h, int xoffset=0, int yoffset=0);
 		// Note: Through a C++ quirk, cannot overload on std::function
 
