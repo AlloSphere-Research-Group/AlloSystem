@@ -263,6 +263,12 @@ int addPrism(
 	bool caps=true
 );
 
+int addPrismOpen(
+	Mesh& m, float btmRadius=1, float topRadius=1, float height=2,
+	unsigned slices=16,
+	float twist=0
+);
+
 
 /// Add an annulus ("little ring") as indexed triangles
 
@@ -296,6 +302,12 @@ int addCylinder(
 	unsigned slices=16,
 	float twist=0,
 	bool caps=true
+);
+
+int addCylinderOpen(
+	Mesh& m, float radius=1, float height=2,
+	unsigned slices=16,
+	float twist=0
 );
 
 

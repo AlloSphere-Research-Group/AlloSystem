@@ -44,6 +44,15 @@ static void scaleVerts(Mesh& m, float radius, int N){
 	}
 }
 
+// Temporarily disable attribute hint(s)
+template <class Func>
+static void noAttribScope(Mesh& m, Mesh::Attrib attribs, const Func& f){
+	auto a = m.attribHint();
+	m.attribHint(a ^ attribs);
+	f();
+	m.attribHint(a);
+}
+
 int addCuboid(Mesh& m, float rx, float ry, float rz){
 
 	m.triangles();
@@ -359,10 +368,9 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 		m.vertex(0,0,-radius);
 
 	} else { // for texturing: edges must have duplicate vertices
-		auto attribHint = m.attribHint();
-		m.attribHint(attribHint ^ (Mesh::NORMAL /*| Mesh::TANGENT*/));
-		addSurface(m, slices+1,stacks+1, 1,1, 0.5,0.5);
-		m.attribHint(attribHint);
+		noAttribScope(m, Mesh::NORMAL /*| Mesh::TANGENT*/, [&](){
+			addSurface(m, slices+1,stacks+1, 1,1, 0.5,0.5);
+		});
 
 		for(int i=Nv; i<m.vertices().size(); ++i){
 			auto& pos = m.vertices()[i];
@@ -580,19 +588,24 @@ Spec_addWireGrid(0,1)
 Spec_addWireGrid(1,2)
 Spec_addWireGrid(2,1)
 
-int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist, bool caps){
+int addPrismOpen(Mesh& m, float rb, float rt, float h, unsigned slices, float twist){
 
 	m.triangles();
 	unsigned Nv = m.vertices().size();
-	float height_2 = height/2;
+	float h_2 = h*0.5f;
 
 	double frq = 2*M_PI/slices;
-	CSin csinb(frq, btmRadius);
+	CSin csinb(frq, rb);
 	CSin csint = csinb;
-	csint.ampPhase(topRadius, twist*frq);
+	csint.ampPhase(rt, twist*frq);
+
+	// With texcoords, we must duplicate the seam. Incrementing the slices by
+	// one here will do the trick---all the math below will still work.
+	if(m.wants(Mesh::TEXCOORD)) ++slices;
+
 	for(unsigned i=0; i<slices; ++i){
-		auto pb = Mesh::Vertex(csinb.r, csinb.i, -height_2);
-		auto pt = Mesh::Vertex(csint.r, csint.i,  height_2);
+		auto pb = Mesh::Vertex(csinb.r, csinb.i, -h_2);
+		auto pt = Mesh::Vertex(csint.r, csint.i,  h_2);
 		csinb();
 		csint();
 
@@ -609,8 +622,8 @@ int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned s
 		}
 		if(m.wants(Mesh::NORMAL)){
 			Mesh::Normal N;
-			if(height != 0.f){
-				N = (btmRadius != 0.f ? pb.xy()/btmRadius : pt.xy()/topRadius).take<3>();
+			if(h != 0.f){
+				N = (rb != 0.f ? pb.xy()/rb : pt.xy()/rt).take<3>();
 				N = N.rej1(T); // rotates N towards T to make orthonormal
 			} else {
 				N = Vec3f(0,0,1);
@@ -619,18 +632,47 @@ int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned s
 			m.normal(N);
 		}
 
-		int j = (i+1)%slices; // next slice over
-		int ib0 = Nv + 2*i;
-		int ib1 = Nv + 2*j;
-		int it0 = ib0 + 1;
-		int it1 = ib1 + 1;
-		m.index(ib0, ib1, it0);
-		m.index(it0, ib1, it1);
+		if(m.wants(Mesh::TEXCOORD)){
+			float u = float(i)/(slices-1);
+			m.texCoord(u, 0.f);
+			m.texCoord(u, 1.f);
+
+			if(i){
+				int ib1 = Nv + 2*i;
+				int ib0 = ib1 - 2;
+				int it0 = ib0 + 1;
+				int it1 = ib1 + 1;
+				m.index(ib0, ib1, it0);
+				m.index(it0, ib1, it1);
+			}
+
+		} else {
+			int j = (i+1)%slices; // next slice over
+			int ib0 = Nv + 2*i;
+			int ib1 = Nv + 2*j;
+			int it0 = ib0 + 1;
+			int it1 = ib1 + 1;
+			m.index(ib0, ib1, it0);
+			m.index(it0, ib1, it1);
+		}
 	}
 
+	return 2*slices;
+}
+
+int addPrism(Mesh& m, float rb, float rt, float h, unsigned slices, float twist, bool caps){
+
+	unsigned Nv = m.vertices().size();
+
+	// tex coords not supported ATM...
+	noAttribScope(m, Mesh::TEXCOORD, [&](){
+		addPrismOpen(m, rb,rt,h, slices, twist);
+	});
+
 	if(caps){
-		m.vertex(0.,0.,-height_2);
-		m.vertex(0.,0., height_2);
+		float h_2 = h*0.5f;
+		m.vertex(0.,0.,-h_2);
+		m.vertex(0.,0., h_2);
 
 		if(m.wants(Mesh::TANGENT)){
 			m.tangent(1.f,0.f,0.f);
@@ -652,17 +694,21 @@ int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned s
 		}
 	}
 
-	return 2*slices + 2*caps;
+	return 2*slices + 2*int(caps);
 }
 
 
 int addAnnulus(Mesh& m, float inRadius, float outRadius, unsigned slices, float twist){
-	return addPrism(m, outRadius, inRadius, 0, slices, twist, false);
+	return addPrismOpen(m, outRadius, inRadius, 0, slices, twist);
 }
 
 
 int addCylinder(Mesh& m, float radius, float height, unsigned slices, float twist, bool caps){
 	return addPrism(m, radius, radius, height, slices, twist, caps);
+}
+
+int addCylinderOpen(Mesh& m, float radius, float height, unsigned slices, float twist){
+	return addPrismOpen(m, radius, radius, height, slices, twist);
 }
 
 
