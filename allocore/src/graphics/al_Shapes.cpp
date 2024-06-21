@@ -591,11 +591,34 @@ int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned s
 	CSin csint = csinb;
 	csint.ampPhase(topRadius, twist*frq);
 	for(unsigned i=0; i<slices; ++i){
-		m.vertex(csinb.r, csinb.i, -height_2);
+		auto pb = Mesh::Vertex(csinb.r, csinb.i, -height_2);
+		auto pt = Mesh::Vertex(csint.r, csint.i,  height_2);
 		csinb();
-		m.vertex(csint.r, csint.i,  height_2);
 		csint();
-		
+
+		m.vertex(pb);
+		m.vertex(pt);
+
+		Mesh::Tangent T;
+		if(m.wants(Mesh::TANGENT | Mesh::NORMAL)){
+			T = (pt - pb).dir();
+		}
+		if(m.wants(Mesh::TANGENT)){
+			m.tangent(T);
+			m.tangent(T);
+		}
+		if(m.wants(Mesh::NORMAL)){
+			Mesh::Normal N;
+			if(height != 0.f){
+				N = (btmRadius != 0.f ? pb.xy()/btmRadius : pt.xy()/topRadius).take<3>();
+				N = N.rej1(T); // rotates N towards T to make orthonormal
+			} else {
+				N = Vec3f(0,0,1);
+			}
+			m.normal(N);
+			m.normal(N);
+		}
+
 		int j = (i+1)%slices; // next slice over
 		int ib0 = Nv + 2*i;
 		int ib1 = Nv + 2*j;
@@ -608,6 +631,16 @@ int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned s
 	if(caps){
 		m.vertex(0.,0.,-height_2);
 		m.vertex(0.,0., height_2);
+
+		if(m.wants(Mesh::TANGENT)){
+			m.tangent(1.f,0.f,0.f);
+			m.tangent(1.f,0.f,0.f);
+		}
+		if(m.wants(Mesh::NORMAL)){
+			m.normal(0.f,0.f,-1.f);
+			m.normal(0.f,0.f,+1.f);
+		}
+
 		int ib = m.vertices().size()-2;
 		int it = m.vertices().size()-1;
 		for(int i=0; i<slices; ++i){
