@@ -231,82 +231,8 @@ Mesh& Mesh::compress(){
 }
 
 Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
-	/*
-		Multi-pass algorithm:
-			generate a list of faces (assume triangles?)
-				(vary according to whether mIndices is used)
-			calculate normal per face (use normal<float>(dst, p0, p1, p2))
-			vertices may be used in multiple faces; their norm should be an average of the uses
-				easy enough if indices is being used; not so easy otherwise.
-					create a lookup table by hashing on vertex x,y,z
 
-			write avg into corresponding normals for each vertex
-				EXCEPT: if edge is sharper than @angle, just use the face normal directly
-	*/
-	/*
-	class TriFace {
-	public:
-		Mesh::Vertex vertices[3];
-		Vec3f norm;
-
-		TriFace(const TriFace& cpy)
-		: norm(cpy.norm) {
-			vertices[0] = cpy.vertices[0];
-			vertices[1] = cpy.vertices[1];
-			vertices[2] = cpy.vertices[2];
-		}
-		TriFace(Mesh::Vertex p0, Mesh::Vertex p1, Mesh::Vertex p2)
-		{
-			vertices[0] = p0;
-			vertices[1] = p1;
-			vertices[2] = p2;
-			norm = normal<float>(p0, p1, p2);
-		}
-	};
-
-	std::vector<TriFace> faces;
-	std::map<std::string, int> vertexHash;
-
-	int Ni = mIndices.size();
-	int Nv = mVertices.size();
-	if (Ni) {
-		for (int i=0; i<Ni;) {
-			TriFace face(
-				mVertices[mIndices[i++]],
-				mVertices[mIndices[i++]],
-				mVertices[mIndices[i++]]
-			);
-			faces.push_back(face);
-		}
-	} else {
-		for (int i=0; i<Nv;) {
-			TriFace face(
-				mVertices[i++],
-				mVertices[i++],
-				mVertices[i++]
-			);
-			faces.push_back(face);
-		}
-	}
-	*/
-
-	auto calcNormal = [](const Vertex& v1, const Vertex& v2, const Vertex& v3, bool MWE){
-		// MWAAT (mean weighted by areas of adjacent triangles)
-		auto vn = cross(v2-v1, v3-v1);
-
-		// MWE (mean weighted equally)
-		if(MWE) vn.normalize();
-
-		// MWA (mean weighted by angle)
-		// This doesn't work well with dynamic marching cubes- normals
-		// pop in and out for small triangles.
-		/*auto v12= v2-v1;
-		auto v13= v3-v1;
-		auto vn = cross(v12, v13).normalize();
-		vn *= angle(v12, v13) / M_PI;*/
-
-		return vn;
-	};
+	if(!isTriangleType()) return *this;
 
 	unsigned Nv = mVertices.size();
 
@@ -316,102 +242,53 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 	// make same number of normals as vertices
 	mNormals.resize(Nv);
 
-	// compute vertex based normals
-	if(indexed()){
-
+	// per-vertex case
+	if(indexed() || isTriangleStrip()){
 		for(auto& n : mNormals) n = 0.;
 
-		unsigned Ni = mIndices.size();
+		auto calcNormal = [](const Vertex& p1, const Vertex& p2, const Vertex& p3, bool MWE){
+			// MWAAT (mean weighted by areas of adjacent triangles)
+			auto n = perp(p1, p2, p3);
 
-		if(isTriangles()){
-			Ni = Ni - (Ni%3); // must be multiple of 3
+			// MWE (mean weighted equally)
+			if(MWE) n.normalize();
 
-			for(unsigned i=0; i<Ni; i+=3){
-				auto i1 = mIndices[i  ];
-				auto i2 = mIndices[i+1];
-				auto i3 = mIndices[i+2];
+			// MWA (mean weighted by angle)
+			// This doesn't work well with dynamic marching cubes- normals
+			// pop in and out for small triangles.
+			/*auto p12 = p2-p1;
+			auto p13 = p3-p1;
+			auto n = cross(p12, p13).normalize();
+			n *= angle(p12, p13) / M_PI;*/
 
-				auto vn = calcNormal(
-					mVertices[i1], mVertices[i2], mVertices[i3],
-					equalWeightPerFace
-				);
+			return n;
+		};
 
-				mNormals[i1] += vn;
-				mNormals[i2] += vn;
-				mNormals[i3] += vn;
-			}
-		}
-		else if(isTriangleStrip()){
-			for(unsigned i=0; i<Ni-2; ++i){
-
-				// Flip every other normal due to change in winding direction
-				auto odd = i & 1;
-
-				auto i1 = mIndices[i];
-				auto i2 = mIndices[i+1+odd];
-				auto i3 = mIndices[i+2-odd];
-
-				auto vn = calcNormal(
-					mVertices[i1], mVertices[i2], mVertices[i3],
-					equalWeightPerFace
-				);
-
-				mNormals[i1] += vn;
-				mNormals[i2] += vn;
-				mNormals[i3] += vn;
-			}
-		}
-
-		// normalize the normals
-		if(normalize) for(auto& n : mNormals) n.normalize();
+		forEachFace([&](int i1, int i2, int i3){
+			auto n = calcNormal(
+				mVertices[i1], mVertices[i2], mVertices[i3],
+				equalWeightPerFace
+			);
+			mNormals[i1] += n;
+			mNormals[i2] += n;
+			mNormals[i3] += n;
+		});
+	}
+	// per-face case (non-indexed triangles)
+	else {
+		forEachFace([&](int i1, int i2, int i3){
+			const auto& p1 = mVertices[i1];
+			const auto& p2 = mVertices[i2];
+			const auto& p3 = mVertices[i3];
+			auto n = perp(p1, p2, p3);
+			mNormals[i1] = n;
+			mNormals[i2] = n;
+			mNormals[i3] = n;
+		});
 	}
 
-	// non-indexed case
-	else{
-		// compute face based normals
-		if(isTriangles()){
-			auto N = Nv - (Nv % 3);
-
-			for(unsigned i=0; i<N; i+=3){
-				auto i1 = i+0;
-				auto i2 = i+1;
-				auto i3 = i+2;
-				const auto& v1 = mVertices[i1];
-				const auto& v2 = mVertices[i2];
-				const auto& v3 = mVertices[i3];
-
-				auto vn = cross(v2-v1, v3-v1);
-				if(normalize) vn.normalize();
-
-				mNormals[i1] = vn;
-				mNormals[i2] = vn;
-				mNormals[i3] = vn;
-			}
-		}
-		// compute vertex based normals
-		else if(isTriangleStrip()){
-
-			for(auto& n : mNormals) n = 0.;
-
-			for(unsigned i=0; i<Nv-2; ++i){
-
-				// Flip every other normal due to change in winding direction
-				auto odd = i & 1;
-
-				auto vn = calcNormal(
-					mVertices[i], mVertices[i+1+odd], mVertices[i+2-odd],
-					equalWeightPerFace
-				);
-
-				mNormals[i  ] += vn;
-				mNormals[i+1] += vn;
-				mNormals[i+2] += vn;
-			}
-
-			// normalize the normals
-			if(normalize) for(auto& n : mNormals) n.normalize();
-		}
-	}
+	// normalize the normals?
+	if(normalize) for(auto& n : mNormals) n.normalize();
 
 	return *this;
 }
