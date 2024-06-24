@@ -1268,12 +1268,6 @@ inline T dot(const Vec<N,T>& a, const Vec<N,T>& b){
 	return a.dot(b);
 }
 
-/// Get vector perpendicular to triangle abc (points in CCW order)
-template <int N, class T>
-inline Vec<N,T> perp(const Vec<N,T>& a, const Vec<N,T>& b, const Vec<N,T>& c){
-	return cross(b-a, c-a);
-}
-
 /// Rotate a vector around a normal vector
 
 /// @param[in,out]	vec		Vector to rotate
@@ -1417,10 +1411,16 @@ inline Vec<N,T> lerp(const Vec<N,T>& input, const Vec<N,T>& target, T amt){
 	return Vec<N,T>(input).lerp(target, amt);
 }
 
-/// Get normal to triangle defined by three points in CCW order
+/// Get vector perpendicular to triangle abc (points in CCW order)
 template <class T>
-inline Vec<3,T> normal(const Vec<3,T>& p1, const Vec<3,T>& p2, const Vec<3,T>& p3){
-	return cross(p2-p1, p3-p1).normalize();
+inline Vec<3,T> perp(const Vec<3,T>& a, const Vec<3,T>& b, const Vec<3,T>& c){
+	return cross(b-a, c-a);
+}
+
+/// Get normal to triangle abc (points in CCW order)
+template <class T>
+inline Vec<3,T> normal(const Vec<3,T>& a, const Vec<3,T>& b, const Vec<3,T>& c){
+	return perp(a,b,c).normalize();
 }
 
 
