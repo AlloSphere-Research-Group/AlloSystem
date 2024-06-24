@@ -344,7 +344,8 @@ int addSurface(
 /// @param[in,out] m	Mesh to add vertices and indices to
 /// @param[in] Nx		Number of vertices along x
 /// @param[in] Ny		Number of vertices along y
-/// @param[in] loopMode	1: connect edges perpendicular to x (cylindrical),
+/// @param[in] loopMode	0: do not connect edges (same as addSurface)
+///						1: connect edges perpendicular to x (cylindrical),
 ///						2: connect edges perpendicular to x and y (toroidal)
 /// @param[in] width	Total width (along x)
 /// @param[in] height	Total height (along y)

@@ -754,6 +754,8 @@ int addSurfaceLoop(
 	Mesh& m, int Nx, int Ny, int loopMode,
 	double width, double height, double cx, double cy
 ){
+	if(0 == loopMode) return addSurface(m ,Nx,Ny, width,height, cx,cy);
+
 	m.triangleStrip();
 
 	int Nv = m.vertices().size();
@@ -820,17 +822,12 @@ int addTorus(
 	double minPhase
 ){
 	int beg = m.vertices().size();
-	int Nv;
 
-	if(m.wants(Mesh::TEXCOORD)){
-		Nv = addSurface(
-			m, Nmaj, Nmin, 2*M_PI, 2*M_PI, M_PI, M_PI - minPhase*2*M_PI/Nmin
-		);
-	} else {
-		Nv = addSurfaceLoop(
-			m, Nmaj, Nmin, 2, 2*M_PI, 2*M_PI, M_PI, M_PI - minPhase*2*M_PI/Nmin
-		);
-	}
+	int Nv = addSurfaceLoop(m,
+		Nmaj, Nmin,
+		m.wants(Mesh::TEXCOORD) ? 0 : 2,
+		2*M_PI, 2*M_PI, M_PI, M_PI - minPhase*2*M_PI/Nmin
+	);
 
 	for(int i=beg; i<beg+Nv; ++i){
 		auto& p = m.vertices()[i];
