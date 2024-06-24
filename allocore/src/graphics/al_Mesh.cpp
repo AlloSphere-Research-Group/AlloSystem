@@ -1746,6 +1746,7 @@ void Mesh::print(FILE * dst) const {
 	QUERY_ATTRIB(mColors, Colors)
 	QUERY_ATTRIB(mColoris, Coloris)
 	QUERY_ATTRIB(mNormals, Normals)
+	QUERY_ATTRIB(mTangents, Tangents)
 	QUERY_ATTRIB(mTexCoord1s, TexCoord1s)
 	QUERY_ATTRIB(mTexCoord2s, TexCoord2s)
 	QUERY_ATTRIB(mTexCoord3s, TexCoord3s)
