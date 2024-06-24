@@ -714,7 +714,7 @@ int addCylinderOpen(Mesh& m, float radius, float height, unsigned slices, float 
 
 int addSurface(
 	Mesh& m, int Nx, int Ny,
-	double width, double height, double x, double y
+	double width, double height, double cx, double cy
 ){
 	m.triangleStrip();
 
@@ -727,8 +727,8 @@ int addSurface(
 		if(m.wants(Mesh::NORMAL  )) m.normal (0,0,1);
 		if(m.wants(Mesh::TANGENT )) m.tangent(0,1,0);
 		m.vertex(
-			x + (u-0.5)*width,
-			y + (v-0.5)*height,
+			cx + (u-0.5)*width,
+			cy + (v-0.5)*height,
 			0.
 		);
 	}}
@@ -752,7 +752,7 @@ int addSurface(
 
 int addSurfaceLoop(
 	Mesh& m, int Nx, int Ny, int loopMode,
-	double width, double height, double x, double y
+	double width, double height, double cx, double cy
 ){
 	m.triangleStrip();
 
@@ -765,9 +765,9 @@ int addSurfaceLoop(
 	double dv = height/My;
 
 	// Generate vertices
-	double v = y - height*0.5;
+	double v = cy - height*0.5;
 	for(int j=0; j<Ny; ++j){
-		double u = x - width*0.5;
+		double u = cx - width*0.5;
 		for(int i=0; i<Nx; ++i){
 			if(m.wants(Mesh::NORMAL )) m.normal (0,0,1);
 			if(m.wants(Mesh::TANGENT)) m.tangent(0,1,0);
@@ -820,9 +820,17 @@ int addTorus(
 	double minPhase
 ){
 	int beg = m.vertices().size();
-	int Nv = addSurfaceLoop(
-		m, Nmaj, Nmin, 2, 2*M_PI, 2*M_PI, M_PI, M_PI - minPhase*2*M_PI/Nmin
-	);
+	int Nv;
+
+	if(m.wants(Mesh::TEXCOORD)){
+		Nv = addSurface(
+			m, Nmaj, Nmin, 2*M_PI, 2*M_PI, M_PI, M_PI - minPhase*2*M_PI/Nmin
+		);
+	} else {
+		Nv = addSurfaceLoop(
+			m, Nmaj, Nmin, 2, 2*M_PI, 2*M_PI, M_PI, M_PI - minPhase*2*M_PI/Nmin
+		);
+	}
 
 	for(int i=beg; i<beg+Nv; ++i){
 		auto& p = m.vertices()[i];
@@ -833,10 +841,10 @@ int addTorus(
 			(majRadius + minRadius*cs2) * sn1,
 			minRadius*sn2
 		);
-		if(m.wants(Mesh::NORMAL)){ // addSurfaceLoop added normals
+		if(m.wants(Mesh::NORMAL)){ // addSurface* added normals
 			m.normals()[i] = { cs2*cs1, cs2*sn1, sn2 };
 		}
-		if(m.wants(Mesh::TANGENT)){ // addSurfaceLoop added tangents
+		if(m.wants(Mesh::TANGENT)){ // addSurface* added tangents
 			m.tangents()[i] = { -sn2*cs1, -sn2*sn1, cs2 };
 		}
 	}
