@@ -71,7 +71,7 @@ bool Mesh::isTriangleStrip() const { return primitive() == Graphics::TRIANGLE_ST
 bool Mesh::isTriangleType() const { return isTriangles() || isTriangleStrip(); }
 
 Mesh& Mesh::decompress(){
-	if(mIndices.size()){ // only makes sense for indexed mesh
+	if(indexed()){ // only makes sense for indexed mesh
 		toTriangles();
 		int Ni = mIndices.size();
 
@@ -317,7 +317,7 @@ Mesh& Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 	mNormals.resize(Nv);
 
 	// compute vertex based normals
-	if(mIndices.size()){
+	if(indexed()){
 
 		for(auto& n : mNormals) n = 0.;
 
@@ -428,7 +428,7 @@ Mesh& Mesh::invertNormals(){
 }
 
 Mesh& Mesh::repeatLast(){
-	if(mIndices.size()){
+	if(indexed()){
 		index(mIndices.last());
 	}
 	else{
@@ -578,7 +578,7 @@ Mesh& Mesh::smooth(float amount, int weighting){
 
 Mesh& Mesh::flipWinding(){
 	if(isTriangles()){
-		if(mIndices.size()){
+		if(indexed()){
 			for(int i=0; i<mIndices.size(); i+=3)
 				std::swap(mIndices[i], mIndices[i+2]);
 		} else {
@@ -604,10 +604,9 @@ Mesh& Mesh::merge(const Mesh& src){
 
 	// Source has indices, and I either do or don't.
 	// After this block, I will have indices.
-	if(src.mIndices.size()){
-		Index Ni = mIndices.size();
+	if(src.indexed()){
 		// If no indices, must create
-		if(0 == Ni){
+		if(!indexed()){
 			for(int i=0; i<Nv; ++i) index(i);
 		}
 		// Add source indices offset by my number of vertices
@@ -615,7 +614,7 @@ Mesh& Mesh::merge(const Mesh& src){
 	}
 
 	// Source doesn't have indices, but I do
-	else if(mIndices.size()){
+	else if(indexed()){
 		for(int i=Nv; i<Nv+src.mVertices.size(); ++i) index(i);
 	}
 
@@ -838,7 +837,7 @@ DEF_FILL(color, Color)
 DEF_FILL(colori, Colori)
 
 Mesh& Mesh::forEachFace(const std::function<void(int v1, int v2, int v3)>& onFace){
-	if(mIndices.size()){
+	if(indexed()){
 		if(isTriangles()){
 			for(int i=2; i<mIndices.size(); i+=3){
 				onFace(mIndices[i-2], mIndices[i-1], mIndices[i]);
@@ -987,7 +986,7 @@ Objects: {
 	fs.seekp(-1, std::ios::cur); // erase last comma
 	fs << "\n\t\t}\n";
 
-	if(m.mIndices.size()){
+	if(m.indexed()){
 		fs << "\t\tPolygonVertexIndex: *" << m.mIndices.size() << " {\n\t\t\ta: ";
 		for(int i=0; i<m.mIndices.size(); i+=3){
 			fs << (int)(m.mIndices[i  ]) << ',';

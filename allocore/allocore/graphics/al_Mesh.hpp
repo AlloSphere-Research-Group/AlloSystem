@@ -170,6 +170,10 @@ public:
 	const Indices& indices() const { return mIndices; }
 	Indices& indices(){ return mIndices; }
 
+
+	/// Returns whether vertices are indexed
+	bool indexed() const { return mIndices.size() > 0; }
+
 	/// Append index to index buffer
 	Mesh& index(unsigned int i){ indices().append(i); return *this; }
 
