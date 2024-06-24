@@ -368,7 +368,7 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 		m.vertex(0,0,-radius);
 
 	} else { // for texturing: edges must have duplicate vertices
-		noAttribScope(m, Mesh::NORMAL /*| Mesh::TANGENT*/, [&](){
+		noAttribScope(m, Mesh::NORMAL | Mesh::TANGENT, [&](){
 			addSurface(m, slices+1,stacks+1, 1,1, 0.5,0.5);
 		});
 
