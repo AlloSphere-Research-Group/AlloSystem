@@ -1268,6 +1268,12 @@ inline T dot(const Vec<N,T>& a, const Vec<N,T>& b){
 	return a.dot(b);
 }
 
+/// Get vector perpendicular to triangle abc (points in CCW order)
+template <int N, class T>
+inline Vec<N,T> perp(const Vec<N,T>& a, const Vec<N,T>& b, const Vec<N,T>& c){
+	return cross(b-a, c-a);
+}
+
 /// Rotate a vector around a normal vector
 
 /// @param[in,out]	vec		Vector to rotate
