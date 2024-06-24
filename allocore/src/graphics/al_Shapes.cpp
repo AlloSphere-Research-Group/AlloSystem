@@ -834,7 +834,10 @@ int addTorus(
 			minRadius*sn2
 		);
 		if(m.wants(Mesh::NORMAL)){ // addSurfaceLoop added normals
-			m.normals()[i] = { cs2 * cs1, cs2 * sn1, sn2 };
+			m.normals()[i] = { cs2*cs1, cs2*sn1, sn2 };
+		}
+		if(m.wants(Mesh::TANGENT)){ // addSurfaceLoop added tangents
+			m.tangents()[i] = { -sn2*cs1, -sn2*sn1, cs2 };
 		}
 	}
 
