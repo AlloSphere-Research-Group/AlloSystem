@@ -522,15 +522,13 @@ int utMath(){
 		// Test roundtrip matrix/quat conversions
 		{
 			double mat4[16];
-			Quatd b;
-			q.fromEuler(1.,2.,3.); // a non-trival quat
-			q.toMatrix(mat4);
-			b = q.fromMatrix(mat4);
-			assert( eq(q,b) || eq(q,b.conj()) );
-
-			q.toMatrixTransposed(mat4);
-			b = q.fromMatrixTransposed(mat4);
-			assert( eq(q,b) || eq(q,b.conj()) );
+			for(int i=0; i<32; ++i){
+				auto a = Quatd().fromEuler(i,i+1,i+2); // a non-trival rotation
+				a.toMatrix(mat4);
+				auto b = Quatd().fromMatrix(mat4);
+				//a.print(); b.print();
+				assert( eq(a,b) || eq(a,-b) );
+			}
 		}
 
 //		int smps = 100;
