@@ -911,7 +911,7 @@ int utMath(){
 			assert(a() != a());	// successive values are unique
 		}
 
-		{	MulLinCon a,b;
+		{	MulCon a,b;
 			assert(a() != b()); // sequences are unique
 			assert(a() != a()); // successive values are unique
 		}
