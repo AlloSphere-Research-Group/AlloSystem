@@ -286,71 +286,71 @@ public:
 
 
 	/// Set linear velocity
-	void move(double dr, double du, double df){ moveR(dr); moveU(du); moveF(df); }
+	Nav& move(double dr, double du, double df){ moveR(dr); moveU(du); return moveF(df); }
 	template <class T>
-	void move(const Vec<3,T>& dp){ move(dp[0],dp[1],dp[2]); }
+	Nav& move(const Vec<3,T>& dp){ return move(dp[0],dp[1],dp[2]); }
 
 	/// Set linear velocity along right vector
-	void moveR(double v){ mMove0[0] = v; }
+	Nav& moveR(double v){ mMove0[0] = v; return *this; }
 
 	/// Set linear velocity along up vector
-	void moveU(double v){ mMove0[1] = v; }
+	Nav& moveU(double v){ mMove0[1] = v; return *this; }
 
 	/// Set linear velocity along forward vector
-	void moveF(double v){ mMove0[2] = v; }
+	Nav& moveF(double v){ mMove0[2] = v; return *this; }
 
 	Vec3d& move(){ return mMove0; }
 
 
 	/// Move by a single increment
-	void nudge(double dr, double du, double df){ nudgeR(dr); nudgeU(du); nudgeF(df); }
+	Nav& nudge(double dr, double du, double df){ nudgeR(dr); nudgeU(du); return nudgeF(df); }
 	template <class T>
-	void nudge(const Vec<3,T>& dp){ nudge(dp[0],dp[1],dp[2]); }
+	Nav& nudge(const Vec<3,T>& dp){ return nudge(dp[0],dp[1],dp[2]); }
 
-	void nudgeR(double amount){ mNudge[0] += amount; }
-	void nudgeU(double amount){ mNudge[1] += amount; }
-	void nudgeF(double amount){ mNudge[2] += amount; }
+	Nav& nudgeR(double amount){ mNudge[0] += amount; return *this; }
+	Nav& nudgeU(double amount){ mNudge[1] += amount; return *this; }
+	Nav& nudgeF(double amount){ mNudge[2] += amount; return *this; }
 
 	/// Move toward a given world-coordinate point
-	void nudgeToward(const Vec3d& p, double amt=1.);
+	Nav& nudgeToward(const Vec3d& p, double amt=1.);
 
 	Vec3d& nudge(){ return mNudge; }
 
 
 	/// Set angular velocity from azimuth, elevation, and bank differentials, in radians
-	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
+	Nav& spin(double da, double de, double db){ spinR(de); spinU(da); return spinF(db); }
 	template <class T>
-	void spin(const Vec<3,T>& daeb){ spin(daeb[0],daeb[1],daeb[2]); }
+	Nav& spin(const Vec<3,T>& daeb){ return spin(daeb[0],daeb[1],daeb[2]); }
 
 	/// Set angular velocity from a unit quaternion (versor)
-	void spin(const Quatd& v){ v.toEuler(mSpin1); }
+	Nav& spin(const Quatd& v){ v.toEuler(mSpin1); return *this; }
 
 	/// Set angular velocity around right vector (elevation), in radians
-	void spinR(double v){ mSpin0[1] = v; }
+	Nav& spinR(double v){ mSpin0[1] = v; return *this; }
 
 	/// Set angular velocity around up vector (azimuth), in radians
-	void spinU(double v){ mSpin0[0] = v; }
+	Nav& spinU(double v){ mSpin0[0] = v; return *this; }
 
 	/// Set angular velocity around forward vector (bank), in radians
-	void spinF(double v){ mSpin0[2] = v; }
+	Nav& spinF(double v){ mSpin0[2] = v; return *this; }
 
 	/// Set angular velocity directly
 	Vec3d& spin(){ return mSpin0; }
 
 
 	/// Turn by a single increment for one step, in radians
-	void turn(double az, double el, double ba){ turnR(el); turnU(az); turnF(ba); }
+	Nav& turn(double az, double el, double ba){ turnR(el); turnU(az); return turnF(ba); }
 	template <class T>
-	void turn(const Vec<3,T>& daeb){ turn(daeb[0],daeb[1],daeb[2]); }
+	Nav& turn(const Vec<3,T>& daeb){ return turn(daeb[0],daeb[1],daeb[2]); }
 
 	/// Turn by a single increment, in radians, around the right vector (elevation)
-	void turnR(double v){ mTurn[1] = v;	}
+	Nav& turnR(double v){ mTurn[1] = v; return *this;	}
 
 	/// Turn by a single increment, in radians, around the up vector (azimuth)
-	void turnU(double v){ mTurn[0] = v; }
+	Nav& turnU(double v){ mTurn[0] = v; return *this; }
 
 	/// Turn by a single increment, in radians, around the forward vector (bank)
-	void turnF(double v){ mTurn[2] = v; }
+	Nav& turnF(double v){ mTurn[2] = v; return *this; }
 
 	Vec3d& turn(){ return mTurn; }
 

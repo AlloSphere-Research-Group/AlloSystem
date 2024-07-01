@@ -125,14 +125,14 @@ Pose Nav::vel() const {
 	return {mMove1, Quatd().fromEuler(mSpin1)};
 }
 
-void Nav::nudgeToward(const Vec3d& p, double amt){
+Nav& Nav::nudgeToward(const Vec3d& p, double amt){
 	Vec3d rotEuler;
 	Vec3d target(p - pos());
 	target.normalize();	// unit vector of direction to move (in world frame)
 	// rotate target into local frame:
 	target = quat().rotate(target);
 	// push ourselves in that particular direction:
-	nudge(target * amt);
+	return nudge(target * amt);
 }
 
 Nav& Nav::halt(){
