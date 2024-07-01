@@ -496,37 +496,46 @@ template<typename T>
 Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz){
 	auto trace = ux[0]+uy[1]+uz[2];
 
+	/* Code from Martin John Baker
+	https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+
+	Input matrix            Baker notation
+	| ux[0] uy[0] uz[0] |   | m00 m01 m02 |
+	| ux[1] uy[1] uz[1] | = | m10 m11 m12 |
+	| ux[2] uy[2] uz[2] |   | m20 m21 m22 |
+	*/
+
 	if(trace > T(0)) {
 		w = std::sqrt(T(1) + trace)*T(0.5);
 		auto c = T(1)/(T(4)*w);
-		x = (uz[1] - uy[2])*c;
-		y = (ux[2] - uz[0])*c;
-		z = (uy[0] - ux[1])*c;
+		x = (uy[2] - uz[1])*c;
+		y = (uz[0] - ux[2])*c;
+		z = (ux[1] - uy[0])*c;
 	}
 	else {
 		if(ux[0] > uy[1] && ux[0] > uz[2]) {
 			// ux[0] is greatest
 			x = std::sqrt(T(1) + ux[0]-uy[1]-uz[2])*T(0.5);
 			auto c = T(1)/(T(4)*x);
-			w = (uz[1] - uy[2])*c;
-			y = (uy[0] + ux[1])*c;
-			z = (uz[0] + ux[2])*c;
+			w = (uy[2] - uz[1])*c;
+			y = (ux[1] + uy[0])*c;
+			z = (ux[2] + uz[0])*c;
 		}
 		else if(uy[1] > ux[0] && uy[1] > uz[2]) {
 			// ux[1] is greatest
 			y = std::sqrt(T(1) + uy[1]-ux[0]-uz[2])*T(0.5);
 			auto c = T(1)/(T(4)*y);
-			w = (ux[2] - uz[0])*c;
-			x = (uy[0] + ux[1])*c;
-			z = (uz[1] + uy[2])*c;
+			w = (uz[0] - ux[2])*c;
+			x = (ux[1] + uy[0])*c;
+			z = (uy[2] + uz[1])*c;
 		}
 		else { //if(uz[2] > ux[0] && uz[2] > uy[1]) {
 			// ux[2] is greatest
 			z = std::sqrt(T(1) + uz[2]-ux[0]-uy[1])*T(0.5);
 			auto c = T(1)/(T(4)*z);
-			w = (uy[0] - ux[1])*c;
-			x = (uz[0] + ux[2])*c;
-			y = (uz[1] + uy[2])*c;
+			w = (ux[1] - uy[0])*c;
+			x = (ux[2] + uz[0])*c;
+			y = (uy[2] + uz[1])*c;
 		}
 	}
 	return *this;
