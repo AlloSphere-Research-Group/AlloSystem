@@ -65,6 +65,9 @@ public:
 	/// @param[in] ori		Initial orientation
 	Pose(const Vec3d& pos=Vec3d(0), const Quatd& ori=Quatd::identity());
 
+	/// Construct from matrix
+	template <class T>
+	Pose(const Mat<4,T>& m){ fromMatrix(m); }
 
 	/// Get identity
 	static Pose identity(){ return Pose().setIdentity(); }
@@ -185,6 +188,12 @@ public:
 	template <class T>
 	Pose& quat(const Quat<T>& v){ mQuat = v; return *this; }
 
+	template <class T>
+	Pose& fromMatrix(const Mat<4,T>& v){
+		mQuat.fromMatrix(v); // just reads upper 3x3
+		mVec = v.template col<3>().xyz();
+		return *this;
+	}
 
 	/// Print to standard output
 	void print() const;
