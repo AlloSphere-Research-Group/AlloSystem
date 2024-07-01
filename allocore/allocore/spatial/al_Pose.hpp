@@ -208,54 +208,6 @@ protected:
 
 
 
-/// A smoothed Pose
-
-/// This Pose approaches the stored target Pose exponentially
-/// with a curvature determined by psmooth and qsmooth
-class SmoothPose : public Pose {
-public:
-	SmoothPose(const Pose& init=Pose(), double psmooth=0.9, double qsmooth=0.9);
-
-	// step toward the target:
-	SmoothPose& operator()() {
-		pos().lerp(mTarget.pos(), 1.-mPF);
-		quat().slerpTo(mTarget.quat(), 1.-mQF);
-		return *this;
-	}
-
-	// set and update:
-	SmoothPose& operator()(const Pose& p) {
-		target(p);
-		return (*this)();
-	}
-
-	// set the target to smoothly interpolate to:
-	Pose& target() { return mTarget; }
-	void target(const Pose& v) { mTarget = v; }
-	void target(const Vec3d& v) { mTarget.pos() = v; }
-	void target(const Quatd& v) { mTarget.quat() = v; }
-
-	// set immediately (without smoothing):
-	void jump(Pose& p) {
-		target(p);
-		*this = p;
-	}
-	void jump(Vec3d& v) {
-		target(v);
-		pos() = v;
-	}
-	void jump(Quatd& q) {
-		target(q);
-		quat() = q;
-	}
-
-protected:
-	Pose mTarget;
-	double mPF, mQF;
-};
-
-
-
 ///	A mobile coordinate frame
 
 ///	This represents a Pose combined with smooth angular and positional

@@ -100,12 +100,6 @@ void Pose::print() const {
 
 
 
-SmoothPose::SmoothPose(const Pose& init, double psmooth, double qsmooth)
-:	Pose(init), mTarget(init), mPF(psmooth), mQF(qsmooth)
-{}
-
-
-
 Nav::Nav(const Vec3d &position, double smooth)
 :	Pose(position), mSmooth(smooth), mVelScale(1), mPullBack0(0), mPullBack1(0)
 {
