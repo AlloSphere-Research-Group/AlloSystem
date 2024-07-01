@@ -507,7 +507,7 @@ Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, co
 
 	if(trace > T(0)) {
 		w = std::sqrt(T(1) + trace)*T(0.5);
-		auto c = T(1)/(T(4)*w);
+		auto c = T(0.25)/w;
 		x = (uy[2] - uz[1])*c;
 		y = (uz[0] - ux[2])*c;
 		z = (ux[1] - uy[0])*c;
@@ -516,15 +516,15 @@ Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, co
 		if(ux[0] > uy[1] && ux[0] > uz[2]) {
 			// ux[0] is greatest
 			x = std::sqrt(T(1) + ux[0]-uy[1]-uz[2])*T(0.5);
-			auto c = T(1)/(T(4)*x);
+			auto c = T(0.25)/x;
 			w = (uy[2] - uz[1])*c;
 			y = (ux[1] + uy[0])*c;
 			z = (ux[2] + uz[0])*c;
 		}
-		else if(uy[1] > ux[0] && uy[1] > uz[2]) {
+		else if(uy[1] > uz[2]) {
 			// ux[1] is greatest
 			y = std::sqrt(T(1) + uy[1]-ux[0]-uz[2])*T(0.5);
-			auto c = T(1)/(T(4)*y);
+			auto c = T(0.25)/y;
 			w = (uz[0] - ux[2])*c;
 			x = (ux[1] + uy[0])*c;
 			z = (uy[2] + uz[1])*c;
@@ -532,7 +532,7 @@ Quat<T>& Quat<T>::fromCoordinateFrame(const Vec<3,T>& ux, const Vec<3,T>& uy, co
 		else { //if(uz[2] > ux[0] && uz[2] > uy[1]) {
 			// ux[2] is greatest
 			z = std::sqrt(T(1) + uz[2]-ux[0]-uy[1])*T(0.5);
-			auto c = T(1)/(T(4)*z);
+			auto c = T(0.25)/z;
 			w = (ux[1] - uy[0])*c;
 			x = (ux[2] + uz[0])*c;
 			y = (uy[2] + uz[1])*c;
