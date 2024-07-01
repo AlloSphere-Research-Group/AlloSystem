@@ -272,15 +272,6 @@ public:
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
 
-	/// Get right unit vector
-	const Vec3d& ur() const { return mUR; }
-
-	/// Get up unit vector
-	const Vec3d& uu() const { return mUU; }
-
-	/// Get forward unit vector
-	const Vec3d& uf() const { return mUF; }
-
 	/// Get current linear and angular velocities as a Pose
 	Pose vel() const {
 		return Pose(mMove1, Quatd().fromEuler(mSpin1));
@@ -296,11 +287,6 @@ public:
 
 	Nav& view(const Quatd& v);
 
-	/// Turn to face a given world-coordinate point
-	void faceToward(const Vec3d& p, double amt=1.);
-
-	/// Turn to face a given world-coordinate point, while maintaining an up vector
-	void faceToward(const Vec3d& point, const Vec3d& up, double amt=1.);
 
 	/// Move toward a given world-coordinate point
 	void nudgeToward(const Vec3d& p, double amt=1.);
@@ -377,12 +363,6 @@ public:
 	/// Go to origin, reset orientation
 	Nav& home();
 
-	/// Update coordinate frame basis vectors based on internal quaternion
-	void updateDirectionVectors(){
-		quat().normalize();
-		directionVectors(mUR, mUU, mUF);
-	}
-
 	Nav& operator=(const Pose& v);
 
 	Nav& operator=(const Nav& v);
@@ -406,7 +386,6 @@ protected:
 	Vec3d mSpin0, mSpin1;	// angular velocities (raw, smoothed)
 	Vec3d mTurn;			// orientation increment for one step
 	Vec3d mNudge;			// position increment for one step
-	Vec3d mUR, mUU, mUF;	// basis vectors of local coordinate frame
 	double mSmooth;
 	double mVelScale;		// velocity scaling factor
 	double mPullBack0, mPullBack1;

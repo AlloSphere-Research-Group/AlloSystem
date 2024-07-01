@@ -98,38 +98,16 @@ SmoothPose::SmoothPose(const Pose& init, double psmooth, double qsmooth)
 Nav::Nav(const Vec3d &position, double smooth)
 :	Pose(position), mSmooth(smooth), mVelScale(1), mPullBack0(0), mPullBack1(0)
 {
-	updateDirectionVectors();
 }
 
 Nav::Nav(const Nav& nav)
 :	Pose(nav.pos(), nav.quat() ),
-	mMove0(nav.mMove0), mMove1(nav.mMove1),	// linear velocities (raw, smoothed)
-	mSpin0(nav.mSpin0), mSpin1(nav.mSpin1),	// angular velocities (raw, smoothed)
-	mTurn(nav.mTurn), mNudge(nav.mNudge),			//
+	mMove0(nav.mMove0), mMove1(nav.mMove1),
+	mSpin0(nav.mSpin0), mSpin1(nav.mSpin1),
+	mTurn(nav.mTurn), mNudge(nav.mNudge),
 	mSmooth(nav.smooth()), mVelScale(nav.mVelScale),
 	mPullBack0(nav.mPullBack0), mPullBack1(nav.mPullBack1)
 {
-	updateDirectionVectors();
-}
-
-void Nav::faceToward(const Vec3d& point, double amt){
-
-	/*Vec3d target(p - pos());
-	target.normalize();
-	Quatd rot = Quatd::getRotationTo(uf(), target);
-
-	// We must pre-multiply the Pose quaternion with our rotation since
-	// it was computed in world space.
-	if(amt == 1.)	quat() = rot * quat();
-	else			quat() = rot.pow(amt) * quat();*/
-
-	Pose::faceToward(point, amt);
-	updateDirectionVectors();
-}
-
-void Nav::faceToward(const Vec3d& point, const Vec3d& up, double amt){
-	Pose::faceToward(point, up, amt);
-	updateDirectionVectors();
 }
 
 void Nav::nudgeToward(const Vec3d& p, double amt){
@@ -149,7 +127,6 @@ Nav& Nav::halt(){
 	mSpin1 = 0;
 	mTurn = 0;
 	mNudge = 0;
-	updateDirectionVectors();
 	return *this;
 }
 
@@ -159,7 +136,6 @@ Nav& Nav::home(){
 	turn(0, 0, 0);
 	spin(0, 0, 0);
 	mVec = 0;
-	updateDirectionVectors();
 	return *this;
 }
 
@@ -169,13 +145,11 @@ Nav& Nav::view(double azimuth, double elevation, double bank) {
 
 Nav& Nav::view(const Quatd& v) {
 	quat(v);
-	updateDirectionVectors();
 	return *this;
 }
 
 Nav& Nav::operator=(const Pose& v){
 	Pose::operator=(v);
-	updateDirectionVectors();
 	return *this;
 }
 
@@ -187,15 +161,11 @@ Nav& Nav::operator=(const Nav& v){
 		mSpin0 = v.mSpin0;
 		mSpin1 = v.mSpin1;
 		mTurn = v.mTurn;
-		mUR = v.mUR;
-		mUU = v.mUU;
-		mUF = v.mUF;
 		mSmooth = v.mSmooth;
 		mVelScale = v.mVelScale;
 		mPullBack0 = v.mPullBack0;
 		mPullBack1 = v.mPullBack1;
 		mTransformed = v.mTransformed;
-		updateDirectionVectors();
 	}
 	return *this;
 }
@@ -216,18 +186,21 @@ void Nav::step(double dt){
 	// Update orientation from smoothed orientation differential
 	// Note that vel() returns a smoothed Pose diff from mMove1 and mSpin1.
 	mQuat *= vel().quat();
-	updateDirectionVectors();
+
+	mQuat.normalize(); // do every n steps for efficiency?
+	Vec3d Ur, Uu, Uf;
+	directionVectors(Ur, Uu, Uf);
 
 	// Move according to smoothed position differential (mMove1)
 	for(int i=0; i<pos().size(); ++i){
-		pos()[i] += mMove1.dot(Vec3d(ur()[i], uu()[i], uf()[i]));
+		pos()[i] += mMove1.dot(Vec3d(Ur[i], Uu[i], Uf[i]));
 	}
 
 	mPullBack1 = mPullBack1 + (mPullBack0-mPullBack1)*amt;
 
 	mTransformed = *this;
 	if(mPullBack1 > 1e-16){
-		mTransformed.pos() -= uf() * mPullBack1;
+		mTransformed.pos() -= Uf * mPullBack1;
 	}
 }
 
