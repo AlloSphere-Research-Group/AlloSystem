@@ -103,18 +103,7 @@ void Pose::print() const {
 
 Nav::Nav(const Vec3d &position, double smooth)
 :	Pose(position), mSmooth(smooth), mVelScale(1), mPullBack0(0), mPullBack1(0)
-{
-}
-
-Nav::Nav(const Nav& nav)
-:	Pose(nav.pos(), nav.quat() ),
-	mMove0(nav.mMove0), mMove1(nav.mMove1),
-	mSpin0(nav.mSpin0), mSpin1(nav.mSpin1),
-	mTurn(nav.mTurn), mNudge(nav.mNudge),
-	mSmooth(nav.smooth()), mVelScale(nav.mVelScale),
-	mPullBack0(nav.mPullBack0), mPullBack1(nav.mPullBack1)
-{
-}
+{}
 
 Pose Nav::vel() const {
 	return {mMove1, Quatd().fromEuler(mSpin1)};
@@ -149,23 +138,6 @@ Nav& Nav::home(){
 
 Nav& Nav::operator=(const Pose& v){
 	Pose::operator=(v);
-	return *this;
-}
-
-Nav& Nav::operator=(const Nav& v){
-	if(&v != this){
-		Pose::operator=(v);
-		mMove0 = v.mMove0;
-		mMove1 = v.mMove1;
-		mSpin0 = v.mSpin0;
-		mSpin1 = v.mSpin1;
-		mTurn = v.mTurn;
-		mSmooth = v.mSmooth;
-		mVelScale = v.mVelScale;
-		mPullBack0 = v.mPullBack0;
-		mPullBack1 = v.mPullBack1;
-		mTransformed = v.mTransformed;
-	}
 	return *this;
 }
 

@@ -220,9 +220,6 @@ public:
 	/// @param[in] smooth	Motion smoothing amount in [0,1)
 	Nav(const Vec3d& pos = Vec3d(0), double smooth=0);
 
-	/// Copy constructor
-	Nav(const Nav& nav);
-
 
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
@@ -314,8 +311,6 @@ public:
 	Nav& home();
 
 	Nav& operator=(const Pose& v);
-
-	Nav& operator=(const Nav& v);
 
 	/// Accumulate pose based on velocity
 	void step(double dt=1);
