@@ -171,7 +171,7 @@ public:
 	// Setters
 
 	/// Set to identity transform
-	Pose& setIdentity(){ mQuat.setIdentity(); mVec = 0; return *this; }
+	Pose& setIdentity();
 
 	/// Set position
 	template <class T>
@@ -187,6 +187,9 @@ public:
 	/// Set quaternion component
 	template <class T>
 	Pose& quat(const Quat<T>& v){ mQuat = v; return *this; }
+
+	/// Set orientation from Euler angles
+	Pose& fromEuler(double azimuth, double elevation, double bank);
 
 	template <class T>
 	Pose& fromMatrix(const Mat<4,T>& v){
@@ -273,23 +276,13 @@ public:
 	double smooth() const { return mSmooth; }
 
 	/// Get current linear and angular velocities as a Pose
-	Pose vel() const {
-		return Pose(mMove1, Quatd().fromEuler(mSpin1));
-	}
+	Pose vel() const;
 
 	double velScale() const { return mVelScale; }
 
 
 	/// Set smoothing amount in [0,1)
 	Nav& smooth(double v){ mSmooth=v; return *this; }
-
-	Nav& view(double azimuth, double elevation, double bank);
-
-	Nav& view(const Quatd& v);
-
-
-	/// Move toward a given world-coordinate point
-	void nudgeToward(const Vec3d& p, double amt=1.);
 
 
 	/// Set linear velocity
@@ -308,6 +301,7 @@ public:
 
 	Vec3d& move(){ return mMove0; }
 
+
 	/// Move by a single increment
 	void nudge(double dr, double du, double df){ nudgeR(dr); nudgeU(du); nudgeF(df); }
 	template <class T>
@@ -317,7 +311,11 @@ public:
 	void nudgeU(double amount){ mNudge[1] += amount; }
 	void nudgeF(double amount){ mNudge[2] += amount; }
 
+	/// Move toward a given world-coordinate point
+	void nudgeToward(const Vec3d& p, double amt=1.);
+
 	Vec3d& nudge(){ return mNudge; }
+
 
 	/// Set angular velocity from azimuth, elevation, and bank differentials, in radians
 	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }

@@ -82,6 +82,17 @@ void Pose::toAED(const Vec3d& to, double& az, double& el, double& dist) const {
 	}
 }
 
+Pose& Pose::setIdentity(){
+	mQuat.setIdentity();
+	mVec = 0;
+	return *this;
+}
+
+Pose& Pose::fromEuler(double azimuth, double elevation, double bank){
+	mQuat.fromEuler(azimuth, elevation, bank);
+	return *this;
+}
+
 void Pose::print() const {
 	printf("Vec3d(%f, %f, %f);\nQuatd(%f, %f, %f, %f);\n",
 		mVec[0], mVec[1], mVec[2], mQuat[0], mQuat[1], mQuat[2], mQuat[3]);
@@ -110,6 +121,10 @@ Nav::Nav(const Nav& nav)
 {
 }
 
+Pose Nav::vel() const {
+	return {mMove1, Quatd().fromEuler(mSpin1)};
+}
+
 void Nav::nudgeToward(const Vec3d& p, double amt){
 	Vec3d rotEuler;
 	Vec3d target(p - pos());
@@ -131,20 +146,9 @@ Nav& Nav::halt(){
 }
 
 Nav& Nav::home(){
-	quat().identity();
-	view(0, 0, 0);
+	setIdentity();
 	turn(0, 0, 0);
 	spin(0, 0, 0);
-	mVec = 0;
-	return *this;
-}
-
-Nav& Nav::view(double azimuth, double elevation, double bank) {
-	return view(Quatd().fromEuler(azimuth, elevation, bank));
-}
-
-Nav& Nav::view(const Quatd& v) {
-	quat(v);
 	return *this;
 }
 
