@@ -1,3 +1,4 @@
+#include <cmath> // atan2, asin
 #include <cstdio>
 #include "allocore/spatial/al_Pose.hpp"
 
@@ -73,8 +74,8 @@ void Pose::toAED(const Vec3d& to, double& az, double& el, double& dist) const {
 		auto yness = rel.dot(uy);
 		auto zness = rel.dot(uz);
 
-		az = -atan2(xness, zness);
-		el = asin(yness);
+		az = -std::atan2(xness, zness);
+		el = std::asin(yness);
 	} else {
 		// near origin; might as well assume 0 to avoid denormals
 		// do not set az/el; they may already have more meaningful values
