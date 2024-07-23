@@ -75,8 +75,8 @@ public:
 	/// Get rendering mode
 	Mode mode() const { return mMode; }
 
-	/// Get path to render files
-	const std::string& path() const { return mPath; }
+	/// Get directory to render files
+	const std::string& dir() const { return mDir; }
 
 
 	/// Adapts frame duration used in model/animation updates
@@ -90,7 +90,7 @@ public:
 	}
 
 	/// Set directory for output files
-	RenderToDisk& path(const std::string& v);
+	RenderToDisk& dir(const std::string& v);
 
 	/// Set rendering mode (only when not rendering)
 
@@ -162,10 +162,8 @@ private:
 	struct AudioRing{
 		std::vector<float> mBuffer;
 		unsigned mChannels, mBlockSize, mNumBlocks;
-		unsigned mWriteBlock, mReadBlock;
+		unsigned mWriteBlock=0, mReadBlock=0;
 		float mGain = 1.f;
-
-		AudioRing();
 
 		void resize(unsigned channels, unsigned blockSize, unsigned numBlocks);
 		void write(const float * block);
@@ -177,7 +175,7 @@ private:
 	struct ImageWriter{
 		Thread mThread;
 		Image mImage;
-		std::string mPath;
+		std::string mDir;
 		bool mBusy = false;
 
 		bool run(
@@ -188,7 +186,7 @@ private:
 	};
 
 	Mode mMode;
-	std::string mUserPath, mPath, mFFMPEGPath;
+	std::string mUserDir, mDir, mFFMPEGDir;
 	unsigned mFrameNumber = 0;
 	double mElapsedSec = 0.;
 
@@ -220,7 +218,7 @@ private:
 	bool mWroteImages = false, mWroteAudio = false;
 
 	virtual bool onFrame();
-	void makePath();
+	void makeDir();
 	bool start(al::AudioIO * aio, al::Window * win, double fps=-1);
 	bool toggle(al::AudioIO * aio, al::Window * win, double fps=-1);
 	void write(); // Write next block of audio and current frame buffer to files

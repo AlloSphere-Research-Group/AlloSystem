@@ -56,8 +56,8 @@ RenderToDisk& RenderToDisk::mode(Mode v){
 	return *this;
 }
 
-RenderToDisk& RenderToDisk::path(const std::string& v){
-	mUserPath = v;
+RenderToDisk& RenderToDisk::dir(const std::string& s){
+	mUserDir = s;
 	return *this;
 }
 
@@ -115,15 +115,17 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 	mWroteImages = mWroteAudio = false;
 	mFrameNumber = 0;
 
-	// Make path on HD
-	makePath();
+	// Make dir on HD
+	makeDir();
 
 	if(aio){
 		// Open sound file for writing
-		mSoundFile.open((mPath + "/output.au").c_str(), std::ofstream::out | std::ofstream::binary);
+		mSoundFile.open((mDir + "/output.au").c_str(), std::ofstream::out | std::ofstream::binary);
 	
 		if(!mSoundFile.is_open()) return false;
 	
+		int numChans = aio->bufferOut().channels();
+
 		// Write AU header to file:
 		//   magic, data offset, data size, sample type (6=float), sample rate, channels
 		// Reference:
@@ -132,7 +134,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		char hdr[24] =
 			{'.','s','n','d', 0,0,0,24, -1,-1,-1,-1, 0,0,0,6, 0,0,0,0, 0,0,0,0};
 		serializeToBigEndian(hdr + 16, uint32_t(aio->framesPerSecond()));
-		serializeToBigEndian(hdr + 20, uint32_t(aio->bufferOut().channels()));
+		serializeToBigEndian(hdr + 20, uint32_t(numChans));
 		mSoundFile.write(hdr, sizeof(hdr));
 	
 		// Resize audio buffer to hold one block
@@ -142,7 +144,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		unsigned ringSizeInFrames = aio->fps() * 0.25; // 1/4 second of audio
 		unsigned numBlocks = ringSizeInFrames/aio->framesPerBuffer();
 		if(numBlocks < 2) numBlocks = 2; // should buffer at least two (?) blocks
-		mAudioRing.resize(aio->bufferOut().channels(), aio->framesPerBuffer(), numBlocks);
+		mAudioRing.resize(numChans, aio->framesPerBuffer(), numBlocks);
 	}
 
 	mAudioIO = aio;
@@ -253,7 +255,7 @@ void RenderToDisk::stop(){
 
 
 void RenderToDisk::saveScreenshot(unsigned w, unsigned h, unsigned l, unsigned b){
-	if(mPath.empty()) makePath();
+	if(mDir.empty()) makeDir();
 	saveImage(w,h,l,b, /*usePBO=*/false);
 }
 
@@ -262,18 +264,18 @@ void RenderToDisk::saveScreenshot(al::Window& win){
 }
 
 
-void RenderToDisk::makePath(){
-	// If no user path specified, create default with time string
-	if(mUserPath.empty()){
-		mPath = "./render";
-		mPath += al::timecodeNow("DHMS");
+void RenderToDisk::makeDir(){
+	// If no user dir specified, create default with time string
+	if(mUserDir.empty()){
+		mDir = "./render";
+		mDir += al::timecodeNow("DHMS");
 	}
 	else{
-		mPath = mUserPath;
+		mDir = mUserDir;
 	}
 
 	// Create output directory if it doesn't exist
-	if(!File::exists(mPath)) Dir::make(mPath);
+	if(!File::exists(mDir)) Dir::make(mDir);
 }
 
 void RenderToDisk::write(){
@@ -413,7 +415,7 @@ void RenderToDisk::saveImage(
 		//printf("----\nWriting frame %d\n", mFrameNumber);
 
 		// At 40 FPS: 60 x 60 x 40 = 144000 frames/hour
-		std::string name = mPath + "/" + al::toString("%07u", mFrameNumber) + "." + mImageExt;
+		std::string name = mDir + "/" + al::toString("%07u", mFrameNumber) + "." + mImageExt;
 		Image::Format format = Image::RGB;
 
 		CHECK_THREADS:
@@ -438,8 +440,8 @@ void RenderToDisk::saveImage(
 	}
 }
 
-RenderToDisk& RenderToDisk::ffmpegPath(const std::string& path){
-	mFFMPEGPath = File::conformDirectory(path);
+RenderToDisk& RenderToDisk::ffmpegPath(const std::string& s){
+	mFFMPEGDir = File::conformDirectory(s);
 	return *this;
 }
 
@@ -450,9 +452,9 @@ void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
 
 	std::string args;
 	args += " -r " + al::toString(1./mFrameDur);
-	args += " -i " + path() + "/%07d." + mImageExt;
+	args += " -i " + mDir + "/%07d." + mImageExt;
 	if(mWroteAudio){
-		args += " -i " + path() + "/output.au -c:a aac -b:a 192k";
+		args += " -i " + mDir + "/output.au -c:a aac -b:a 192k";
 	}
 
 	//args += " -pix_fmt yuv420p" // for compatibility with outdated media players
@@ -460,19 +462,15 @@ void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
 	args += " -crf " + al::toString(videoCompress);
 	static const std::string speedStrings[] = {"placebo","veryslow","slower","slow","medium","fast","faster","veryfast","superfast","ultrafast"};
 	args += " -preset " + speedStrings[videoEncodeSpeed];
-	args += " " + path() + "/movie.mp4";
+	args += " " + mDir + "/movie.mp4";
 
-	std::string cmd = "\"" + mFFMPEGPath + "ffmpeg" + "\"" + args;
+	std::string cmd = "\"" + mFFMPEGDir + "ffmpeg" + "\"" + args;
 	//printf("%s\n", cmd.c_str());
 
 	// TODO: thread this; std::system blocks until the command finishes
 	std::system(cmd.c_str());
 }
 
-
-RenderToDisk::AudioRing::AudioRing()
-:	mWriteBlock(0), mReadBlock(0)
-{}
 
 void RenderToDisk::AudioRing::resize(
 	unsigned channels, unsigned blockSize, unsigned numBlocks
@@ -549,7 +547,7 @@ unsigned RenderToDisk::AudioRing::blockSizeInSamples() const {
 
 
 bool RenderToDisk::ImageWriter::run(
-	const std::string& path,
+	const std::string& dir,
 	const std::vector<unsigned char>& pixels, unsigned w, unsigned h,
 	Image::Format format, int compress, int paletteSize
 ){
@@ -563,14 +561,14 @@ bool RenderToDisk::ImageWriter::run(
 
 	mImage.compression(compress);
 	mImage.paletteSize(paletteSize);
-	mPath = path;
+	mDir = dir;
 
 	// Wait for any thread function in progress
 	mThread.join();
 
 	mThread.start(
 		[this](){
-			mImage.save(mPath);
+			mImage.save(mDir);
 			mBusy = false;
 		}
 	);
