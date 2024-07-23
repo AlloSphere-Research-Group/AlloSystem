@@ -128,6 +128,8 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 
 		// Write AU header to file:
 		//   magic, data offset, data size, sample type (6=float), sample rate, channels
+		// After the header, we write interleaved sample data.
+		// The header and data must be written in big endian format.
 		// Reference:
 		//	http://pubs.opengroup.org/external/auformat.html
 		//	http://paulbourke.net/dataformats/audio/
@@ -145,6 +147,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		unsigned numBlocks = ringSizeInFrames/aio->framesPerBuffer();
 		if(numBlocks < 2) numBlocks = 2; // should buffer at least two (?) blocks
 		mAudioRing.resize(numChans, aio->framesPerBuffer(), numBlocks);
+		mAudioRing.mInputInterleaved = aio->interleaved();
 	}
 
 	mAudioIO = aio;
@@ -517,9 +520,17 @@ int RenderToDisk::AudioRing::read(){
 	float * dst = &mBuffer[blockSizeInSamples() * mNumBlocks];
 
 	// Copy samples into read buffer as fast as possible
-	for(unsigned c=0; c<mChannels; ++c){
+	if(mInputInterleaved){
 		for(unsigned i=0; i<mBlockSize; ++i){
-			dst[i*mChannels + c] = (*src++) * mGain;
+			for(unsigned c=0; c<mChannels; ++c){
+				dst[i*mChannels + c] = (*src++) * mGain;
+			}
+		}
+	} else {
+		for(unsigned c=0; c<mChannels; ++c){
+			for(unsigned i=0; i<mBlockSize; ++i){
+				dst[i*mChannels + c] = (*src++) * mGain;
+			}
 		}
 	}
 

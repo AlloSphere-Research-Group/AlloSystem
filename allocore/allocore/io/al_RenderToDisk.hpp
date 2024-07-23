@@ -164,6 +164,7 @@ private:
 		unsigned mChannels, mBlockSize, mNumBlocks;
 		unsigned mWriteBlock=0, mReadBlock=0;
 		float mGain = 1.f;
+		bool mInputInterleaved=true;
 
 		void resize(unsigned channels, unsigned blockSize, unsigned numBlocks);
 		void write(const float * block);
