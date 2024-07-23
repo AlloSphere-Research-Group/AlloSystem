@@ -38,6 +38,10 @@ public:
 		// The default is "png" with medium compression.
 		//render.imageFormat("jpg", 50);
 
+		// Set the sound file format:
+		// The default is FLOAT32.
+		//render.soundFormat(render.PCM16);
+
 		addDodecahedron(shape);
 		shape.color(HSV(0.1));
 		shape.decompress();

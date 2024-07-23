@@ -63,6 +63,14 @@ public:
 		REAL_TIME		/**< Real-time rendering */
 	};
 
+	enum SoundFormat{
+		FLOAT32,
+		PCM16
+	};
+
+	using AudioChans = std::vector<unsigned short>;
+
+
 	/// @param[in] mode		rendering mode, /see mode
 	RenderToDisk(Mode mode = REAL_TIME);
 
@@ -106,8 +114,13 @@ public:
 	/// Set format of image files
 	RenderToDisk& imageFormat(const std::string& ext, int compression=50, int paletteSize=-1);
 
+	/// Set format of sound file
+	RenderToDisk& soundFormat(SoundFormat fmt);
+
 	/// Set post-gain of captured audio
 	RenderToDisk& audioGain(float v);
+
+	AudioChans& audioChans(){ return mAudioChans; }
 
 	/// Start rendering
 
@@ -210,9 +223,11 @@ private:
 
 	al::AudioIO * mAudioIO = NULL;
 	al::AudioIO::Callback mAudioCB;
-	//std::vector<char> mAudioBuf;
+	AudioChans mAudioChans; // channels to capture
 	AudioRing mAudioRing;
 	std::ofstream mSoundFile;
+	SoundFormat mSoundFormat = FLOAT32;
+	std::vector<char> mSoundFileSamples;
 	Thread mSoundFileThread;
 
 	bool mActive = false;

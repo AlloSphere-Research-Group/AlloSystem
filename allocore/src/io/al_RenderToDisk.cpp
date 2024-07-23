@@ -8,11 +8,22 @@
 
 namespace al{
 
+static void serializeToBigEndian(char * out, uint16_t in){
+	out[0] = (in >>  8) & 0xff;
+	out[1] = (in      ) & 0xff;
+}
+
 static void serializeToBigEndian(char * out, uint32_t in){
 	out[0] = (in >> 24) & 0xff;
 	out[1] = (in >> 16) & 0xff;
 	out[2] = (in >>  8) & 0xff;
 	out[3] = (in      ) & 0xff;
+}
+
+static void serializeToBigEndian(char * out, int16_t in){
+	union{ uint16_t u; int16_t s; } u;
+	u.s = in;
+	serializeToBigEndian(out, u.u);
 }
 
 static void serializeToBigEndian(char * out, float in){
@@ -65,6 +76,11 @@ RenderToDisk& RenderToDisk::imageFormat(const std::string& ext, int compress, in
 	mImageExt = ext;
 	mImageCompress = compress;
 	mImagePaletteSize = paletteSize;
+	return *this;
+}
+
+RenderToDisk& RenderToDisk::soundFormat(SoundFormat fmt){
+	mSoundFormat = fmt;
 	return *this;
 }
 
@@ -123,18 +139,27 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		mSoundFile.open((mDir + "/output.au").c_str(), std::ofstream::out | std::ofstream::binary);
 	
 		if(!mSoundFile.is_open()) return false;
-	
-		int numChans = aio->bufferOut().channels();
 
 		// Write AU header to file:
-		//   magic, data offset, data size, sample type (6=float), sample rate, channels
+		//   magic, data offset, data size, sample type (3=PCM16 6=float), sample rate, channels
 		// After the header, we write interleaved sample data.
 		// The header and data must be written in big endian format.
 		// Reference:
 		//	http://pubs.opengroup.org/external/auformat.html
 		//	http://paulbourke.net/dataformats/audio/
+
+		char fmt;
+		unsigned char bytesPerSample;
+		switch(mSoundFormat){
+		default:
+		case FLOAT32: fmt=6; bytesPerSample=4; break;
+		case PCM16:   fmt=3; bytesPerSample=2; break;
+		}
+
+		int numChans = aio->bufferOut().channels();
+
 		char hdr[24] =
-			{'.','s','n','d', 0,0,0,24, -1,-1,-1,-1, 0,0,0,6, 0,0,0,0, 0,0,0,0};
+			{'.','s','n','d', 0,0,0,24, -1,-1,-1,-1, 0,0,0,fmt, 0,0,0,0, 0,0,0,0};
 		serializeToBigEndian(hdr + 16, uint32_t(aio->framesPerSecond()));
 		serializeToBigEndian(hdr + 20, uint32_t(numChans));
 		mSoundFile.write(hdr, sizeof(hdr));
@@ -148,6 +173,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		if(numBlocks < 2) numBlocks = 2; // should buffer at least two (?) blocks
 		mAudioRing.resize(numChans, aio->framesPerBuffer(), numBlocks);
 		mAudioRing.mInputInterleaved = aio->interleaved();
+		mSoundFileSamples.resize(aio->framesPerBuffer() * numChans * bytesPerSample);
 	}
 
 	mAudioIO = aio;
@@ -180,10 +206,26 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 					if(readCode){
 						//printf("SoundFile writer thread: %s\n", readCode>0 ? "read" : "underrun");
 						if(readCode<0) fprintf(stderr, "SoundFile writer thread: underrun\n");
-						mSoundFile.write(
-							reinterpret_cast<const char*>(mAudioRing.readBuffer()),
-							mAudioRing.blockSizeInSamples() * sizeof(float)
-						);
+						const float * src = mAudioRing.readBuffer();
+						char * dst = mSoundFileSamples.data();
+						int numSamps = mAudioRing.blockSizeInSamples();
+						switch(mSoundFormat){
+						default:
+						case FLOAT32:
+							for(int i=0; i<numSamps; ++i){
+								serializeToBigEndian(dst + i*4, src[i]);
+							}
+							break;
+						case PCM16:
+							for(int i=0; i<numSamps; ++i){
+								auto s = src[i];
+								s = (s<-1.f ? -1.f : (s>1.f ? s=1.f : s)) * 32767.f;
+								int16_t i16 = s<0.f ? s-0.5f : s+0.5f; // round to nearest int
+								serializeToBigEndian(dst + i*2, i16);
+							}
+							break;
+						}
+						mSoundFile.write(mSoundFileSamples.data(), mSoundFileSamples.size());
 					}
 					else{
 						//printf("SoundFile writer thread: overrun (sleeping...)\n");
@@ -299,28 +341,12 @@ void RenderToDisk::writeAudio(){
 	unsigned audioBlock0 = mFrameNumber * mFrameDur / mAudioIO->secondsPerBuffer();
 	unsigned audioBlock1 = (mFrameNumber+1) * mFrameDur / mAudioIO->secondsPerBuffer();
 	unsigned audioBlocks = audioBlock1 - audioBlock0;
-
-	//unsigned Nchans = mAudioIO->channelsOut();
-	//unsigned Nblock = mAudioIO->framesPerBuffer();
 	
 	for(unsigned k=0; k<audioBlocks; ++k){
 
 		// In non-real-time mode, this may write many blocks of audio. The read
 		// thread must check for new samples often enough to avoid underruns.
 		mAudioIO->processAudio();
-		
-		/*
-		// Interleave and big-endianize samples
-		for(unsigned c=0; c<Nchans; ++c){
-			for(unsigned f=0; f<Nblock; ++f){
-				float smp = mAudioIO->out(c,f);
-				serializeToBigEndian(&mAudioBuf[(f*Nchans + c)*4], smp);
-			}
-		}
-
-		// Write to file
-		mSoundFile.write(&mAudioBuf[0], mAudioBuf.size());
-		//*/
 	}
 }
 
@@ -535,12 +561,12 @@ int RenderToDisk::AudioRing::read(){
 	}
 
 	// Big-endianize
-	if(true){
+	/*if(true){
 		for(unsigned i=0; i<blockSizeInSamples(); ++i){
 			float& s = dst[i];
 			serializeToBigEndian(reinterpret_cast<char*>(&s), s);
 		}
-	}
+	}*/
 
 	++mReadBlock;
 
