@@ -162,12 +162,13 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		case PCM16:   fmt=3; bytesPerSample=2; break;
 		}
 
-		int numChans = aio->bufferOut().channels();
+		int ioChans = aio->bufferOut().channels();
+		int sfChans = mAudioChans.empty() ? ioChans : mAudioChans.size();
 
 		char hdr[24] =
 			{'.','s','n','d', 0,0,0,24, -1,-1,-1,-1, 0,0,0,fmt, 0,0,0,0, 0,0,0,0};
 		serializeToBigEndian(hdr + 16, uint32_t(aio->framesPerSecond()));
-		serializeToBigEndian(hdr + 20, uint32_t(numChans));
+		serializeToBigEndian(hdr + 20, uint32_t(sfChans));
 		mSoundFile.write(hdr, sizeof(hdr));
 	
 		// Resize audio buffer to hold one block
@@ -177,9 +178,9 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		unsigned ringSizeInFrames = aio->fps() * 0.25; // 1/4 second of audio
 		unsigned numBlocks = ringSizeInFrames/aio->framesPerBuffer();
 		if(numBlocks < 2) numBlocks = 2; // should buffer at least two (?) blocks
-		mAudioRing.resize(numChans, aio->framesPerBuffer(), numBlocks);
+		mAudioRing.resize(ioChans, aio->framesPerBuffer(), numBlocks);
 		mAudioRing.mInputInterleaved = aio->interleaved();
-		mSoundFileSamples.resize(aio->framesPerBuffer() * numChans * bytesPerSample);
+		mSoundFileSamples.resize(aio->framesPerBuffer() * sfChans * bytesPerSample);
 	}
 
 	mAudioIO = aio;
@@ -203,6 +204,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 
 		mAudioIO->append(mAudioCB);
 
+		// This thread checks the audio ring buffer for a new block of audio. If present, it writes it to the sound file, otherwise the thread sleeps.
 		mSoundFileThread.start(
 			[this](){
 				while(mActive){
@@ -214,21 +216,36 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 						if(readCode<0) fprintf(stderr, "SoundFile writer thread: underrun\n");
 						const float * src = mAudioRing.readBuffer();
 						char * dst = mSoundFileSamples.data();
-						int numSamps = mAudioRing.blockSizeInSamples();
+
+						auto iterateSamples = [this](const std::function<void(int,int)>& onSample){
+							if(mAudioChans.empty()){
+								int numSamps = mAudioRing.blockSizeInSamples();
+								for(int i=0; i<numSamps; ++i){
+									onSample(i,i);
+								}
+							} else {
+								for(int j=0; j<mAudioRing.mBlockSize; ++j){
+									for(int i=0; i<mAudioChans.size(); ++i){
+										onSample(j*mAudioChans.size() + i, j*mAudioRing.mChannels + mAudioChans[i]);
+									}
+								}
+							}
+						};
+
 						switch(mSoundFormat){
 						default:
 						case FLOAT32:
-							for(int i=0; i<numSamps; ++i){
-								serializeToBigEndian(dst + i*4, src[i]);
-							}
+							iterateSamples([=](int idst, int isrc){
+								serializeToBigEndian(dst + idst*4, src[isrc]);
+							});
 							break;
 						case PCM16:
-							for(int i=0; i<numSamps; ++i){
-								auto s = src[i];
+							iterateSamples([=](int idst, int isrc){
+								auto s = src[isrc];
 								s = (s<-1.f ? -1.f : (s>1.f ? s=1.f : s)) * 32767.f;
 								int16_t i16 = s<0.f ? s-0.5f : s+0.5f; // round to nearest int
-								serializeToBigEndian(dst + i*2, i16);
-							}
+								serializeToBigEndian(dst + idst*2, i16);
+							});
 							break;
 						}
 						mSoundFile.write(mSoundFileSamples.data(), mSoundFileSamples.size());
