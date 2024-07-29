@@ -84,6 +84,11 @@ RenderToDisk& RenderToDisk::soundFormat(SoundFormat fmt){
 	return *this;
 }
 
+RenderToDisk& RenderToDisk::soundFileName(const std::string& name){
+	mSoundFileName = name;
+	return *this;
+}
+
 RenderToDisk& RenderToDisk::audioGain(float v){
 	mAudioRing.mGain = v;
 	return *this;
@@ -136,7 +141,8 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 
 	if(aio){
 		// Open sound file for writing
-		mSoundFile.open((mDir + "/output.au").c_str(), std::ofstream::out | std::ofstream::binary);
+		auto sfname = mSoundFileName.empty() ? std::string("output") : mSoundFileName;
+		mSoundFile.open((mDir + "/" + sfname + ".au").c_str(), std::ofstream::out | std::ofstream::binary);
 	
 		if(!mSoundFile.is_open()) return false;
 

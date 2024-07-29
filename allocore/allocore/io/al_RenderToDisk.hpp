@@ -117,6 +117,9 @@ public:
 	/// Set format of sound file
 	RenderToDisk& soundFormat(SoundFormat fmt);
 
+	/// Set name (without extension) of sound file
+	RenderToDisk& soundFileName(const std::string& name);
+
 	/// Set post-gain of captured audio
 	RenderToDisk& audioGain(float v);
 
@@ -223,9 +226,10 @@ private:
 
 	al::AudioIO * mAudioIO = NULL;
 	al::AudioIO::Callback mAudioCB;
-	AudioChans mAudioChans; // channels to capture
+	AudioChans mAudioChans; // channels to write to sound file
 	AudioRing mAudioRing;
 	std::ofstream mSoundFile;
+	std::string mSoundFileName;
 	SoundFormat mSoundFormat = FLOAT32;
 	std::vector<char> mSoundFileSamples;
 	Thread mSoundFileThread;
