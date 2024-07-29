@@ -227,11 +227,11 @@ public:
 	}
 
 	/// Get a scaling transform matrix
-	template <class V>
-	static Mat scaling(const Vec<N-1,V>& v){
-		Mat m;
-		for(int r=0; r<N-1; ++r) m(r,r) = v[r];
-		m(N-1,N-1) = T(1);
+	template <int M, class V>
+	static Mat scaling(const Vec<M,V>& v){
+		static_assert(M <= N-1, "Invalid vector size");
+		Mat m(T(1));
+		for(int r=0; r<M; ++r) m(r,r) = v[r];
 		return m;
 	}
 
@@ -244,21 +244,22 @@ public:
 	/// Get a scaling transform matrix
 	template <typename... Vals>
 	static Mat scaling(Vals... vals){
-		return scaling(Vec<(sizeof...(Vals)),T>(vals...));
+		return scaling(Vec<sizeof...(Vals),T>(vals...));
 	}
 
 	/// Get a translation transform matrix
-	template <class V>
-	static Mat translation(const Vec<N-1,V>& v){
+	template <int M, class V>
+	static Mat translation(const Vec<M,V>& v){
+		static_assert(M <= N-1, "Invalid vector size");
 		Mat m(T(1));
-		for(int r=0; r<N-1; ++r) m(r,N-1) = v[r];
+		for(int r=0; r<M; ++r) m(r,N-1) = v[r];
 		return m;
 	}
 
 	/// Get a translation transform matrix
 	template <typename... Vals>
 	static Mat translation(Vals... vals){
-		return translation(Vec<(sizeof...(Vals)),T>(vals...));
+		return translation(Vec<sizeof...(Vals),T>(vals...));
 	}
 
 	//--------------------------------------------------------------------------
