@@ -6,7 +6,7 @@
 #include "allocore/types/al_Conversion.hpp"
 #include "allocore/io/al_RenderToDisk.hpp"
 
-namespace al{
+using namespace al;
 
 static void serializeToBigEndian(char * out, uint16_t in){
 	out[0] = (in >>  8) & 0xff;
@@ -128,11 +128,6 @@ bool RenderToDisk::start(al::Window& win, double fps){
 bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 	if(mActive) return true;
 
-	if(NON_REAL_TIME == mMode && 0 == win){
-		fprintf(stderr, "RenderToDisk::start: Warning-- Non-real-time audio-only rendering currently not supported\n");
-		return false;
-	}
-
 	mWroteImages = mWroteAudio = false;
 	mFrameNumber = 0;
 
@@ -170,10 +165,6 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		serializeToBigEndian(hdr + 16, uint32_t(aio->framesPerSecond()));
 		serializeToBigEndian(hdr + 20, uint32_t(sfChans));
 		mSoundFile.write(hdr, sizeof(hdr));
-	
-		// Resize audio buffer to hold one block
-		//int bytesPerSample = 4;
-		//mAudioBuf.resize(aio.channelsOut() * aio.framesPerBuffer() * bytesPerSample);
 
 		unsigned ringSizeInFrames = aio->fps() * 0.25; // 1/4 second of audio
 		unsigned numBlocks = ringSizeInFrames/aio->framesPerBuffer();
@@ -205,58 +196,71 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		mAudioIO->append(mAudioCB);
 
 		// This thread checks the audio ring buffer for a new block of audio. If present, it writes it to the sound file, otherwise the thread sleeps.
-		mSoundFileThread.start(
-			[this](){
+		mSoundFileThread.start([this](){
+
+			auto copyRingToSoundFile = [this](){
+				const int readCode = mAudioRing.read();
+
+				if(0 == readCode) return false; // overrun, no new samples
+
+				//printf("SoundFile writer thread: %s\n", readCode>0 ? "read" : "underrun");
+				if(readCode<0) fprintf(stderr, "SoundFile writer thread: underrun\n");
+				const float * src = mAudioRing.readBuffer();
+				char * dst = mSoundFileSamples.data();
+
+				auto iterateSamples = [this](const std::function<void(int,int)>& onSample){
+					if(mAudioChans.empty()){
+						int numSamps = mAudioRing.blockSizeInSamples();
+						for(int i=0; i<numSamps; ++i){
+							onSample(i,i);
+						}
+					} else {
+						for(int j=0; j<mAudioRing.mBlockSize; ++j){
+							for(int i=0; i<mAudioChans.size(); ++i){
+								onSample(j*mAudioChans.size() + i, j*mAudioRing.mChannels + mAudioChans[i]);
+							}
+						}
+					}
+				};
+
+				switch(mSoundFormat){
+				default:
+				case FLOAT32:
+					iterateSamples([=](int idst, int isrc){
+						serializeToBigEndian(dst + idst*4, src[isrc]);
+					});
+					break;
+				case PCM16:
+					iterateSamples([=](int idst, int isrc){
+						auto s = src[isrc];
+						s = (s<-1.f ? -1.f : (s>1.f ? s=1.f : s)) * 32767.f;
+						int16_t i16 = s<0.f ? s-0.5f : s+0.5f; // round to nearest int
+						serializeToBigEndian(dst + idst*2, i16);
+					});
+					break;
+				}
+				mSoundFile.write(mSoundFileSamples.data(), mSoundFileSamples.size());
+
+				return true;
+			};
+
+			if(mWindow || REAL_TIME==mMode){
 				while(mActive){
 					//printf("SoundFile writer thread\n");
-
-					const int readCode = mAudioRing.read();
-					if(readCode){
-						//printf("SoundFile writer thread: %s\n", readCode>0 ? "read" : "underrun");
-						if(readCode<0) fprintf(stderr, "SoundFile writer thread: underrun\n");
-						const float * src = mAudioRing.readBuffer();
-						char * dst = mSoundFileSamples.data();
-
-						auto iterateSamples = [this](const std::function<void(int,int)>& onSample){
-							if(mAudioChans.empty()){
-								int numSamps = mAudioRing.blockSizeInSamples();
-								for(int i=0; i<numSamps; ++i){
-									onSample(i,i);
-								}
-							} else {
-								for(int j=0; j<mAudioRing.mBlockSize; ++j){
-									for(int i=0; i<mAudioChans.size(); ++i){
-										onSample(j*mAudioChans.size() + i, j*mAudioRing.mChannels + mAudioChans[i]);
-									}
-								}
-							}
-						};
-
-						switch(mSoundFormat){
-						default:
-						case FLOAT32:
-							iterateSamples([=](int idst, int isrc){
-								serializeToBigEndian(dst + idst*4, src[isrc]);
-							});
-							break;
-						case PCM16:
-							iterateSamples([=](int idst, int isrc){
-								auto s = src[isrc];
-								s = (s<-1.f ? -1.f : (s>1.f ? s=1.f : s)) * 32767.f;
-								int16_t i16 = s<0.f ? s-0.5f : s+0.5f; // round to nearest int
-								serializeToBigEndian(dst + idst*2, i16);
-							});
-							break;
-						}
-						mSoundFile.write(mSoundFileSamples.data(), mSoundFileSamples.size());
-					}
-					else{
+					if(!copyRingToSoundFile()){
 						//printf("SoundFile writer thread: overrun (sleeping...)\n");
+						// Note that we allocated 1/4 sec of audio in the ring, so the sleep time just needs to be less than that and not too low as to affect performance.
 						al_sleep(0.01);
 					}
 				}
+			} else { // non-real-time, audio only
+				while(mActive){
+					// With a window, the audio ring is written to from Window::onFrame. Since we don't have a window, we must call it manually.
+					writeAudio();
+					copyRingToSoundFile();
+				}
 			}
-		);
+		});
 	}
 
 	if(mWindow){
@@ -360,7 +364,7 @@ void RenderToDisk::writeAudio(){
 
 	if(!mActive || (REAL_TIME == mMode) || !mAudioIO) return;
 
-	// Compute number of blocks over one frame of graphics
+	// Compute number of blocks over current render frame
 	unsigned audioBlock0 = mFrameNumber * mFrameDur / mAudioIO->secondsPerBuffer();
 	unsigned audioBlock1 = (mFrameNumber+1) * mFrameDur / mAudioIO->secondsPerBuffer();
 	unsigned audioBlocks = audioBlock1 - audioBlock0;
@@ -371,6 +375,8 @@ void RenderToDisk::writeAudio(){
 		// thread must check for new samples often enough to avoid underruns.
 		mAudioIO->processAudio();
 	}
+
+	if(!mWindow) ++mFrameNumber;
 }
 
 void RenderToDisk::writeImage(){
@@ -524,6 +530,7 @@ void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
 }
 
 
+
 void RenderToDisk::AudioRing::resize(
 	unsigned channels, unsigned blockSize, unsigned numBlocks
 ){
@@ -583,14 +590,6 @@ int RenderToDisk::AudioRing::read(){
 		}
 	}
 
-	// Big-endianize
-	/*if(true){
-		for(unsigned i=0; i<blockSizeInSamples(); ++i){
-			float& s = dst[i];
-			serializeToBigEndian(reinterpret_cast<char*>(&s), s);
-		}
-	}*/
-
 	++mReadBlock;
 
 	return returnCode;
@@ -634,6 +633,4 @@ bool RenderToDisk::ImageWriter::run(
 	);
 
 	return true;
-}
-
 }
