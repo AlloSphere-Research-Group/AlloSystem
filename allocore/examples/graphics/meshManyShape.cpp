@@ -3,6 +3,8 @@ Allocore Example: Many Shape Mesh
 
 Description:
 This demonstrates how a single mesh can be used to draw many different shapes.
+A Mesh::Group is used to keep track of newly added vertices for successive
+operations on the mesh.
 
 Author:
 Lance Putnam, April 2011
@@ -20,26 +22,29 @@ public:
 	MyApp(){
 
 		for(int i=0; i<100; ++i){
-			int Nv = rnd::prob(0.5)
-						? (rnd::prob(0.5) ? addCube(shapes) : addDodecahedron(shapes))
-						: addIcosahedron(shapes);
+			// Add new shape and get a group of its vertices
+			auto group = shapes.group([this](){
+				rnd::prob(0.5)
+					? (rnd::prob(0.5) ? addCube(shapes) : addDodecahedron(shapes))
+					: addIcosahedron(shapes);
+			});
 
 			// Scale and translate the newly added shape
 			Mat4f xfm(1);
 			xfm.translate(rnd::ball<Vec3f>());
 			xfm.scale(0.05f + 0.05f*rnd::cube<Vec3f>());
-			shapes.transform(xfm, shapes.vertices().size()-Nv);
+			shapes.transform(xfm, group);
 
 			// Color newly added vertices
-			for(int i=0; i<Nv; ++i){
-				float f = float(i)/Nv;
+			shapes.forEachVertex(group, [&](int i){
+				float f = float(group.local(i))/group.count;
 				shapes.color(HSV(f*0.1+0.2,1,1));
-			}
+			});
 		}
 
 		// Convert to non-indexed triangles to get flat shading
 		shapes.decompress();
-		shapes.generateNormals();
+		shapes.ensureNormals();
 
 		nav().pullBack(4);
 		initWindow();

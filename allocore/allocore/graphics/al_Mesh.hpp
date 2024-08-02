@@ -105,6 +105,19 @@ public:
 	};
 
 
+	/// Vertex group
+	struct Group{
+		int begin; /// First index in parent mesh
+		int count; /// Number of vertices
+
+		/// Get one past end vertex
+		int end() const { return begin + count; }
+
+		/// Convert mesh (parent) index to local index
+		int local(int i) const { return i - begin; }
+	};
+
+
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0);
 
@@ -356,6 +369,16 @@ public:
 	/// Returns whether mesh is empty (has no vertex positions)
 	bool empty() const;
 
+	/// Get vertex group of vertices added in function
+	template <class Func>
+	Group group(const Func& f){
+		Group g;
+		g.begin = mVertices.size();
+		f();
+		g.count = mVertices.size() - g.begin;
+		return g;
+	}
+
 	/// Repeat last vertex element(s)
 	Mesh& repeatLast();
 
@@ -372,6 +395,10 @@ public:
 	/// 	for(int i=0; i<mesh.vertices().size(); ++i) ...
 	const Mesh& forEachVertex(const std::function<void(int i)>& onVert) const;
 	Mesh& forEachVertex(const std::function<void(int i)>& onVert);
+
+	/// Call function for each vertex (position, normal, etc.) in group
+	const Mesh& forEachVertex(Group g, const std::function<void(int i)>& onVert) const;
+	Mesh& forEachVertex(Group g, const std::function<void(int i)>& onVert);
 
 	/// Get corners of bounding box of vertices
 
@@ -419,6 +446,11 @@ public:
 	///						distance from one past last element
 	template <class T>
 	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
+
+	template <class T>
+	Mesh& transform(const Mat<4,T>& m, Group g){
+		return transform(m, g.begin, g.end());
+	}
 
 	/// Scales and translates vertices to lie in sphere
 	Mesh& fitToSphere(float radius=1);
