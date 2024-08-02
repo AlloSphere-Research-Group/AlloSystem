@@ -782,7 +782,7 @@ const Mesh& Mesh::forEachVertex(const std::function<void(int i)>& onVert) const 
 }
 
 Mesh& Mesh::forEachVertex(Mesh::Group g, const std::function<void(int i)>& onVert){
-	for(int i=g.begin; i<g.end(); ++i) onVert(i);
+	for(int i=g.begin; i<g.end; ++i) onVert(i);
 	return *this;
 }
 

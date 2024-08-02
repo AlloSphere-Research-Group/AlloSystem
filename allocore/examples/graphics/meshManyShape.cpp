@@ -37,7 +37,7 @@ public:
 
 			// Color newly added vertices
 			shapes.forEachVertex(group, [&](int i){
-				float f = float(group.local(i))/group.count;
+				float f = float(group.local(i))/group.count();
 				shapes.color(HSV(f*0.1+0.2,1,1));
 			});
 		}

@@ -107,11 +107,11 @@ public:
 
 	/// Vertex group
 	struct Group{
-		int begin; /// First index in parent mesh
-		int count; /// Number of vertices
+		int begin;	/// First index in parent mesh
+		int end;	/// One past last index in parent mesh
 
-		/// Get one past end vertex
-		int end() const { return begin + count; }
+		/// Get number of vertices
+		int count() const { return end - begin; }
 
 		/// Convert mesh (parent) index to local index
 		int local(int i) const { return i - begin; }
@@ -375,7 +375,7 @@ public:
 		Group g;
 		g.begin = mVertices.size();
 		f();
-		g.count = mVertices.size() - g.begin;
+		g.end = mVertices.size();
 		return g;
 	}
 
@@ -449,7 +449,7 @@ public:
 
 	template <class T>
 	Mesh& transform(const Mat<4,T>& m, Group g){
-		return transform(m, g.begin, g.end());
+		return transform(m, g.begin, g.end);
 	}
 
 	/// Scales and translates vertices to lie in sphere
