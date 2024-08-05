@@ -78,7 +78,7 @@ inline int addCuboid(Mesh& m, const Vec3f& radii){ return addCuboid(m,radii[0],r
 /// \returns number of vertices added
 inline int addCube(Mesh& m, float radius=0.57735026919){ return addCuboid(m,radius); }
 
-/// Add octahedron as triangle vertices and indices
+/// Add octahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
 /// @param[in]		radius	Radius of enclosing sphere
