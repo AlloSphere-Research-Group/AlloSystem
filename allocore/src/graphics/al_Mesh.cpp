@@ -781,15 +781,6 @@ const Mesh& Mesh::forEachVertex(const std::function<void(int i)>& onVert) const 
 	return const_cast<Mesh*>(this)->forEachVertex(onVert);
 }
 
-Mesh& Mesh::forEachVertex(Mesh::Group g, const std::function<void(int i)>& onVert){
-	for(int i=g.begin; i<g.end; ++i) onVert(i);
-	return *this;
-}
-
-const Mesh& Mesh::forEachVertex(Mesh::Group g, const std::function<void(int i)>& onVert) const {
-	return const_cast<Mesh*>(this)->forEachVertex(g, onVert);
-}
-
 bool Mesh::saveFBX(const std::string& filePath, const std::string& solidName) const {
 
 	if(!(isTriangles() || isTriangleStrip())){

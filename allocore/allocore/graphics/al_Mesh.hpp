@@ -115,6 +115,13 @@ public:
 
 		/// Convert mesh (parent) index to local index
 		int local(int i) const { return i - begin; }
+
+		/// Iterate over vertices
+		template <class OnVert>
+		const Group& forEach(const OnVert& onVert) const {
+			for(int i=begin; i<end; ++i) onVert(i);
+			return *this;
+		}
 	};
 
 
@@ -395,10 +402,6 @@ public:
 	/// 	for(int i=0; i<mesh.vertices().size(); ++i) ...
 	const Mesh& forEachVertex(const std::function<void(int i)>& onVert) const;
 	Mesh& forEachVertex(const std::function<void(int i)>& onVert);
-
-	/// Call function for each vertex (position, normal, etc.) in group
-	const Mesh& forEachVertex(Group g, const std::function<void(int i)>& onVert) const;
-	Mesh& forEachVertex(Group g, const std::function<void(int i)>& onVert);
 
 	/// Get corners of bounding box of vertices
 
