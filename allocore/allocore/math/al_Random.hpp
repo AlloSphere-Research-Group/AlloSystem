@@ -307,7 +307,7 @@ protected:
 
 /// Convenience macro for creating a scoped random environment
 #define AL_RNG_ENVIR(initSeed)\
-	al::rnd::Random<> rng(initSeed ? initSeed : al::rnd::seed());\
+	al::rnd::Random<> rng(initSeed ? uint32_t(initSeed) : al::rnd::seed());\
 	auto P = [&](float p=0.5){ return rng.prob(p); };\
 	auto Bs= [&](float p=0.5, float v=1.){ return P(p)?v:-v; };\
 	auto U = [&](){ return rng.uniform(1.); };		/* uniform real in [ 0,1) */\
