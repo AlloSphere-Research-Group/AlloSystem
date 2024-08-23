@@ -226,6 +226,12 @@ public:
 		};
 	}
 
+	/// Get a 90-degree rotation transform matrix
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat rotation90(){
+		return rotation<Dim1,Dim2>(0.,1.);
+	}
+
 	/// Get a scaling transform matrix
 	template <int M, class V>
 	static Mat scaling(const Vec<M,V>& v){
