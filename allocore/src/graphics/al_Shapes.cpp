@@ -61,7 +61,7 @@ int addCuboid(Mesh& m, float rx, float ry, float rz){
 	4 5       l +--r
 	6 7       f b       */
 
-	if(m.wants(Mesh::NORMAL | Mesh::TEXCOORD)){
+	if(m.wants(Mesh::NORMAL | Mesh::TANGENT | Mesh::TEXCOORD)){
 		Mesh::Vertex v[2][2][2] = {
 			{
 				{{-rx,-ry,-rz}, { rx,-ry,-rz}},
@@ -556,8 +556,12 @@ int addQuad(Mesh& m,
 	Mesh::Vertex a(x1,y1,z1), b(x2,y2,z2), c(x3,y3,z3), d(x4,y4,z4);
 	m.vertex(a).vertex(b).vertex(c).vertex(d);
 	if(m.wants(Mesh::NORMAL)){
-		auto N = normalize(cross(b-a, c-a));
+		auto N = cross(b-a, d-a).dir();
 		m.normalFill(N);
+	}
+	if(m.wants(Mesh::TANGENT)){
+		auto T = (d-a).dir();
+		m.tangentFill(T);
 	}
 	if(m.wants(Mesh::TEXCOORD)){
 		m.texCoord(0,0).texCoord(1,0).texCoord(1,1).texCoord(0,1);
