@@ -56,45 +56,37 @@ static void noAttribScope(Mesh& m, Mesh::Attrib attribs, const Func& f){
 int addCuboid(Mesh& m, float rx, float ry, float rz){
 
 	m.triangles();
-	/* 0 1      t  b
-	   2 3      | /
-	4 5       l +--r
-	6 7       f b       */
+
+	/* 2 3      y  
+	   0 1      |
+	6 7         /--x
+	4 5       z         */
+
+	Mesh::Vertex v[8] = {
+		{-rx,-ry,-rz}, { rx,-ry,-rz}, {-rx, ry,-rz}, { rx, ry,-rz},
+		{-rx,-ry, rz}, { rx,-ry, rz}, {-rx, ry, rz}, { rx, ry, rz}
+	};
 
 	if(m.wants(Mesh::NORMAL | Mesh::TANGENT | Mesh::TEXCOORD)){
-		Mesh::Vertex v[2][2][2] = {
-			{
-				{{-rx,-ry,-rz}, { rx,-ry,-rz}},
-				{{-rx, ry,-rz}, { rx, ry,-rz}}
-			},{
-				{{-rx,-ry, rz}, { rx,-ry, rz}},
-				{{-rx, ry, rz}, { rx, ry, rz}}
-			}
-		}; // index as [z][y][x]
-
-		addQuad(m, v[0][0][1], v[0][0][0], v[0][1][0], v[0][1][1]); // back
-		addQuad(m, v[1][0][0], v[1][0][1], v[1][1][1], v[1][1][0]); // front
-		addQuad(m, v[0][0][0], v[1][0][0], v[1][1][0], v[0][1][0]); // left
-		addQuad(m, v[1][0][1], v[0][0][1], v[0][1][1], v[1][1][1]); // right
-		addQuad(m, v[0][0][0], v[0][0][1], v[1][0][1], v[1][0][0]); // bottom
-		addQuad(m, v[1][1][0], v[1][1][1], v[0][1][1], v[0][1][0]); // top
-
+		addQuad(m, v[2],v[0],v[4],v[6]); // left
+		addQuad(m, v[1],v[3],v[7],v[5]); // right
+		addQuad(m, v[3],v[2],v[6],v[7]); // back
+		addQuad(m, v[0],v[1],v[5],v[4]); // front
+		addQuad(m, v[2],v[3],v[1],v[0]); // bottom
+		addQuad(m, v[4],v[5],v[7],v[6]); // top
 		return 4*6;
 	}
-	
+
 	m.indexRel(
-		6,5,4, 6,7,5, // front
-		7,1,5, 7,3,1, // right
-		3,0,1, 3,2,0, // back
-		2,4,0, 2,6,4, // left
-		4,1,0, 4,5,1, // top
-		2,3,6, 3,7,6  // bottom
+		2,0,4, 2,4,6, // left
+		1,3,7, 1,7,5, // right
+		3,2,6, 3,6,7, // back
+		0,1,5, 0,5,4, // front
+		2,3,1, 2,1,0, // bottom
+		4,5,7, 4,7,6  // top
 	);
 
-	m.vertex(-rx, ry,-rz); m.vertex( rx, ry,-rz);
-	m.vertex(-rx,-ry,-rz); m.vertex( rx,-ry,-rz);
-	m.vertex(-rx, ry, rz); m.vertex( rx, ry, rz);
-	m.vertex(-rx,-ry, rz); m.vertex( rx,-ry, rz);
+	m.vertex(v, 8);
 
 	return 8;
 }
