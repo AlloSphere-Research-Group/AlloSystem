@@ -474,8 +474,9 @@ public:
 	/// \tparam M	Number of elements to drop from head (if positive) or tail
 	///				(if negative).
 	/// This function is based on the APL function of the same name.
-	template <int M, int L = N-const_min(const_abs(M), N)>
-	Vec<L,T> drop() const {
+	template <int M>
+	auto drop() const {
+		constexpr auto L = N - const_min(const_abs(M), N);
 		return sub<L, M<0?0:N-L>();
 	}
 
@@ -493,8 +494,10 @@ public:
 	/// 	Vec(1,2,3).take<-5>(-1) == Vec(-1,-1,1,2,3)
 	/// \endcode
 	/// This function is based on the APL function of the same name.
-	template <int M, int L = const_abs(M)>
-	Vec<L,T> take(const T& fill = T()) const {
+	template <int M>
+	auto take(const T& fill = T()) const {
+
+		constexpr auto L = const_abs(M);
 
 		constexpr auto Nc = const_min(L, N);
 		constexpr auto Bc = M>=0 ? 0 : L-Nc;
