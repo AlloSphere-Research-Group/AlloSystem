@@ -436,14 +436,18 @@ public:
 	Vec dup() const { return *this; }
 
 	/// Get a subvector
+
+	/// \tparam M		Size of subvector; if M<0, the size is M+N.
+	/// \tparam Begin	Starting element of subvector
 	template <int M, int Begin=0>
-	const Vec<M,T>& sub() const {
+	const auto& sub() const {
 		return const_cast<Vec*>(this)->sub<M,Begin>();
 	}
 	template <int M, int Begin=0>
-	Vec<M,T>& sub(){
-		static_assert((Begin+M)<=N, "Invalid subvector range");
-		return Vec<M,T>::pun(elems()+Begin);
+	auto& sub(){
+		static constexpr int L = M>=0 ? M : N+M;
+		static_assert((Begin+L)<=N, "Invalid subvector range");
+		return Vec<L,T>::pun(elems()+Begin);
 	}
 
 	const Vec<2,T>& xy() const { return sub<2>(); }
@@ -1152,19 +1156,19 @@ Vec<1+sizeof...(Vs),V> toVec(const V& v, Vs... vs){
 
 /// Get a subvector
 template <int M, int Begin, int N, class T>
-inline Vec<M,T> sub(const Vec<N,T>& v){
+inline auto sub(const Vec<N,T>& v){
 	return v.template sub<M,Begin>();
 }
 template <int M, int Begin, int N, class T>
-inline Vec<M,T>& sub(Vec<N,T>& v){
+inline auto& sub(Vec<N,T>& v){
 	return v.template sub<M,Begin>();
 }
 template <int M, int N, class T>
-inline Vec<M,T> sub(const Vec<N,T>& v){
+inline auto sub(const Vec<N,T>& v){
 	return sub<M,0>(v);
 }
 template <int M, int N, class T>
-inline Vec<M,T>& sub(Vec<N,T>& v){
+inline auto& sub(Vec<N,T>& v){
 	return sub<M,0>(v);
 }
 
