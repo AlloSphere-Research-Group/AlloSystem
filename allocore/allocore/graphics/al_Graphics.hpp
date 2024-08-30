@@ -761,6 +761,7 @@ public:
 
 const char * toString(Graphics::DataType v);
 const char * toString(Graphics::Format v);
+const char * toString(Graphics::Primitive v);
 
 
 // ============== INLINE ==============

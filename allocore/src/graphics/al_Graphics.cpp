@@ -1150,6 +1150,15 @@ const char * toString(Graphics::Format v){
 		default: return "";
 	}
 }
+
+const char * toString(Graphics::Primitive v){
+	switch(v){
+		CS(POINTS)
+		CS(LINES) CS(LINE_STRIP) CS(LINE_LOOP)
+		CS(TRIANGLES) CS(TRIANGLE_STRIP) CS(TRIANGLE_FAN)
+		default: return "";
+	}
+}
 #undef CS
 
 int Graphics::numComponents(Format v){
