@@ -1724,7 +1724,7 @@ int sizeBytes(const Array& a){
 
 void Mesh::print(FILE * dst) const {
 
-	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);
+	fprintf(dst, "Mesh %p (%s) has:\n", this, toString(Graphics::Primitive(mPrimitive)));
 
 	auto niceByteString = [](unsigned bytes, double& printVal){
 		if(bytes <    1000){ printVal=bytes; return "B"; }
