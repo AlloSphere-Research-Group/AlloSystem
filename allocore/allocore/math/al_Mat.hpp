@@ -206,13 +206,9 @@ public:
 		return rotation(angle, Dim1, Dim2);
 	}
 
-	/// Get a rotation transform matrix
-
-	/// @param[in] angle	rotation angle in radians
-	/// @param[in] axis		rotation axis; should be a unit vector
-	static Mat<4,T> rotation(double angle, const Vec<3,T>& axis){
-		T s = sin(angle);
-		T c = cos(angle);
+	static Mat<4,T> rotation(double cosAngle, double sinAngle, const Vec<3,T>& axis){
+		T c = cosAngle;
+		T s = sinAngle;
 		T t = T(1)-c;
 		T x = axis[0], y = axis[1], z = axis[2];
 		T tx = t*x, ty = t*y, tz = t*z;
@@ -224,6 +220,14 @@ public:
 			tx*z - sy, ty*z + sx, tz*z + c , T(0),
 			T(0),T(0),T(0),T(1)
 		};
+	}
+
+	/// Get a rotation transform matrix
+
+	/// @param[in] angle	rotation angle in radians
+	/// @param[in] axis		rotation axis; should be a unit vector
+	static Mat<4,T> rotation(double angle, const Vec<3,T>& axis){
+		return rotation(std::cos(angle), std::sin(angle), axis);
 	}
 
 	/// Get a 90-degree rotation transform matrix
