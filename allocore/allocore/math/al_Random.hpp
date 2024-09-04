@@ -256,6 +256,8 @@ public:
 		Random& rng;
 		float cdf[N];
 
+		static constexpr int size(){ return N; }
+
 		template <class... Weights>
 		Die(Random& r, const Weights... ws): rng(r), cdf{static_cast<float>(ws)...}{
 			PDF2CDF();
