@@ -90,7 +90,7 @@
 /*
 	primitive typedefs
 */
-#if !defined(AL_WINDOWS) || defined(__MSYS__)
+#if !defined(AL_WINDOWS) || defined(__MSYS__) || defined(__MINGW64__)
 	#include "allocore/system/pstdint.h"
 	#define AL_PRINTF_LL "ll"
 #else
