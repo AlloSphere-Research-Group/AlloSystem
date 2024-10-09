@@ -25,7 +25,7 @@ void equalPowerPan(const Vec3d& relPos, float &gainL, float &gainR){
 	gainR = std::sin(pi_2*panVal);
 }
 
-void StereoPanner::renderSample(AudioIOData& io, const Pose& listeningPose, const float& sample, const int& frameIndex){
+void StereoPanner::renderSample(AudioIOData& io, const Pose& listeningPose, float sample, int frameIndex){
 	Vec3d vec = listeningPose.vec();
 	Quatd srcRot = listeningPose.quat();
 	vec = srcRot.rotate(vec);
@@ -44,7 +44,7 @@ void StereoPanner::renderSample(AudioIOData& io, const Pose& listeningPose, cons
 	}
 }
 
-void StereoPanner::renderBuffer(AudioIOData& io, const Pose& listeningPose, const float *samples, const int& numFrames){
+void StereoPanner::renderBuffer(AudioIOData& io, const Pose& listeningPose, const float *samples, int numFrames){
 	Vec3d vec = listeningPose.vec();
 	Quatd srcRot = listeningPose.quat();
 	vec = srcRot.rotate(vec);

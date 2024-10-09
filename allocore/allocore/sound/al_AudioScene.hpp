@@ -315,16 +315,20 @@ public:
 	virtual void prepare(){}
 
 	/// Render audio buffer in position
-	virtual void renderBuffer(AudioIOData& io,
-	                          const Pose& listeningPose,
-	                          const float *samples,
-	                          const int& numFrames
-	                          ) = 0;
+	virtual void renderBuffer(
+		AudioIOData& io,
+		const Pose& listeningPose,
+		const float *samples,
+		int numFrames
+	) = 0;
 
 	/// Render audio sample in position
-	virtual void renderSample(AudioIOData& io, const Pose& listeningPose,
-	                          const float& sample,
-	                          const int& frameIndex) = 0;
+	virtual void renderSample(
+		AudioIOData& io,
+		const Pose& listeningPose,
+		float sample,
+		int frameIndex
+	) = 0;
 
 	/// Called once per listener, after sources are rendered. ex. ambisonics decode
 	virtual void finalize(AudioIOData& io){}

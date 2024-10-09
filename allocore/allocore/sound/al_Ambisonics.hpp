@@ -317,15 +317,17 @@ public:
 
 	void prepare() override;
 
-	void renderBuffer(AudioIOData& io,
-	                  const Pose& listeningPose,
-	                  const float *samples,
-	                  const int& numFrames
-	                  ) override;
+	void renderBuffer(
+		AudioIOData& io,
+		const Pose& listeningPose,
+		const float *samples, int numFrames
+	) override;
 
-	void renderSample(AudioIOData& io, const Pose& listeningPose,
-	                          const float& sample,
-	                          const int& frameIndex) override;
+	void renderSample(
+		AudioIOData& io,
+		const Pose& listeningPose,
+		float sample, int frameIndex
+	) override;
 
 	//void finalize(AudioIOData& io) override;
 

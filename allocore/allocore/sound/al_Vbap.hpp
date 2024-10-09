@@ -101,8 +101,8 @@ public:
 
 	void compile(Listener& listener) override;
 
-	void renderSample(AudioIOData& io, const Pose& reldir, const float& sample, const int& frameIndex) override;
-	void renderBuffer(AudioIOData& io, const Pose& reldir, const float *samples, const int& numFrames) override;
+	void renderSample(AudioIOData& io, const Pose& reldir, float sample, int frameIndex) override;
+	void renderBuffer(AudioIOData& io, const Pose& reldir, const float *samples, int numFrames) override;
 
 	void print() override;
 

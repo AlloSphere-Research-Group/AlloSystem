@@ -401,7 +401,7 @@ void Vbap::compile(Listener& listener){
 	this->mListener = &listener;
 }
 
-void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float *samples, const int &numFrames)
+void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float *samples, int numFrames)
 {
 	// FIMXE AC use cached index
 //	unsigned currentTripletIndex = src.cachedIndex();
@@ -476,7 +476,7 @@ void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float 
 	//mCachedTripletIndex = currentTripletIndex; // Store the new index
 }
 
-void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, const float &sample, const int &frameIndex)
+void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, float sample, int frameIndex)
 {
 	// FIXME AC use cached index
 //	unsigned currentTripletIndex = src.cachedIndex();

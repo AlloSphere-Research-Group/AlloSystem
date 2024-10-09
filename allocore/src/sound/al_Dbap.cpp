@@ -19,7 +19,7 @@ void Dbap::compile(Listener& listener){
 	}
 }
 
-void Dbap::renderBuffer(AudioIOData& io, const Pose& src, const float *samples, const int& numFrames){
+void Dbap::renderBuffer(AudioIOData& io, const Pose& src, const float *samples, int numFrames){
 
 	for(int k = 0; k < mNumSpeakers; ++k) {
 		float gain = 1.f;
@@ -42,7 +42,7 @@ void Dbap::renderBuffer(AudioIOData& io, const Pose& src, const float *samples, 
 
 }
 
-void Dbap::renderSample(AudioIOData& io, const Pose& src, const float& sample, const int& frameIndex){
+void Dbap::renderSample(AudioIOData& io, const Pose& src, float sample, int frameIndex){
 	for(int i = 0; i < mNumSpeakers; ++i){
 		float gain = 1.f;
 		if(mEnabled){
