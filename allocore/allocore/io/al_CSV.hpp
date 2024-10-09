@@ -133,7 +133,7 @@ public:
 
 	/// Set column delimiter
 	CSVWriter& delim(char v){ mDelim=v; return *this; }
-	const char delim() const { return mDelim; }
+	char delim() const { return mDelim; }
 
 	/// Start new row
 	CSVWriter& beginRow();

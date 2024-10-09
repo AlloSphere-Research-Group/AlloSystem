@@ -804,8 +804,6 @@ bool Mesh::saveFBX(const std::string& filePath, const std::string& solidName) co
 	const auto& m = isTriangleStrip() ? copy : *this;
 
 	const auto Nv = m.mVertices.size();
-	const auto Nc = m.mColors.size();
-	const auto Nci = m.mColoris.size();
 
 	fs <<
 R"(; FBX 7.4.0 project file
@@ -877,7 +875,6 @@ Objects: {
 	fs << "\t\tGeometryVersion: 100\n";
 
 	bool hasNormals = m.mNormals.size()>=Nv;
-	bool hasColors = m.mColors.size()>=Nv || m.mColoris.size()>=Nv;
 
 	if(hasNormals){
 		fs << R"(
@@ -896,9 +893,10 @@ Objects: {
 		fs << "\n\t\t\t}\n\t\t}\n";
 	}
 
+	bool hasColors = m.mColors.size()>=Nv || m.mColoris.size()>=Nv;
+
 	if(hasColors){
 		auto Nc = m.mColors.size();
-		auto Nci = m.mColoris.size();
 		fs << R"(
 		LayerElementColor: 0 {
 			Version: 100
@@ -1301,7 +1299,7 @@ void getTokens(std::vector<std::string>& tokens, const std::string& src, char de
 	tokens.clear();
 	std::stringstream ss(src);
 	std::string token;
-	char delimStr[] = {delim, 0}; 
+	//char delimStr[] = {delim, 0}; 
 	while(getline(ss, token, delim)){
 		//tokens.push_back(strip(token, delimStr));
 		tokens.push_back(token);

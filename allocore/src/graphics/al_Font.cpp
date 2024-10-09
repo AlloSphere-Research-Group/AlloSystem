@@ -231,7 +231,8 @@ struct Font::Impl {
 
 		auto * charMetrics = new stbtt_bakedchar[glyphCount];
 
-		auto res = stbtt_BakeFontBitmap(
+		//auto res = 
+		stbtt_BakeFontBitmap(
 			(unsigned char *)(fontData.data()),
 			0, // font location (use offset=0 for plain .ttf)
 			fontSize,

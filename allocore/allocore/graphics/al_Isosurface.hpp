@@ -215,7 +215,7 @@ public:
 
 	void vertexAction(VertexAction& a){ mVertexAction = &a; }
 
-	const bool inBox() const { return mInBox; }
+	bool inBox() const { return mInBox; }
 
 	/// Set whether isosurface is assumed to fit snugly within a box
 

@@ -95,10 +95,8 @@ Vec3d Vbap::computeGains(const Vec3d& vecA, const SpeakerTriple& speak) {
 void Vbap::findSpeakerPairs(const std::vector<Speaker>& spkrs){
 
 	unsigned numSpeakers = spkrs.size();
-	unsigned j, index;
-	unsigned speakerMapping[numSpeakers]; // To map unordered speakers into an ordered set.
-	float speakerAngles[numSpeakers];
-	float indexAngle;
+	auto * speakerMapping = new unsigned[numSpeakers]; // To map unordered speakers into an ordered set.
+	auto * speakerAngles = new float[numSpeakers];
 
 	// Build a map to the speaker, that points to speaker indexes.
 	for (unsigned i = 0; i < numSpeakers; i++) {
@@ -113,9 +111,9 @@ void Vbap::findSpeakerPairs(const std::vector<Speaker>& spkrs){
 		// Only sort speakers that have elevation == 0. Ignore all other.
 		if (spkrs[i].elevation == 0) {
 
-			indexAngle = speakerAngles[i];
-			index = speakerMapping[i];
-			j = i;
+			auto indexAngle = speakerAngles[i];
+			auto index = speakerMapping[i];
+			auto j = i;
 
 			while ((j > 0) && (speakerAngles[j-1] > indexAngle)) {
 				speakerAngles[j] = speakerAngles[j-1];
@@ -145,6 +143,9 @@ void Vbap::findSpeakerPairs(const std::vector<Speaker>& spkrs){
 	triple.s3 = -1;
 	triple.loadVectors(spkrs);
 	addTriple(triple);
+
+	delete[] speakerMapping;
+	delete[] speakerAngles;
 }
 
 bool Vbap::isCrossing(Vec3d c, Vec3d li, Vec3d lj, Vec3d ln, Vec3d lm){

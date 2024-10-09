@@ -855,8 +855,8 @@ int addVoxels(
 	int numVertIn = m.vertices().size();
 	m.triangles();
 	float n = 1.; // 1 normals point out, -1 normals point in
-	bool wantsTan = m.wants(Mesh::TANGENT);
-	bool wantsTxc = m.wants(Mesh::TEXCOORD);
+	//bool wantsTan = m.wants(Mesh::TANGENT);
+	//bool wantsTxc = m.wants(Mesh::TEXCOORD);
 	for(int k=0; k<Nz+1; ++k){
 	for(int j=0; j<Ny+1; ++j){
 	for(int i=0; i<Nx+1; ++i){
