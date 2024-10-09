@@ -230,7 +230,7 @@ public:
 	/// Get speaker
 	Speaker& speaker(int num) { return (*mSpeakers)[num]; }
 
-	virtual void onChannelsChange();
+	void onChannelsChange() override;
 
 protected:
 	int mNumSpeakers;
@@ -311,21 +311,23 @@ public:
 
 	AmbisonicsSpatializer(SpeakerLayout& sl, int dim, int order, int flavor=1);
 
-	virtual void compile(Listener& l) override;
+	void compile(Listener& l) override;
 
-	virtual void numFrames(int v) override;
+	void numFrames(int v) override;
 
-	virtual void prepare() override;
+	void prepare() override;
 
-	virtual void renderBuffer(AudioIOData& io,
+	void renderBuffer(AudioIOData& io,
 	                  const Pose& listeningPose,
 	                  const float *samples,
 	                  const int& numFrames
 	                  ) override;
 
-	virtual void renderSample(AudioIOData& io, const Pose& listeningPose,
+	void renderSample(AudioIOData& io, const Pose& listeningPose,
 	                          const float& sample,
 	                          const int& frameIndex) override;
+
+	//void finalize(AudioIOData& io) override;
 
 	void numSpeakers(int num);
 
@@ -334,9 +336,6 @@ public:
 	void zeroAmbi();
 
 	float * ambiChans(unsigned channel=0);
-
-
-//	virtual void finalize(AudioIOData& io) override;
 
 private:
 	AmbiDecode mDecoder;

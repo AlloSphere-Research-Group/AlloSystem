@@ -552,16 +552,6 @@ void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, const float 
 	}
 }
 
-////Per buffer
-//void Vbap::perform(AudioIOData& io,SoundSource& src,Vec3d& relpos,const int& numFrames,float *samples){
-
-//}
-
-////per sample
-//void Vbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
-
-//}
-
 void Vbap::print() {
 	printf("Number of Triplets: %d\n", (int) mTriplets.size());
 	for (unsigned i = 0; i < mTriplets.size(); i++) {

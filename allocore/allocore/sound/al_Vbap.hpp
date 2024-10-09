@@ -99,12 +99,12 @@ public:
 	///
 	void makePhantomChannel(int channelIndex, std::vector<int> assignedOutputs);
 
-	virtual void compile(Listener& listener) override;
+	void compile(Listener& listener) override;
 
-	virtual void renderSample(AudioIOData& io, const Pose& reldir, const float& sample, const int& frameIndex) override;
-	virtual void renderBuffer(AudioIOData& io, const Pose& reldir, const float *samples, const int& numFrames) override;
+	void renderSample(AudioIOData& io, const Pose& reldir, const float& sample, const int& frameIndex) override;
+	void renderBuffer(AudioIOData& io, const Pose& reldir, const float *samples, const int& numFrames) override;
 
-	virtual void print() override;
+	void print() override;
 
 	/// Manually add a triple from indeces to speakers
 	void makeTriple(int s1, int s2, int s3 = -1);

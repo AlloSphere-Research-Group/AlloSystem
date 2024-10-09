@@ -342,7 +342,8 @@ public:
 	void setEnabled(bool _enable) {mEnabled = _enable;}
 
 protected:
-	/// Render each source per sample
+	// LJP: What is perform for? Subclasses seem to all be using render* virtuals.
+	// Render each source per sample
 	virtual void perform(AudioIOData& io,
 	                     SoundSource& src,
 	                     Vec3d& reldir,
@@ -351,7 +352,7 @@ protected:
 		renderSample(io, reldir, src.readSample(frameIndex), frameIndex);
 	}
 
-	/// Render each source per buffer
+	// Render each source per buffer
 	virtual void perform(AudioIOData& io,
 	                     SoundSource& src,
 	                     Vec3d& reldir,

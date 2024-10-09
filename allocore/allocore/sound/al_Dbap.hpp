@@ -58,21 +58,17 @@ public:
 	/// @param[in] focus	Amplitude focus to nearby speakers
 	Dbap(const SpeakerLayout &sl, float focus = 1.f);
 
-	void compile(Listener& listener);
+	void compile(Listener& listener) override;
+	void renderBuffer(AudioIOData& io, const Pose& reldir, const float *samples, const int& numFrames) override;
+	void renderSample(AudioIOData& io, const Pose& reldir, const float& sample, const int& frameIndex) override;
 
-	///Per Sample Processing
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
-
-	/// Per Buffer Processing
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
-
-	/// focus is an exponent determining the amplitude focus to nearby speakers.
+	/// Set exponent determining the amplitude focus to nearby speakers.
 
 	///focus is (0, inf) with usable range typically [0.2, 5]. Default is 1.
 	///A denser speaker layout my benefit from a high focus > 1, and a sparse layout may benefit from focus < 1
 	void setFocus(float focus) { mFocus = focus; }
 
-	void print();
+	void print() override;
 
 private:
 	Listener * mListener;

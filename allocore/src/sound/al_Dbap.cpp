@@ -19,13 +19,12 @@ void Dbap::compile(Listener& listener){
 	}
 }
 
-void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
-	for (int k = 0; k < mNumSpeakers; ++k)
-	{
+void Dbap::renderBuffer(AudioIOData& io, const Pose& src, const float *samples, const int& numFrames){
+
+	for(int k = 0; k < mNumSpeakers; ++k) {
 		float gain = 1.f;
-		if(mEnabled)
-		{
-			Vec3d vec = relpos - mSpeakerVecs[k];
+		if(mEnabled){
+			auto vec = src.pos() - mSpeakerVecs[k];
 			float dist = vec.mag();
 			gain = 1.f / (1.f + dist);
 			gain = powf(gain, mFocus);
@@ -40,16 +39,14 @@ void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 			io.bufferOut().at(i, mDeviceChannels[k]) += gain * samples[i];
 		}
 	}
+
 }
 
-void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
-{
-	for (int i = 0; i < mNumSpeakers; ++i)
-	{
+void Dbap::renderSample(AudioIOData& io, const Pose& src, const float& sample, const int& frameIndex){
+	for(int i = 0; i < mNumSpeakers; ++i){
 		float gain = 1.f;
-		if(mEnabled)
-		{
-			Vec3d vec = relpos - mSpeakerVecs[i];
+		if(mEnabled){
+			auto vec = src.pos() - mSpeakerVecs[i];
 			float dist = vec.mag();
 			gain = 1.f / (1.f + dist);
 			gain = powf(gain, mFocus);
