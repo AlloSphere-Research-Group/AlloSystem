@@ -1154,7 +1154,7 @@ Vec<1,V> toVec(const V& v){ return {v}; }
 /// Returns new Vec filled with values
 template <class V, class... Vs>
 Vec<1+sizeof...(Vs),V> toVec(const V& v, Vs... vs){
-	return concat(v, toVec(vs...));
+	return concat(v, toVec(V(vs)...));
 }
 
 /// Get a subvector
