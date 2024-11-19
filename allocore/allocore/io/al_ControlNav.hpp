@@ -78,6 +78,9 @@ public:
 	/// Whether to use mouse control
 	NavInputControl& useKeyboard(bool use){ mUseKeyboard = use; return *this; }
 
+	NavInputControl& bubbleMouseEvents(bool v){ mBubbleMouseEvents = v; return *this; }
+	NavInputControl& bubbleKeyboardEvents(bool v){ mBubbleKeyboardEvents = v; return *this; }
+
 	NavInputControl& vscale(float v) { mVScale=v; return *this; }
 	float vscale() const { return mVScale; }
 
@@ -89,6 +92,8 @@ protected:
 	float mVScale, mTScale, mMouseSens;
 	bool mUseMouse = true;
 	bool mUseKeyboard = true;
+	bool mBubbleMouseEvents = false;
+	bool mBubbleKeyboardEvents = false;
 };
 
 /// @} // end allocore group
