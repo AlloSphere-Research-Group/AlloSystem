@@ -91,14 +91,6 @@ protected:
 	bool mUseKeyboard = true;
 };
 
-
-class NavInputControlCosm : public NavInputControl {
-public:
-	bool onKeyDown(const Keyboard& k) override;
-	bool onKeyUp(const Keyboard& k) override;
-	bool onMouseDrag(const Mouse& m) override;
-};
-
 /// @} // end allocore group
 
 } // al::
