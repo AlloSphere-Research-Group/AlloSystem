@@ -1161,7 +1161,6 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 
 	int w = opt.width(), h = opt.height();
 
-	fs << "<?xml version=\"1.0\"?>\n";
 	//fs << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 " << w << " " << h << "\">\n";
 	fs << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"" << -w/2 << " " << -h/2 << " " << w << " " << h << "\">\n";
 	if(opt.title().size()) fs << "<title>" << opt.title() << "</title>\n";
