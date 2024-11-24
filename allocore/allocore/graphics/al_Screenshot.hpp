@@ -56,6 +56,9 @@ public:
 	/// Get output directory
 	const std::string& dir() const { return mDir; }
 
+	/// Get output file extension
+	const std::string& fileExt() const { return mExt; }
+
 	/// Set format of image file
 	//Screenshot& imageFormat(const std::string& ext){ mExt=ext; return *this; }
 
