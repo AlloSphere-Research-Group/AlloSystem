@@ -1209,39 +1209,49 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 	bounds(mn,mx);
 	float vmul = w * 0.5 * opt.scale()/(max(mn.absVec(), mx.absVec()).get(e1,e2).max());
 
+	// For truncating decimal digits
+	double qmul1 = std::pow(10., (double)opt.prec());
+	double qmul2 = 1./qmul1;
+
 	auto encodePos = [&](Vec3f pos){
 		auto xy = pos.get(e1,e2) * vmul;
 		for(auto& v : xy){
 			auto a = std::abs(v);
 			if(a < 1e-10) v = 0.;
+			if(opt.prec() < 10) // Truncate decimal digits
+				v = std::floor(v * qmul1 + 0.5) * qmul2;
 		}
 		return xy;
 	};
 
 	// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands
-	fs << "<path " << style << xfm << "d=\"";	
+
 	
 	if(isLines()){
+		fs << "<path " << style << xfm << "d=\"";
 		Vec2f prevPos{1e38}; // to detect line strips
 		forEachFace([&](int i1, int i2, int i3){
 			auto v1 = encodePos(mVertices[i1]);
 			auto v2 = encodePos(mVertices[i2]);
-			if(v1 != prevPos){
+			if(v1 != prevPos){ // start new line
 				fs << "M" << v1.x << "," << v1.y << " ";
 			}
 			fs << "L" << v2.x << "," << v2.y << " ";
 			prevPos = v2;
 		});
 	} else if(isLineStrip() || isLineLoop()){
+		fs << (isLineStrip() ? "<polyline " : "<polygon ") << style << xfm << "points=\"";
 		forEachFace([&](int i1, int i2, int i3){
-			if(0==i1){
+			// forEachFace gives us strip broken into lines. On the first line, we add both points and for the rest of the lines we add only the second point.
+			if(0==i1){ // first point?
 				auto v1 = encodePos(mVertices[i1]);
-				fs << "M" << v1.x << "," << v1.y << " ";
+				fs << v1.x << "," << v1.y << " ";
 			}
 			auto v2 = encodePos(mVertices[i2]);
-			fs << "L" << v2.x << "," << v2.y << " ";
+			fs << v2.x << "," << v2.y << " ";
 		});
 	} else if(isPoints()){
+		fs << "<path " << style << xfm << "d=\"";
 		forEachFace([&](int i1, int i2, int i3){
 			auto v1 = encodePos(mVertices[i1]);
 			fs << "M" << v1.x << "," << v1.y << " ";

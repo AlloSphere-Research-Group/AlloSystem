@@ -60,11 +60,12 @@ struct SVGOptions{
 	public: auto name(const T& v) -> decltype(*this)& { m_##name = v; return *this; }\
 	public: const T& name() const { return m_##name; }\
 	public: T& name(){ return m_##name; }
-	AL_SVG_PROPERTY(std::string, title);
-	AL_SVG_PROPERTY(std::string, desc);
-	AL_SVG_PROPERTY(int, width, 400);
-	AL_SVG_PROPERTY(int, height, 400);
-	AL_SVG_PROPERTY(float, scale, 0.95);
+	AL_SVG_PROPERTY(std::string, title);///< Title tag
+	AL_SVG_PROPERTY(std::string, desc);	///< Description tag
+	AL_SVG_PROPERTY(int, width, 400);	///< View box width
+	AL_SVG_PROPERTY(int, height, 400);	///< View box height
+	AL_SVG_PROPERTY(float, scale, 0.95);///< Scale factor of all points
+	AL_SVG_PROPERTY(int, prec, 10);		///< Max number of decimal digits of point values; useful for reducing file size
 	#undef AL_SVG_PROPERTY
 };
 
