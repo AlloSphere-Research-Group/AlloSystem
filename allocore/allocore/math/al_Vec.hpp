@@ -1315,7 +1315,7 @@ template <class T>
 void rotate90(Vec<3,T>& vec, const Vec<3,T>& normal){
 	// Simplified Rodrigues' rotation formula with c=0,s=1:
 	//vec = vec*c + cross(normal, vec)*s + normal*(normal.dot(vec)*(T(1)-c));
-	vec = cross(normal, vec) + vec.projection(normal);
+	vec = cross(normal, vec) + vec.proj(normal);
 }
 
 template <class T>
@@ -1347,7 +1347,7 @@ inline Vec<N,T> centroid(const Vec<N,T>& p1, const Vec<N,T>& p2, const Vec<N,T>&
 /// Get closest point on a line to a point p
 template <int N, class T>
 Vec<N,T> closestPointOnLine(const Vec<N,T>& linePnt, const Vec<N,T>& lineDir, const Vec<N,T>& p){
-	return linePnt + (p-linePnt).projection(lineDir);
+	return linePnt + (p-linePnt).proj(lineDir);
 }
 
 template <int N, class T, class Tf>
