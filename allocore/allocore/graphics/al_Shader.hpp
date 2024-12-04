@@ -196,6 +196,19 @@ public:
 	ShaderProgram& version(const std::string& v){ mVersion=v; return *this; }
 	ShaderProgram& version(int n){ return version(std::to_string(n)); }
 
+	/// Add #define's for the shader type at the start of each program
+
+	/// The macros can be used to conditionally compile code, for example,
+	/// functions or variables that may only exist for a particular type of
+	/// shader. The macros are placed just after the version directive.
+	ShaderProgram& typeMacros(
+		const std::string& vertMacro = "VERT",
+		const std::string& fragMacro = "FRAG",
+		const std::string& geomMacro = "GEOM",
+		const std::string& prefix = "",
+		const std::string& suffix = "_PROG"
+	);
+
 	/// Name of shader program (for debugging)
 	ShaderProgram& name(const std::string& v){ mName=v; return *this; }
 	const std::string& name() const { return mName; }
@@ -420,6 +433,7 @@ protected:
 	std::vector<std::string> mTFVaryings;
 	std::string mName;
 	std::string mVersion;
+	std::string mVertMacro, mFragMacro, mGeomMacro;
 	std::string mPreamble;
 	bool mActive = true;
 	bool mOnce = true;

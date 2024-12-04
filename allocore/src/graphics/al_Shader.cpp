@@ -243,6 +243,22 @@ std::string ShaderProgram::idString() const {
 	return mName.empty() ? std::to_string(id()) : "\""+mName+"\"";
 }
 
+ShaderProgram& ShaderProgram::typeMacros(
+	const std::string& vertMacro,
+	const std::string& fragMacro,
+	const std::string& geomMacro,
+	const std::string& prefix,
+	const std::string& suffix
+){
+	auto macroString = [&](const std::string& s){
+		return s.size() ? "#define " + prefix + s + suffix + "\n" : "";
+	};
+	mVertMacro = macroString(vertMacro);
+	mFragMacro = macroString(fragMacro);
+	mGeomMacro = macroString(geomMacro);
+	return *this;
+}
+
 bool ShaderProgram::compile(
 	const std::string& vertSource,
 	const std::string& fragSource,
@@ -258,17 +274,20 @@ bool ShaderProgram::compile(
 	mAttribLocs.clear();
 
 	std::string ver = mVersion.empty() ? "" : "#version " + mVersion + "\n";
-	auto pre = ver + mPreamble;
+
+	auto sourceString = [&](const std::string& macro, const std::string& source){
+		return ver + macro + mPreamble + source;
+	};
 
 	Shader mShaderV, mShaderF, mShaderG;
-	mShaderV.source(pre + vertSource, al::Shader::VERTEX);
+	mShaderV.source(sourceString(mVertMacro, vertSource), al::Shader::VERTEX);
 	attach(mShaderV);
-	mShaderF.source(pre + fragSource, al::Shader::FRAGMENT);
+	mShaderF.source(sourceString(mFragMacro, fragSource), al::Shader::FRAGMENT);
 	attach(mShaderF);
 	
 	bool bGeom = geomSource[0];
 	if(bGeom){
-		mShaderG.source(pre + geomSource, al::Shader::GEOMETRY);
+		mShaderG.source(sourceString(mGeomMacro, geomSource), al::Shader::GEOMETRY);
 		attach(mShaderG);
 	}
 	link(false);
