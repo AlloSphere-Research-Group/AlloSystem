@@ -761,28 +761,31 @@ inline Vec<3,T> Quat<T>::rotateTransposed(const Vec<3,T>& v) const {
 
 template<typename T>
 Quat<T> Quat<T>::slerp(const Quat& input, const Quat& target, T amt){
-	Quat<T> result;
 
-	if (amt==T(0)) {
-		return input;
-	} else if (amt==T(1)) {
-		return target;
-	}
+	// Short-circuit if at endpoint
+	if(amt==T(0)) return input;
+	if(amt==T(1)) return target;
+
+	//      q1 sin((1-t) h) + q2 sin(t h)
+	// q' = -----------------------------
+	//                 sin h
+	//
+	// where t is in [0,1] and h is the half-angle between q1 and q2.
 
 	T bflip = 1.;
 	T dot_prod = input.dot(target);
 	//clamp
-	dot_prod = (dot_prod < -1) ? -1 : ((dot_prod > 1) ? 1 : dot_prod);
+	dot_prod = dot_prod < T(-1) ? T(-1) : dot_prod > T(1) ? T(1) : dot_prod;
 
 	// if B is on opposite hemisphere from A, use -B instead
-	if (dot_prod < 0.0) {
+	if(dot_prod < T(0)){
 		dot_prod = -dot_prod;
-		bflip = -1.;
+		bflip = T(-1);
 	}
 
 	T a, b;
 	T angle = std::acos(dot_prod);
-	if(std::abs(angle) > eps()) {
+	if(std::abs(angle) > eps()){
 		T inv_sine = 1./std::sin(angle);
 		a = std::sin(angle*(1.-amt)) * inv_sine;
 		b = std::sin(angle*    amt ) * inv_sine * bflip;
@@ -790,21 +793,15 @@ Quat<T> Quat<T>::slerp(const Quat& input, const Quat& target, T amt){
 		// nearly the same;
 		// approximate without trigonometry
 		a = amt;
-		b = 1.-amt;
+		b = T(1)-amt;
 	}
 
-	result.w = a*input.w + b*target.w;
-	result.x = a*input.x + b*target.x;
-	result.y = a*input.y + b*target.y;
-	result.z = a*input.z + b*target.z;
+	return (input*a + target*b).normalize();
 
-	result.normalize();
-	return result;
 }
 
 template<typename T>
 void Quat<T>::slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buffer, int numFrames){
-
 
 	// Sinusoidal generator based on recursive formula x0 = c x1 - x2
 	struct RSin {
@@ -828,44 +825,33 @@ void Quat<T>::slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buffe
 	T dot_prod = input.dot(target);
 
 	//clamp
-	dot_prod = (dot_prod < -1) ? -1 : ((dot_prod > 1) ? 1 : dot_prod);
+	dot_prod = dot_prod < T(-1) ? T(-1) : dot_prod > T(1) ? T(1) : dot_prod;
 
 	// if B is on opposite hemisphere from A, use -B instead
-	if (dot_prod < 0.0) {
+	if (dot_prod < T(0)) {
 		dot_prod = -dot_prod;
-		bflip = -1.;
+		bflip = T(-1);
 	}
 
 	const T angle = std::acos(dot_prod);
 	const T inv_frames = 1./((T)numFrames);
 
-	if(std::abs(angle) > eps())
-	{
+	if(std::abs(angle) > eps()){
 		const T inv_sine = 1./std::sin(angle);
 		RSin sinA(-angle*inv_frames, angle, inv_sine);
 		RSin sinB( angle*inv_frames, 0, inv_sine * bflip);
 
-		for (int i=0; i<numFrames; i++) {
+		for(int i=0; i<numFrames; i++){
 			//T amt = i*inv_frames;
 			T a = sinA();
 			T b = sinB();
-
-			buffer[i].w = a*input.w + b*target.w;
-			buffer[i].x = a*input.x + b*target.x;
-			buffer[i].y = a*input.y + b*target.y;
-			buffer[i].z = a*input.z + b*target.z;
-			buffer[i].normalize();
+			buffer[i] = (input*a + target*b).normalize();
 		}
 	} else {
-		for (int i=0; i<numFrames; i++) {
+		for(int i=0; i<numFrames; i++){
 			T a = i*inv_frames;
-			T b = 1.-a;
-
-			buffer[i].w = a*input.w + b*target.w;
-			buffer[i].x = a*input.x + b*target.x;
-			buffer[i].y = a*input.y + b*target.y;
-			buffer[i].z = a*input.z + b*target.z;
-			buffer[i].normalize();
+			T b = T(1)-a;
+			buffer[i] = (input*a + target*b).normalize();
 		}
 	}
 }
