@@ -422,11 +422,21 @@ public:
 		return res;
 	}
 
-	/// Returns inverse of matrix
-	Mat<N,T> inverse() const {
-		auto inv = *this;
-		invert(inv);
-		return inv;
+	/// Swap two columns in place
+	template <int Count=N> 
+	Mat& swapCol(int dim1, int dim2){
+		swap(
+			col(dim1).template sub<Count>(),
+			col(dim2).template sub<Count>()
+		);
+		return *this;
+	}
+
+	/// Swap two columns in place
+	template <int Dim1, int Dim2, int Count=N> 
+	Mat& swapCol(){
+		static_assert_plane<Dim1,Dim2>();
+		return swapCol<Count>(Dim1, Dim2);
 	}
 
 	/// Get reference to self as another type
@@ -652,6 +662,12 @@ public:
 	//--------------------------------------------------------------------------
 	// Linear Operations
 
+	/// Returns inverse of matrix
+	Mat<N,T> inverse() const {
+		auto inv = *this;
+		invert(inv);
+		return inv;
+	}
 
 	/// Get cofactor
 	T cofactor(int row, int col) const {
@@ -731,7 +747,7 @@ public:
 	Mat& rotate90(int dim1, int dim2){
 		auto& col1 = col(dim1).template sub<N-1>();
 		auto& col2 = col(dim2).template sub<N-1>();
-		std::swap(col1, col2);
+		swap(col1, col2);
 		col2 = -col2;
 		return *this;
 	}
