@@ -46,6 +46,7 @@
 
 #include <cmath>
 #include <cstdio>
+#include <ostream>
 #include "allocore/math/al_Vec.hpp"
 
 namespace al {
@@ -1064,6 +1065,21 @@ void Mat<N,T>::print(FILE * file) const {
 		}
 		fprintf(file, "\n");
 	}
+}
+
+template <int N, class T>
+std::ostream& operator << (std::ostream& out, const Mat<N,T>& m) {
+	for(int R=0; R<N; ++R){
+		out << " {"[R==0];
+		for(int C=0; C<N; ++C){
+			out.width(6);
+			out.precision(3);
+			out << m(R,C);
+			out << ((R!=N-1)||(C!=N-1) ? ", " : "}");
+		}
+		out << '\n';
+	}
+	return out;
 }
 
 #undef IT
