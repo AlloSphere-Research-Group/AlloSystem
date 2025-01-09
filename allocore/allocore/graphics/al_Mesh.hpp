@@ -480,12 +480,13 @@ public:
 	/// buffer. Buffers are extended by copying their last element.
 	Mesh& equalizeBuffers();
 
-	/// Append buffers from another mesh:
-	Mesh& merge(const Mesh& src);
+	/// Append another mesh to end
+	Mesh& append(const Mesh& src);
 
+	/// Append another mesh with transform applied---useful for baked instancing
 	template <class T>
-	Mesh& merge(const Mesh& src, const Mat<4,T>& xfm){
-		return merge(src).transform(xfm, -src.vertices().size());
+	Mesh& append(const Mesh& src, const Mat<4,T>& xfm){
+		return append(src).transform(xfm, -src.vertices().size());
 	}
 
 	/// Convert triangle strip to triangles

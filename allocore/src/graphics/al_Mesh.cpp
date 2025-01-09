@@ -467,8 +467,8 @@ Mesh& Mesh::flipWinding(){
 }
 
 
-Mesh& Mesh::merge(const Mesh& src){
-	// TODO: only do merge if source and dest are well-formed
+Mesh& Mesh::append(const Mesh& src){
+	// TODO: only do if source and dest are well-formed
 
 	if(src.mVertices.empty()) return *this;
 
