@@ -389,6 +389,18 @@ public:
 	 // i.e. use mouse xy
 	Ray<double> getPickRay(const ViewpointWindow& w, int screenX, int screenY);
 
+
+
+	// Utility functions
+	/// Get value of trigonometric pi constant
+	static constexpr double pi(){ return 3.14159265358979; }
+
+	/// Convert degrees to radians
+	static constexpr double deg2rad(double v){
+		constexpr double mul = pi()/180.;
+		return v * mul;
+	}
+
 protected:
 	virtual void onSoundWrapper(AudioIOData& io){ onSound(io); }
 	virtual void onAnimateWrapper(double dt){ onAnimate(dt); }
