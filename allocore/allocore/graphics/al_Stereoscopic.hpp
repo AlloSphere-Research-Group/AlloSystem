@@ -174,6 +174,10 @@ public:
 	/// Get current view matrix
 	const Matrix4d& view() const { return mView; }
 
+	/// Get current view-projection matrix
+	Matrix4d viewProjection() const { return mProjection * mView; }
+	Matrix4d MVP() const { return viewProjection(); }
+
 	/// Get current eye position
 	const Vec3d& eye() const { return mEye; }
 
