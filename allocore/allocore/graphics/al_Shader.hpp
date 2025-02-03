@@ -250,6 +250,9 @@ public:
 	ShaderProgram& toggleActive(){ mActive^=true; return *this; }
 
 	/// Begin use of shader program
+
+	/// \return true if the shader has begun use (and is active), otherwise
+	/// false.
 	bool begin();
 
 	/// End use of shader program
@@ -261,7 +264,7 @@ public:
 	/// ShaderProgram (which will receive *this).
 	template <class Func>
 	ShaderProgram& scope(const Func& f){
-		begin(); f(*this); end();
+		if(begin()){ f(*this); end(); }
 		return *this;
 	}
 
