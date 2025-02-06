@@ -387,6 +387,14 @@ public:
 		return g;
 	}
 
+	/// Get vertex group with applied transform
+	template <class Func>
+	Group group(const Func& f, const Mat4f& xfm){
+		auto g = group(f);
+		transform(xfm, g);
+		return g;
+	}
+
 	/// Repeat last vertex element(s)
 	Mesh& repeatLast();
 
