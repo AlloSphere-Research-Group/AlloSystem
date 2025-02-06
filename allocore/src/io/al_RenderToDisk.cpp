@@ -39,8 +39,10 @@ RenderToDisk::RenderToDisk(Mode m)
 	mPBOs[0] = 0;
 	resetPBOQueue();
 
-	mAudioCB = [this](const AudioIOData& io){
-		mAudioRing.write(io.bufferOut().data());
+	mAudioCB = [this](AudioIOData& io){
+		auto& buf = io.bufferOut();
+		for(auto& v : buf) v *= io.gain(); // usually applied after all callbacks
+		mAudioRing.write(buf.data());
 	};
 
 	/*AudioRing ring;
