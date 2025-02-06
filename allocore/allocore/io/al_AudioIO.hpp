@@ -83,6 +83,11 @@ public:
 	const value_type * data() const { return mData; }
 	value_type * data(){ return mData; }
 
+	const value_type * begin() const { return mData; }
+	value_type * begin(){ return mData; }
+	const value_type * end() const { return mData + samples(); }
+	value_type * end(){ return mData + samples(); }
+
 	/// Resize buffer
 	AudioBlock& resize(int frames, int chans);
 
