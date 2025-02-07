@@ -236,6 +236,7 @@ private:
 
 	bool mActive = false;
 	bool mWroteImages = false, mWroteAudio = false;
+	bool mDisabledVSync = false;
 
 	virtual bool onFrame();
 	void makeDir();

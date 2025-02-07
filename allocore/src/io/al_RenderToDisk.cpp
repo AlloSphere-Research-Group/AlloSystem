@@ -270,7 +270,10 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 
 		if(NON_REAL_TIME == mMode){
 			mWindow->asap(true);
-			mWindow->vsync(false);
+			if(mWindow->vsync()){
+				mWindow->vsync(false);
+				mDisabledVSync = true;
+			}
 		}
 		else{
 			mWindow->fps(1./mFrameDur);
@@ -302,7 +305,10 @@ void RenderToDisk::stop(){
 
 		if(NON_REAL_TIME == mMode){
 			mWindow->asap(false);
-			mWindow->vsync(true);
+			if(mDisabledVSync){
+				mWindow->vsync(true);
+				mDisabledVSync = false;
+			}
 		}
 		else{
 			mWindow->fps(mWindowFPS);
