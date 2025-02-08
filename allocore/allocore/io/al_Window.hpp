@@ -71,7 +71,7 @@ public:
 		bool state;
 	};
 
-	typedef std::deque<Event> Events;
+	using Events = std::deque<Event>;
 
 	/// Non-printable keys
 	enum Key{
@@ -183,16 +183,38 @@ protected:
 };
 
 
+/// Abstract event handler
+class EventHandler{
+public:
+	virtual ~EventHandler();
+
+	bool attached() const { return nullptr != mWindow; }
+	Window& window(){ return *mWindow; }
+	const Window& window() const { return *mWindow; }
+
+protected:
+	friend class Window;
+	Window * mWindow = nullptr;
+
+	/// Called just after attached to window
+	virtual void onAttach(){}
+	/// Called just before detaching from window
+	virtual void onDetach(){}
+	/// Remove self from current window
+	virtual void onRemoveFromWindow() = 0;
+
+	void attach(Window& win);
+	void detach();
+	void removeFromWindow();
+};
+
 
 /// Controller for handling input events
 
 /// The return value of the event handlers determines whether or not
 /// the event should be propagated to other handlers.
-class InputEventHandler{
+class InputEventHandler : public EventHandler {
 public:
-	InputEventHandler();
-	virtual ~InputEventHandler();
-
 
 	/// Called when a keyboard key is pressed
 	virtual bool onKeyDown(const Keyboard& k){ return true; }
@@ -217,15 +239,8 @@ public:
 	/// Return self
 	InputEventHandler& inputEventHandler(){ return *this; }
 
-	bool attached() const { return NULL != mWindow; }
-	Window& window(){ return *mWindow; }
-	const Window& window() const { return *mWindow; }
-
 private:
-	friend class Window;
-	Window * mWindow;
-	InputEventHandler& window(Window * v){ mWindow=v; return *this; }
-	void removeFromWindow();
+	void onRemoveFromWindow() override;
 };
 
 
@@ -233,11 +248,8 @@ private:
 
 /// The return value of the event handlers determines whether or not
 /// the event should be propagated to other handlers.
-class WindowEventHandler {
+class WindowEventHandler : public EventHandler {
 public:
-	WindowEventHandler();
-	virtual ~WindowEventHandler();
-
 
 	/// Called after window is created with valid OpenGL context
 	virtual bool onCreate(){ return true; }
@@ -261,18 +273,11 @@ public:
 	/// Return self
 	WindowEventHandler& windowEventHandler(){ return *this; }
 
-
-	bool attached() const { return NULL != mWindow; }
-	Window& window(){ return *mWindow; }
-	const Window& window() const { return *mWindow; }
-
 private:
-	friend class Window;
-	Window * mWindow;
-	WindowEventHandler& window(Window * v){ mWindow=v; return *this; }
-	void removeFromWindow();
+	void onAttach() override;
+	void onDetach() override;
+	void onRemoveFromWindow() override;
 };
-
 
 
 /// Window with OpenGL context
@@ -282,8 +287,11 @@ private:
 class Window : public InputEventHandler, public WindowEventHandler, public GPUContext {
 public:
 
-	typedef std::vector<InputEventHandler *> InputEventHandlers;
-	typedef std::vector<WindowEventHandler *> WindowEventHandlers;
+	template <class TEventHandler>
+	using EventHandlers = std::vector<TEventHandler *>;
+
+	using InputEventHandlers = EventHandlers<InputEventHandler>;
+	using WindowEventHandlers = EventHandlers<WindowEventHandler>;
 
 	/// Window display mode bit flags
 	enum DisplayMode{
@@ -484,8 +492,14 @@ protected:
 	void implSetTitle();
 	void implSetVSync();
 
-	Window& insert(InputEventHandler& v, int i);
-	Window& insert(WindowEventHandler& v, int i);
+	template <class TEventHandler>
+	EventHandlers<TEventHandler>& eventHandlers();
+
+	template <class TEventHandler>
+	Window& removeT(TEventHandler&);
+
+	template <class TEventHandler>
+	Window& insert(TEventHandler&, int i);
 
 	#define CALL(func){\
 		for(auto * handler : mInputEventHandlers){\

@@ -74,33 +74,72 @@ void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=
 void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 
 
-InputEventHandler::InputEventHandler()
-:	mWindow(NULL)
-{}
 
-InputEventHandler::~InputEventHandler(){
+EventHandler::~EventHandler(){
 	removeFromWindow();
 }
 
-void InputEventHandler::removeFromWindow(){
-	if(attached()) window().remove(*this);
-}
-
-
-
-WindowEventHandler::WindowEventHandler()
-:	mWindow(NULL)
-{}
-
-WindowEventHandler::~WindowEventHandler(){
-	removeFromWindow();
-}
-
-void WindowEventHandler::removeFromWindow(){
+void EventHandler::attach(Window& win){
 	if(attached()){
-		window().remove(*this); // Window::remove calls onResize
+		removeFromWindow();
+	}
+	mWindow = &win;
+	onAttach();
+}
+
+void EventHandler::detach(){
+	if(attached()){
+		onDetach();
+		mWindow = nullptr;
 	}
 }
+
+void EventHandler::removeFromWindow(){
+	/* Assumed call stack:
+		onRemoveFromWindow
+			Window::remove
+				detach
+	*/
+	if(attached()){
+		onRemoveFromWindow();
+	}
+}
+
+
+void InputEventHandler::onRemoveFromWindow(){
+	window().remove(*this);
+}
+
+
+void WindowEventHandler::onAttach(){
+	auto& win = window();
+	// notify new handler of changes if the window already is created
+	// otherwise, the window will call the proper handlers when created
+	if(win.created()){
+		//printf("onCreate for new addition to existing window\n");
+		onCreate();
+	}
+	if(win.started()){
+		onResize(win.width(), win.height());
+		//printf("WindowEventHandler %p onResize(%d, %d)\n", this, win.width(), win.height());
+	}
+}
+
+void WindowEventHandler::onDetach(){
+	auto& win = window();
+	if(win.started()){
+		onResize(-win.width(), -win.height());
+		//printf("WindowEventHandler %p onResize(%d, %d)\n", this, win.width(), win.height());
+	}
+	if(win.created()){
+		onDestroy();
+	}
+}
+
+void WindowEventHandler::onRemoveFromWindow(){
+	window().remove(*this);
+}
+
 
 
 Window::Dim::Dim(int v):Window::Dim(v,v){}
@@ -329,81 +368,48 @@ void Window::updateFrameTime(){
 	mFPSAvg += 0.3 * (fpsCurr - mFPSAvg);
 }
 
+template<> Window::EventHandlers<InputEventHandler>& Window::eventHandlers<InputEventHandler>(){
+	return mInputEventHandlers;
+}
 
-Window& Window::insert(InputEventHandler& v, int i){
-	auto& H = mInputEventHandlers;
-	if(std::find(H.begin(), H.end(), &v) == H.end()){
-		v.removeFromWindow();
-		H.insert(H.begin()+i, &(v.window(this)));
+template<> Window::EventHandlers<WindowEventHandler>& Window::eventHandlers<WindowEventHandler>(){
+	return mWindowEventHandlers;
+}
+
+template <class TEventHandler>
+Window& Window::removeT(TEventHandler& v){
+	auto& H = eventHandlers<TEventHandler>();
+	auto it = std::find(H.begin(), H.end(), &v);
+	if(it != H.end()){
+		H.erase(it);
+		// the proper way to do it:
+		//H.erase(std::remove(H.begin(), H.end(), &v), H.end());
+		v.detach();
 	}
 	return *this;
 }
 
-Window& Window::insert(WindowEventHandler& v, int i){
-	auto& H = mWindowEventHandlers;
-	if(std::find(H.begin(), H.end(), &v) == H.end()){
-		v.removeFromWindow();
-		H.insert(H.begin()+i, &(v.window(this)));
+Window& Window::remove(InputEventHandler& v){ return removeT(v); }
+Window& Window::remove(WindowEventHandler& v){ return removeT(v); }
 
-		// notify new handler of changes if the window already is created
-		// otherwise, the window will call the proper handlers when created
-		if(created()){
-			//printf("onCreate for new addition to existing window\n");
-			v.onCreate();
-		}
-		if(started()){
-			v.onResize(width(), height());
-			//printf("WindowEventHandler %p onResize(%d, %d)\n", &v, width(), height());
-		}
+template <class TEventHandler>
+Window& Window::insert(TEventHandler& v, int i){
+	auto& H = eventHandlers<TEventHandler>();
+	if(std::find(H.begin(), H.end(), &v) == H.end()){
+		v.attach(*this);
+		H.insert(H.begin()+i, &v);
 	}
 	return *this;
 }
+
+// Explicit template instantiations not needed since only used internally...
+//template Window& Window::insert<InputEventHandler>(InputEventHandler&, int);
+//template Window& Window::insert<WindowEventHandler>(WindowEventHandler&, int);
 
 Window& Window::append(InputEventHandler& v){ return insert(v, mInputEventHandlers.size()); }
 Window& Window::append(WindowEventHandler& v){ return insert(v, mWindowEventHandlers.size()); }
 Window& Window::prepend(InputEventHandler& v){ return insert(v,0); }
 Window& Window::prepend(WindowEventHandler& v){ return insert(v,0); }
-
-
-Window& Window::remove(InputEventHandler& v){
-	auto& H = mInputEventHandlers;
-	auto it = std::find(H.begin(), H.end(), &v);
-
-	if(it != H.end()){
-		H.erase(it);
-
-		// the proper way to do it:
-		//H.erase(std::remove(H.begin(), H.end(), &v), H.end());
-		v.mWindow = NULL;
-	}
-	return *this;
-}
-
-Window& Window::remove(WindowEventHandler& v){
-	auto& H = mWindowEventHandlers;
-	auto it = std::find(H.begin(), H.end(), &v);
-
-	if(it != H.end()){
-
-		H.erase(it);
-
-		// the proper way to do it:
-		//H.erase(std::remove(H.begin(), H.end(), &v), H.end());
-
-		//printf("removed window event handler (%p) from window (%p)\n", &v, this);
-		//assert(std::find(H.begin(), H.end(), &v) == H.end());
-
-		if(started()){
-			v.onResize(-width(), -height());
-			//printf("WindowEventHandler %p onResize(%d, %d)\n", &v, width(), height());
-		}
-		if(created()){
-			v.onDestroy();
-		}
-		v.mWindow = NULL;
-	}
-	return *this;
-}
 
 
 bool Window::started(){
