@@ -84,21 +84,21 @@ void EventHandler::attach(Window& win){
 		removeFromWindow();
 	}
 	mWindow = &win;
-	onAttach();
+	if(active()) onAttach();
 }
 
 void EventHandler::detach(){
 	if(attached()){
-		onDetach();
+		if(active()) onDetach();
 		mWindow = nullptr;
 	}
 }
 
 void EventHandler::removeFromWindow(){
-	/* Assumed call stack:
-		onRemoveFromWindow
+	/* Expected call stack:
+		this->onRemoveFromWindow
 			Window::remove
-				detach
+				this->detach
 	*/
 	if(attached()){
 		onRemoveFromWindow();
@@ -357,6 +357,18 @@ bool Window::enabled(DisplayMode v) const {
 	return mDisplayMode & v;
 }
 
+bool Window::started(){
+	return Main::get().isRunning();
+}
+
+void Window::startLoop(){
+	Main::get().start();
+}
+
+void Window::stopLoop(){
+	Window::destroyAll();
+	Main::get().stop();
+}
 
 void Window::updateFrameTime(){
 	double timeNow = timeInSec();
@@ -412,19 +424,39 @@ Window& Window::prepend(InputEventHandler& v){ return insert(v,0); }
 Window& Window::prepend(WindowEventHandler& v){ return insert(v,0); }
 
 
-bool Window::started(){
-	return Main::get().isRunning();
+#define CALL_HANDLERS(handlers, func){\
+	for(auto * handler : handlers){\
+		if(!handler->active()) continue;\
+		if(false == handler->func) break;\
+	}\
 }
 
-void Window::startLoop(){
-	Main::get().start();
-}
+#define CALL(func) CALL_HANDLERS(mInputEventHandlers, func)
+void Window::callHandlersOnMouseDown(){ CALL(onMouseDown(mMouse)); }
+void Window::callHandlersOnMouseDrag(){ CALL(onMouseDrag(mMouse)); }
+void Window::callHandlersOnMouseMove(){ CALL(onMouseMove(mMouse)); }
+void Window::callHandlersOnMouseUp(){ CALL(onMouseUp(mMouse)); }
+void Window::callHandlersOnKeyDown(){ CALL(onKeyDown(mKeyboard)); }
+void Window::callHandlersOnKeyUp(){ CALL(onKeyUp(mKeyboard)); }
+#undef CALL
 
-void Window::stopLoop(){
-	Window::destroyAll();
-	Main::get().stop();
+#define CALL(func) CALL_HANDLERS(mWindowEventHandlers, func)
+void Window::callHandlersOnFrame(){
+	CALL(onFrame());
+	mKeyboard.mEvents.clear();
 }
-
+void Window::callHandlersOnCreate(){
+	contextCreate();
+	CALL(onCreate());
+}
+void Window::callHandlersOnDestroy(){
+	CALL(onDestroy());
+	contextDestroy();
+}
+void Window::callHandlersOnResize(int w, int h){ CALL(onResize(w, h)); }
+void Window::callHandlersOnVisibility(bool v){ CALL(onVisibility(v)); }
+void Window::callHandlersOnDrop(const std::vector<std::string>& paths){ CALL(onDrop(paths)); }
+#undef CALL
 
 
 bool StandardWindowKeyControls::onKeyDown(const Keyboard& k){

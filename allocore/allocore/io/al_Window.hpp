@@ -188,6 +188,17 @@ class EventHandler{
 public:
 	virtual ~EventHandler();
 
+	/// Set whether handler is active
+
+	/// This is useful for disabling a handler without removing it from its
+	/// parent window (for example, to maintain correct call ordering).
+	void active(bool v){ mActive = v; }
+	void activeToggle(){ mActive ^= true; }
+
+	/// Get whether handler is active
+	bool active() const { return mActive; }
+
+	/// Whether currently attached to a window
 	bool attached() const { return nullptr != mWindow; }
 	Window& window(){ return *mWindow; }
 	const Window& window() const { return *mWindow; }
@@ -195,6 +206,7 @@ public:
 protected:
 	friend class Window;
 	Window * mWindow = nullptr;
+	bool mActive = true;
 
 	/// Called just after attached to window
 	virtual void onAttach(){}
@@ -501,43 +513,19 @@ protected:
 	template <class TEventHandler>
 	Window& insert(TEventHandler&, int i);
 
-	#define CALL(func){\
-		for(auto * handler : mInputEventHandlers){\
-			if(false == handler->func) break;\
-		}\
-	}
+	void callHandlersOnMouseDown();
+	void callHandlersOnMouseDrag();
+	void callHandlersOnMouseMove();
+	void callHandlersOnMouseUp();
+	void callHandlersOnKeyDown();
+	void callHandlersOnKeyUp();
 
-	void callHandlersOnMouseDown(){ CALL(onMouseDown(mMouse)); }
-	void callHandlersOnMouseDrag(){ CALL(onMouseDrag(mMouse)); }
-	void callHandlersOnMouseMove(){ CALL(onMouseMove(mMouse)); }
-	void callHandlersOnMouseUp(){ CALL(onMouseUp(mMouse)); }
-	void callHandlersOnKeyDown(){ CALL(onKeyDown(mKeyboard)); }
-	void callHandlersOnKeyUp(){ CALL(onKeyUp(mKeyboard)); }
-	#undef CALL
-
-	#define CALL(func){\
-		for(auto * handler : mWindowEventHandlers){\
-			if(false == handler->func) break;\
-		}\
-	}
-
-	void callHandlersOnFrame(){
-		CALL(onFrame());
-		mKeyboard.mEvents.clear();
-	}
-	void callHandlersOnCreate(){
-		contextCreate();
-		CALL(onCreate());
-	}
-	void callHandlersOnDestroy(){
-		CALL(onDestroy());
-		contextDestroy();
-	}
-	void callHandlersOnResize(int w, int h){ CALL(onResize(w, h)); }
-	void callHandlersOnVisibility(bool v){ CALL(onVisibility(v)); }
-	void callHandlersOnDrop(const std::vector<std::string>& paths){ CALL(onDrop(paths)); }
-
-	#undef CALL
+	void callHandlersOnFrame();
+	void callHandlersOnCreate();
+	void callHandlersOnDestroy();
+	void callHandlersOnResize(int w, int h);
+	void callHandlersOnVisibility(bool v);
+	void callHandlersOnDrop(const std::vector<std::string>& paths);
 };
 
 
