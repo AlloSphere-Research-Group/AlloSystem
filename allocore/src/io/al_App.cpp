@@ -11,10 +11,7 @@ namespace al{
 //______________________________________________________________________________
 
 Viewpoint::Viewpoint(const Pose& transform)
-:	mViewport(0,0,0,0),
-	mParentTransform(NULL), mTransform(transform),
-	mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
-	mLens(NULL), mClearColor(NULL)
+:	mTransform(transform)
 {}
 
 Viewpoint& Viewpoint::anchor(float ax, float ay){
@@ -23,6 +20,10 @@ Viewpoint& Viewpoint::anchor(float ax, float ay){
 
 Viewpoint& Viewpoint::stretch(float sx, float sy){
 	mStretchX=sx; mStretchY=sy; return *this;
+}
+
+Pose Viewpoint::worldTransform() const {
+	return mParentTransform ? (*mParentTransform) * mTransform : mTransform;
 }
 
 Frustumd Viewpoint::frustum() const {

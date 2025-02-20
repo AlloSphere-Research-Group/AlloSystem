@@ -98,19 +98,18 @@ public:
 	/// @param[in] sy	stretch factor relative to bottom edge of window, in [0,1]
 	Viewpoint& stretch(float sx, float sy);
 
-	bool hasLens() const { return NULL != mLens; }
-	bool hasClearColor() const { return NULL != mClearColor; }
-
 	/// Get lens
 	const Lens& lens() const { return *mLens; }
 	Viewpoint& lens(Lens& v){ mLens=&v; return *this; }
+	bool hasLens() const { return nullptr != mLens; }
 
 	/// Get clear color
 	const Color& clearColor() const { return *mClearColor; }
 	Viewpoint& clearColor(Color& v){ mClearColor=&v; return *this; }
-
+	bool hasClearColor() const { return nullptr != mClearColor; }
+	
 	/// Get parent transform
-	const Pose* parentTransform() const { return mParentTransform; }
+	const Pose * parentTransform() const { return mParentTransform; }
 	Viewpoint& parentTransform(Pose& v){ mParentTransform =&v; return *this; }
 	Viewpoint& parentTransform(Pose* v){ mParentTransform = v; return *this; }
 
@@ -119,7 +118,7 @@ public:
 	Pose& transform(){ return mTransform; }
 	Viewpoint& transform(const Pose& v){ mTransform=v; return *this; }
 
-	Pose worldTransform() const { return mParentTransform ? (*mParentTransform) * transform() : transform(); }
+	Pose worldTransform() const;
 
 	/// Get screen viewport
 	const Viewport& viewport() const { return mViewport; }
@@ -132,13 +131,13 @@ public:
 	void onParentResize(int w, int h);
 
 private:
-	Viewport mViewport;				// screen display region
-	Pose * mParentTransform;		// parent transform, 0 if none
-	Pose mTransform;				// local transform
-	float mAnchorX, mAnchorY;		// viewport anchor factors relative to parent window
-	float mStretchX, mStretchY;		// viewport stretch factors relative to parent window
-	Lens * mLens;					// if not set, will be set to scene's default lens
-	Color * mClearColor;
+	Viewport mViewport{0,0,0,0};		// screen display region
+	Pose * mParentTransform = nullptr;	// parent transform, nullptr if none
+	Pose mTransform;					// local transform
+	float mAnchorX=0.f, mAnchorY=0.f;	// viewport anchor factors relative to parent window
+	float mStretchX=1.f, mStretchY=1.f;	// viewport stretch factors relative to parent window
+	Lens * mLens = nullptr;				// if not set, will be set to scene's default lens
+	Color * mClearColor = nullptr;
 };
 
 
