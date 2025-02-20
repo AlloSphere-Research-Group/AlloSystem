@@ -179,7 +179,7 @@ protected:
 private:
 	friend class SceneWindowHandler;
 	StandardWindowKeyControls mStandardKeyControls;
-	bool mResized;
+	bool mResized = false;
 };
 
 
