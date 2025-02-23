@@ -163,7 +163,8 @@ std::map<const Mesh *, std::unique_ptr<GPUMesh>> gpuMeshes;
 GPUMesh * currentGPUMesh = NULL;
 
 void Graphics::Backend::draw(const Mesh& m, int count, int begin){
-	draw(RawMeshData(m, count, begin));
+	if(m.visible())
+		draw(RawMeshData(m, count, begin));
 }
 
 

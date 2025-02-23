@@ -632,6 +632,12 @@ public:
 	/// Get whether mesh wants attribute(s)
 	bool wants(Attrib v) const { return mAttribHint & v; }
 
+	/// Get whether mesh should be rendered
+	bool visible() const { return mVisible; }
+	/// Set whether mesh should be rendered
+	Mesh& visible(bool v){ mVisible=v; return *this; }
+	Mesh& visibleToggle(){ mVisible^=true; return *this; }
+
 	/// Print information about Mesh
 	void print(FILE * dst = stdout) const;
 
@@ -657,6 +663,7 @@ protected:
 	int mPrimitive;
 	Attrib mAttribHint = Attrib(0);
 	float mStroke = -1.f;
+	bool mVisible = true;
 };
 
 inline Mesh::Attrib operator& (Mesh::Attrib a, Mesh::Attrib b){ return Mesh::Attrib(+a & +b); }
