@@ -180,8 +180,8 @@ public:
 	static Mat rotation(double cosAngle, double sinAngle, unsigned dim1, unsigned dim2){
 		Mat m(T(1));
 		m(dim1,dim1) = cosAngle;
-		m(dim1,dim2) =-sinAngle;
 		m(dim2,dim1) = sinAngle;
+		m(dim1,dim2) =-sinAngle;
 		m(dim2,dim2) = cosAngle;
 		return m;
 	}
@@ -278,6 +278,37 @@ public:
 	static Mat translation(Vals... vals){
 		return translation(Vec<sizeof...(Vals),T>(vals...));
 	}
+
+	/// Get rotation-scaling-translation (RST) transform matrix
+
+	/// This returns the transform matrix T*S*R where the respective matrices
+	/// are a translation, scaling and rotation. Due to the simplicity of the 
+	/// matrices involved, it is possible to form the lumped transform directly
+	/// with only four multiplies versus 2N^2 if using matrix multiplication.
+	/// In 2D, this transform forms a complete "model" matrix. In 3D and above,
+	/// it may be multiplied on the right by additional rotation matrices.
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat RST(double cosAngle, double sinAngle, const Vec<N-1,T>& s, const Vec<N-1,T>& t = T(0)){
+		Mat m(T(1)); // I
+		for(int i=0; i<N-1; ++i) m(i,i) = s[i]; // S
+		m(Dim1,Dim1) = cosAngle * s.template at<Dim1>(); // SR
+		m(Dim2,Dim1) = sinAngle * s.template at<Dim1>();
+		m(Dim1,Dim2) =-sinAngle * s.template at<Dim2>();
+		m(Dim2,Dim2) = cosAngle * s.template at<Dim2>();
+		m.col<N-1>().template sub<-1>() = t; // TSR
+		return m;
+	}
+
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat RST(double angle, const Vec<N-1,T>& s, const Vec<N-1,T>& t = T(0)){
+		return RST<Dim1,Dim2>(std::cos(angle), std::sin(angle), s, t);
+	}
+
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat RST(double angle, const T& s, const Vec<N-1,T>& t = T(0)){
+		return RST<Dim1,Dim2>(angle, Vec<N-1,T>(s), t);
+	}
+
 
 	//--------------------------------------------------------------------------
 	// Access/Memory Operations
@@ -778,6 +809,9 @@ public:
 		return rotateGlobal<N-1>(angle,dim1,dim2); }
 
 	/// Scale transformation matrix
+
+	/// This applies a non-uniform scaling to the matrix. Specifically, given
+	/// matrix A, it applies A' = S*A where S is a scaling matrix.
 	template<class V>
 	Mat& scale(const Vec<N-1,V>& amount){
 		for(int C=0; C<N-1; ++C){
@@ -797,6 +831,9 @@ public:
 	Mat& scale(Vals... vals){ return scale(Vec<(sizeof...(Vals)),T>(vals...)); }
 
 	/// Scale transformation matrix global coordinates
+
+	/// This applies a non-uniform scaling to the matrix. Specifically, given
+	/// matrix A, it applies A' = A*S where S is a scaling matrix.
 	template<class V>
 	Mat& scaleGlobal(const Vec<N-1,V>& amount){
 		for(int R=0; R<N-1; ++R){
