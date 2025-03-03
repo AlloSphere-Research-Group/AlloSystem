@@ -186,11 +186,24 @@ public:
 	/// Returns argument with sign randomly flipped
 	float sign(float x=1.f);
 
+	/// Returns true with a probability of p
+	bool prob(float p){ return uniform() < p; }
+
 	/// Returns true with a probability of 0.5
 	bool prob(){ return mRNG()&0x80000000; }
 
-	/// Returns true with a probability of p
-	bool prob(float p){ return uniform() < p; }
+	/// Return true with probability Num/Den
+
+	/// This is an optimized version that avoids conversions to floating point,
+	/// but requires the probability to be fixed at compile-time.
+	/// Due numerical limitations, a probability of 1 is not supported.
+	template <unsigned Num, unsigned Den>
+	bool prob(){
+		static_assert(Num < Den, "Fraction is greater than or equal to 1");
+		static_assert(Den != 0, "Division by zero");
+		static constexpr uint32_t p = (4294967296ULL/Den)*Num;
+		return mRNG() < p;
+	}
 
 	/// Shuffles array elements
 	template <class T>
