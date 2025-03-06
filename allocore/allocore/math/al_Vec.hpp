@@ -696,6 +696,17 @@ public:
 		return r;
 	}
 
+	/// Get new vector from a cumulative binary operation
+
+	/// If the input is {a,b,c,...} this returns {a, a@b, (a@b)@c, ...} where @ 
+	/// is a binary operation.
+	template <class Func, class... Args>
+	Vec scan(Func func, Args... args){
+		auto r = *this;
+		for(int i=1; i<size(); ++i)
+			r[i] = func(r[i-1], r[i], args...);
+		return r;
+	}
 
 	//--------------------------------------------------------------------------
 	// Linear Operations
