@@ -701,7 +701,7 @@ public:
 	/// If the input is {a,b,c,...} this returns {a, a@b, (a@b)@c, ...} where @ 
 	/// is a binary operation.
 	template <class Func, class... Args>
-	Vec scan(Func func, Args... args){
+	Vec scan(Func func, Args... args) const {
 		auto r = *this;
 		for(int i=1; i<size(); ++i)
 			r[i] = func(r[i-1], r[i], args...);
@@ -819,6 +819,14 @@ public:
 
 	/// Returns sum of absolute value of elements (1-norm)
 	T sumAbs() const { return absVec().sum(); }
+
+	/// Get running sum as vector
+
+	/// Currently, the window size is limited to one element so this function is
+	/// equivalent to a prefix sum.
+	Vec sumRun() const {
+		return scan([](const auto& a, const auto& b){ return a+b; });
+	}
 
 	/// Returns mean (average) of elements
 	T mean() const {
