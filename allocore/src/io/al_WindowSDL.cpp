@@ -107,14 +107,6 @@ private:
 
 		std::vector<std::string> dropPaths;
 
-		auto setModifiers = [this](SDL_Event ev){
-			auto& k = mWindow->mKeyboard;
-			k.alt  (ev.key.keysym.mod & KMOD_ALT);
-			k.ctrl (ev.key.keysym.mod & KMOD_CTRL);
-			k.shift(ev.key.keysym.mod & KMOD_SHIFT);
-			//printf("a:%d c:%d s:%d\n", k.alt(), k.ctrl(), k.shift());
-		};
-
 		auto sdlToAlloKey = [](int sdlKey) -> int {
 			switch(sdlKey){
 			#define CS(v) case SDLK_##v: return Keyboard::v;
@@ -186,13 +178,22 @@ private:
 				}
 				break;
 
+			// A "scancode" represents a physical location on a keyboard according to a QWERTY layout.
+
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
-			if(ev.key.repeat == 0){
+			if(ev.key.repeat == 0){ //&& !SDL_IsTextInputActive()
 				bool keyDown = (ev.type == SDL_KEYDOWN);
-				//printf("Key %s: %s (sym=%#x)\n", keyDown?"down":"up", SDL_GetKeyName(ev.key.keysym.sym), ev.key.keysym.sym);
-				win->mKeyboard.setKey(sdlToAlloKey(ev.key.keysym.sym), keyDown);
-				setModifiers(ev);
+				auto& key = ev.key.keysym;
+				//printf("Key %s: %s (sym:%#x scancode:%d keycode:%d)\n", keyDown?"down":"up", SDL_GetKeyName(key.sym), key.sym, key.scancode, SDL_GetKeyFromScancode(key.scancode));
+
+				auto& kb = win->mKeyboard;
+				kb.setKey(sdlToAlloKey(key.sym), keyDown);
+				kb.alt  (key.mod & KMOD_ALT);
+				kb.ctrl (key.mod & KMOD_CTRL);
+				kb.shift(key.mod & KMOD_SHIFT);
+				//printf("a:%d c:%d s:%d\n", kb.alt(), kb.ctrl(), kb.shift());
+
 				keyDown ? win->callHandlersOnKeyDown() : win->callHandlersOnKeyUp();
 			}	break;
 
@@ -210,8 +211,6 @@ private:
 					default:; // unrecognized button
 				}
 
-				// update modifiers here for shift-mouse etc.
-				setModifiers(ev);
 				if(!mUsingTouch){ // always 0,0 on touch devices!
 					win->mMouse.position(ev.button.x, ev.button.y);
 				}
@@ -425,13 +424,13 @@ bool Window::implCreate(){
 		printf("SDL ERROR: Could not create window.\n");
 		return false;
 	}
-	
+
 	int top, left, bottom, right;
 	if(SDL_GetWindowBordersSize(sdlWin, &top, &left, &bottom, &right) == 0) {
 		mDim.l += left;
 		mDim.t += top;
 	}
-	
+
 	mImpl->mSDLWindow = sdlWin;
 	WindowImpl::windows()[mImpl->ID()] = mImpl;
 
