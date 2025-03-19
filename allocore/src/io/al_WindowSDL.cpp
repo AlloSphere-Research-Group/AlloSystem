@@ -1,5 +1,3 @@
-#include <stdio.h>		// snprintf
-#include <stdlib.h>		// exit
 #include <map>
 #include "allocore/io/al_Window.hpp"
 #include "allocore/system/al_Config.h"		// system defines
@@ -9,7 +7,10 @@
 
 // SDL API:
 // https://wiki.libsdl.org/APIByCategory
+
+// Prevents SDL from taking control of the main() function
 #define SDL_MAIN_HANDLED
+
 #include <SDL2/SDL.h>
 
 #ifdef AL_EMSCRIPTEN
@@ -195,6 +196,14 @@ private:
 				//printf("a:%d c:%d s:%d\n", kb.alt(), kb.ctrl(), kb.shift());
 
 				keyDown ? win->callHandlersOnKeyDown() : win->callHandlersOnKeyUp();
+			}	break;
+
+			// In SDL2, this is the only way to get unicode (shifted) values.
+			// Unfortunately, this event is only sent on key down.
+			// These events are only active if SDL_StartTextInput was called.
+			case SDL_TEXTINPUT:{
+				const char * t = ev.text.text;
+				//printf("Text input: %s\n", t);
 			}	break;
 
 			case SDL_MOUSEBUTTONDOWN:
@@ -430,6 +439,9 @@ bool Window::implCreate(){
 		mDim.l += left;
 		mDim.t += top;
 	}
+
+	// Needed to get shifted keys in SDL2
+	//SDL_StartTextInput();
 
 	mImpl->mSDLWindow = sdlWin;
 	WindowImpl::windows()[mImpl->ID()] = mImpl;
