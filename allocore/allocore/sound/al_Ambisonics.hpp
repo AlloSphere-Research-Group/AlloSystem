@@ -229,6 +229,7 @@ public:
 
 	/// Get speaker
 	Speaker& speaker(int num) { return (*mSpeakers)[num]; }
+	const Speaker& speaker(int num) const { return (*mSpeakers)[num]; }
 
 	void onChannelsChange() override;
 

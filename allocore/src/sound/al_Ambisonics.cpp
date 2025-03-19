@@ -208,9 +208,10 @@ void AmbiDecode::decode(float * dec, const float * ambi, int numDecFrames) const
 
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
+		const auto& spkr = speaker(s);
 		// skip zero-amp speakers:
-		if ((*mSpeakers)[s].gain != 0.) {
-			float * out = dec + (*mSpeakers)[s].deviceChannel * numDecFrames;
+		if (spkr.gain != 0.) {
+			float * out = dec + spkr.deviceChannel * numDecFrames;
 
 			// iterate ambi channels
 			for(int c=0; c<channels(); ++c){
@@ -231,9 +232,10 @@ void AmbiDecode::decode(float *dec, const float * ambi, int numDecFrames, int ti
 
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
+		const auto& spkr = speaker(s);
 		// skip zero-amp speakers:
-		if ((*mSpeakers)[s].gain != 0.f) {
-			float * out = dec + (*mSpeakers)[s].deviceChannel * numDecFrames;
+		if (spkr.gain != 0.f) {
+			float * out = dec + spkr.deviceChannel * numDecFrames;
 
 			// iterate ambi channels
 			for(int c=0; c<channels(); ++c){
@@ -269,10 +271,10 @@ void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float
 		numSpeakers(index);	// grow adaptively
 	}
 
-	(*mSpeakers)[index].azimuth = az;
-	(*mSpeakers)[index].elevation = el;
-	(*mSpeakers)[index].deviceChannel = deviceChannel;
-	(*mSpeakers)[index].gain = amp;
+	speaker(index).azimuth = az;
+	speaker(index).elevation = el;
+	speaker(index).deviceChannel = deviceChannel;
+	speaker(index).gain = amp;
 
 	// update encoding weights
 	encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
