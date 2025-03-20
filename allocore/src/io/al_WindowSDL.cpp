@@ -4,14 +4,10 @@
 #include "allocore/system/al_MainLoop.hpp"	// start/stop loop, rendering
 #include "allocore/system/al_Printing.hpp"	// warnings
 #include "allocore/graphics/al_OpenGL.hpp"	// OpenGL headers
+#include "al_SDL.hpp"
 
 // SDL API:
 // https://wiki.libsdl.org/APIByCategory
-
-// Prevents SDL from taking control of the main() function
-#define SDL_MAIN_HANDLED
-
-#include <SDL2/SDL.h>
 
 #ifdef AL_EMSCRIPTEN
 	#include <emscripten.h>
@@ -53,7 +49,11 @@ public:
 			#ifdef AL_EMSCRIPTEN
 			Main::get().remove(mMainHandler);
 			#endif
-			SDL_GL_DeleteContext(mGLContext);
+			#ifdef USING_SDL3
+				SDL_GL_DestroyContext(mGLContext);
+			#elif defined USING_SDL2
+				SDL_GL_DeleteContext(mGLContext);
+			#endif
 			mGLContext = NULL;
 			SDL_DestroyWindow(mSDLWindow);
 			mSDLWindow = NULL;
@@ -101,7 +101,7 @@ private:
 
 	void handleEvents(){
 		if(!mWindow) return;
-		auto * win = mWindow;
+		auto& win = *mWindow;
 
 		SDL_Event ev;
 		//ev.key.repeat == 0 // key was not repeated
@@ -126,89 +126,154 @@ private:
 		// https://wiki.libsdl.org/SDL_EventType
 		while(SDL_PollEvent(&ev)){
 
+			//printf("SDL event %d\n", ev.type);
+
+			// https://github.com/libsdl-org/SDL/blob/SDL2/include/SDL_events.h
+			// https://github.com/libsdl-org/SDL/blob/main/include/SDL3/SDL_events.h
+			#ifdef USING_SDL3
+				#define EV_QUIT 			SDL_EVENT_QUIT
+				#define EV_WIN_CLOSE		SDL_EVENT_WINDOW_CLOSE_REQUESTED
+				#define EV_WIN_SHOW			SDL_EVENT_WINDOW_SHOWN
+				#define EV_WIN_HIDE			SDL_EVENT_WINDOW_HIDDEN
+				#define EV_WIN_EXPOSE		SDL_EVENT_WINDOW_EXPOSED
+				#define EV_WIN_MOVE			SDL_EVENT_WINDOW_MOVED
+				#define EV_WIN_RESIZE		SDL_EVENT_WINDOW_RESIZED
+				#define EV_WIN_SIZE_CHANGE	SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED
+				#define EV_DROP_FILE		SDL_EVENT_DROP_FILE
+				#define EV_KEY_DOWN			SDL_EVENT_KEY_DOWN
+				#define EV_KEY_UP			SDL_EVENT_KEY_UP
+				#define EV_TEXT_INPUT		SDL_EVENT_TEXT_INPUT
+				#define EV_MOUSE_DOWN		SDL_EVENT_MOUSE_BUTTON_DOWN
+				#define EV_MOUSE_UP			SDL_EVENT_MOUSE_BUTTON_UP
+				#define EV_MOUSE_WHEEL		SDL_EVENT_MOUSE_WHEEL
+				#define EV_MOUSE_MOTION		SDL_EVENT_MOUSE_MOTION
+				#define EV_FINGER_DOWN		SDL_EVENT_FINGER_DOWN
+				#define EV_FINGER_UP		SDL_EVENT_FINGER_UP
+				#define EV_FINGER_MOTION	SDL_EVENT_FINGER_MOTION
+				#define K_ALT				SDL_KMOD_ALT
+				#define K_CTL				SDL_KMOD_CTRL
+				#define K_SHF				SDL_KMOD_SHIFT
+
+			#elif defined USING_SDL2
+				#define EV_QUIT				SDL_QUIT
+				#define EV_WIN_CLOSE		SDL_WINDOWEVENT_CLOSE
+				#define EV_WIN_SHOW			SDL_WINDOWEVENT_SHOWN
+				#define EV_WIN_HIDE			SDL_WINDOWEVENT_HIDDEN
+				#define EV_WIN_EXPOSE		SDL_WINDOWEVENT_EXPOSED
+				#define EV_WIN_MOVE			SDL_WINDOWEVENT_MOVED
+				#define EV_WIN_RESIZE		SDL_WINDOWEVENT_RESIZED
+				#define EV_WIN_SIZE_CHANGE	SDL_WINDOWEVENT_SIZE_CHANGED
+				#define EV_DROP_FILE		SDL_DROPFILE
+				#define EV_KEY_DOWN			SDL_KEYDOWN
+				#define EV_KEY_UP			SDL_KEYUP
+				#define EV_TEXT_INPUT		SDL_TEXTINPUT
+				#define EV_MOUSE_DOWN		SDL_MOUSEBUTTONDOWN
+				#define EV_MOUSE_UP			SDL_MOUSEBUTTONUP
+				#define EV_MOUSE_WHEEL		SDL_MOUSEWHEEL
+				#define EV_MOUSE_MOTION		SDL_MOUSEMOTION
+				#define EV_FINGER_DOWN		SDL_FINGERDOWN
+				#define EV_FINGER_UP		SDL_FINGERUP
+				#define EV_FINGER_MOTION	SDL_FINGERMOTION
+				#define K_ALT				KMOD_ALT
+				#define K_CTL				KMOD_CTRL
+				#define K_SHF				KMOD_SHIFT
+			#endif
+
 			switch(ev.type){
 
-			case SDL_QUIT:
+			case EV_QUIT:
 				//ctx->done = true;
 				break;
 
-			case SDL_DROPFILE: // called multiple times per frame if multi-file drop
-				dropPaths.emplace_back(ev.drop.file);
-				SDL_free(ev.drop.file);
-				break;
+			case EV_DROP_FILE:{ // called multiple times per frame if multi-file drop
+				#ifdef USING_SDL3
+					dropPaths.emplace_back(ev.drop.data);
+				#elif defined USING_SDL2
+					dropPaths.emplace_back(ev.drop.file);
+					SDL_free(ev.drop.file);	
+				#endif
+				} break;
 
+			#ifdef USING_SDL2
+			// SDL2 window events use two different enums and SDL3 only one.
 			case SDL_WINDOWEVENT:
 				if(ev.window.windowID == ID()){
 					switch(ev.window.event){
-					case SDL_WINDOWEVENT_CLOSE:
-						win->destroyAll();
+			#endif
+					case EV_WIN_CLOSE:
+						win.destroyAll();
 						Main::get().stop();
-						return;
-					case SDL_WINDOWEVENT_SHOWN:
+						return; // exit run loop
+					case EV_WIN_SHOW:
 						//printf("Window %d shown\n", ID());
-						win->mVisible = true;
-						win->callHandlersOnVisibility(win->mVisible);
-						win->dimensions(win->dimensions());
+						win.mVisible = true;
+						win.callHandlersOnVisibility(win.mVisible);
+						win.dimensions(win.dimensions());
 						break;
-					case SDL_WINDOWEVENT_HIDDEN:
+					case EV_WIN_HIDE:
 						//printf("Window %d hidden\n", ID());
-						win->mVisible = false;
-						win->callHandlersOnVisibility(win->mVisible);
+						win.mVisible = false;
+						win.callHandlersOnVisibility(win.mVisible);
 						break;
-					case SDL_WINDOWEVENT_EXPOSED:
+					case EV_WIN_EXPOSE:
 						//printf("Window %d exposed\n", ID());
 						break;
-					case SDL_WINDOWEVENT_MOVED:
+					case EV_WIN_MOVE:
 						//printf("Window %d moved to %d,%d\n", ID(), ev.window.data1, ev.window.data2);
-						win->mDim.l = ev.window.data1;
-						win->mDim.t = ev.window.data2;
+						win.mDim.l = ev.window.data1;
+						win.mDim.t = ev.window.data2;
 						break;
-					case SDL_WINDOWEVENT_RESIZED:
+					case EV_WIN_RESIZE:
+					case EV_WIN_SIZE_CHANGE:
 						//printf("Window %d resized to %dx%d\n", ID(), ev.window.data1, ev.window.data2);
-						win->mDim.w = ev.window.data1;
-						win->mDim.h = ev.window.data2;
-						win->callHandlersOnResize(win->mDim.w, win->mDim.h);
+						win.mDim.w = ev.window.data1;
+						win.mDim.h = ev.window.data2;
+						win.callHandlersOnResize(win.mDim.w, win.mDim.h);
 						break;
-					case SDL_WINDOWEVENT_SIZE_CHANGED:
-						//printf("Window %d size changed to %dx%d\n", ID(), ev.window.data1, ev.window.data2);
-						win->mDim.w = ev.window.data1;
-						win->mDim.h = ev.window.data2;
-						win->callHandlersOnResize(win->mDim.w, win->mDim.h);
-						break;
+			#ifdef USING_SDL2
 					}
 				}
 				break;
+			#endif
 
 			// A "scancode" represents a physical location on a keyboard according to a QWERTY layout.
 
-			case SDL_KEYDOWN:
-			case SDL_KEYUP:
+			case EV_KEY_DOWN:
+			case EV_KEY_UP:
 			if(ev.key.repeat == 0){ //&& !SDL_IsTextInputActive()
-				bool keyDown = (ev.type == SDL_KEYDOWN);
-				auto& key = ev.key.keysym;
-				//printf("Key %s: %s (sym:%#x scancode:%d keycode:%d)\n", keyDown?"down":"up", SDL_GetKeyName(key.sym), key.sym, key.scancode, SDL_GetKeyFromScancode(key.scancode));
+				bool keyDown = EV_KEY_DOWN == ev.type;
+				auto& kb = win.mKeyboard;
 
-				auto& kb = win->mKeyboard;
-				kb.setKey(sdlToAlloKey(key.sym), keyDown);
-				kb.alt  (key.mod & KMOD_ALT);
-				kb.ctrl (key.mod & KMOD_CTRL);
-				kb.shift(key.mod & KMOD_SHIFT);
+				#ifdef USING_SDL3
+					const auto& key = ev.key;
+					int keyCode = SDL_GetKeyFromScancode(key.scancode, key.mod, false);
+				#elif defined USING_SDL2
+					// keysym gives us an SDL_Keysym struct with .scancode (physical code), .sym (virtual code) and .mod (modifier).
+					const auto& key = ev.key.keysym;
+					int keyCode = SDL_GetKeyFromScancode(key.scancode);
+					//printf("Key %s: %s (sym:%#x scancode:%d keycode:%d)\n", keyDown?"down":"up", SDL_GetKeyName(key.sym), key.sym, key.scancode, SDL_GetKeyFromScancode(key.scancode));
+				#endif
+
+				kb.setKey(sdlToAlloKey(keyCode), keyDown);
+				kb.alt  (key.mod & K_ALT);
+				kb.ctrl (key.mod & K_CTL);
+				kb.shift(key.mod & K_SHF);
 				//printf("a:%d c:%d s:%d\n", kb.alt(), kb.ctrl(), kb.shift());
 
-				keyDown ? win->callHandlersOnKeyDown() : win->callHandlersOnKeyUp();
+				keyDown ? win.callHandlersOnKeyDown() : win.callHandlersOnKeyUp();
 			}	break;
 
 			// In SDL2, this is the only way to get unicode (shifted) values.
 			// Unfortunately, this event is only sent on key down.
 			// These events are only active if SDL_StartTextInput was called.
-			case SDL_TEXTINPUT:{
+			case EV_TEXT_INPUT:{
 				const char * t = ev.text.text;
 				//printf("Text input: %s\n", t);
 			}	break;
 
-			case SDL_MOUSEBUTTONDOWN:
-			case SDL_MOUSEBUTTONUP:
-			{	bool buttonDown = (ev.type == SDL_MOUSEBUTTONDOWN);
+			case EV_MOUSE_DOWN:
+			case EV_MOUSE_UP:
+			{	bool buttonDown = EV_MOUSE_DOWN == ev.type;
 				//printf("Mouse %s: %d (%d clicks)\n", buttonDown?"down":"up", ev.button.button, ev.button.clicks);
 				auto btn = Mouse::EXTRA;
 				switch(ev.button.button){
@@ -221,55 +286,55 @@ private:
 				}
 
 				if(!mUsingTouch){ // always 0,0 on touch devices!
-					win->mMouse.position(ev.button.x, ev.button.y);
+					win.mMouse.position(ev.button.x, ev.button.y);
 				}
-				win->mMouse.button(btn, buttonDown);
-				buttonDown ? win->callHandlersOnMouseDown() : win->callHandlersOnMouseUp();
+				win.mMouse.button(btn, buttonDown);
+				buttonDown ? win.callHandlersOnMouseDown() : win.callHandlersOnMouseUp();
 			}	break;
 
-			case SDL_MOUSEWHEEL: //printf("Mouse wheel: %d\n", ev.wheel.y);
+			case EV_MOUSE_WHEEL: //printf("Mouse wheel: %d\n", ev.wheel.y);
 				break;
 
-			case SDL_MOUSEMOTION: //printf("Mouse motion: %d %d\n", ev.motion.x, ev.motion.y);
-			{	if(!mUsingTouch) win->mMouse.position(ev.motion.x, ev.motion.y);
-				if(win->mMouse.any())	win->callHandlersOnMouseDrag();
-				else					win->callHandlersOnMouseMove();
+			case EV_MOUSE_MOTION: //printf("Mouse motion: %d %d\n", ev.motion.x, ev.motion.y);
+			{	if(!mUsingTouch) win.mMouse.position(ev.motion.x, ev.motion.y);
+				if(win.mMouse.any())	win.callHandlersOnMouseDrag();
+				else					win.callHandlersOnMouseMove();
 			}	break;
 
 			// For a single finger swipe, we get: SDL_MOUSEBUTTONDOWN, SDL_FINGERDOWN, SDL_FINGERMOTION, SDL_MOUSEBUTTONUP, SDL_FINGERUP. For multi-gesture, we get SDL_FINGERMOTION followed by SDL_MULTIGESTURE for each finger.
 
-			case SDL_FINGERDOWN:
+			case EV_FINGER_DOWN:
 			{	mUsingTouch = true;
 				++mFingersDown;
 				if(1 == mFingersDown){ // prevent multiple triggers from different fingers
-					win->mMouse.position(ev.tfinger.x*win->width(), ev.tfinger.y*win->height());
+					win.mMouse.position(ev.tfinger.x*win.width(), ev.tfinger.y*win.height());
 				}
 			}	break;
 
-			case SDL_FINGERUP:
+			case EV_FINGER_UP:
 			{	--mFingersDown;
 				if(mFingersDown<0) mFingersDown=0; // just in case...
 			}	break;
 
-			case SDL_FINGERMOTION:
+			case EV_FINGER_MOTION:
 			{	if(1 == mFingersDown){ // prevent multiple triggers from different fingers
-					win->mMouse.position(ev.tfinger.x*win->width(), ev.tfinger.y*win->height());
-					win->callHandlersOnMouseDrag();
+					win.mMouse.position(ev.tfinger.x*win.width(), ev.tfinger.y*win.height());
+					win.callHandlersOnMouseDrag();
 				}
 			}	break;
 			/*
 			case SDL_MULTIGESTURE:
 			{	switch(ev.mgesture.numFingers){
-				case 2: win->mMouse.button(Mouse::RIGHT, true);
-				case 3: win->mMouse.button(Mouse::MIDDLE, true);
+				case 2: win.mMouse.button(Mouse::RIGHT, true);
+				case 3: win.mMouse.button(Mouse::MIDDLE, true);
 				default:;
 				}
-				win->mMouse.position(ev.mgesture.x*win->width(), ev.mgesture.y*win->height());
-				win->callHandlersOnMouseDrag();
+				win.mMouse.position(ev.mgesture.x*win.width(), ev.mgesture.y*win.height());
+				win.callHandlersOnMouseDrag();
 			}	break;
 
 			case SDL_FINGERUP:
-			{	for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i) win->mMouse.button(i, false);
+			{	for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i) win.mMouse.button(i, false);
 			}	break;
 			*/
 			default:;
@@ -277,7 +342,7 @@ private:
 		}
 
 		if(dropPaths.size())
-			win->callHandlersOnDrop(dropPaths);
+			win.callHandlersOnDrop(dropPaths);
 	}
 
 	void onFrame(){
@@ -399,12 +464,12 @@ void Window::implDestroy(){
 bool Window::implCreate(){
 	//printf("Window::create called (in al_WindowSDL.cpp)\n");
 
-	/*if(SDL_InitSubSystem(SDL_INIT_TIMER) < 0){
+	/*if(SDL_INIT_ERROR(SDL_InitSubSystem(SDL_INIT_TIMER))){
 		printf("SDL ERROR: Failed to init SDL timer subsystem.\n");
 		return false;
 	}*/
 
-	if(SDL_InitSubSystem(SDL_INIT_VIDEO) < 0){
+	if(SDL_INIT_ERROR(SDL_InitSubSystem(SDL_INIT_VIDEO))){
 		printf("SDL ERROR: Failed to init SDL video subsystem.\n");
 		return false;
 	}
@@ -428,7 +493,15 @@ bool Window::implCreate(){
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	}
 
-	auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.l,mDim.t, mDim.w,mDim.h, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+	auto sdlWinFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+
+	#ifdef USING_SDL3
+		auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.w,mDim.h, sdlWinFlags);
+		if(sdlWin) SDL_SetWindowPosition(sdlWin, mDim.l,mDim.t);
+	#elif defined USING_SDL2
+		auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.l,mDim.t, mDim.w,mDim.h, sdlWinFlags);
+	#endif
+
 	if(!sdlWin){
 		printf("SDL ERROR: Could not create window.\n");
 		return false;
@@ -440,8 +513,10 @@ bool Window::implCreate(){
 		mDim.t += top;
 	}
 
-	// Needed to get shifted keys in SDL2
-	//SDL_StartTextInput();
+	// Needed to get shifted keys in SDL2, although never got working...
+	#ifdef USING_SDL2
+		//SDL_StartTextInput();
+	#endif
 
 	mImpl->mSDLWindow = sdlWin;
 	WindowImpl::windows()[mImpl->ID()] = mImpl;
