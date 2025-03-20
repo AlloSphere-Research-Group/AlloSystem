@@ -39,7 +39,7 @@ if [ $EXT != "c" ]; then #since so many C++ extensions
 	CXXFLAGS="-std=c++14"
 	#CXXFLAGS+=" -fno-rtti"
 fi
-EMFLAGS+=" -s USE_SDL=2"
+EMFLAGS+=" --use-port=sdl2"
 #EMFLAGS+=" -s LEGACY_GL_EMULATION=1"
 #EMFLAGS+=" -s USE_WEBGL2=1" #default, recommended setting
 EMFLAGS+=" -sFULL_ES2" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
