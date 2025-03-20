@@ -1153,7 +1153,6 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 }
 
 bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
-	if(!isLines() && !isLineStrip() && !isLineLoop() && !isPoints()) return false;
 
 	std::ofstream fs;
 	fs.open(filePath);
@@ -1181,26 +1180,6 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 	// SVG typically has transparent background, but this is how we can color it:
 	//fs << "<rect x=\"-50%\" y=\"-50%\" width=\"100%\" height=\"100%\" fill=\"#ff8888\"/>\n";
 
-	RGB col(0);
-
-	if(colors().size()) col = colors()[0].rgb();
-	else if(coloris().size()) col = coloris()[0];
-
-	std::string style = "style=\"fill:none";
-	style += ";stroke-width:" + std::to_string(int((stroke()>0.?stroke():1.f)+0.5));
-	style += ";stroke:" + rgbToHexString(col.components);
-	style += ";stroke-linecap:round";
-	style += ";stroke-linejoin:round";
-	style += "\" ";
-
-	// (0,0) is left-top (y is flipped) in SVG
-	std::string xfm = "transform=\"";
-	xfm += "scale(1,-1)";
-	/* Probably right thing to do, but affects stroke-width
-	xfm += "scale(" + al::toString(w/2) + "," + al::toString(-h/2) + ")";
-	//*/
-	xfm += "\" ";
-
 	// projection plane
 	const int e1 = 0;
 	const int e2 = 1;
@@ -1224,42 +1203,108 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 		return xy;
 	};
 
-	// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands
+	// (0,0) is left-top (y is flipped) in SVG
+	std::string xfm = "transform=\"";
+	xfm += "scale(1,-1)";
+	/* Probably right thing to do, but affects stroke-width
+	xfm += "scale(" + al::toString(w/2) + "," + al::toString(-h/2) + ")";
+	//*/
+	xfm += "\" ";
 
-	
-	if(isLines()){
-		fs << "<path " << style << xfm << "d=\"";
-		Vec2f prevPos{1e38}; // to detect line strips
-		forEachFace([&](int i1, int i2, int i3){
-			auto v1 = encodePos(mVertices[i1]);
-			auto v2 = encodePos(mVertices[i2]);
-			if(v1 != prevPos){ // start new line
-				fs << "M" << v1.x << "," << v1.y << " ";
-			}
-			fs << "L" << v2.x << "," << v2.y << " ";
-			prevPos = v2;
-		});
-	} else if(isLineStrip() || isLineLoop()){
-		fs << (isLineStrip() ? "<polyline " : "<polygon ") << style << xfm << "points=\"";
-		forEachFace([&](int i1, int i2, int i3){
-			// forEachFace gives us strip broken into lines. On the first line, we add both points and for the rest of the lines we add only the second point.
-			if(0==i1){ // first point?
+	RGB col(0);
+	if(colors().size()) col = colors()[0].rgb();
+	else if(coloris().size()) col = coloris()[0];
+
+	if(!isTriangleType()){
+
+		std::string style = "style=\"fill:none";
+		style += ";stroke-width:" + std::to_string(int((stroke()>0.?stroke():1.f)+0.5));
+		style += ";stroke:" + rgbToHexString(col.components);
+		style += ";stroke-linecap:round";
+		style += ";stroke-linejoin:round";
+		style += "\" ";
+		
+		if(isLines()){
+			// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands
+			fs << "<path " << style << xfm << "d=\"";
+			Vec2f prevPos{1e38}; // to detect line strips
+			forEachFace([&](int i1, int i2, int i3){
 				auto v1 = encodePos(mVertices[i1]);
-				fs << v1.x << "," << v1.y << " ";
-			}
-			auto v2 = encodePos(mVertices[i2]);
-			fs << v2.x << "," << v2.y << " ";
-		});
-	} else if(isPoints()){
-		fs << "<path " << style << xfm << "d=\"";
+				auto v2 = encodePos(mVertices[i2]);
+				if(v1 != prevPos){ // start new line
+					fs << "M" << v1.x << "," << v1.y << " ";
+				}
+				fs << "L" << v2.x << "," << v2.y << " ";
+				prevPos = v2;
+			});
+		} else if(isLineStrip() || isLineLoop()){
+			fs << (isLineStrip() ? "<polyline " : "<polygon ") << style << xfm << "points=\"";
+			forEachFace([&](int i1, int i2, int i3){
+				// forEachFace gives us strip broken into lines. On the first line, we add both points and for the rest of the lines we add only the second point.
+				if(0==i1){ // first point?
+					auto v1 = encodePos(mVertices[i1]);
+					fs << v1.x << "," << v1.y << " ";
+				}
+				auto v2 = encodePos(mVertices[i2]);
+				fs << v2.x << "," << v2.y << " ";
+			});
+		} else if(isPoints()){
+			fs << "<path " << style << xfm << "d=\"";
+			forEachFace([&](int i1, int i2, int i3){
+				auto v1 = encodePos(mVertices[i1]);
+				fs << "M" << v1.x << "," << v1.y << " ";
+				fs << "h0 "; // dup; points are degenerate lines
+			});
+		}
+
+		fs << "\"/>\n"; // end path
+
+	} else { // is triangles or triangle strip
+
+		// TODO: MVP matrix transform (to put us in NDCs)
+		// TODO: Depth testing
+		// TODO: Color interpolation
+		// TODO: Lighting
+		std::string style;
+		style += "shape-rendering=\"crispEdges\" "; // prevent edges from showing due to AA
+
+		fs << "<g " + style + xfm + ">\n";
+
+		auto Nv = vertices().size();
 		forEachFace([&](int i1, int i2, int i3){
 			auto v1 = encodePos(mVertices[i1]);
-			fs << "M" << v1.x << "," << v1.y << " ";
-			fs << "h0 "; // dup; points are degenerate lines
+			auto v2 = encodePos(mVertices[i2]);
+			auto v3 = encodePos(mVertices[i3]);
+			if(opt.cullBackFace()){
+				auto a = v2-v1;
+				auto b = v3-v1;
+				auto Nz = a.x*b.y - a.y*b.x; // cross product with z=0
+				if(Nz < 0.) return;
+			}
+			if(mColors.size() >= Nv){
+				col = (mColors[i1] + mColors[i2] + mColors[i3])*0.33333;
+			} else if(mColoris.size() >= Nv){
+				col = mColoris[i1].mix(mColoris[i2],0.5f).mix(mColoris[i3],1.f/3.f);
+			}
+
+			// We have two options here: path or polygon. Polygon creates a closed shape, but is more characters than path. For path, we just start with M and then all following points are implicitly line-to commands. We can also add z at end to close path, but it doesn't seem necessary for fill-only (no stroke).
+			// https://www.w3.org/TR/SVG11/paths.html
+
+			fs << "<path fill=\"" << rgbToHexString(col.components) << "\" d=\"M";
+			fs << v1.x << "," << v1.y << " ";
+			fs << v2.x << "," << v2.y << " ";
+			fs << v3.x << "," << v3.y;
+
+			/*fs << "<polygon fill=\"" << rgbToHexString(col.components) << "\" points=\"";
+			fs << v1.x << "," << v1.y << " ";
+			fs << v2.x << "," << v2.y << " ";
+			fs << v3.x << "," << v3.y;*/
+			fs << "\"/>\n";
 		});
+
+		fs << "</g>\n";
 	}
 
-	fs << "\"/>\n"; // end path
 	fs << "</svg>";
 
 	return true;

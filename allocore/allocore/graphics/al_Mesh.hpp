@@ -66,6 +66,7 @@ struct SVGOptions{
 	AL_SVG_PROPERTY(int, height, 400);	///< View box height
 	AL_SVG_PROPERTY(float, scale, 0.95);///< Scale factor of all points
 	AL_SVG_PROPERTY(int, prec, 10);		///< Max number of decimal digits of point values; useful for reducing file size
+	AL_SVG_PROPERTY(bool, cullBackFace, true); ///< Ignore back-facing elements (triangle types only)
 	#undef AL_SVG_PROPERTY
 };
 
