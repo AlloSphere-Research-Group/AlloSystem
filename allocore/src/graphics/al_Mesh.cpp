@@ -1196,7 +1196,7 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 		auto xy = pos.get(e1,e2) * vmul;
 		for(auto& v : xy){
 			auto a = std::abs(v);
-			if(a < 1e-10) v = 0.;
+			if(a < opt.minMag()) v = 0.;
 			if(opt.prec() < 10) // Truncate decimal digits
 				v = std::floor(v * qmul1 + 0.5) * qmul2;
 		}
