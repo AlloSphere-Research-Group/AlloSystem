@@ -1152,18 +1152,14 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) co
 	return true;
 }
 
-bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
-
-	std::ofstream fs;
-	fs.open(filePath);
-	if(fs.fail()) return false;
+bool Mesh::toSVG(std::stringstream& ss, const SVGOptions& opt) const {
 
 	int w = opt.width(), h = opt.height();
 
-	//fs << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 " << w << " " << h << "\">\n";
-	fs << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"" << -w/2 << " " << -h/2 << " " << w << " " << h << "\">\n";
-	if(opt.title().size()) fs << "<title>" << opt.title() << "</title>\n";
-	if(opt.desc().size() ) fs << "<desc>\n" << opt.desc() << "\n</desc>\n";
+	//ss << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 " << w << " " << h << "\">\n";
+	ss << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"" << -w/2 << " " << -h/2 << " " << w << " " << h << "\">\n";
+	if(opt.title().size()) ss << "<title>" << opt.title() << "</title>\n";
+	if(opt.desc().size() ) ss << "<desc>\n" << opt.desc() << "\n</desc>\n";
 
 	auto toHexString = [](float v01){
 		auto clamp = [](float v){ return v<0.f ? 0.f : (v>1.f ? 1.f : v); };
@@ -1178,7 +1174,7 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 	};
 
 	// SVG typically has transparent background, but this is how we can color it:
-	//fs << "<rect x=\"-50%\" y=\"-50%\" width=\"100%\" height=\"100%\" fill=\"#ff8888\"/>\n";
+	//ss << "<rect x=\"-50%\" y=\"-50%\" width=\"100%\" height=\"100%\" fill=\"#ff8888\"/>\n";
 
 	// projection plane
 	const int e1 = 0;
@@ -1226,38 +1222,38 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 		
 		if(isLines()){
 			// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands
-			fs << "<path " << style << xfm << "d=\"";
+			ss << "<path " << style << xfm << "d=\"";
 			Vec2f prevPos{1e38}; // to detect line strips
 			forEachFace([&](int i1, int i2, int i3){
 				auto v1 = encodePos(mVertices[i1]);
 				auto v2 = encodePos(mVertices[i2]);
 				if(v1 != prevPos){ // start new line
-					fs << "M" << v1.x << "," << v1.y << " ";
+					ss << "M" << v1.x << "," << v1.y << " ";
 				}
-				fs << "L" << v2.x << "," << v2.y << " ";
+				ss << "L" << v2.x << "," << v2.y << " ";
 				prevPos = v2;
 			});
 		} else if(isLineStrip() || isLineLoop()){
-			fs << (isLineStrip() ? "<polyline " : "<polygon ") << style << xfm << "points=\"";
+			ss << (isLineStrip() ? "<polyline " : "<polygon ") << style << xfm << "points=\"";
 			forEachFace([&](int i1, int i2, int i3){
 				// forEachFace gives us strip broken into lines. On the first line, we add both points and for the rest of the lines we add only the second point.
 				if(0==i1){ // first point?
 					auto v1 = encodePos(mVertices[i1]);
-					fs << v1.x << "," << v1.y << " ";
+					ss << v1.x << "," << v1.y << " ";
 				}
 				auto v2 = encodePos(mVertices[i2]);
-				fs << v2.x << "," << v2.y << " ";
+				ss << v2.x << "," << v2.y << " ";
 			});
 		} else if(isPoints()){
-			fs << "<path " << style << xfm << "d=\"";
+			ss << "<path " << style << xfm << "d=\"";
 			forEachFace([&](int i1, int i2, int i3){
 				auto v1 = encodePos(mVertices[i1]);
-				fs << "M" << v1.x << "," << v1.y << " ";
-				fs << "h0 "; // dup; points are degenerate lines
+				ss << "M" << v1.x << "," << v1.y << " ";
+				ss << "h0 "; // dup; points are degenerate lines
 			});
 		}
 
-		fs << "\"/>\n"; // end path
+		ss << "\"/>\n"; // end path
 
 	} else { // is triangles or triangle strip
 
@@ -1268,7 +1264,7 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 		std::string style;
 		style += "shape-rendering=\"crispEdges\" "; // prevent edges from showing due to AA
 
-		fs << "<g " + style + xfm + ">\n";
+		ss << "<g " + style + xfm + ">\n";
 
 		auto Nv = vertices().size();
 		forEachFace([&](int i1, int i2, int i3){
@@ -1290,22 +1286,43 @@ bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
 			// We have two options here: path or polygon. Polygon creates a closed shape, but is more characters than path. For path, we just start with M and then all following points are implicitly line-to commands. We can also add z at end to close path, but it doesn't seem necessary for fill-only (no stroke).
 			// https://www.w3.org/TR/SVG11/paths.html
 
-			fs << "<path fill=\"" << rgbToHexString(col.components) << "\" d=\"M";
-			fs << v1.x << "," << v1.y << " ";
-			fs << v2.x << "," << v2.y << " ";
-			fs << v3.x << "," << v3.y;
+			ss << "<path fill=\"" << rgbToHexString(col.components) << "\" d=\"M";
+			ss << v1.x << "," << v1.y << " ";
+			ss << v2.x << "," << v2.y << " ";
+			ss << v3.x << "," << v3.y;
 
-			/*fs << "<polygon fill=\"" << rgbToHexString(col.components) << "\" points=\"";
-			fs << v1.x << "," << v1.y << " ";
-			fs << v2.x << "," << v2.y << " ";
-			fs << v3.x << "," << v3.y;*/
-			fs << "\"/>\n";
+			/*ss << "<polygon fill=\"" << rgbToHexString(col.components) << "\" points=\"";
+			ss << v1.x << "," << v1.y << " ";
+			ss << v2.x << "," << v2.y << " ";
+			ss << v3.x << "," << v3.y;*/
+			ss << "\"/>\n";
 		});
 
-		fs << "</g>\n";
+		ss << "</g>\n";
 	}
 
-	fs << "</svg>";
+	ss << "</svg>";
+
+	return true;
+}
+
+bool Mesh::toSVG(std::string& s, const SVGOptions& opt) const {
+	std::stringstream ss;
+	if(!toSVG(ss, opt)) return false;
+	s = ss.str();
+	return true;
+}
+
+bool Mesh::saveSVG(const std::string& filePath, const SVGOptions& opt) const {
+
+	std::ofstream fs;
+	fs.open(filePath);
+	if(fs.fail()) return false;
+
+	std::stringstream ss;
+	if(!toSVG(ss, opt)) return false;
+
+	fs << ss.rdbuf();
 
 	return true;
 }

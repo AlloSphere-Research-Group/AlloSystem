@@ -46,6 +46,7 @@
 
 #include <functional>
 #include <string>
+#include <sstream>
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/types/al_Buffer.hpp"
@@ -615,6 +616,9 @@ public:
 	/// @param[in] opt			options specific to SVG
 	/// \returns true on successful save, otherwise false
 	bool saveSVG(const std::string& filePath, const SVGOptions& opt = {}) const;
+
+	bool toSVG(std::stringstream& ss, const SVGOptions& opt = {}) const;
+	bool toSVG(std::string& s, const SVGOptions& opt = {}) const;
 
 
 	/// Load mesh data from 3D object file
