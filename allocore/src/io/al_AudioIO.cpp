@@ -326,19 +326,6 @@ AudioIO::Device AudioIO::device(int i) const {
 
 #include "al_SDL.hpp"
 
-#ifdef USING_SDL2
-	#define SDL_AUDIO_F32 AUDIO_F32
-	#define AL_SDL_FALSE SDL_FALSE
-	#define AL_SDL_TRUE SDL_TRUE
-
-#elif defined USING_SDL3
-	#define AL_SDL_FALSE false
-	#define AL_SDL_TRUE true
-#endif
-
-#define AL_SDL_OUT AL_SDL_FALSE
-#define AL_SDL_IN AL_SDL_TRUE
-
 void initSDLAudio(){
 	static bool needsInit = true;
 	if(needsInit){
@@ -351,6 +338,30 @@ void initSDLAudio(){
 	}
 }
 
+#if defined USING_SDL3
+
+#define AL_DEFAULT_DEVICE_IN  0x7ffffffe
+#define AL_DEFAULT_DEVICE_OUT 0x7fffffff
+
+SDL_AudioDeviceID deviceID_al2sdl(int id){
+	if(AL_DEFAULT_DEVICE_IN == id){
+		return SDL_AUDIO_DEVICE_DEFAULT_RECORDING;
+	} else if(AL_DEFAULT_DEVICE_OUT == id){
+		return SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
+	}
+	return id;
+}
+
+int deviceID_sdl2al(SDL_AudioDeviceID id){
+	if(id == SDL_AUDIO_DEVICE_DEFAULT_RECORDING){
+		return AL_DEFAULT_DEVICE_IN;
+	} else if(id == SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK){
+		return AL_DEFAULT_DEVICE_OUT;
+	}
+	return id;
+}
+
+
 struct AudioIO::Impl{
 	Impl(AudioIO& aio)
 	:	mAudioIO(aio)
@@ -358,7 +369,214 @@ struct AudioIO::Impl{
 		initSDLAudio();
 	}
 
-	#ifdef USING_SDL2
+	// https://github.com/libsdl-org/SDL/blob/main/include/SDL3/SDL_audio.h
+	// https://github.com/libsdl-org/SDL/blob/main/examples/audio/02-simple-playback-callback/simple-playback-callback.c
+	bool open(){
+
+		// TODO: audio input
+
+		auto audioCB = [](void * userData, SDL_AudioStream * stream, int bytesNeeded, int bytesBuffering){
+
+			auto& io = *static_cast<AudioIO *>(userData);
+			auto& buf = io.bufferOut();
+
+			const int bytesPerSample = sizeof(float);
+			const auto samplesPerBlock = buf.samples();
+			const auto bytesPerBlock = samplesPerBlock * bytesPerSample;
+			auto samplesNeeded = bytesNeeded/bytesPerSample;
+
+			//printf("SDL3 audioCB (needs:%d b:%d)\n", samplesNeeded, samplesPerBlock);
+
+			while(samplesNeeded > 0){
+
+				io.processAudio();
+
+				// Copy AudioIO to output buffer
+				SDL_PutAudioStreamData(stream, buf.data(), bytesPerBlock);
+
+				samplesNeeded -= samplesPerBlock;
+			}
+		};
+
+		if(mAudioIO.mDevO.hasOutput()){
+			SDL_AudioSpec want;
+			want.channels = mAudioIO.mBufO.channels();
+			want.freq = mAudioIO.fps();
+			want.format = SDL_AUDIO_F32;
+
+			auto sdlID = deviceID_al2sdl(mAudioIO.mDevO.id);
+
+			//printf("SDL_OpenAudioDeviceStream(%u c:%d r:%d)\n", sdlID, want.channels, want.freq);
+			auto * stream = SDL_OpenAudioDeviceStream(sdlID, &want, audioCB, &mAudioIO);
+	
+			if(stream){
+				deviceStreamO.dev = sdlID;
+				deviceStreamO.stream = stream;
+
+				// TODO: validate format?
+				//SDL_AudioSpec got;
+				//SDL_GetAudioStreamFormat(stream, nullptr, &got);
+
+				return true;
+
+			} else {
+				AL_WARN("Failed to create audio output stream: %s", SDL_GetError());
+			}
+
+		}
+
+		return false;
+	}
+
+	bool start(){
+		bool res = false;
+		for(auto& dev : deviceStreams) res |= dev.start();
+		return res;
+	}
+
+	bool stop(){
+		bool res = false;
+		for(auto& dev : deviceStreams) res |= dev.stop();
+		return res;
+	}
+
+	bool close(){
+		for(auto& dev : deviceStreams) dev.close();
+		return true;
+	}
+
+
+	struct DeviceStream{
+		SDL_AudioDeviceID dev = 0; // valid devices are >0
+		SDL_AudioStream * stream = nullptr;
+
+		bool start(){
+			if(stream) return SDL_ResumeAudioStreamDevice(stream);
+			return false;
+		}
+
+		bool stop(){
+			if(stream) return SDL_PauseAudioStreamDevice(stream);
+			return false;
+		}
+
+		void close(){
+			if(stream){
+				SDL_DestroyAudioStream(stream); // also closes audio device
+				stream = nullptr;
+				//SDL_CloseAudioDevice(dev);
+				dev = 0;
+			}
+		}
+	};
+
+	AudioIO& mAudioIO;
+	DeviceStream deviceStreams[2];
+	DeviceStream& deviceStreamI = deviceStreams[0];
+	DeviceStream& deviceStreamO = deviceStreams[1];
+};
+
+
+// Use RAII for getting devices
+struct Devices {
+	~Devices(){
+		SDL_free(devs);
+	}
+	SDL_AudioDeviceID * devs = nullptr;
+	int count = 0;
+};
+
+struct OutputDevices : public Devices {
+	OutputDevices(){
+		devs = SDL_GetAudioPlaybackDevices(&count);
+	}
+};
+
+struct InputDevices : public Devices {
+	InputDevices(){
+		devs = SDL_GetAudioRecordingDevices(&count);
+	}
+};
+
+AudioIO::Device deviceFromSDL(SDL_AudioDeviceID id){
+	AudioIO::Device dev;
+
+	// Default device IDs are "special" in that they cannot be passed in directly to several of the getter functions. Instead we must get a "logical" ID by actually opening the device!
+	if(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK == id || SDL_AUDIO_DEVICE_DEFAULT_RECORDING == id){
+		auto tempID = SDL_OpenAudioDevice(id, nullptr);
+		dev = deviceFromSDL(tempID);
+		dev.id = deviceID_sdl2al(id);
+		SDL_CloseAudioDevice(tempID);
+
+	} else if(id){ // SDL IDs of 0 are invalid
+
+		dev.id = id;
+		dev.name = SDL_GetAudioDeviceName(dev.id);
+		//printf("%s\n", dev.name.c_str());
+
+		SDL_AudioSpec spec;
+		int blockSize;
+		SDL_GetAudioDeviceFormat(dev.id, &spec, &blockSize);
+
+		dev.frameRate = spec.freq;
+
+		if(SDL_IsAudioDevicePlayback(dev.id)){
+			dev.channelsIn  = 0;
+			dev.channelsOut = spec.channels;
+		} else {
+			dev.channelsIn  = spec.channels;
+			dev.channelsOut = 0;
+		}
+	}
+
+	return dev;
+}
+
+int AudioIO::numDevices() const {
+	return InputDevices().count + OutputDevices().count;
+}
+
+AudioIO::Device AudioIO::device(int i) const {
+	// SDL3 decided not to simply use enumerated device IDs, so we have to do some gymnastics to get a seemingly arbitrary ID from SDL.
+	InputDevices idevs;
+	OutputDevices odevs;
+
+	int sdlID = 0;
+
+	if(i < idevs.count){
+		sdlID = idevs.devs[i];
+	} else if(i < idevs.count + odevs.count){
+		sdlID = odevs.devs[i - idevs.count];
+	}
+
+	return deviceFromSDL(sdlID);
+}
+
+AudioIO::Device AudioIO::defaultDeviceIn() const {
+	return deviceFromSDL(SDL_AUDIO_DEVICE_DEFAULT_RECORDING);
+}
+
+AudioIO::Device AudioIO::defaultDeviceOut() const {
+	return deviceFromSDL(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK);
+}
+
+// end SDL3
+
+#elif defined USING_SDL2
+
+#define SDL_AUDIO_F32 AUDIO_F32
+#define AL_SDL_FALSE SDL_FALSE
+#define AL_SDL_TRUE SDL_TRUE
+#define AL_SDL_OUT AL_SDL_FALSE
+#define AL_SDL_IN AL_SDL_TRUE
+
+struct AudioIO::Impl{
+	Impl(AudioIO& aio)
+	:	mAudioIO(aio)
+	{
+		initSDLAudio();
+	}
+
 	bool open(){
 		auto audioCallback = [](void * userData, unsigned char * stream, int streamSizeBytes){
 			auto& io = *static_cast<AudioIO *>(userData);
@@ -400,12 +618,12 @@ struct AudioIO::Impl{
 			want.callback = audioCallback;
 			SDL_AudioSpec got;
 
-			devOut = SDL_OpenAudioDevice(
+			devO = SDL_OpenAudioDevice(
 				dev.name.c_str(), AL_SDL_OUT, &want, &got,
 				SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE
 			);
 
-			if(devOut){
+			if(devO){
 				bool reconfigure = false;
 				if(mAudioIO.mFramesPerBuffer != got.samples){
 					AL_WARN("Opened audio stream with %d frames/buffer instead of requested %d frames/buffer", got.samples, mAudioIO.mFramesPerBuffer);
@@ -427,88 +645,52 @@ struct AudioIO::Impl{
 
 		// TODO: audio input
 
-		return devOut;
+		return devO;
 	}
 
 	bool start(){
-		if(devOut){
-			SDL_PauseAudioDevice(devOut, AL_SDL_FALSE);
+		if(devO){
+			SDL_PauseAudioDevice(devO, AL_SDL_FALSE);
 			return true;
 		}
 		return false;
 	}
 	bool stop(){
-		if(devOut){
-			SDL_PauseAudioDevice(devOut, AL_SDL_TRUE);
+		if(devO){
+			SDL_PauseAudioDevice(devO, AL_SDL_TRUE);
 			return true;
 		}
 		return false;
 	}
-
-	#elif defined USING_SDL3
-	bool open(){
-		// https://wiki.libsdl.org/SDL3/SDL_OpenAudioDeviceStream
-		//auto * stream = SDL_OpenAudioDeviceStream(dev.id, &want, audioCallback, &mAudioIO);
-
-		return false;
-	}
-
-	bool start(){
-		if(devOut){
-			SDL_ResumeAudioDevice(devOut);
-			return true;
-		}
-		return false;
-	}
-	bool stop(){
-		if(devOut){
-			SDL_PauseAudioDevice(devOut);
-			return true;
-		}
-		return false;
-	}
-
-	#endif
 
 	bool close(){
-		if(devIn){
-			SDL_CloseAudioDevice(devIn);
-		}
-		if(devOut){
-			SDL_CloseAudioDevice(devOut);
+		for(auto& dev : devs){
+			if(dev){
+				SDL_CloseAudioDevice(dev); // no return value
+				dev = 0;
+			}
 		}
 		return true;
 	}
 
 	AudioIO& mAudioIO;
-	SDL_AudioDeviceID devIn=0, devOut=0; // valid devices are >0
+	SDL_AudioDeviceID devs[2] = {0, 0}; // valid devices are >0
+	SDL_AudioDeviceID& devI  = devs[0]; 
+	SDL_AudioDeviceID& devO = devs[1]; 
 };
 
-
 int AudioIO::numDevices() const {
-	#ifdef USING_SDL2
-		return SDL_GetNumAudioDevices(AL_SDL_OUT);
-	#elif defined USING_SDL3
-		int numDevOs;
-		auto * devOs = SDL_GetAudioPlaybackDevices(&numDevOs);
-		SDL_free(devOs);
-		return numDevOs;
-	#endif
+	return SDL_GetNumAudioDevices(AL_SDL_OUT);
 }
 
 AudioIO::Device AudioIO::device(int i) const {
+	AudioIO::Device dev;
+
+	dev.id = i;
+	dev.name = SDL_GetAudioDeviceName(i, AL_SDL_OUT);
 	// The only way to get detailed device information seems to be to call
 	// SDL_OpenAudioDevice. But, we don't want to open devices here, so just
 	// choose reasonable defaults.
-	AudioIO::Device dev;
-	dev.id = i;
-
-	#ifdef USING_SDL2
-	dev.name = SDL_GetAudioDeviceName(i, AL_SDL_OUT);
-	#elif defined USING_SDL3
-	dev.name = SDL_GetAudioDeviceName(i);
-	#endif
-
 	dev.frameRate = 44100;
 	dev.channelsIn  = 0;
 	dev.channelsOut = 2;
@@ -519,8 +701,10 @@ AudioIO::Device AudioIO::device(int i) const {
 AudioIO::Device AudioIO::defaultDeviceIn() const { return {}; }
 AudioIO::Device AudioIO::defaultDeviceOut() const { return device(0); }
 
-//---- End SDL2 backend
-#endif
+#endif // SDL2
+
+#endif //---- End SDL backend
+
 
 
 AudioBlock::~AudioBlock(){ clear(); }
