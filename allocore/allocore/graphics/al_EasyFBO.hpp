@@ -64,7 +64,8 @@ struct EasyFBO {
 		int w, int h,
 		Graphics::Format format = Graphics::RGBA,
 		Graphics::DataType type = Graphics::UBYTE
-	){
+	):	EasyFBO()
+	{
 		resize(w,h, format,type);
 	}
 
@@ -72,9 +73,9 @@ struct EasyFBO {
 		int wh,
 		Graphics::Format format = Graphics::RGBA,
 		Graphics::DataType type = Graphics::UBYTE	
-	){
-		resize(wh,wh, format,type);
-	}
+	)
+	:	EasyFBO(wh,wh, format,type)
+	{}
 
 	/// Resize and configure color buffer
 	EasyFBO& resize(
