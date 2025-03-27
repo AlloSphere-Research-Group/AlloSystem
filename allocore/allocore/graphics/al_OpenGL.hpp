@@ -199,8 +199,16 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_LR_BUFFERS
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+#if defined(AL_GRAPHICS_USE_OPENGL)
 	#define AL_GRAPHICS_SUPPORTS_DEPTH_COMP
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3)
+	#define AL_GRAPHICS_SUPPORTS_DEPTH_COMP24
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
+	#define AL_GRAPHICS_SUPPORTS_DEPTH_COMP16
 #endif
 
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
