@@ -501,13 +501,19 @@ struct InputDevices : public Devices {
 AudioIO::Device deviceFromSDL(SDL_AudioDeviceID id){
 	AudioIO::Device dev;
 
-	// Default device IDs are "special" in that they cannot be passed in directly to several of the getter functions. Instead we must get a "logical" ID by actually opening the device!
-	if(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK == id || SDL_AUDIO_DEVICE_DEFAULT_RECORDING == id){
+	// Default device IDs are "special" in that they cannot be passed in directly to several of the getter functions. Since there seems no way to get a "physical" default device ID, we must get a "logical" ID by actually opening the device!
+	//if(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK == id || SDL_AUDIO_DEVICE_DEFAULT_RECORDING == id){
+	if(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK == id){
 		auto tempID = SDL_OpenAudioDevice(id, nullptr);
 		dev = deviceFromSDL(tempID);
 		dev.id = deviceID_sdl2al(id);
 		SDL_CloseAudioDevice(tempID);
-
+	} else if(SDL_AUDIO_DEVICE_DEFAULT_RECORDING == id){
+		// For input devices, we do not want to open a device as it can force a prompt in the browser. Instead, we will just grab the first device in the list, if any.
+		InputDevices idevs;
+		if(idevs.count){
+			return deviceFromSDL(idevs.devs[0]);
+		}
 	} else if(id){ // SDL IDs of 0 are invalid
 
 		dev.id = id;
