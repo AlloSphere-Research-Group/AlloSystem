@@ -359,6 +359,18 @@ struct Colori {
 	/// Get color component at index with no bounds checking
 	const uint8_t& operator[](int i) const { return components[i]; }
 
+	/// Get reference to self as another type
+	template <class T>
+	T& as(){
+		static_assert(sizeof(T) <= sizeof(*this), "Attempt to pun to object of larger size");
+		return *(T *)(this);
+	}
+
+	template <class T>
+	const T& as() const {
+		return const_cast<Colori*>(this)->as<T>();
+	}
+
 	value_type * begin(){ return components; }
 	const value_type * begin() const { return components; }
 	value_type * end(){ return components + size(); }
