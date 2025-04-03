@@ -56,6 +56,7 @@
 #include "allocore/graphics/al_Light.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
+#include "allocore/graphics/al_Shader.hpp"
 
 #ifndef AL_MAX_LIGHTS
 	#define AL_MAX_LIGHTS 4
@@ -82,7 +83,6 @@
 namespace al {
 
 class Viewport;
-class ShaderProgram;
 
 
 /// Interface for setting graphics state and rendering Mesh

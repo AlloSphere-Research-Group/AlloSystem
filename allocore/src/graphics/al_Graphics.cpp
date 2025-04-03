@@ -8,7 +8,6 @@
 
 #ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 	#include <stack> // matrix stack
-	#include "allocore/graphics/al_Shader.hpp"
 	#ifndef AL_MODELVIEW_STACK_SIZE
 		#define AL_MODELVIEW_STACK_SIZE 8
 	#endif
