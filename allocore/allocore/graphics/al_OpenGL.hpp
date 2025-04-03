@@ -153,21 +153,29 @@ A bit on GLenum allocations:
 https://www.khronos.org/registry/OpenGL/docs/enums.html
 */
 
-#if defined(AL_GRAPHICS_USE_OPENGLES2)
+#if defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
 	#define AL_GRAPHICS_USE_PROG_PIPELINE
 #else
 	#define AL_GRAPHICS_USE_FIXED_PIPELINE
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
 	#define AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
+	#define AL_GRAPHICS_SUPPORTS_SHADER
+	#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3_2)
+		#define AL_GRAPHICS_SUPPORTS_GEOMETRY_SHADER
+	#endif
+	#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3_1) || defined(AL_GRAPHICS_USE_OPENGLES3_2)
+		#define AL_GRAPHICS_SUPPORTS_COMPUTE_SHADER
+	#endif
 #endif
 
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES1)
 	#define AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+// GL_INT and GL_UNSIGNED support as used with, e.g., glTexSubImage2D
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
 	#define AL_GRAPHICS_SUPPORTS_INT32
 #endif
 
@@ -213,13 +221,6 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
 	#define AL_GRAPHICS_SUPPORTS_BLEND_EQ
-#endif
-
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
-	#define AL_GRAPHICS_SUPPORTS_SHADER
-	#if defined(AL_GRAPHICS_USE_OPENGL)
-		#define AL_GRAPHICS_SUPPORTS_GEOMETRY_SHADER
-	#endif
 #endif
 
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
