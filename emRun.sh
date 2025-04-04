@@ -45,6 +45,7 @@ EMFLAGS+=" --use-port=sdl3"
 EMFLAGS+=" -sFULL_ES2" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
 EMFLAGS+=" -sFULL_ES3" #OpenGL ES 3.0 emulation (req'd for GL_UNSIGNED_INT indices)
 EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
+EMFLAGS+=" -sALLOW_MEMORY_GROWTH=1" # allow heap allocs beyond INITIAL_MEMORY, o.w. aborts
 #EMFLAGS+=" -s ASSERTIONS=1" # get more info on runtime errors
 #EMFLAGS+=" --cpuprofiler" # adds profiler to generated page
 #EMFLAGS+=" -fsanitize=undefined" # undefined behavior sanitizer
