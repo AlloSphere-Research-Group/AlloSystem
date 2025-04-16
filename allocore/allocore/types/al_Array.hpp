@@ -168,8 +168,11 @@ public:
 	bool isFormat(const AlloArrayHeader& h2) const;
 	bool isFormat(const Array& src) const { return isFormat(src.header); }
 
-	/// Returns true if Array contains data, false otherwise
-	bool hasData() const { return NULL != data.ptr; }
+	/// Returns true if there is no data
+	bool empty() const { return NULL == data.ptr; }
+
+	/// Returns true if there is data
+	bool hasData() const { return !empty(); }
 
 	/// Allocate memory for the given header.
 
@@ -177,7 +180,7 @@ public:
 	/// Call dataFree() first if you know it will be safe to do so.
 	void dataCalloc();
 
-	/// Free memory and set data.ptr to NULL
+	/// Free memory and set internal data pointer to null
 	void dataFree();
 
 	/// Set all data to zero
