@@ -435,6 +435,18 @@ public:
 	/// Get temp copy
 	Vec dup() const { return *this; }
 
+	/// Copy to another array-like object
+
+	/// The other array type must have a capacity of at least the size of this
+	/// vector and a value_type that can be implicitly cast to.
+	template <class Arr>
+	Arr dup() const {
+		static_assert(sizeof(Arr)/sizeof(typename Arr::value_type) >= N, "Invalid array size");
+		Arr dst;
+		for(int i=0; i<N; ++i) dst[i] = at(i);
+		return dst;
+	}
+
 	/// Get a subvector
 
 	/// \tparam M		Size of subvector; if M<0, the size is M+N.
