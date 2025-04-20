@@ -466,7 +466,6 @@ bool StandardWindowKeyControls::onKeyDown(const Keyboard& k){
 			//case 'w': window().destroy(); return false;
 			case 'h': window().hide(); return false;
 			case 'm': window().iconify(); return false;
-			case 'c': window().cursorHideToggle(); return false;
 			default:;
 		}
 	}
