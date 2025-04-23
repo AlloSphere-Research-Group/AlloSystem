@@ -107,6 +107,10 @@ public:
 	SphereCoord(const C& theta =C(1,0), const C& phi =C(1,0))
 	:	t(theta), p(phi){}
 
+
+	/// Get copy
+	SphereCoord dup() const { return *this; }
+
 	/// @param[in] v	Cartesian position
 	template <class U>
 	SphereCoord(const Vec<3,U>& v){ fromCart(v); }
@@ -115,7 +119,19 @@ public:
 	/// Get negation in Cartesian space
 	SphereCoord  operator - () const { return SphereCoord(t, -p); }
 	SphereCoord& operator *=(T v){ p*=v; return *this; }
-	SphereCoord  operator * (T v) const { return SphereCoord(t, p*v); }
+	SphereCoord  operator * (T v) const { return dup()*=v; }
+	SphereCoord& operator *=(SphereCoord v){ t*=v.t; p*=v.p; return *this; }
+	SphereCoord  operator * (SphereCoord v) const { return dup()*=v; }
+
+	SphereCoord& operator +=(SphereCoord v){ return fromCart(toCart() + v.toCart()); }
+	SphereCoord  operator + (SphereCoord v) const { return dup()+=v; }
+
+	SphereCoord pow(T n) const {
+		auto r = dup();
+		r.t.pow(n);
+		r.p.pow(n);
+		return r;
+	}
 
 	/// Get radius
 	T radius() const { return p.mag(); }
