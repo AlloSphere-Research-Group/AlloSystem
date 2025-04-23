@@ -619,7 +619,7 @@ Texture& Texture::submit(const void * pixels, uint32_t align){
 	// This ensures that the texture is created on the GPU
 	GPUObject::validate();
 
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + mTexUnit);
 		AL_GRAPHICS_ERROR("Texture::submit (glActiveTexture)", id());
 
 	tryBind([&](){
