@@ -104,21 +104,52 @@ void Texture::onDestroy(){
 }
 
 
-Texture& Texture::width(unsigned v){
-	update(v, mWidth, mShapeUpdated);
-	if(mShapeUpdated) deriveTarget();
+Texture& Texture::format(Format v){
+	if(update(v, mFormat, mShapeUpdated) && mArray.hasData())
+		allocate();
 	return *this;
 }
 
-Texture& Texture::height(unsigned v){
-	update(v, mHeight, mShapeUpdated);
-	if(mShapeUpdated) deriveTarget();
+Texture& Texture::type(DataType v){
+	if(update(v, mType, mShapeUpdated) && mArray.hasData())
+		allocate();
 	return *this;
 }
 
-Texture& Texture::depth(unsigned v){
-	update(v, mDepth, mShapeUpdated);
-	if(mShapeUpdated) deriveTarget();
+Texture& Texture::resize(unsigned w){
+	return resize(w,0,0);
+}
+
+Texture& Texture::resize(unsigned w, unsigned h){
+	return resize(w,h,0);
+}
+
+Texture& Texture::resize(unsigned w, unsigned h, unsigned d){
+	if(
+		update(w, mWidth , mShapeUpdated) | // yes, bitwise to prevent short-circuiting!
+		update(h, mHeight, mShapeUpdated) |
+		update(d, mDepth , mShapeUpdated)
+	){
+		if(mArray.hasData()) allocate(); // ensure local data matches new size
+
+		// derive the GL texture target
+		if(mDepth != 0){
+			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
+			mTarget = TEXTURE_3D;
+			#endif
+		}
+		else if(mHeight != 0){
+			mTarget = TEXTURE_2D;
+		}
+		else if(mWidth != 0){
+			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
+			mTarget = TEXTURE_1D;
+			#endif
+		}
+		else{
+			mTarget = NO_TARGET;
+		}
+	}
 	return *this;
 }
 
@@ -133,7 +164,8 @@ Texture& Texture::filterMin(Filter v){
 	default:
 		mMipmap = false;
 	}
-	return update(v, mFilterMin, mParamsUpdated);
+	update(v, mFilterMin, mParamsUpdated);
+	return *this;
 }
 
 Texture& Texture::filterMag(Filter v){
@@ -149,45 +181,32 @@ Texture& Texture::filterMag(Filter v){
 		break;
 	default:;
 	}
-	return update(v, mFilterMag, mParamsUpdated);
+	update(v, mFilterMag, mParamsUpdated);
+	return *this;
 }
 
-Texture& Texture::wrap(Wrap S, Wrap T, Wrap R){
-	if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
-		mWrapS = S; mWrapT = T; mWrapR = R;
-		mParamsUpdated = true;
-	}
+Texture& Texture::wrap(Wrap s, Wrap t, Wrap r){
+	update(s, mWrapS, mParamsUpdated);
+	update(t, mWrapT, mParamsUpdated);
+	update(r, mWrapR, mParamsUpdated);
 	return *this;
 }
 
 Texture& Texture::texelClamp(bool v){
 	if(unclampedFloatFormat()){
-		mTexelClamp = v;
-		mShapeUpdated = true;
+		update(v, mTexelClamp, mShapeUpdated);
 	}
 	return *this;
 }
 
 void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
-	switch(hdr.dimcount){
-		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
-		case 1: target(TEXTURE_1D); break;
-		#endif
-		case 2: target(TEXTURE_2D); break;
-		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-		case 3: target(TEXTURE_3D); break;
-		#endif
-		default:
-			AL_WARN("invalid array dimensions for texture");
-			return;
-	}
 
 	switch(hdr.dimcount){
-		case 3:	 depth(hdr.dim[2]);
-		case 2:	height(hdr.dim[1]);
-		case 1:	 width(hdr.dim[0]); break;
+		case 1:	resize(hdr.dim[0]); break;
+		case 2:	resize(hdr.dim[0], hdr.dim[1]); break;
+		case 3:	resize(hdr.dim[0], hdr.dim[1], hdr.dim[2]); break;
 		default:
-			AL_WARN("texture array must have 1, 2 or 3 dimensions");
+			AL_WARN("invalid array dimensions for texture (must be 1, 2 or 3)");
 			return;
 	}
 
@@ -247,33 +266,11 @@ void Texture::shapeFromArray(){
 	}
 }
 
-void Texture::deriveTarget(){
-	if(mDepth != 0){
-		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-		target(TEXTURE_3D);
-		#endif
-	}
-	else if(mHeight != 0){
-		target(TEXTURE_2D);
-	}
-	else if(mWidth != 0){
-		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
-		target(TEXTURE_1D);
-		#endif
-	}
-	else{
-		target(NO_TARGET);
-	}
-}
-
 void Texture::tryBind(const std::function<void(void)>& onPostBind){
 	// Sync shape if array is dirty
 	shapeFromArray();
 
-	// Ensure target is synchronized before bind
-	deriveTarget();
-
-	if(target() != Texture::NO_TARGET){
+	if(target() != NO_TARGET){
 		glBindTexture(target(), id());
 		onPostBind();
 		mFirstBind = false;
@@ -361,8 +358,11 @@ void Texture::resetArray(unsigned align){
 }
 
 Texture& Texture::allocate(unsigned align){
+	//printf("w:%d h:%d\n", width(), height());
+	//printf("alloc 1:\n"); mArray.print();
 	resetArray(align);
 	mArray.dataCalloc();
+	//printf("alloc 2:\n"); mArray.print();
 	mPixelsUpdated = true;
 	return *this;
 }
@@ -894,17 +894,6 @@ void Texture::print(){
 		toString(mType), allo_type_name(mArray.type()), toString(mFormat), mArray.components(), mArray.alignment()
 	);
 	//mArray.print();
-}
-
-
-void Texture::configure(AlloArrayHeader& hdr){
-	AL_WARN_ONCE("Texture::configure() deprecated, use Texture::shapeFrom()");
-	shapeFrom(hdr, false);
-}
-
-Texture& Texture::updatePixels(){
-	AL_WARN_ONCE("Texture::updatePixels() deprecated, use Texture::dirty()");
-	return dirty();
 }
 
 

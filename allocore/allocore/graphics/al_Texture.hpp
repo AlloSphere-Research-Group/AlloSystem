@@ -220,10 +220,10 @@ public:
 
 
 	/// Set pixel (color) format
-	Texture& format(Format v){ return update(v, mFormat, mShapeUpdated); }
+	Texture& format(Format v);
 
 	/// Set texel (color) format
-	Texture& texelFormat(int v){ return update(v, mTexelFormat, mShapeUpdated); }
+	Texture& texelFormat(int v){ update(v, mTexelFormat, mShapeUpdated); return *this; }
 
 	/// Set whether texel values should be clamped into [0,1] on GPU
 
@@ -232,29 +232,17 @@ public:
 	/// Default value is true.
 	Texture& texelClamp(bool whether);
 
-	/// Set target type (e.g., TEXTURE_2D)
-	Texture& target(Target v){ return update(v, mTarget, mShapeUpdated); }
-
 	/// Set pixel component data type
-	Texture& type(DataType v){ return update(v, mType, mShapeUpdated); }
-
-	/// Set width, in pixels
-	Texture& width (unsigned v);
-
-	/// Set height, in pixels
-	Texture& height(unsigned v);
-
-	/// Set depth, in pixels
-	Texture& depth (unsigned v);
+	Texture& type(DataType v);
 
 	/// Resize 1D texture
-	Texture& resize(unsigned w){ return width(w); }
+	Texture& resize(unsigned w);
 
 	/// Resize 2D texture
-	Texture& resize(unsigned w, unsigned h){ return width(w).height(h); }
+	Texture& resize(unsigned w, unsigned h);
 
 	/// Resize 3D texture
-	Texture& resize(unsigned w, unsigned h, unsigned d){ return width(w).height(h).depth(d); }
+	Texture& resize(unsigned w, unsigned h, unsigned d);
 
 	/// Set minification and magnification filter types
 	Texture& filter(Filter v){ return filterMin(v).filterMag(v); }
@@ -497,7 +485,6 @@ protected:
 	void onDestroy() override;
 
 	void init();
-	void deriveTarget();
 
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
@@ -517,14 +504,10 @@ protected:
 
 	// Pattern for setting a variable that when changed sets a notification flag
 	template<class T>
-	Texture& update(const T& v, T& var, bool& flag){
-		if(v!=var){ var=v; flag=true; }
-		return *this;
+	static bool update(const T& v, T& var, bool& flag){
+		if(v!=var){ var=v; flag=true; return true; }
+		return false;
 	}
-
-public:
-	Texture& updatePixels(); /// \deprecated use dirty() instead
-	void configure(AlloArrayHeader& header); /// \deprecated use shapeFrom() instead
 };
 
 
