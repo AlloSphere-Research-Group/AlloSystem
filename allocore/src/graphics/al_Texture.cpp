@@ -365,7 +365,6 @@ void Texture::resetArray(unsigned align){
 }
 
 Texture& Texture::allocate(unsigned align){
-	deallocate();
 	resetArray(align);
 	mArray.dataCalloc();
 	mPixelsUpdated = true;
