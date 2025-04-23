@@ -493,6 +493,7 @@ protected:
 #else
 
 #include <cctype> // tolower
+#include <fstream> // ofstream
 #include <vector>
 #define STB_IMAGE_IMPLEMENTATION
 #include "external/stb_image.h"
@@ -522,33 +523,64 @@ public:
 		return false;
 	}
 
-	bool load(const std::string& filename, Array& arr){
-		return loadData(arr, stbi_load, filename.c_str());
+	bool load(const std::string& filePath, Array& arr){
+		return loadData(arr, stbi_load, filePath.c_str());
 	}
 
 	bool load(const unsigned char * src, int len, Array& arr){
 		return loadData(arr, stbi_load_from_memory, src, len);
 	}
 
-	bool save(const std::string& filename, const Array& arr, int compressFlags, int paletteSize){
-		auto ext = filename.substr(filename.find_last_of('.'));
+	bool save(const std::string& filePath, const Array& pix, int compressFlags, int paletteSize){
+		auto extPos = filePath.find_last_of('.');
+		if(extPos == std::string::npos){
+			AL_WARN("No file extension found");
+			return false;
+		}
+
+		auto ext = filePath.substr(extPos+1);
 		for(auto& c:ext) c=std::tolower(c);
+
+		FileType ftype;
+		if("png" == ext) ftype = PNG;
+		else if("jpg" == ext || "jpeg" == ext) ftype = JPG;
+		else if("tga" == ext) ftype = TGA;
+		else if("bmp" == ext) ftype = BMP;
+		else {
+			AL_WARN("Cannot match extension to a supported file type");
+			return false;
+		}
+
+		ByteArray bytes;
+		save(ftype, bytes, pix, compressFlags, paletteSize);
+
+		std::ofstream fs(filePath, std::ios::binary);
+		if(!fs.good()){
+			AL_WARN("Cannot open file for writing");
+			return false;
+		}
+		fs.write((char *)bytes.data(), bytes.size());
+
+		return true;
+	}
+
+	bool save(FileType fileType, ByteArray& dst, const Array& pix, int compressFlags, int paletteSize){
 		auto compressAmt = compressFlags & 127;
 		if(compressAmt > 100) compressAmt=100;
-		auto w = arr.dim(0);
-		auto h = (arr.dimcount() > 1) ? arr.dim(1) : 1;
-		auto n = arr.components();
-		auto s = arr.stride(0);
-		const void * data = arr.data.ptr;
+		auto w = pix.dim(0);
+		auto h = (pix.dimcount() > 1) ? pix.dim(1) : 1;
+		auto n = pix.components();
+		auto s = pix.stride(0);
+		const void * data = pix.data.ptr;
 		std::vector<unsigned char> packui8;
-		if(arr.type() != AlloUInt8Ty || s != w*n){
-			switch(arr.type()){
+		if(pix.type() != AlloUInt8Ty || s != w*n){
+			switch(pix.type()){
 				#define CS(T, op)\
 				case Array::type<T>():\
 				for(unsigned j=0; j<h; ++j){\
 				for(unsigned i=0; i<w; ++i){\
 				for(unsigned c=0; c<n; ++c){\
-					packui8.push_back(arr.elem<T>(c,i,j) op);\
+					packui8.push_back(pix.elem<T>(c,i,j) op);\
 				}}} break;
 				CS(uint8_t,);
 				CS(uint16_t, >>16);
@@ -564,17 +596,29 @@ public:
 		}
 
 		stbi_flip_vertically_on_write(1); // rows go bottom to top
-		if(".png" == ext){
+
+		dst.clear();
+
+		auto writeFunc = [](void * ctx, void * buf, int size){
+			auto * bytes = (ByteArray::value_type *)buf;
+			auto& dst = *(ByteArray *)ctx;
+			dst.insert(dst.end(), bytes, bytes+size);
+		};
+
+		switch(fileType){
+		case PNG:
 			stbi_write_png_compression_level = compressAmt;
-			return stbi_write_png(filename.c_str(), w,h,n, data, w*n);
-		} else if(".jpg" == ext || ".jpeg" == ext){
-			return stbi_write_jpg(filename.c_str(), w,h,n, data, 100-compressAmt);
-		} else if(".tga" == ext){
+			return stbi_write_png_to_func(writeFunc, &dst, w,h,n, data, w*n);
+		case JPG:
+			return stbi_write_jpg_to_func(writeFunc, &dst, w,h,n, data, 100-compressAmt);
+		case TGA:
 			stbi_write_tga_with_rle = compressAmt >= 50;
-			return stbi_write_tga(filename.c_str(), w,h,n, data);
-		} else if(".bmp" == ext){
-			return stbi_write_bmp(filename.c_str(), w,h,n, data);
+			return stbi_write_tga_to_func(writeFunc, &dst, w,h,n, data);
+		case BMP:
+			return stbi_write_bmp_to_func(writeFunc, &dst, w,h,n, data);
+		default:;
 		}
+
 		return false;
 	}
 };
@@ -609,11 +653,30 @@ bool Image::load(const unsigned char * src, int len){
 	return mLoaded;
 }
 
-bool Image::save(const std::string& filename) {
+bool Image::save(const std::string& filename){
 	if(!mImpl) mImpl = new Impl();
 	mLoaded = mImpl->save(filename, mArray, mCompression, mPaletteSize);
 	if(mLoaded) mFilename = filename;
 	return mLoaded;
+}
+
+bool Image::save(FileType fileType, ByteArray& buffer){
+	if(!mImpl) mImpl = new Impl();
+	return mImpl->save(fileType, buffer, mArray, mCompression, mPaletteSize);
+}
+
+template <class OnSave>
+bool saveFromArray(const Array& src, int compress, int paletteSize, const OnSave& onSave){
+	if(src.empty()) AL_WARN("Source al::Array is empty");
+	Image img;
+	Array& a = img.array();
+	a.configure(src.header); // copy over header information
+	a.data.ptr = src.data.ptr;
+	img.compression(compress);
+	img.paletteSize(paletteSize);
+	bool res = onSave(img);
+	a.data.ptr = nullptr; // prevent ~Array from deleting data
+	return res;
 }
 
 /*static*/ bool Image::save(
@@ -625,7 +688,7 @@ bool Image::save(const std::string& filename) {
 		compress
 	);*/
 
-	Image img;
+	/*Image img;
 	Array& a = img.array();
 	a.configure(src.header); // copy over header information
 	a.data.ptr = src.data.ptr;
@@ -633,8 +696,21 @@ bool Image::save(const std::string& filename) {
 	img.paletteSize(paletteSize);
 	bool res = img.save(filePath);
 	a.data.ptr = NULL; // prevent ~Array from deleting data
-	return res;
+	return res;*/
+
+	return saveFromArray(src, compress, paletteSize, [&](auto& img){
+		return img.save(filePath);
+	});
 }
+
+/*static*/ bool Image::save(
+	FileType t, ByteArray& dst, const Array& src, int compress, int paletteSize
+){
+	return saveFromArray(src, compress, paletteSize, [&](auto& img){
+		return img.save(t, dst);
+	});
+}
+
 
 Image::Format Image::format() const {
 	return getFormat(array().components());

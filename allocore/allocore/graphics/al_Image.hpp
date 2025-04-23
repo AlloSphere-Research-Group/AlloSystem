@@ -42,6 +42,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include <vector>
 #include <string>
 #include "allocore/types/al_Array.hpp"
 
@@ -63,11 +64,20 @@ public:
 		UNKNOWN_FORMAT
 	};
 
+	enum FileType {
+		PNG,
+		TGA,
+		BMP,
+		JPG
+	};
+
 	template<typename T>
 	struct RGBPix { T r, g, b; };
 
 	template<typename T>
 	struct RGBAPix { T r, g, b, a; };
+
+	using ByteArray = std::vector<unsigned char>;
 
 
 	Image();
@@ -91,6 +101,7 @@ public:
 	/// @param[in] len		Number of bytes
     /// \returns true for success or print error message and return false
 	bool load(const unsigned char * src, int len);
+	bool load(const ByteArray& src){ return load(&src[0], src.size()); }
 
 
 	/// Save image to disk
@@ -100,6 +111,9 @@ public:
     /// \returns true for success or print error message and return false
 	bool save(const std::string& filePath);
 
+	/// Save image file data to raw byte array
+	bool save(FileType t, ByteArray& dst);
+
 	/// Save pixel data to disk
 
 	/// @param[in] filePath		File to save. Image type determined by file 
@@ -108,6 +122,7 @@ public:
 	/// @param[in] compressFlags level of compression in [0,100] and other flags
 	/// @param[in] paletteSize	number of colors in palette, in [2,256]
 	static bool save(const std::string& filePath, const Array& src, int compressFlags=50, int paletteSize=-1);
+	static bool save(FileType t, ByteArray& dst, const Array& src, int compressFlags=50, int paletteSize=-1);
 
 	/// Save pixel data to disk
 
