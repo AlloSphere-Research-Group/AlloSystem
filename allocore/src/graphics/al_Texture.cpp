@@ -300,8 +300,6 @@ void Texture::bind(){
 			AL_GRAPHICS_ERROR("enable target binding texture", id());
 		#endif
 
-		shapeFromArray();
-
 		// Synchronize client texture state with GPU
 		sendShape(false);
 
