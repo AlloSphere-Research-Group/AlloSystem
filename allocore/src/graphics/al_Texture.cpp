@@ -329,39 +329,35 @@ void Texture::resetArray(unsigned align){
 	deallocate();
 
 	// reconfigure the internal array according to the current settings:
+	mArray.header.type = Graphics::toAlloTy(mType);
+	mArray.header.components = Graphics::numComponents(mFormat);
+
 	switch(mTarget){
 	case TEXTURE_2D:
 	default:
-		mArray.header.type = Graphics::toAlloTy(mType);
-		mArray.header.components = Graphics::numComponents(mFormat);
 		mArray.header.dimcount = 2;
 		mArray.header.dim[0] = mWidth;
 		mArray.header.dim[1] = mHeight;
-		mArray.deriveStride(mArray.header, align);
 		break;
 
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	case TEXTURE_1D:
-		mArray.header.type = Graphics::toAlloTy(mType);
-		mArray.header.components = Graphics::numComponents(mFormat);
 		mArray.header.dimcount = 1;
 		mArray.header.dim[0] = mWidth;
-		mArray.deriveStride(mArray.header, align);
 		break;
 	#endif
 
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 	case TEXTURE_3D:
-		mArray.header.type = Graphics::toAlloTy(mType);
-		mArray.header.components = Graphics::numComponents(mFormat);
 		mArray.header.dimcount = 3;
 		mArray.header.dim[0] = mWidth;
 		mArray.header.dim[1] = mHeight;
 		mArray.header.dim[2] = mDepth;
-		mArray.deriveStride(mArray.header, align);
 		break;
 	#endif
 	}
+
+	mArray.deriveStride(mArray.header, align);
 }
 
 Texture& Texture::allocate(unsigned align){
