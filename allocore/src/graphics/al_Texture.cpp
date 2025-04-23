@@ -435,10 +435,12 @@ Texture& Texture::getRemoteData(){
 	#ifdef AL_GRAPHICS_SUPPORTS_GET_TEX_IMAGE
 	if(!mArray.hasData()){
 		allocate();
-		mPixelsUpdated = false; // prevent overwriting server data
 	}
+
+	mPixelsUpdated = false; // prevent overwriting remote with local data on bind
+
 	bind();
-	// Do not call array() here as it will flag texture as dirty on client
+	// Do not call array() here as it will flag local data as dirty
 	glGetTexImage(mTarget, 0, mFormat, mType, mArray.data.ptr);
 	unbind();
 	#elif defined(AL_GRAPHICS_SUPPORTS_FBO)
