@@ -570,9 +570,11 @@ public:
 		auto w = pix.dim(0);
 		auto h = (pix.dimcount() > 1) ? pix.dim(1) : 1;
 		auto n = pix.components();
-		auto s = pix.stride(0);
+		auto s = pix.stride(1); // row stride, in bytes
 		const void * data = pix.data.ptr;
 		std::vector<unsigned char> packui8;
+
+		// Only uint8 type and tight packing is supported across all file types. If incoming data is not in that format, we pack it into a temp buffer. The second check is only for ensuring tight-packing of a uint8 array.
 		if(pix.type() != AlloUInt8Ty || s != w*n){
 			switch(pix.type()){
 				#define CS(T, op)\
@@ -598,10 +600,9 @@ public:
 		stbi_flip_vertically_on_write(1); // rows go bottom to top
 
 		dst.clear();
-
-		auto writeFunc = [](void * ctx, void * buf, int size){
+		auto writeFunc = [](void * userData, void * buf, int size){
 			auto * bytes = (ByteArray::value_type *)buf;
-			auto& dst = *(ByteArray *)ctx;
+			auto& dst = *(ByteArray *)userData;
 			dst.insert(dst.end(), bytes, bytes+size);
 		};
 
