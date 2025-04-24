@@ -203,17 +203,16 @@ public:
 	Filter filterMag() const { return mFilterMag; }
 
 	/// Get number of components per pixel
-	unsigned numComponents() const { return Graphics::numComponents(format()); }
-
-	/// Get total number of elements (components x width x height x depth)
-	unsigned numElems() const {
-		return numPixels() * numComponents();
-	}
+	unsigned numComponents() const;
 
 	/// Get total number of pixels
-	unsigned numPixels() const {
-		return width() * (height()?height():1) * (depth()?depth():1);
-	}
+	unsigned numPixels() const;
+
+	/// Get total number of elements (components x width x height x depth)
+	unsigned numElems() const;
+
+	/// Get total number of bytes consumed
+	unsigned numBytes() const;
 
 	/// Get texture unit
 	int unit() const { return mTexUnit; }

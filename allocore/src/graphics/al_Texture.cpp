@@ -199,6 +199,22 @@ Texture& Texture::texelClamp(bool v){
 	return *this;
 }
 
+unsigned Texture::numComponents() const {
+	return Graphics::numComponents(mFormat);
+}
+
+unsigned Texture::numPixels() const {
+	return mWidth * (mHeight?mHeight:1) * (mDepth?mDepth:1);
+}
+
+unsigned Texture::numElems() const {
+	return numPixels() * numComponents();
+}
+
+unsigned Texture::numBytes() const {
+	return numElems() * Graphics::numBytes(mType);
+}
+
 void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
 
 	switch(hdr.dimcount){
