@@ -1033,6 +1033,56 @@ Graphics::~Graphics(){
 	}
 }
 
+Graphics::FrameBuffer::FrameBuffer(Graphics::FrameBuffer&& other){
+	*this = std::move(other);
+}
+
+Graphics::FrameBuffer::~FrameBuffer(){ clear(); }
+
+Graphics::FrameBuffer& Graphics::FrameBuffer::operator=(Graphics::FrameBuffer&& other) noexcept {
+	if(this != &other){
+		clear();
+		data = other.data;
+		other.data = nullptr;
+		width = other.width;
+		height = other.height;
+		format = other.format;
+		type = other.type;
+	}
+	return *this;
+}
+
+bool Graphics::FrameBuffer::empty() const {
+	return nullptr == data;
+}
+
+void Graphics::FrameBuffer::clear(){
+	if(data) delete[] data;
+	width = height = 0;
+}
+
+/*static*/ Graphics::FrameBuffer Graphics::getFrameBuffer(unsigned x, unsigned y, unsigned w, unsigned h, Graphics::Format format, Graphics::DataType type){
+	// Check support for requested format/type
+	// ES2 has very specific rules: "... format GL_RGBA in conjunction with type GL_UNSIGNED_BYTE is always allowed..." (see https://registry.khronos.org/OpenGL-Refpages/es2.0/ and https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glGet.xml)
+	// Using glGet gives us the best supported values for all GL implementations with minimal fuss.
+	{	GLint f; glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &f);
+		GLint t; glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &t);
+		//printf("frmt:%s type:%s\n", toString(Graphics::Format(f)), toString(Graphics::DataType(t)));
+		format = Graphics::Format(f);
+		type = Graphics::DataType(t);
+	}
+
+	unsigned nBytes = w*h*Graphics::numComponents(format)*Graphics::numBytes(type);
+	Graphics::FrameBuffer fb;
+	fb.data = new unsigned char[nBytes];
+	fb.width = w;
+	fb.height = h;
+	fb.format = format;
+	fb.type = type;
+	glReadPixels(x,y,w,h, format, type, fb.data);
+	return fb;
+}
+
 void Graphics::pipeline(Pipeline p){
 	switch(p){
 	case FIXED:

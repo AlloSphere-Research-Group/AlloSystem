@@ -376,6 +376,39 @@ public:
 	/// Set read buffer
 	void readBuffer(Direction d);
 
+	/// Minimal framebuffer for storing temporary results
+	struct FrameBuffer{
+		FrameBuffer(){}
+		FrameBuffer(FrameBuffer&& other);
+		~FrameBuffer();
+		FrameBuffer& operator=(FrameBuffer&& other) noexcept;
+		bool empty() const;
+		void clear();
+		unsigned char * data = nullptr;
+		unsigned width = 0;
+		unsigned height = 0;
+		Format format;
+		DataType type;
+	};
+
+	/// Retrieve remote color framebuffer
+
+	/// Request color framebuffer from remote server and fill returned object
+	/// with the result. The function will block until all values are received.
+	/// The format and type of the returned framebuffer may differ from the 
+	/// requested values depending on available support in the underlying
+	/// rendering API.
+	///
+	/// \param[in] x		Left position of extraction region, in pixels
+	/// \param[in] y		Bottom position of extraction region, in pixels
+	/// \param[in] w		Width of extraction region, in pixels
+	/// \param[in] h		Height of extraction region, in pixels
+	/// \param[in] format	Desired pixel component format; returned format may differ
+	/// \param[in] type		Desired pixel data type; returned type may differ
+	static FrameBuffer getFrameBuffer(unsigned x, unsigned y, unsigned w, unsigned h, Format format, DataType type);
+	static FrameBuffer getFrameBuffer(unsigned w, unsigned h, Format format, DataType type){
+		return getFrameBuffer(0,0, w,h, format, type);
+	}
 
 	/// Set linear fog parameters
 
