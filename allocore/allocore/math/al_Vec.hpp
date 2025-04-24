@@ -633,10 +633,10 @@ public:
 	#define DEF_VEC_OP(op)\
 	template <class U>\
 	Vec& operator op##=(const Vec<N,U>& v){ IT(N) at(i) op##= v[i]; return *this; }\
-	Vec& operator op##=(const        T& v){ IT(N) at(i) op##= v;    return *this; }\
+	Vec& operator op##=(              T v){ IT(N) at(i) op##= v;    return *this; }\
 	template <class U>\
 	Vec operator op (const Vec<N,U>& v) const { return dup() op##= v; }\
-	Vec operator op (const        T& v) const { return dup() op##= v; }
+	Vec operator op (              T v) const { return dup() op##= v; }
 	
 	DEF_VEC_OP(+)
 	DEF_VEC_OP(-)
