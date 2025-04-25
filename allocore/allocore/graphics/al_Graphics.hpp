@@ -605,6 +605,9 @@ public:
 
 	// Utility functions: converting, reporting, etc.
 
+	/// Get integer parameter of current GPU state
+	static int paramInt(int param);
+
 	/// Print current GPU error state
 
 	/// @param[in] msg		Custom error message

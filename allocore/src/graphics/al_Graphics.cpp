@@ -1302,11 +1302,18 @@ AlloTy Graphics::toAlloTy(Graphics::DataType v) {
 	}
 }
 
-const char * Graphics::errorString(bool verbose){
+
+/*static*/ int Graphics::paramInt(int param){
+	GLint val;
+	glGetIntegerv(param, &val);
+	return val;
+}
+
+/*static*/ const char * Graphics::errorString(bool verbose){
 	return glGetErrorString(verbose);
 }
 
-bool Graphics::error(const char * msg, int ID){
+/*static*/ bool Graphics::error(const char * msg, int ID){
 	const char * errStr = errorString();
 	if(errStr[0]){
 		if(ID>=0)	AL_WARN_ONCE("Error %s (id=%d): %s", msg, ID, errStr);
