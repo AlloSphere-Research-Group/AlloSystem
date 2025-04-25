@@ -1066,11 +1066,11 @@ void Graphics::FrameBuffer::clear(){
 	// ES2 has very specific rules: "... format GL_RGBA in conjunction with type GL_UNSIGNED_BYTE is always allowed..." (see https://registry.khronos.org/OpenGL-Refpages/es2.0/ and https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glGet.xml)
 	// Using glGet gives us the best supported values for all GL implementations with minimal fuss.
 	#ifdef GL_IMPLEMENTATION_COLOR_READ_FORMAT /* req's gl3 or es2 */
-	{	GLint f; glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &f);
-		GLint t; glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &t);
-		//printf("frmt:%s type:%s\n", toString(Graphics::Format(f)), toString(Graphics::DataType(t)));
-		format = Graphics::Format(f);
-		type = Graphics::DataType(t);
+	{	auto f = decltype(format)(paramInt(GL_IMPLEMENTATION_COLOR_READ_FORMAT));
+		auto t = decltype(type  )(paramInt(GL_IMPLEMENTATION_COLOR_READ_TYPE));
+		//printf("frmt:%s type:%s\n", toString(f), toString(t));
+		format = f;
+		type = t;
 	}
 	#endif
 
