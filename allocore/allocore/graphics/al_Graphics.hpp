@@ -410,6 +410,17 @@ public:
 		return getFrameBuffer(0,0, w,h, format, type);
 	}
 
+	/// Get remote-to-local pixel alignment
+	static int pixelAlignDownload();
+	/// Set remote-to-local pixel alignment (must be 1, 2, 4, or 8)
+	static void pixelAlignDownload(int v);
+
+	/// Get local-to-remote pixel alignment
+	static int pixelAlignUpload();
+	/// Set local-to-remote pixel alignment (must be 1, 2, 4, or 8)
+	static void pixelAlignUpload(int v);
+
+
 	/// Set linear fog parameters
 
 	/// \param[in] end		distance from viewer to fog end

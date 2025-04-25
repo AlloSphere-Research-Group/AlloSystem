@@ -1085,6 +1085,19 @@ void Graphics::FrameBuffer::clear(){
 	return fb;
 }
 
+void pixelAlign(int which, int v){
+	if(v!=1 && v!=2 && v!=4 && v!=8){
+		AL_WARN("Pixel alignment must be 1, 2, 4 or 8");
+		return;
+	}
+	glPixelStorei(which, v);
+}
+
+/*static*/ int Graphics::pixelAlignDownload(){ return paramInt(GL_PACK_ALIGNMENT); }
+/*static*/ void Graphics::pixelAlignDownload(int v){ pixelAlign(GL_PACK_ALIGNMENT, v); }
+/*static*/ int Graphics::pixelAlignUpload(){ return paramInt(GL_UNPACK_ALIGNMENT); }
+/*static*/ void Graphics::pixelAlignUpload(int v){ pixelAlign(GL_UNPACK_ALIGNMENT, v); }
+
 void Graphics::pipeline(Pipeline p){
 	switch(p){
 	case FIXED:
