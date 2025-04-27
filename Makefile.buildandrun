@@ -7,24 +7,26 @@
 RUN_DIR ?= $(dir $(lastword $(MAKECMDGOALS)))
 -include $(RUN_DIR)Makefile.user
 
+# Simplify paths (remove ..)
+RUN_SRC_DIRS := $(addsuffix /, $(realpath $(RUN_SRC_DIRS)))
+
 # Add user specified source dirs to global Make vars
 VPATH += $(RUN_SRC_DIRS)
 CPPFLAGS += $(addprefix -I, $(RUN_SRC_DIRS))
 
 # Create list of all valid source files found in RUN_SRC_DIRS
-RUN_SRCS	 = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
-RUN_SRCS	+= $(wildcard $(addsuffix /*.cc, $(RUN_SRC_DIRS)))
-RUN_SRCS	+= $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
+RUN_SRCS  = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
+RUN_SRCS += $(wildcard $(addsuffix /*.cc, $(RUN_SRC_DIRS)))
+RUN_SRCS += $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
 
 # Add Objective-C++ support if using OSX
 ifeq ($(PLATFORM), macosx)
-RUN_SRCS	+= $(wildcard $(addsuffix /*.mm, $(RUN_SRC_DIRS)))
+RUN_SRCS += $(wildcard $(addsuffix /*.mm, $(RUN_SRC_DIRS)))
 endif
 
 # Generate .o targets from all sources in RUN_SRC_DIRS
-RUN_OBJS	 = $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
-#RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
-RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
+RUN_OBJS  = $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
+RUN_OBJS := $(addprefix $(OBJ_DIR), $(RUN_OBJS))
 
 # These variables are used to link to all libraries found in build/lib/
 LINK_LIBS_PATH  = $(wildcard $(BUILD_DIR)lib/*.$(SLIB_EXT))
