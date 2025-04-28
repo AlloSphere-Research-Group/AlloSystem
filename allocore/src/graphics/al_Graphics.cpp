@@ -1033,13 +1033,13 @@ Graphics::~Graphics(){
 	}
 }
 
-Graphics::FrameBuffer::FrameBuffer(Graphics::FrameBuffer&& other){
+Graphics::FrameBuffer::FrameBuffer(FrameBuffer&& other){
 	*this = std::move(other);
 }
 
 Graphics::FrameBuffer::~FrameBuffer(){ clear(); }
 
-Graphics::FrameBuffer& Graphics::FrameBuffer::operator=(Graphics::FrameBuffer&& other) noexcept {
+Graphics::FrameBuffer& Graphics::FrameBuffer::operator=(FrameBuffer&& other) noexcept {
 	if(this != &other){
 		clear();
 		data = other.data;
@@ -1061,7 +1061,7 @@ void Graphics::FrameBuffer::clear(){
 	width = height = 0;
 }
 
-/*static*/ Graphics::FrameBuffer Graphics::getFrameBuffer(unsigned x, unsigned y, unsigned w, unsigned h, Graphics::Format format, Graphics::DataType type){
+/*static*/ Graphics::FrameBuffer Graphics::getFrameBuffer(unsigned x, unsigned y, unsigned w, unsigned h, Format format, DataType type){
 	// Check support for requested format/type
 	// ES2 has very specific rules: "... format GL_RGBA in conjunction with type GL_UNSIGNED_BYTE is always allowed..." (see https://registry.khronos.org/OpenGL-Refpages/es2.0/ and https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glGet.xml)
 	// Using glGet gives us the best supported values for all GL implementations with minimal fuss.
@@ -1074,18 +1074,35 @@ void Graphics::FrameBuffer::clear(){
 	}
 	#endif
 
-	unsigned nBytes = w*h*Graphics::numComponents(format)*Graphics::numBytes(type);
-	Graphics::FrameBuffer fb;
+	auto rowBytes = w*numBytes(format, type);
+	unsigned nBytes = h*rowBytes;
+	FrameBuffer fb;
 	fb.data = new unsigned char[nBytes];
 	fb.width = w;
 	fb.height = h;
 	fb.format = format;
 	fb.type = type;
+	
+	auto origAlign = pixelAlignDownload();
+	pixelAlignDownload(pixelAlign(rowBytes));
 	glReadPixels(x,y,w,h, format, type, fb.data);
+	pixelAlignDownload(origAlign);
+
 	return fb;
 }
 
-void pixelAlign(int which, int v){
+/*static*/ unsigned Graphics::pixelAlign(unsigned numBytes){
+	if(numBytes % 2) return 1;
+	if(numBytes % 4) return 2;
+	if(numBytes % 8) return 4;
+	return 8;
+}
+
+/*static*/ unsigned Graphics::pixelAlign(unsigned width, Format f, DataType t){
+	return pixelAlign(width*numBytes(f,t));
+}
+
+void setPixelAlign(unsigned which, unsigned v){
 	if(v!=1 && v!=2 && v!=4 && v!=8){
 		AL_WARN("Pixel alignment must be 1, 2, 4 or 8");
 		return;
@@ -1093,10 +1110,10 @@ void pixelAlign(int which, int v){
 	glPixelStorei(which, v);
 }
 
-/*static*/ int Graphics::pixelAlignDownload(){ return paramInt(GL_PACK_ALIGNMENT); }
-/*static*/ void Graphics::pixelAlignDownload(int v){ pixelAlign(GL_PACK_ALIGNMENT, v); }
-/*static*/ int Graphics::pixelAlignUpload(){ return paramInt(GL_UNPACK_ALIGNMENT); }
-/*static*/ void Graphics::pixelAlignUpload(int v){ pixelAlign(GL_UNPACK_ALIGNMENT, v); }
+/*static*/ unsigned Graphics::pixelAlignDownload(){ return paramInt(GL_PACK_ALIGNMENT); }
+/*static*/ void Graphics::pixelAlignDownload(unsigned v){ setPixelAlign(GL_PACK_ALIGNMENT, v); }
+/*static*/ unsigned Graphics::pixelAlignUpload(){ return paramInt(GL_UNPACK_ALIGNMENT); }
+/*static*/ void Graphics::pixelAlignUpload(unsigned v){ setPixelAlign(GL_UNPACK_ALIGNMENT, v); }
 
 void Graphics::pipeline(Pipeline p){
 	switch(p){
@@ -1226,7 +1243,7 @@ const char * toString(Graphics::Primitive v){
 }
 #undef CS
 
-int Graphics::numComponents(Format v){
+/*static*/ int Graphics::numComponents(Format v){
 	switch(v){
 		case RGBA:				return 4;
 		case RGB:				return 3;
@@ -1240,7 +1257,7 @@ int Graphics::numComponents(Format v){
 	};
 }
 
-int Graphics::numBytes(DataType v){
+/*static*/ int Graphics::numBytes(DataType v){
 	#define CS(a,b) case a: return sizeof(b);
 	switch(v){
 		CS(BYTE, GLbyte)
@@ -1260,7 +1277,11 @@ int Graphics::numBytes(DataType v){
 	#undef CS
 }
 
-Graphics::Format Graphics::toFormat(int n){
+/*static*/ int Graphics::numBytes(Format f, DataType t){
+	return numComponents(f)*numBytes(t);
+}
+
+/*static*/ Graphics::Format Graphics::toFormat(int n){
 	static const Format f[] = {LUMINANCE, LUMINANCE_ALPHA, RGB, RGBA};
 	n = n<1 ? 1 : n>4 ? 4 : n; // clamp in [1,4]
 	return f[n-1];

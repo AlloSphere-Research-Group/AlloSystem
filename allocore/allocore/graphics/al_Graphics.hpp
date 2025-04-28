@@ -410,15 +410,19 @@ public:
 		return getFrameBuffer(0,0, w,h, format, type);
 	}
 
+	/// Get largest possible pixel alignment
+	static unsigned pixelAlign(unsigned numBytes);
+	static unsigned pixelAlign(unsigned width, Format f, DataType t);
+
 	/// Get remote-to-local pixel alignment
-	static int pixelAlignDownload();
+	static unsigned pixelAlignDownload();
 	/// Set remote-to-local pixel alignment (must be 1, 2, 4, or 8)
-	static void pixelAlignDownload(int v);
+	static void pixelAlignDownload(unsigned v);
 
 	/// Get local-to-remote pixel alignment
-	static int pixelAlignUpload();
+	static unsigned pixelAlignUpload();
 	/// Set local-to-remote pixel alignment (must be 1, 2, 4, or 8)
-	static void pixelAlignUpload(int v);
+	static void pixelAlignUpload(unsigned v);
 
 
 	/// Set linear fog parameters
@@ -643,6 +647,9 @@ public:
 
 	/// Returns number of bytes for given data type
 	static int numBytes(DataType v);
+
+	/// Returns number of bytes for given pixel format and data type
+	static int numBytes(Format f, DataType t);
 
 	/// Get Format best matching number of components
 
