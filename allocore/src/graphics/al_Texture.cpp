@@ -500,8 +500,9 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 	if(pixels){
 
 		// Tell GPU the row alignment of the pixels we are sending
-		glPixelStorei(GL_UNPACK_ALIGNMENT, align);
-			AL_GRAPHICS_ERROR("Texture::sendPixels (glPixelStorei set)", id());
+		auto origAlign = Graphics::pixelAlignUpload();
+		Graphics::pixelAlignUpload(align);
+			AL_GRAPHICS_ERROR("Texture::sendPixels (pixelAlignUpload set)", id());
 
 		auto sendSubImage = [&](const Rows& r){
 
@@ -565,9 +566,9 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 			}
 		}
 
-		// Set alignment back to default
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-			AL_GRAPHICS_ERROR("Texture::sendPixels (glPixelStorei unset)", id());
+		// Set alignment back to original
+		Graphics::pixelAlignUpload(origAlign);
+			AL_GRAPHICS_ERROR("Texture::sendPixels (pixelAlignUpload unset)", id());
 	}
 }
 
