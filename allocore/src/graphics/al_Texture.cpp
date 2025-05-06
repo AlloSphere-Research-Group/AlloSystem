@@ -215,6 +215,10 @@ unsigned Texture::numBytes() const {
 	return numElems() * Graphics::numBytes(mType);
 }
 
+bool Texture::valid() const {
+	return mTarget != NO_TARGET;
+}
+
 void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
 
 	switch(hdr.dimcount){
@@ -286,7 +290,7 @@ void Texture::tryBind(const std::function<void(void)>& onPostBind){
 	// Sync shape if array is dirty
 	shapeFromArray();
 
-	if(target() != NO_TARGET){
+	if(valid()){
 		glBindTexture(target(), id());
 		onPostBind();
 		mFirstBind = false;

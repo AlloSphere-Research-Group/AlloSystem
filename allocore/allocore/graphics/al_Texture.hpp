@@ -217,6 +217,10 @@ public:
 	/// Get texture unit
 	int unit() const { return mTexUnit; }
 
+	/// Returns whether the texture is valid for rendering
+	bool valid() const;
+	operator bool() const { return valid(); }
+
 
 	/// Set pixel (color) format
 	Texture& format(Format v);
