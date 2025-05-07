@@ -685,9 +685,15 @@ public:
 	void pipeline(Pipeline p);
 
 	ShaderProgram& shader();
+	/// Insert code in global scope of all shader stages
 	Graphics& shaderPreamble(const std::string& s);
+	/// Insert code in vertex stage; attribute variables are 'posObj', 'color', 'normal' and 'texCoord2'
 	Graphics& shaderOnVertex(const std::string& s);
+	/// Insert code to customize the lighting
 	Graphics& shaderOnLight(const std::string& s);
+	/// Insert code in fragment shader just after computing the base color; useful for alpha discard
+	Graphics& shaderOnAlpha(const std::string& s);
+	/// Insert code to customize the material
 	Graphics& shaderOnMaterial(const std::string& s);
 
 	/// Set custom shader
