@@ -373,6 +373,10 @@ public:
 	template <class T>
 	Mesh& texCoord(const Vec<3,T>& v){ return texCoord(v[0], v[1], v[2]); }
 
+	/// Append 2D texture coordinates
+	template <class T1, class T2, class... Ts>
+	Mesh& texCoord2(T1 u1, T2 v1, Ts... unvn){ return texCoord(u1, v1).texCoord2(unvn...); }
+	Mesh& texCoord2(){ return *this; } // terminal case
 
 	/// Returns whether mesh has valid data for rendering
 	bool valid() const;
