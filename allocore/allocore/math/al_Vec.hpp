@@ -258,6 +258,30 @@ public:
 		return const_cast<Vec*>(this)->forEach(f);
 	}
 
+	/// Iterate over range of elements
+
+	/// Iterates from a begin index to an end index.
+	/// \tparam Beg		Begin index, inclusive. If negative, uses size() + Beg.
+	/// \tparam End		End index, inclusive. If negative, uses size() + End.
+	/// \param[in] f	Function called for each element with first arg the
+	///					value and second arg the index.
+	template <int Beg, int End, class Func>
+	Vec& forEach(const Func& f){
+		static constexpr int b = Beg<0 ? Beg+N : Beg;
+		static constexpr int e = End<0 ? End+N : End;
+		static_assert(0 <= b && b < N, "Invalid begin index");
+		static_assert(0 <= e && e < N, "Invalid end index");
+		static constexpr int s = b<e ? 1 : -1; // stride
+		static constexpr int ee = e + s; // exclusive end
+		for(int i=b; i!=ee; i+=s) f(at(i), i);
+		return *this;
+	}
+
+	template <int Beg, int End, class Func>
+	const Vec& forEach(const Func& f) const {
+		return const_cast<Vec*>(this)->forEach<Beg,End>(f);
+	}
+
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems()[i];}
 
@@ -905,7 +929,7 @@ public:
 
 	/// Get rejection of vector from another vector
 
-	/// Returns a vector orthogonal to 'v' that lies on the same  plane as this
+	/// Returns a vector orthogonal to 'v' that lies on the same plane as this
 	/// and 'v'. Used in Gram-Schmidt process to orthogonalize vectors.
 	Vec rej(const Vec& v) const { return *this - proj(v); }
 
