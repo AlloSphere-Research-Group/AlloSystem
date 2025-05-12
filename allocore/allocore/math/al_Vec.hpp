@@ -471,6 +471,21 @@ public:
 		return dst;
 	}
 
+	/// Get vector repeated a given number of times
+
+	/// \tparam M	The number of instances of the original vector
+	///
+	template <int M=2>
+	Vec<M*N,T> rep() const {
+		static_assert(M>=0, "Rep count cannot be negative");
+		Vec<M*N,T> r;
+		for(int j=0; j<M; ++j){
+		for(int i=0; i<N; ++i){
+			r[j*N+i] = at(i);
+		}}
+		return r;
+	}
+
 	/// Get a subvector
 
 	/// \tparam M		Size of subvector; if M<0, the size is M+N.
