@@ -27,7 +27,7 @@ bool ZipReader::open(const std::string& path){
 		char buf[128];
 		for(int i=0; i<numFiles; ++i){
 			auto bytes = mz_zip_reader_get_filename(zip, i, buf, sizeof buf);
-			mFilePaths.emplace_back(buf, bytes);
+			if(bytes) mFilePaths.emplace_back(buf, bytes-1); // buf includes terminal '\0'
 		}
 		return true;
 	}
