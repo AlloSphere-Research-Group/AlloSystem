@@ -23,8 +23,8 @@ GFX_DIR		= graphics/
 IO_DIR		= io/
 MATH_DIR	= math/
 PRO_DIR		= protocol/
-SPA_DIR		= spatial/
 SND_DIR		= sound/
+SPA_DIR		= spatial/
 SYS_DIR		= system/
 TYP_DIR		= types/
 TEST_DIR	= unitTests/
@@ -56,13 +56,13 @@ endif
 #-------------------------------------------------------------------------
 INC_DIRS += $(INC_DIR)
 
-VPATH += $(addprefix $(SRC_DIR), $(GFX_DIR) $(IO_DIR) $(PRO_DIR) $(MATH_DIR) $(SND_DIR) $(SPA_DIR) $(SYS_DIR) $(TYP_DIR))
+MODULE_DIRS := $(GFX_DIR) $(IO_DIR) $(MATH_DIR) $(PRO_DIR) $(SND_DIR) $(SPA_DIR) $(SYS_DIR) $(TYP_DIR)
+
+VPATH += $(addprefix $(SRC_DIR), $(MODULE_DIRS))
 
 # Include configuration files of AlloCore modules
 # TODO: Permit selective inclusive of modules for building a library
 # and doing unit tests.
-
-MODULE_DIRS := $(GFX_DIR) $(IO_DIR) $(MATH_DIR) $(PRO_DIR) $(SND_DIR) $(SPA_DIR) $(SYS_DIR) $(TYP_DIR)
 
 include $(SRC_DIR)$(GFX_DIR)Makefile.config
 include $(SRC_DIR)$(IO_DIR)Makefile.config
@@ -78,17 +78,17 @@ GFX_SRC		:= $(addprefix $(SRC_DIR)$(GFX_DIR), $(GFX_SRC))
 IO_SRC		:= $(addprefix $(SRC_DIR)$(IO_DIR), $(IO_SRC))
 MATH_SRC	:= $(addprefix $(SRC_DIR)$(MATH_DIR), $(MATH_SRC))
 PRO_SRC		:= $(addprefix $(SRC_DIR)$(PRO_DIR), $(PRO_SRC))
-TYP_SRC		:= $(addprefix $(SRC_DIR)$(TYP_DIR), $(TYP_SRC))
 SND_SRC		:= $(addprefix $(SRC_DIR)$(SND_DIR), $(SND_SRC))
 SPA_SRC		:= $(addprefix $(SRC_DIR)$(SPA_DIR), $(SPA_SRC))
 SYS_SRC		:= $(addprefix $(SRC_DIR)$(SYS_DIR), $(SYS_SRC))
+TYP_SRC		:= $(addprefix $(SRC_DIR)$(TYP_DIR), $(TYP_SRC))
 
 # These are all the source files
-SRCS		= \
-		$(GFX_SRC) $(IO_SRC) $(PRO_SRC) $(MATH_SRC) \
+SRCS		:= \
+		$(GFX_SRC) $(IO_SRC) $(MATH_SRC) $(PRO_SRC) \
 		$(SND_SRC) $(SPA_SRC) $(SYS_SRC) $(TYP_SRC)
 
-OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
+OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(BUILD_DIR)/include)
 LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
