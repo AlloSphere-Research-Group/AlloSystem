@@ -3,6 +3,11 @@
 # Build and run source file in browser using Emscripten
 # Note that the first time running this may take some time as Emscripten configures its libraries.
 
+if [ $# -eq 0 ]; then
+	echo "Usage: ./$(basename "$0") [SOURCE FILE]"
+	exit
+fi
+
 if [[ `echo $EM_CONFIG` ]]; then
 	# Assume PATH already configured via emsdk_env.sh
 	EM_DIR=
@@ -39,19 +44,20 @@ if [ $EXT != "c" ]; then #since so many C++ extensions
 	CXXFLAGS="-std=c++14"
 	#CXXFLAGS+=" -fno-rtti"
 fi
-EMFLAGS+=" --use-port=sdl3"
-#EMFLAGS+=" -s LEGACY_GL_EMULATION=1"
-#EMFLAGS+=" -s USE_WEBGL2=1" #default, recommended setting
+EMFLAGS+="--use-port=sdl3"
+#EMFLAGS+=" -sLEGACY_GL_EMULATION=1"
+#EMFLAGS+=" -sUSE_WEBGL2=1" #default, recommended setting
 EMFLAGS+=" -sFULL_ES2" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
 EMFLAGS+=" -sFULL_ES3" #OpenGL ES 3.0 emulation (req'd for GL_UNSIGNED_INT indices)
 EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
 EMFLAGS+=" -sALLOW_MEMORY_GROWTH=1" # allow heap allocs beyond INITIAL_MEMORY, o.w. aborts
+EMFLAGS+=" -sEXPORTED_FUNCTIONS=_main,_malloc,_free" # req'd to prevent stripping of said em functions (_main MUST be here if exporting any other functions)
 EMFLAGS+=" -sEXPORTED_RUNTIME_METHODS=ccall" # req'd to call C functions from JS
-#EMFLAGS+=" -s ASSERTIONS=1" # get more info on runtime errors
+#EMFLAGS+=" -sASSERTIONS=1" # get more info on runtime errors
 #EMFLAGS+=" --cpuprofiler" # adds profiler to generated page
 #EMFLAGS+=" -fsanitize=undefined" # undefined behavior sanitizer
 #EMFLAGS+=" -lwebsocket.js" #WebSockets API
-#EMFLAGS+=" -lwebsocket.js -s PROXY_POSIX_SOCKETS=1 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1" #full POSIX socket emulation over WebSockets
+#EMFLAGS+=" -lwebsocket.js -sPROXY_POSIX_SOCKETS=1 -sUSE_PTHREADS=1 -sPROXY_TO_PTHREAD=1" #full POSIX socket emulation over WebSockets
 
 mkdir -p $OUTPUT_DIR
 
@@ -63,13 +69,11 @@ OPTIONS="$(grep "$PRAGMA_KEY" $1 | grep -v "^[[:blank:]]*//")"
 OPTIONS="${OPTIONS//$PRAGMA_KEY /}"
 OPTIONS="${OPTIONS//RUN_MAIN_SOURCE_DIR/$SOURCE_DIR}"
 OPTIONS="$(echo "$OPTIONS" | sed 's/^[ \t]*//;s/[ \t]*$//' | tr '\n' ' ')"
-#echo "$OPTIONS"
-#exit
+#echo "$OPTIONS"; exit
 
 # Build objects of any build-and-run sources
 ${EM_DIR}emmake make runobjs PLATFORM=em ARCH=none BUILD_DIR=$BUILD_DIR RUN_DIR=$SOURCE_DIR
 
-#${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.html
 ${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js $OPTIONS
 
 # Exit if compilation errors...
