@@ -1,6 +1,7 @@
 #### Input variables:
 # RUN_DIRS must contain the directory of the source file to be executed.
-# RUN_SRC_DIRS only additional source code (e.g., libraries) to be compiled and linked into the executable.
+# RUN_SRC_DIRS contain additional source code (e.g., libraries) to be compiled and linked into the executable.
+# EXE_EXT is an optional extension appended to the produced executable (e.g., .exe)
 # ALL_CXXFLAGS is defined in Makefile.rules.
 
 # Include user file, if present
@@ -54,7 +55,7 @@ $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.t
 $(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_DIR="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	$(CXX) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
+	$(CXX) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F)$(EXE_EXT) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
     ifneq ($(BUILD_CONFIG), Debugger)
 	@cd $(BIN_DIR) && ./$(*F)
