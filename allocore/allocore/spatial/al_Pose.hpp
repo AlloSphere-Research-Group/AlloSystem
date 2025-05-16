@@ -119,6 +119,10 @@ public:
 	double z() const { return mVec[2]; }
 
 	/// Convert to 4x4 projection space matrix
+
+	/// The first three columns hold the right, up and back vectors,
+	/// respectively, according to a right-handed convention. The last column
+	/// holds the position.
 	Mat4d matrix() const;
 
 	/// Convert to 4x4 direction matrix
@@ -309,6 +313,9 @@ public:
 
 	/// Go to origin, reset orientation
 	Nav& home();
+
+	/// Finish any tweening (go directly to final target)
+	Nav& finish();
 
 	Nav& operator=(const Pose& v);
 

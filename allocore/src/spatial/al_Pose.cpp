@@ -136,6 +136,14 @@ Nav& Nav::home(){
 	return *this;
 }
 
+Nav& Nav::finish(){
+	auto s = mSmooth;
+	mSmooth = 0.f;
+	step(1.);
+	mSmooth = s;
+	return *this;
+}
+
 Nav& Nav::operator=(const Pose& v){
 	Pose::operator=(v);
 	return *this;
@@ -144,7 +152,7 @@ Nav& Nav::operator=(const Pose& v){
 void Nav::step(double dt){
 	mVelScale = dt;
 
-	double amt = 1.-smooth();	// TODO: adjust for dt
+	double amt = 1.-mSmooth;	// TODO: adjust for dt
 
 	// Low-pass filter velocities
 	mMove1.lerp(mMove0*dt + mNudge, amt);
