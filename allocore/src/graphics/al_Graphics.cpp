@@ -259,11 +259,11 @@ precision mediump float; // req'd by ES2
 mPreamble
 + R"(
 const float pi = 3.141592653589793;
-varying vec3 pos;		// position (eye space)
-varying vec3 normal;	// normal (eye space)
-varying vec3 posObj;	// position (object space)
-varying vec4 color;
-varying vec2 texCoord2;
+varying vec3 vpos;		// position (eye space)
+varying vec3 vnrm;		// normal (eye space)
+varying vec3 vposObj;	// position (object space)
+varying vec4 vcol;
+varying vec2 vtc2;
 
 uniform mat4 view;		// view matrix (convert from world to eye space)
 uniform bool doTex2;
@@ -294,25 +294,19 @@ attribute vec4 colIn;
 attribute vec2 tcIn;
 
 void main(){
-	posObj = posIn;
-	color = singleColor.a==8192. ? colIn : singleColor;
-	if(hasNormals){
-		normal = normalMatrix * nrmIn;
-	} else {
-		normal = vec3(1.,0.,0.);
-	}
-	if(doTex2){
-		texCoord2 = tcIn;
-	}
+	vposObj = posIn;
+	vcol = singleColor.a==8192. ? colIn : singleColor;
+	vnrm = hasNormals ? normalMatrix * nrmIn : vec3(1.,0.,0.);
+	if(doTex2) vtc2 = tcIn;
 	gl_PointSize = pointSize;
 )" +
 	mOnVertex +
 R"(
-	pos = (MV * vec4(posObj,1.)).xyz; // to eye space
-	gl_Position = P * vec4(pos,1.); // to screen space
+	vpos = (MV * vec4(vposObj,1.)).xyz; // to eye space
+	gl_Position = P * vec4(vpos,1.); // to screen space
 
 	// fogMix: [0,1] -> [start, end]
-	fogMix = clamp((-pos.z - fog.start) * fog.scale, 0.,1.);
+	fogMix = clamp((-vpos.z - fog.start) * fog.scale, 0.,1.);
 }
 )",
 
@@ -460,8 +454,9 @@ vec3 lightColor(
 }
 
 void main(){
-	vec4 col = color;
-	vec2 tc2 = texCoord2;
+	vec3 pos = vpos;
+	vec4 col = vcol;
+	vec2 tc2 = vtc2;
 )" +
 	mOnFragmentPre +
 R"(
@@ -472,7 +467,7 @@ R"(
 	mOnAlpha +
 R"(
 	if(doLighting){
-		vec3 N = normalize(normal);
+		vec3 N = normalize(vnrm);
 		vec3 V = normalize(-pos); // surface to eye
 		// Two-sided lighting: make normal always face eye
 		if(lightTwoSided && !gl_FrontFacing) N=-N;
