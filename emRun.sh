@@ -45,8 +45,9 @@ if [ $EXT != "c" ]; then #since so many C++ extensions
 	#CXXFLAGS+=" -fno-rtti"
 fi
 EMFLAGS+="--use-port=sdl3"
-#EMFLAGS+=" -sLEGACY_GL_EMULATION=1"
-#EMFLAGS+=" -sUSE_WEBGL2=1" #default, recommended setting
+#EMFLAGS+=" -sLEGACY_GL_EMULATION"
+#EMFLAGS+=" -sUSE_WEBGL2" #default, recommended setting
+#EMFLAGS+=" -sMAX_WEBGL_VERSION=2"
 EMFLAGS+=" -sFULL_ES2" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
 EMFLAGS+=" -sFULL_ES3" #OpenGL ES 3.0 emulation (req'd for GL_UNSIGNED_INT indices)
 EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
