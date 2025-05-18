@@ -461,8 +461,12 @@ vec3 lightColor(
 
 void main(){
 	vec4 col = color;
+	vec2 tc2 = texCoord2;
+)" +
+	mOnFragmentPre +
+R"(
 	if(doTex2){
-		col *= texture2D(tex2, texCoord2);
+		col *= texture2D(tex2, tc2);
 	}
 )" +
 	mOnAlpha +
@@ -779,7 +783,7 @@ protected:
 		}
 	};
 	AttribLocs mDefaultAttribLocs, mAttribLocs;
-	std::string mPreamble, mOnVertex, mOnLight, mOnAlpha, mOnMaterial;
+	std::string mPreamble, mOnVertex, mOnFragmentPre, mOnAlpha, mOnMaterial, mOnLight;
 	Color mCurrentColor;
 	ShaderData<float> mPointSize{1};
 	std::vector<Colori> mColorArray;
@@ -1160,9 +1164,9 @@ Graphics& Graphics::shaderOnVertex(const std::string& s){
 	}
 	return *this;
 }
-Graphics& Graphics::shaderOnLight(const std::string& s){
+Graphics& Graphics::shaderOnFragmentPre(const std::string& s){
 	if(mBackends[PROG]){
-		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnLight = s;
+		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnFragmentPre = s;
 	}
 	return *this;
 }
@@ -1175,6 +1179,12 @@ Graphics& Graphics::shaderOnAlpha(const std::string& s){
 Graphics& Graphics::shaderOnMaterial(const std::string& s){
 	if(mBackends[PROG]){
 		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnMaterial = s;
+	}
+	return *this;
+}
+Graphics& Graphics::shaderOnLight(const std::string& s){
+	if(mBackends[PROG]){
+		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnLight = s;
 	}
 	return *this;
 }
