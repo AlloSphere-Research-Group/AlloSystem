@@ -242,7 +242,8 @@ public:
 
 	/// The base name is everything following the last slash.
 	/// @param[in] path		The input path
-	/// @param[in] suffix	An optional suffix to strip from the end of the base name
+	/// @param[in] suffix	An optional suffix to strip from the end of the base
+	///						name. To remove the extension, use ".*".
 	static std::string baseName(const std::string& path, const std::string& suffix="");
 
 	/// Returns the directory part of path.
