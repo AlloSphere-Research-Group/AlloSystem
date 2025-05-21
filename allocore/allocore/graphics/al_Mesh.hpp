@@ -629,7 +629,18 @@ public:
 	/// @param[in] filePath		path of object file to load
 	bool load(const std::string& filePath);
 
+	/// Load file from memory
+
+	/// @param[in] filePath		Path to file or file name used as a hint to  
+	///							check extension (no files are opened)
+	/// @param[in] data			Buffer containing file data
+	/// @param[in] numBytes		Size of buffer, in bytes
+	bool load(const std::string& filePath, const void * data, int numBytes);
+
+	/// Load OBJ file from memory
 	bool loadOBJ(const void * data, int numBytes);
+
+	/// Load PLY file from memory
 	bool loadPLY(const void * data, int numBytes);
 
 

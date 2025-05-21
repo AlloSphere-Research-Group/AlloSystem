@@ -1752,19 +1752,22 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 	return true;
 }
 
+bool load(Mesh& mesh, const std::string& filePath, std::istream& is){
+	auto ext = extension(filePath);
+	bool res = false;
+	if("ply" == ext)		res = al::loadPLY(mesh, is);
+	else if("obj" == ext)	res = al::loadOBJ(mesh, is);
+	if(res){
+		if(mesh.wants(Mesh::NORMAL)) mesh.ensureNormals();
+	}
+	return res;
+}
 
 bool Mesh::load(const std::string& filePath){
 	std::filebuf fb;
 	if(!fb.open(filePath, std::ios::in | std::ios::binary)) return false;
 	std::istream is(&fb);
-	auto ext = extension(filePath);
-	bool res = false;
-	if("ply" == ext)		res = al::loadPLY(*this, is);
-	else if("obj" == ext)	res = al::loadOBJ(*this, is);
-	if(res){
-		if(mAttribHint & Mesh::NORMAL) ensureNormals();
-	}
-	return res;
+	return al::load(*this, filePath, is);
 }
 
 // Must subclass streambuf for reading raw bytes
@@ -1774,6 +1777,12 @@ struct imembuf : public std::streambuf {
 		setg(ptr, ptr, ptr+len);
 	}
 };
+
+bool Mesh::load(const std::string& filePath, const void * data, int numBytes){
+	imembuf buf(data, numBytes);
+	std::istream is(&buf);
+	return al::load(*this, filePath, is);
+}
 
 #define LOAD_MEM(TYPE)\
 bool Mesh::load##TYPE(const void * data, int numBytes){\
