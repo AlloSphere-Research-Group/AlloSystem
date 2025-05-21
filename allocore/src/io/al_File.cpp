@@ -1,4 +1,5 @@
 #include <algorithm> // sort
+#include <cctype> // tolower
 #include <cstring>
 #include <fstream> // ifstream, ofstream
 #include <memory>
@@ -674,10 +675,14 @@ static char getDelimiter(const std::string& path){
 	return "." AL_FILE_DELIMITER_STR;
 }
 
-/*static*/ std::string File::extension(const std::string& path){
+/*static*/ std::string File::extension(const std::string& path, bool excPeriod, bool toLower){
 	size_t pos = path.find_last_of('.');
 	if(path.npos != pos){
-		return path.substr(pos);
+		auto s = path.substr(pos + int(excPeriod));
+		if(toLower){
+			for(auto& c : s) std::tolower(c);
+		}
+		return s;
 	}
 	return "";
 }

@@ -255,9 +255,13 @@ public:
 
 	/// Returns extension of file name.
 
-	/// The extension is everything including and after the last period.
-	/// If there is no period, an empty string is returned.
-	static std::string extension(const std::string& path);
+	/// The extension is everything after the last period and may or may not
+	/// include the period.
+	/// @param[in] path			File path
+	/// @param[in] excPeriod	Whether to exclude period from result
+	/// @param[in] toLower		Whether to convert result to lowercase
+	/// \returns the extension, otherwise, if no period is found, an empty string.
+	static std::string extension(const std::string& path, bool excPeriod=false, bool toLower=false);
 
 	/// Returns string with extension replaced
 
