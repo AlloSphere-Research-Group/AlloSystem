@@ -680,7 +680,7 @@ static char getDelimiter(const std::string& path){
 	if(path.npos != pos){
 		auto s = path.substr(pos + int(excPeriod));
 		if(toLower){
-			for(auto& c : s) std::tolower(c);
+			for(auto& c : s) c = std::tolower(c);
 		}
 		return s;
 	}
