@@ -769,6 +769,8 @@ protected:
 	class BackendFixed;
 	Backend * mBackends[2] = {0};
 	Backend * mBackend = 0;
+	BackendProg * backendProg();
+	BackendFixed * backendFixed();
 
 	template <class T, class Loc=int>
 	class ShaderData{

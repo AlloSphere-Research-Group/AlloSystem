@@ -999,6 +999,19 @@ private:
 	std::vector<unsigned short> mIndices16;
 	mutable Mat4f mModelViewTemp, mProjectionTemp;
 };
+#else
+// No fixed pipeline, so fall back to dummy. Note, it might be more useful if this had some graphics state (matrix stack, etc.) as with BackendProg.
+class Graphics::BackendFixed : public Graphics::Backend{
+	const Mat4f& modelView() const override {
+		static Mat4f m{1};
+		return m;
+	}
+	const Mat4f& projection() const override {
+		static Mat4f m{1};
+		return m;
+	}
+};
+
 #endif // AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 
 
@@ -1137,9 +1150,16 @@ void Graphics::pipeline(Pipeline p){
 	}
 }
 
+Graphics::BackendProg * Graphics::backendProg(){
+	return dynamic_cast<BackendProg *>(mBackends[PROG]);
+}
+Graphics::BackendFixed * Graphics::backendFixed(){
+	return dynamic_cast<BackendFixed *>(mBackends[FIXED]);
+}
+
 ShaderProgram& Graphics::shader(){
 	if(mBackends[PROG]){
-		auto * backend = dynamic_cast<BackendProg *>(mBackends[PROG]);
+		auto * backend = backendProg();
 		backend->validateShader();
 		return backend->mShader;
 	} else {
@@ -1149,45 +1169,33 @@ ShaderProgram& Graphics::shader(){
 }
 
 Graphics& Graphics::shaderPreamble(const std::string& s){
-	if(mBackends[PROG]){
-		dynamic_cast<BackendProg *>(mBackends[PROG])->mPreamble = s;
-	}
+	if(mBackends[PROG]) backendProg()->mPreamble = s;
 	return *this;
 }
 Graphics& Graphics::shaderOnVertex(const std::string& s){
-	if(mBackends[PROG]){
-		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnVertex = s;
-	}
+	if(mBackends[PROG]) backendProg()->mOnVertex = s;
 	return *this;
 }
 Graphics& Graphics::shaderOnFragmentPre(const std::string& s){
-	if(mBackends[PROG]){
-		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnFragmentPre = s;
-	}
+	if(mBackends[PROG]) backendProg()->mOnFragmentPre = s;
 	return *this;
 }
 Graphics& Graphics::shaderOnAlpha(const std::string& s){
-	if(mBackends[PROG]){
-		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnAlpha = s;
-	}
+	if(mBackends[PROG]) backendProg()->mOnAlpha = s;
 	return *this;
 }
 Graphics& Graphics::shaderOnMaterial(const std::string& s){
-	if(mBackends[PROG]){
-		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnMaterial = s;
-	}
+	if(mBackends[PROG]) backendProg()->mOnMaterial = s;
 	return *this;
 }
 Graphics& Graphics::shaderOnLight(const std::string& s){
-	if(mBackends[PROG]){
-		dynamic_cast<BackendProg *>(mBackends[PROG])->mOnLight = s;
-	}
+	if(mBackends[PROG]) backendProg()->mOnLight = s;
 	return *this;
 }
 
 Graphics& Graphics::setShader(ShaderProgram& shader, const std::function<void(void)>& onBind){
 	if(mBackends[PROG]){
-		auto * backend = dynamic_cast<BackendProg *>(mBackends[PROG]);
+		auto * backend = backendProg();
 		backend->mDrawShader = &shader;
 		if(&shader != &backend->mShader){
 			shader.begin();
@@ -1205,9 +1213,7 @@ Graphics& Graphics::unsetShader(){
 }
 
 Graphics& Graphics::shaderAutoBind(bool v){
-	if(mBackends[PROG]){
-		dynamic_cast<BackendProg *>(mBackends[PROG])->mShaderAutoBind = v;
-	}
+	if(mBackends[PROG]) backendProg()->mShaderAutoBind = v;
 	return *this;
 }
 
