@@ -710,6 +710,12 @@ public:
 		return setShader(v, onBind).unsetShader();
 	}
 
+	/// Set whether shader should be automatically bound/unbound around draw calls
+
+	/// By setting this to false, the user is responsible for ensuring the
+	/// shader is bound before any calls to draw or prepareDraw.
+	Graphics& shaderAutoBind(bool v);
+
 	/// Set current vertex buffer and optionally update
 
 	/// The buffer is automatically updated the first time a mesh is used.

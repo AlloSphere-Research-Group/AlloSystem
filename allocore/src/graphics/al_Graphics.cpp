@@ -545,7 +545,7 @@ R"(
 		auto& mView = mGraphics.mView;
 		auto& mUpdateView = mGraphics.mUpdateView;
 
-		mShader.begin();
+		if(mShaderAutoBind) mShader.begin();
 			if(mMatrixStacks[MODELVIEW].handleUpdate()){
 				// Needed to correctly convert normals into eye space
 				mShader.uniform("normalMatrix", normalMatrix(modelView()));
@@ -637,7 +637,7 @@ R"(
 				}
 			}
 
-		mShader.end();
+		if(mShaderAutoBind) mShader.end();
 
 		mUpdateView = false;
 
@@ -709,7 +709,7 @@ R"(
 
 		auto& shader = *mDrawShader;
 
-		shader.begin();
+		if(mShaderAutoBind) shader.begin();
 			if(&shader == &mShader){ // using built-in shader
 				shader.uniform("singleColor", singleColor);
 				shader.uniform("hasNormals", hasNrm);
@@ -731,7 +731,7 @@ R"(
 			else{
 				glDrawArrays(m.primitive, m.begin, m.count);
 			}
-		shader.end();
+		if(mShaderAutoBind) shader.end();
 
 		glDisableVertexAttribArray(mAttribLocs.pos());
 		if(hasCol) glDisableVertexAttribArray(mAttribLocs.col());
@@ -783,6 +783,7 @@ protected:
 	ShaderData<float> mPointSize{1};
 	std::vector<Colori> mColorArray;
 	bool mCompileShader = true;
+	bool mShaderAutoBind = true;
 };
 #endif // AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 
@@ -1201,6 +1202,13 @@ Graphics& Graphics::setShader(ShaderProgram& shader, const std::function<void(vo
 }
 Graphics& Graphics::unsetShader(){
 	return setShader(shader());
+}
+
+Graphics& Graphics::shaderAutoBind(bool v){
+	if(mBackends[PROG]){
+		dynamic_cast<BackendProg *>(mBackends[PROG])->mShaderAutoBind = v;
+	}
+	return *this;
 }
 
 void Graphics::setVertexBuffer(const Mesh& m, bool updateBuffer){
