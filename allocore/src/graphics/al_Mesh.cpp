@@ -558,21 +558,15 @@ Mesh& Mesh::fitToSphere(float radius){
 	return *this;
 }
 
-Mesh& Mesh::fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius, bool proportional){
+void Mesh::fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius, bool proportional) const{
 	Vertex min(0), max(0);
 	bounds(min, max);
-	// span of each axis:
-	auto span = max-min;	// positive only
-	// center of each axis:
-	center = min + (span * 0.5);
-	// axis scalar:
-	scale = (2.f*radius)/span; // positive only
-
-	// adjust to use scale of largest axis:
+	auto radii = (max-min)*0.5f; // positive only
+	center = min + radii;
+	scale = radius/radii; // positive only
 	if(proportional){
 		scale = std::min({scale.x, scale.y, scale.z});
 	}
-	return *this;
 }
 
 Mesh& Mesh::fitToCube(float radius, bool proportional){

@@ -474,7 +474,14 @@ public:
 	/// Scales and translates vertices to lie in cube
 	Mesh& fitToCube(float radius=1, bool proportional=true);
 
-	Mesh& fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius=1, bool proportional=true);
+	/// Get translation and scaling amounts that would fit mesh to cube
+
+	/// Positions can be fitted in the cube via (p - center)*scale.
+	/// @param[out] center			center of mesh bounding box
+	/// @param[out] scale			scaling to fit in signed unit interval [-1,1]
+	/// @param[in]  radius			radius of cube
+	/// @param[in]  proportional	whether scaling is uniform
+	void fitToCubeTransform(Vec3f& center, Vec3f& scale, float radius=1, bool proportional=true) const;
 
 	/// Scales and translates vertices to lie in cube with extrema [-1,1]
 	Mesh& unitize(bool proportional=true);
