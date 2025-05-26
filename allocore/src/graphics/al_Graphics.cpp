@@ -306,7 +306,7 @@ R"(
 	gl_Position = P * vec4(vpos,1.); // to screen space
 
 	// fogMix: [0,1] -> [start, end]
-	fogMix = clamp((-vpos.z - fog.start) * fog.scale, 0.,1.);
+	fogMix = (-vpos.z - fog.start) * fog.scale;
 }
 )",
 
@@ -480,7 +480,7 @@ R"(
 R"(
 		col.rgb = lightColor(pos, N, V, material);
 	}
-	col.rgb = mix(col.rgb, fog.color, fogMix);
+	col.rgb = mix(col.rgb, fog.color, clamp(fogMix,0.,1.));
 	gl_FragColor = col;
 	//gl_FragColor = vec4(1.,0.,0.,1.); //debug
 }
