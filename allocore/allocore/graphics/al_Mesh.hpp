@@ -128,6 +128,12 @@ public:
 		}
 	};
 
+	struct NamedGroup : public Group{
+		std::string name;
+	};
+
+	typedef Buffer<NamedGroup> NamedGroups;
+
 
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0);
@@ -663,6 +669,9 @@ public:
 	Mesh& visible(bool v){ mVisible=v; return *this; }
 	Mesh& visibleToggle(){ mVisible^=true; return *this; }
 
+	const NamedGroups& groups() const { return mGroups; }
+	NamedGroups& groups(){ return mGroups; }
+
 	/// Print information about Mesh
 	void print(FILE * dst = stdout) const;
 
@@ -684,6 +693,7 @@ protected:
 	TexCoord2s mTexCoord2s;
 	TexCoord3s mTexCoord3s;
 	Indices mIndices;
+	NamedGroups mGroups;
 
 	int mPrimitive;
 	Attrib mAttribHint = Attrib(0);

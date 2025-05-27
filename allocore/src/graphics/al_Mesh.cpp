@@ -48,6 +48,7 @@ Mesh& Mesh::reset() {
 	mTexCoord2s.reset();
 	mTexCoord3s.reset();
 	mIndices.reset();
+	mGroups.reset();
 	return *this;
 }
 
@@ -1667,6 +1668,17 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 	std::vector<Vec3f> Ns;
 	char attr = 0; // 'p', 'n', 't', 'f'
 
+	int groupIdx = 0;
+
+	auto addGroup = [&](const std::string& name){
+		Mesh::NamedGroup g;
+		g.name = name;
+		g.begin = groupIdx;
+		g.end = mesh.vertices().size();
+		groupIdx = g.end;
+		mesh.groups().push_back(g);
+	};
+
 	while(is){
 		getLineTrim(is, buf, " \r\t");
 		if(buf.empty() || '#'==buf[0]) continue;
@@ -1738,8 +1750,12 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 					//mesh.index(i0.p, i1.p, i2.p);
 				}
 			}
-		} else if("g"==tokens[0]){
-			// object name
+		} else if("o"==tokens[0]){ // object
+			addGroup(tokens[1]);
+		} else if("g"==tokens[0]){ // group (typically just before faces)
+			addGroup(tokens[1]);
+		} else if("usemtl"==tokens[0]){ // material identifier (typically after a "g")
+
 		}
 	}
 
