@@ -317,8 +317,10 @@ public:
 	const T& front() const { return const_cast<Vec*>(this)->front(); }
 
 	/// Access last element
-	T& back(){ return at<N-1>(); }
-	const T& back() const { return const_cast<Vec*>(this)->back(); }
+	template <int I=0>
+	T& back(){ return at<N-1-I>(); }
+	template <int I=0>
+	const T& back() const { return const_cast<Vec*>(this)->back<I>(); }
 
 	Vec& operator = (const T& v){ return fill(v); }
 
