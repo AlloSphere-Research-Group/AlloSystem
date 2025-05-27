@@ -122,6 +122,8 @@ public:
 	/// @param[in] compressFlags level of compression in [0,100] and other flags
 	/// @param[in] paletteSize	number of colors in palette, in [2,256]
 	static bool save(const std::string& filePath, const Array& src, int compressFlags=50, int paletteSize=-1);
+
+	/// Save pixel data to memory
 	static bool save(FileType t, ByteArray& dst, const Array& src, int compressFlags=50, int paletteSize=-1);
 
 	/// Save pixel data to disk
