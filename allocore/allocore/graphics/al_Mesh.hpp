@@ -117,6 +117,9 @@ public:
 		/// Get number of vertices
 		int count() const { return end - begin; }
 
+		/// \returns true if there are no vertices
+		bool empty() const { return begin==end; }
+
 		/// Convert mesh (parent) index to local index
 		int local(int i) const { return i - begin; }
 
