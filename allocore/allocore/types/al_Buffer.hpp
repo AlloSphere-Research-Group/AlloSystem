@@ -205,9 +205,7 @@ public:
 
 	/// Appends element to end of buffer growing its size if necessary
 	void append(const T& v){
-		if(mEnd == mCapEnd) grow(); // Grow array if too small
-		new(mEnd) T(v);
-		mEnd++;
+		emplace_back(v);
 	}
 	/// synonym for append():
 	void push_back(const T& v) { append(v); }
@@ -231,6 +229,16 @@ public:
 	/// Repeat last element
 	void repeatLast(){ append(T(last())); }
 	template <int N> void repeatLast(){ for(int i=0;i<N;++i) append(T(last())); }
+
+	/// Construct and append element
+	template <class... Args>
+	void emplace_back(Args&&... args){
+        if(mEnd == mCapEnd){ // Grow if out of memory
+			size_t newCap = capacity() > 0 ? capacity() * 2 : 2;
+			reserve(newCap);
+		}
+        new(mEnd++) T(std::forward<Args>(args)...);
+	}
 
 	/// Insert new elements after each existing element
 
@@ -278,11 +286,6 @@ private:
 		mCapEnd = mData + newCap;
 		if(tmpSize >= newCap){ mEnd = mCapEnd; }
 		else{ mEnd = mData + tmpSize; }
-	}
-
-	void grow(){
-		size_t newCap = capacity() > 0 ? capacity() * 2 : 2;
-		reserve(newCap);
 	}
 };
 
