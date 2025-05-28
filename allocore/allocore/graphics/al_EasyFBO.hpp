@@ -102,10 +102,14 @@ struct EasyFBO {
 	/// Get modelview matrix
 	const Matrix4d& modelView() const { return mMV; }
 	Matrix4d& modelView(){ return mMV; }
+	/// Set modelview matrix
+	EasyFBO& modelView(const Matrix4d& m){ mMV=m; return *this; }
 
 	/// Get projection matrix
 	const Matrix4d& projection() const { return mProj; }
 	Matrix4d& projection(){ return mProj; }
+	/// Set projection matrix
+	EasyFBO& projection(const Matrix4d& m){ mProj=m; return *this; }
 
 	/// Set clear color
 	EasyFBO& clearColor(const Color& c){ mClearColor=c; return *this; }
