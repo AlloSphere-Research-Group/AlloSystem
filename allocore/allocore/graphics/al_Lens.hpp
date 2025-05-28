@@ -118,11 +118,6 @@ protected:
 	double mEyeSep;				// Eye separation
 };
 
-
-/// Typedef for backwards compatability
-typedef Lens Camera;
-
-
 } // al::
 
 #endif
