@@ -54,7 +54,10 @@ namespace al{
 
 /// This buffer automatically expands itself as new elements are added.
 /// Additionally, its logical size can be reduced without triggering memory
-/// deallocations.
+/// deallocations. For performance reasons, functions may take a const reference
+/// to an element instead of copy. In cases where the reference is an element in
+/// the array and the function might trigger a new memory allocation
+/// (e.g., resize and append), then a copy should be passed in.
 template <class T>
 class Buffer{
 public:
@@ -121,7 +124,7 @@ public:
 			delete[] oldData;
 		}
 		mEnd = mData+n;
-		for(auto& elem : *this){ new(&elem) value_type(v); }
+		for(auto& elem : *this){ new(&elem) T(v); }
 	}
 
 	/// Get last element
@@ -157,7 +160,7 @@ public:
 	/// otherwise the buffer is extended and new elements are default-constructed.
 	/// If n is also larger than the capacity, then the capacity is increased.
 	void resize(size_t n){
-		resize(n, value_type());
+		resize(n, T());
 	}
 
 	/// Resize buffer
@@ -166,18 +169,18 @@ public:
 	/// otherwise the buffer is extended and new elements are copy-constructed 
 	/// from the provided val.
 	/// If n is also larger than the capacity, then the capacity is increased.
-	void resize(size_t n, const value_type& val){
+	void resize(size_t n, const T& val){
 		if(n > size()){ // sizing up
 			reserve(n);
 			// construct new elements
 			for(auto it = mEnd; it != mData+n; ++it){
-				new(it) value_type(val);
+				new(it) T(val);
 			}
 		}
 		else{ // sizing down
 			// destruct removed elements
 			for(auto it = mData+n; it != mEnd; ++it){
-				it->~value_type();
+				it->~T();
 			}
 		}
 		mEnd = mData+n;
@@ -202,14 +205,8 @@ public:
 
 	/// Appends element to end of buffer growing its size if necessary
 	void append(const T& v){
-		// Grow array if too small
-		if(mEnd == mCapEnd){
-			// Copy argument since it may be an element in current memory range
-			// which may become invalid after the resize.
-			size_t newCapacity = capacity() > 0 ? capacity() * 2 : 2;
-			reserve(newCapacity);
-		}
-		new(mEnd) value_type(v);
+		if(mEnd == mCapEnd) grow(); // Grow array if too small
+		new(mEnd) T(v);
 		mEnd++;
 	}
 	/// synonym for append():
@@ -232,8 +229,8 @@ public:
 	}
 
 	/// Repeat last element
-	void repeatLast(){ append(last()); }
-	template <int N> void repeatLast(){ for(int i=0;i<N;++i) append(last()); }
+	void repeatLast(){ append(T(last())); }
+	template <int N> void repeatLast(){ for(int i=0;i<N;++i) append(T(last())); }
 
 	/// Insert new elements after each existing element
 
@@ -251,8 +248,8 @@ public:
 				for(size_t i = 0, iExp = 0; i < size(); i++, iExp+=n){
 					mData[iExp] = std::move(oldData[i]);
 					for(size_t j = 1; j < n; j++){
-						if(dup)	new(mData+(iExp +j)) value_type(mData[iExp]);
-						else	new(mData+(iExp +j)) value_type();
+						if(dup)	new(mData+(iExp +j)) T(mData[iExp]);
+						else	new(mData+(iExp +j)) T();
 					}
 				}
 				delete[] oldData;
@@ -260,8 +257,8 @@ public:
 			else{
 				for(size_t i = size()-1, iExp = newSize-1; i != static_cast<size_t>(-1); i--){
 					for(size_t k = 0; k < n; k++, iExp--){
-						if(k==n-1 || dup)	new(mData+iExp) value_type(mData[i]);
-						else				new(mData+iExp) value_type();
+						if(k==n-1 || dup)	new(mData+iExp) T(mData[i]);
+						else				new(mData+iExp) T();
 					}
 				}
 			}
@@ -274,13 +271,18 @@ private:
 	T* mEnd = nullptr;
 	T* mCapEnd = nullptr;
 
-	void alloc(size_t newCapacity){
-		if(newCapacity<=0){ newCapacity = 2; }
+	void alloc(size_t newCap){
+		if(newCap<=0){ newCap = 2; }
 		auto tmpSize = size();
-		mData = new T[newCapacity];
-		mCapEnd = mData + newCapacity;
-		if(tmpSize >= newCapacity){ mEnd = mCapEnd; }
+		mData = new T[newCap];
+		mCapEnd = mData + newCap;
+		if(tmpSize >= newCap){ mEnd = mCapEnd; }
 		else{ mEnd = mData + tmpSize; }
+	}
+
+	void grow(){
+		size_t newCap = capacity() > 0 ? capacity() * 2 : 2;
+		reserve(newCap);
 	}
 };
 
