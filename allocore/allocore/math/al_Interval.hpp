@@ -129,8 +129,8 @@ public:
 
 	/// Set the endpoints
 	Interval& endpoints(const T& min, const T& max){
-		mMax=max; mMin=min;
-		if(mMin > mMax){ T t=mMin; mMin=mMax; mMax=t; }
+		if(mMin <= mMax){ mMin=min; mMax=max; }
+		else { mMin=max; mMax=min;  }
 		return *this;
 	}
 
