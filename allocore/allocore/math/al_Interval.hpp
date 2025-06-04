@@ -64,42 +64,43 @@ public:
 	Interval(const T& min, const T& max)
 	{ endpoints(min,max); }
 
-	T diameter() const { return max()-min(); }		///< Returns absolute difference of endpoints
+	T diameter() const { return mMax-mMin; }		///< Returns absolute difference of endpoints
 	T size() const { return diameter(); }			///< Returns absolute difference of endpoints
 	T radius() const { return diameter()/T(2); }	///< Returns one-half the diameter
 	const T& max() const { return mMax; }			///< Get maximum endpoint
 	const T& min() const { return mMin; }			///< Get minimum endpoint
-	T center() const { return (max()+min())/T(2); }	///< Returns center point
-	bool proper() const { return min()!=max(); }	///< Returns true if diameter is non-zero
-	bool degenerate() const { return min()==max(); }///< Returns true if diameter is zero
+	T center() const { return (mMax+mMin)/T(2); }	///< Returns center point
+	bool proper() const { return mMin!=mMax; }		///< Returns true if diameter is non-zero
+	bool degenerate() const { return mMin==mMax; }	///< Returns true if diameter is zero
 
 	/// Get absolute value of interval
-	Interval abs() const { return {abs(min()), abs(max())}; }
+	Interval abs() const { return {abs(mMin), abs(mMax)}; }
 
 	/// Returns true if value is in interval
-	bool contains(const T& v) const { return v>=min() && v<=max(); }
+	bool contains(const T& v) const { return v>=mMin && v<=mMax; }
 
 	/// Linearly map point in interval to point in the unit interval [0,1]
-	T toUnit(const T& v) const { return (v-min())/diameter(); }
+	T toUnit(const T& v) const { return proper() ? toUnitUnsafe(v) : T(0); }
+	T toUnitUnsafe(const T& v) const { return (v-mMin)/diameter(); }
 
 	/// Linearly map point in the unit interval [0,1] to point in interval
-	T fromUnit(const T& u) const { return u*diameter() + min(); }
+	T fromUnit(const T& u) const { return u*diameter() + mMin; }
 
 	template <class U>
-	bool operator == (const Interval<U>& v){ return min()==v.min() && max()==v.max(); }
+	bool operator == (const Interval<U>& v){ return mMin==v.mMin && mMax==v.mMax; }
 
 	template <class U>
 	bool operator != (const Interval<U>& v){ return !(*this == v); }
 
 	template <class U>
-	Interval& operator +=(const Interval<U>& v){ endpoints(min()+v.min(), max()+v.max()); return *this; }
+	Interval& operator +=(const Interval<U>& v){ endpoints(mMin+v.mMin, mMax+v.mMax); return *this; }
 
 	template <class U>
-	Interval& operator -=(const Interval<U>& v){ endpoints(min()-v.max(), max()-v.min()); return *this; }
+	Interval& operator -=(const Interval<U>& v){ endpoints(mMin-v.mMax, mMax-v.mMin); return *this; }
 
 	template <class U>
 	Interval& operator *=(const Interval<U>& v){
-		T a=min()*v.min(), b=min()*v.max(), c=max()*v.min(), d=max()*v.max();
+		T a=mMin*v.mMin, b=mMin*v.mMax, c=mMax*v.mMin, d=mMax*v.mMax;
 		mMin = min(min(a,b),min(c,d));
 		mMax = max(max(a,b),max(c,d));
 		return *this;
@@ -107,7 +108,7 @@ public:
 
 	template <class U>
 	Interval& operator /=(const Interval<U>& v){
-		T a=min()/v.min(), b=min()/v.max(), c=max()/v.min(), d=max()/v.max();
+		T a=mMin/v.mMin, b=mMin/v.mMax, c=mMax/v.mMin, d=mMax/v.mMax;
 		mMin = min(min(a,b),min(c,d));
 		mMax = max(max(a,b),max(c,d));
 		return *this;
@@ -137,10 +138,10 @@ public:
 	Interval& translate(const T& v){ mMin+=v; mMax+=v; return *this; }
 
 	/// Set maximum endpoint
-	Interval& max(const T& v){ return endpoints(min(), v); }
+	Interval& max(const T& v){ return endpoints(mMin, v); }
 
 	/// Set minimum endpoint
-	Interval& min(const T& v){ return endpoints(v, max()); }
+	Interval& min(const T& v){ return endpoints(v, mMax); }
 
 
 	/// Initialize interval for fitting to input values
