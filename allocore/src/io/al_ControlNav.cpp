@@ -74,6 +74,8 @@ bool NavInputControl::onMouseDrag(const Mouse& m){
 	if(mUseMouse){
 		auto bubble = mBubbleMouseEvents;
 
+		if(window().keyboard().modifiers()) return true;
+
 		if(m.left()){
 			nav().turnU(-m.dx() * (mMouseSens * M_DEG2RAD));
 			nav().turnR(-m.dy() * (mMouseSens * M_DEG2RAD));
