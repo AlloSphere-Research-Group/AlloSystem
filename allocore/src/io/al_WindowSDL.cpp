@@ -224,8 +224,10 @@ private:
 						win.mDim.t = ev.window.data2;
 						break;
 					case EV_WIN_RESIZE:
+				#ifdef USING_SDL2 // does not appear necessary with SDL3
 					case EV_WIN_SIZE_CHANGE:
-						//printf("Window %d resized to %dx%d\n", ID(), ev.window.data1, ev.window.data2);
+				#endif
+						printf("Window %d resized to %dx%d (ev:%d)\n", ID(), ev.window.data1, ev.window.data2, ev.type);
 						win.mDim.w = ev.window.data1;
 						win.mDim.h = ev.window.data2;
 						win.callHandlersOnResize(win.mDim.w, win.mDim.h);
@@ -605,9 +607,11 @@ void Window::implSetFPS(){
 void Window::implSetFullScreen(){
 	#ifdef AL_EMSCRIPTEN
 		if(mFullScreen){
+			// https://emscripten.org/docs/api_reference/html5.h.html#fullscreen
 			EmscriptenFullscreenStrategy s;
 			s.scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_DEFAULT;
-			s.canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_NONE;
+			//s.canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_NONE; // was this, but doesn't seem to work right...
+			s.canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_HIDEF; // match and render 1:1 to the native display resolution
 			s.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT;
 			s.canvasResizedCallback = nullptr;
 			s.canvasResizedCallbackUserData = nullptr;
