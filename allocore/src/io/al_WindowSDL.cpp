@@ -227,7 +227,7 @@ private:
 				#ifdef USING_SDL2 // does not appear necessary with SDL3
 					case EV_WIN_SIZE_CHANGE:
 				#endif
-						printf("Window %d resized to %dx%d (ev:%d)\n", ID(), ev.window.data1, ev.window.data2, ev.type);
+						//printf("Window %d resized to %dx%d (ev:%d)\n", ID(), ev.window.data1, ev.window.data2, ev.type);
 						win.mDim.w = ev.window.data1;
 						win.mDim.h = ev.window.data2;
 						win.callHandlersOnResize(win.mDim.w, win.mDim.h);
