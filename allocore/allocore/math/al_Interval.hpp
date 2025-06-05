@@ -103,17 +103,19 @@ public:
 	template <class U>
 	Interval& operator *=(const Interval<U>& v){
 		T a=mMin*v.mMin, b=mMin*v.mMax, c=mMax*v.mMin, d=mMax*v.mMax;
-		mMin = min(min(a,b),min(c,d));
-		mMax = max(max(a,b),max(c,d));
-		return *this;
+		return set(
+			min(min(a,b),min(c,d)),
+			max(max(a,b),max(c,d))
+		);
 	}
 
 	template <class U>
 	Interval& operator /=(const Interval<U>& v){
 		T a=mMin/v.mMin, b=mMin/v.mMax, c=mMax/v.mMin, d=mMax/v.mMax;
-		mMin = min(min(a,b),min(c,d));
-		mMax = max(max(a,b),max(c,d));
-		return *this;
+		return set(
+			min(min(a,b),min(c,d)),
+			max(max(a,b),max(c,d))
+		);
 	}
 
 	/// Set center point preserving diameter
@@ -131,9 +133,7 @@ public:
 
 	/// Set the endpoints
 	Interval& endpoints(const T& min, const T& max){
-		if(mMin <= mMax){ mMin=min; mMax=max; }
-		else { mMin=max; mMax=min;  }
-		return *this;
+		return mMin <= mMax ? set(min,max) : set(max,min);
 	}
 
 	/// Translate interval by fixed amount
@@ -145,12 +145,14 @@ public:
 	/// Set minimum endpoint
 	Interval& min(const T& v){ return endpoints(v, mMax); }
 
+	Interval& operator=(const Interval& v){ return set(v.mMin, v.mMax); }
+
+	template <class V>
+	Interval& operator=(const V& v){ return set(v,v); }
 
 	/// Initialize interval for fitting to input values
 	Interval& resetForFitting(T extrema = 3e38){
-		mMin = extrema;
-		mMax = -mMin;
-		return *this;
+		return set(extrema, -extrema);
 	}
 
 	/// Adjust interval to include value
@@ -162,6 +164,11 @@ public:
 
 private:
 	T mMin, mMax;
+
+	// Helper setter, no validation checks
+	Interval& set(const T& min, const T& max){
+		mMin=min; mMax=max; return *this;
+	}
 
 	static const T& min(const T& a, const T& b){ return a<b?a:b; }
 	static const T& max(const T& a, const T& b){ return a>b?a:b; }
