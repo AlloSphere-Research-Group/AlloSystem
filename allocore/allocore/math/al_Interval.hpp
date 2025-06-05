@@ -56,6 +56,8 @@ template <class T>
 class Interval{
 public:
 
+	using value_type = T;
+
 	Interval()
 	:	mMin(0), mMax(1){}
 
