@@ -133,7 +133,7 @@ public:
 
 	/// Set the endpoints
 	Interval& endpoints(const T& min, const T& max){
-		return mMin <= mMax ? set(min,max) : set(max,min);
+		return min <= max ? set(min,max) : set(max,min);
 	}
 
 	/// Translate interval by fixed amount
@@ -165,8 +165,8 @@ public:
 private:
 	T mMin, mMax;
 
-	// Helper setter, no validation checks
-	Interval& set(const T& min, const T& max){
+	// Helper setter, no validation checks, pass-by-value to avoid self-referencing
+	Interval& set(T min, T max){
 		mMin=min; mMax=max; return *this;
 	}
 
