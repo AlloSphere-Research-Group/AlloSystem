@@ -857,6 +857,7 @@ int utMath(){
 		Interval<double> i(0,1);
 
 		assert(i.min()==0 && i.max()==1);
+		assert(i == Interval<double>(0,1));
 
 		i.min(2);
 		assert(i.min()==1 && i.max()==2);
@@ -872,6 +873,13 @@ int utMath(){
 		assert(i.radius()	==1);
 
 		assert(i.proper());
+
+		i = 7;
+		assert(i.degenerate());
+		assert(i.min()==7 && i.max()==7);
+
+		i = Interval<double>(5,6);
+		assert(i == Interval<double>(5,6));
 
 		i.endpoints(0,0);
 		assert(i.degenerate());
@@ -889,11 +897,22 @@ int utMath(){
 
 		i.endpoints(-1, 1);
 		assert(i.toUnit(0) == 0.5);
+		assert(i.fromUnit(0.75) == 0.5);
 
 		assert(Interval<int>(0,1) == Interval<int>(0,1));
 		assert(Interval<int>(0,2) != Interval<int>(0,1));
 		assert((Interval<int>(0,2) += Interval<int>(-1,2)) == Interval<int>(-1,4));
 		assert((Interval<int>(0,2) -= Interval<int>(-1,2)) == Interval<int>(-2,3));
+
+		i.endpoints(7,13);
+		assert(i.contains(7));
+		assert(i.contains(10));
+		assert(i.contains(13));
+		assert(!i.contains(-10));
+		assert(!i.contains(100));
+
+		i.endpoints(1,2).translate(10);
+		assert(i.min()==11 && i.max()==12);
 	}
 
 
