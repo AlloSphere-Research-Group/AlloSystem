@@ -905,9 +905,17 @@ public:
 		return *this;
 	}
 
-	/// Negates all elements
+	/// Negate all elements
 	Vec& negate(){
-		for(auto& v:*this){ v = -v; } return *this;
+		for(auto& v:*this) v = -v;
+		return *this;
+	}
+
+	/// Negate single element
+	template <int i>
+	Vec& negate(){
+		at<i>() = -at<i>();
+		return *this;
 	}
 
 	/// Normalize magnitude (preserving direction)
