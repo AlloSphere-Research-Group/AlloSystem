@@ -1,12 +1,61 @@
 #### Input variables:
 # RUN_DIRS must contain the directory of the source file to be executed.
 # RUN_SRC_DIRS contain additional source code (e.g., libraries) to be compiled and linked into the executable.
-# EXE_EXT is an optional extension appended to the produced executable (e.g., .exe)
+# EXE_EXT is an optional extension appended to the produced executable (e.g., .exe).
+# EXE_DIR is an optional directory into which the executable is placed (default is BIN_DIR).
+# RUN_USER_LDFLAGS are optional LDFLAGS used when linking (typically passed as args to make).
 # ALL_CXXFLAGS is defined in Makefile.rules.
 
-# Include user file, if present
+# Location of executable
+EXE_DIR ?= $(BIN_DIR)
+
+# RUN_DIR shall be the directory part of the source we want to build and run. If not specified, then we extract the directory part from the goal (inside MAKECMDGOALS). For example, if we hand in the goal code/proj/myApp.cpp, then RUN_DIR is set to code/proj/.
 RUN_DIR ?= $(dir $(lastword $(MAKECMDGOALS)))
+
+# Include user file, if present
 -include $(RUN_DIR)Makefile.user
+
+ifeq ($(PLATFORM), em)
+
+CPPFLAGS += -DRUN_MAIN_SOURCE_DIR="\"./\""
+
+# Req'd for window, mouse/keyboard and audio
+RUN_LDFLAGS += --use-port=sdl3
+
+# Choose which OpenGL profile(s) to build against. Options:
+# LEGACY_GL_EMULATION
+# USE_WEBGL2				Default and recommended
+# MAX_WEBGL_VERSION=2
+# FULL_ES2					OpenGL ES 2.0 emulation (req'd for client-side arrays)
+# FULL_ES3					OpenGL ES 3.0 emulation (req'd for GL_UNSIGNED_INT indices)
+
+RUN_LDFLAGS += -sFULL_ES2
+RUN_LDFLAGS += -sFULL_ES3
+
+# To capture stdout, stderr, and exit
+RUN_LDFLAGS += --emrun
+
+# Allow heap allocs beyond INITIAL_MEMORY, o.w. aborts
+RUN_LDFLAGS += -sALLOW_MEMORY_GROWTH=1
+
+# Req'd to prevent stripping of said em functions (_main MUST be here if exporting any other functions)
+RUN_LDFLAGS += -sEXPORTED_FUNCTIONS=_main,_malloc,_free
+
+# Req'd to call C functions from JS
+RUN_LDFLAGS += -sEXPORTED_RUNTIME_METHODS=ccall
+
+# Other flags:
+# -sASSERTIONS=1		Get more info on runtime errors
+# --cpuprofiler			Adds profiler to generated page
+# -fsanitize=undefined	Undefined behavior sanitizer
+# -lwebsocket.js		WebSockets API
+
+else
+
+# For RUN_MAIN_SOURCE_DIR, use directory of target and convert single drive designators /c/ to c:/ to be compatible with Windows file I/O
+CPPFLAGS += -DRUN_MAIN_SOURCE_DIR="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
+
+endif
 
 # Simplify paths (remove ..)
 RUN_SRC_DIRS := $(addsuffix /, $(realpath $(RUN_SRC_DIRS)))
@@ -42,20 +91,19 @@ runobjs: $(RUN_OBJS)
 #%.hpp:
 
 # Compile and run source files in any of the RUN_DIRS directories
+# The rule targets are all valid source files (.cpp, .c, ...) found in RUN_DIRS.
+# The rule must be forced because if the target is also a prereq, then we get a 
+# circular dependency.
 # Note that if any of the directories in RUN_DIRS match those in RUN_SRC_DIRS,
 # a circular dependency is likely to occur with the standard %.o : %.cpp rule.
-# Note, the crazy regex used to determine RUN_MAIN_SOURCE_PATH replaces single
-# letter drive paths /c/ with c:/ which are compatible with Windows file system.
 EXEC_TARGETS := $(addsuffix *.cpp, $(RUN_DIRS)) $(addsuffix *.c, $(RUN_DIRS)) $(addsuffix *.mm, $(RUN_DIRS))
 ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
 endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
-$(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_DIR="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
-#$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	$(CXX) $(ALL_CXXFLAGS) -o $(BIN_DIR)$(*F)$(EXE_EXT) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
+	$(CXX) $(ALL_CXXFLAGS) -o $(EXE_DIR)$(*F)$(EXE_EXT) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(RUN_LDFLAGS) $(RUN_USER_LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
     ifneq ($(BUILD_CONFIG), Debugger)
 	@cd $(BIN_DIR) && ./$(*F)

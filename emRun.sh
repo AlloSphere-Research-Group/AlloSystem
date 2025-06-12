@@ -22,11 +22,13 @@ fi
 #BROWSER=firefox
 if [[ $BROWSER ]]; then BROWSER="--browser $BROWSER"; fi
 
+EM_RUN="${EM_DIR}emrun --no_emrun_detect $BROWSER"
+
 EXT="${1##*.}"
 
-# If passed a .html, just emrun it
+# If passed a .html, just run it
 if [ $EXT == "html" ]; then
-	${EM_DIR}emrun --no_emrun_detect $BROWSER "$1"
+	$EM_RUN "$1"
 	exit
 fi
 
@@ -34,48 +36,24 @@ ALLO_DIR=$PWD
 BUILD_DIR=$ALLO_DIR/build/em/
 PROJ_NAME=$(basename "$1" | cut -d. -f1)
 SOURCE_DIR="$(dirname "$1")/"
-OUTPUT_DIR="${BUILD_DIR}bin/$PROJ_NAME"
+OUTPUT_DIR="${BUILD_DIR}bin/$PROJ_NAME/"
 
-OBJS=`ls ${BUILD_DIR}obj/*.o`
-CPPFLAGS="-I${BUILD_DIR}include -O2"
-CPPFLAGS+=' -DRUN_MAIN_SOURCE_DIR="./"'
-CFLAGS="-O2"
-if [ $EXT != "c" ]; then #since so many C++ extensions
-	CXXFLAGS="-std=c++14"
-	#CXXFLAGS+=" -fno-rtti"
-fi
-EMFLAGS+="--use-port=sdl3"
-#EMFLAGS+=" -sLEGACY_GL_EMULATION"
-#EMFLAGS+=" -sUSE_WEBGL2" #default, recommended setting
-#EMFLAGS+=" -sMAX_WEBGL_VERSION=2"
-EMFLAGS+=" -sFULL_ES2" #OpenGL ES 2.0 emulation (req'd for client-side arrays)
-EMFLAGS+=" -sFULL_ES3" #OpenGL ES 3.0 emulation (req'd for GL_UNSIGNED_INT indices)
-EMFLAGS+=" --emrun" # necessary to capture stdout, stderr, and exit
-EMFLAGS+=" -sALLOW_MEMORY_GROWTH=1" # allow heap allocs beyond INITIAL_MEMORY, o.w. aborts
-EMFLAGS+=" -sEXPORTED_FUNCTIONS=_main,_malloc,_free" # req'd to prevent stripping of said em functions (_main MUST be here if exporting any other functions)
-EMFLAGS+=" -sEXPORTED_RUNTIME_METHODS=ccall" # req'd to call C functions from JS
-#EMFLAGS+=" -sASSERTIONS=1" # get more info on runtime errors
-#EMFLAGS+=" --cpuprofiler" # adds profiler to generated page
-#EMFLAGS+=" -fsanitize=undefined" # undefined behavior sanitizer
-#EMFLAGS+=" -lwebsocket.js" #WebSockets API
-#EMFLAGS+=" -lwebsocket.js -sPROXY_POSIX_SOCKETS=1 -sUSE_PTHREADS=1 -sPROXY_TO_PTHREAD=1" #full POSIX socket emulation over WebSockets
-
+# Should this be in makefile?
 mkdir -p $OUTPUT_DIR
 
-# Parse emcc options from source code
+# Parse emcc (linker) options from source code
 PRAGMA_KEY="#pragma EM"
-# strip leading slash
-#SOURCE_DIR="${SOURCE_DIR#/}"
+# Find lines with pragma key and excluding those in comments
 OPTIONS="$(grep "$PRAGMA_KEY" $1 | grep -v "^[[:blank:]]*//")"
+# Remove pragma directive
 OPTIONS="${OPTIONS//$PRAGMA_KEY /}"
 OPTIONS="${OPTIONS//RUN_MAIN_SOURCE_DIR/$SOURCE_DIR}"
-OPTIONS="$(echo "$OPTIONS" | sed 's/^[ \t]*//;s/[ \t]*$//' | tr '\n' ' ')"
-#echo "$OPTIONS"; exit
+# Strip whitespace at start/end and convert newlines to spaces (last sed strips off remaining space)
+OPTIONS="$(echo "$OPTIONS" | sed 's/^[[:blank:]]*//;s/[[:blank:]]*$//' | tr '\n' ' ' | sed 's/ $//')"
+#echo "[$OPTIONS]"; exit
 
-# Build objects of any build-and-run sources
-${EM_DIR}emmake make runobjs PLATFORM=em ARCH=none BUILD_DIR=$BUILD_DIR RUN_DIR=$SOURCE_DIR
-
-${EM_DIR}emcc $CPPFLAGS $CFLAGS $CXXFLAGS $1 $EMFLAGS $OBJS -o $OUTPUT_DIR/$PROJ_NAME.js $OPTIONS
+# Note the := on RUN_DIRS seems to be required to prevent /c/ from changing to C:/
+${EM_DIR}emmake make $@ PLATFORM=em ARCH=none BUILD_DIR=$BUILD_DIR AUTORUN=0 EXE_DIR=$OUTPUT_DIR EXE_EXT=.js RUN_DIRS=$SOURCE_DIR CXX=${EM_DIR}emcc RUN_USER_LDFLAGS="$OPTIONS" LDFLAGS=
 
 # Exit if compilation errors...
 if [[ $? != 0 ]]; then exit $?; fi
@@ -86,7 +64,7 @@ sed s/PROJ_NAME/$PROJ_NAME/g emMain.html > $OUTPUT_DIR/$PROJ_NAME.html
 # Run HTML
 # You cannot simply double-click the .html since you need a local server.
 # Note that this blocks in terminal even after page close!
-${EM_DIR}emrun --no_emrun_detect $BROWSER $OUTPUT_DIR/$PROJ_NAME.html
+$EM_RUN $OUTPUT_DIR/$PROJ_NAME.html
 
 # Run local server
 #python -m SimpleHTTPServer 8888
