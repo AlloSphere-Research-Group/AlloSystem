@@ -291,10 +291,10 @@ public:
 	static Mat RST(double cosAngle, double sinAngle, const Vec<N-1,T>& s, const Vec<N-1,T>& t = T(0)){
 		Mat m(T(1)); // I
 		for(int i=0; i<N-1; ++i) m(i,i) = s[i]; // S
-		m(Dim1,Dim1) = cosAngle * s.template at<Dim1>(); // SR
-		m(Dim2,Dim1) = sinAngle * s.template at<Dim1>();
-		m(Dim1,Dim2) =-sinAngle * s.template at<Dim2>();
-		m(Dim2,Dim2) = cosAngle * s.template at<Dim2>();
+		m.at<Dim1,Dim1>() = cosAngle * s.template at<Dim1>(); // SR
+		m.at<Dim2,Dim1>() = sinAngle * s.template at<Dim1>();
+		m.at<Dim1,Dim2>() =-sinAngle * s.template at<Dim2>();
+		m.at<Dim2,Dim2>() = cosAngle * s.template at<Dim2>();
 		m.col<N-1>().template sub<-1>() = t; // TSR
 		return m;
 	}
