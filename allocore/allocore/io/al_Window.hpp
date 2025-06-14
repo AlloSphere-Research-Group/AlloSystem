@@ -228,6 +228,8 @@ protected:
 class InputEventHandler : public EventHandler {
 public:
 
+	~InputEventHandler() override;
+
 	/// Called when a keyboard key is pressed
 	virtual bool onKeyDown(const Keyboard& k){ return true; }
 
@@ -262,6 +264,8 @@ private:
 /// the event should be propagated to other handlers.
 class WindowEventHandler : public EventHandler {
 public:
+
+	~WindowEventHandler() override;
 
 	/// Called after window is created with valid OpenGL context
 	virtual bool onCreate(){ return true; }

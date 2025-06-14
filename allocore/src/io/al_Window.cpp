@@ -76,7 +76,7 @@ void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 
 
 EventHandler::~EventHandler(){
-	removeFromWindow();
+	//removeFromWindow(); // no, no since it calls a virtual
 }
 
 void EventHandler::attach(Window& win){
@@ -106,10 +106,18 @@ void EventHandler::removeFromWindow(){
 }
 
 
+InputEventHandler::~InputEventHandler(){
+	removeFromWindow();
+}
+
 void InputEventHandler::onRemoveFromWindow(){
 	window().remove(*this);
 }
 
+
+WindowEventHandler::~WindowEventHandler(){
+	removeFromWindow();
+}
 
 void WindowEventHandler::onAttach(){
 	auto& win = window();
