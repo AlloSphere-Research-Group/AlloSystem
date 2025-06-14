@@ -279,16 +279,16 @@ public:
 		return translation(Vec<sizeof...(Vals),T>(vals...));
 	}
 
-	/// Get rotation-scaling-translation (RST) transform matrix
+	/// Get scaling-rotation-translation (SRT) transform matrix
 
-	/// This returns the transform matrix T*S*R where the respective matrices
-	/// are a translation, scaling and rotation. Due to the simplicity of the 
+	/// This returns the transform matrix T*R*S where the respective matrices
+	/// are a translation, rotation and scaling. Due to the simplicity of the
 	/// matrices involved, it is possible to form the lumped transform directly
-	/// with only four multiplies versus 2N^2 if using matrix multiplication.
+	/// with only four multiplies versus 2(N^3) if using matrix multiplication.
 	/// In 2D, this transform forms a complete "model" matrix. In 3D and above,
 	/// it may be multiplied on the right by additional rotation matrices.
 	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat RST(double cosAngle, double sinAngle, const Vec<N-1,T>& s, const Vec<N-1,T>& t = T(0)){
+	static Mat SRT(const Vec<N-1,T>& s, double cosAngle, double sinAngle, const Vec<N-1,T>& t = T(0)){
 		Mat m(T(1)); // I
 		for(int i=0; i<N-1; ++i) m(i,i) = s[i]; // S
 		m.at<Dim1,Dim1>() = cosAngle * s.template at<Dim1>(); // SR
@@ -300,13 +300,13 @@ public:
 	}
 
 	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat RST(double angle, const Vec<N-1,T>& s, const Vec<N-1,T>& t = T(0)){
-		return RST<Dim1,Dim2>(std::cos(angle), std::sin(angle), s, t);
+	static Mat SRT(const Vec<N-1,T>& s, double angle, const Vec<N-1,T>& t = T(0)){
+		return SRT<Dim1,Dim2>(s, std::cos(angle), std::sin(angle), t);
 	}
 
 	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat RST(double angle, const T& s, const Vec<N-1,T>& t = T(0)){
-		return RST<Dim1,Dim2>(angle, Vec<N-1,T>(s), t);
+	static Mat SRT(const T& s, double angle, const Vec<N-1,T>& t = T(0)){
+		return SRT<Dim1,Dim2>(Vec<N-1,T>(s), angle, t);
 	}
 
 
