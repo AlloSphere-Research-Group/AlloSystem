@@ -52,12 +52,15 @@ etc.												Addtional bundle elements
 
 */
 
-#define OSCTRY(msg, expr) \
+#define OSCTRY(msg, ...) \
 	try { \
-		expr \
+		__VA_ARGS__ \
 	} catch (::osc::Exception& e) { \
 		AL_WARN("OSC error: %s", e.what()); \
 	}
+
+//#undef OSCTRY
+//#define OSCTRY(msg, ...) __VA_ARGS__
 
 //#define VERBOSE
 #ifdef VERBOSE
@@ -78,36 +81,33 @@ public:
 
 
 Packet::Packet(int size)
-:	mData(size), mImpl(0)
+:	Packet(nullptr, size)
 {
-	OSCTRY("Packet::Packet", mImpl = new Impl(&mData[0], size);)
 }
 
 Packet::Packet(const char * contents, int size)
-:	mData(size), mImpl(0)
+:	mData(size)
 {
-	OSCTRY("Packet::Packet1",
-		memcpy(&mData[0], contents, size);
-		mImpl = new Impl(&mData[0], size);
-	)
+	if(contents) memcpy(&mData[0], contents, size);
+	mImpl = new Impl(&mData[0], size);
 }
 
 Packet::~Packet(){ delete mImpl; }
 
 Packet& Packet::operator<< (int v){
-	OSCTRY("Packet::<<int",  (*mImpl) << (::osc::int32)v;)
+	OSCTRY("Packet::<<int", (*mImpl) << (::osc::int32)v;)
 	return *this;
 }
 Packet& Packet::operator<< (unsigned v){
-	OSCTRY("Packet::<<unsigned",  (*mImpl) << (::osc::int32)v;)
+	OSCTRY("Packet::<<unsigned", (*mImpl) << (::osc::int32)v;)
 	return *this;
 }
 Packet& Packet::operator<< (float v){
-	OSCTRY("Packet::<<float",  (*mImpl) << v;)
+	OSCTRY("Packet::<<float", (*mImpl) << v;)
 	return *this;
 }
 Packet& Packet::operator<< (double v){
-	OSCTRY("Packet::<<double",  (*mImpl) << v;)
+	OSCTRY("Packet::<<double", (*mImpl) << v;)
 	return *this;
 }
 Packet& Packet::operator<< (char v){
@@ -115,33 +115,36 @@ Packet& Packet::operator<< (char v){
 	return *this;
 }
 Packet& Packet::operator<< (const char * v){
-	OSCTRY("Packet::<<const char *",  (*mImpl) << v;)
+	OSCTRY("Packet::<<const char *", (*mImpl) << v;)
 	return *this;
 }
 Packet& Packet::operator<< (const std::string& v){
-	OSCTRY("Packet::<< string",  (*mImpl) << v.c_str();)
+	OSCTRY("Packet::<< string", (*mImpl) << v.c_str();)
 	return *this;
 }
 Packet& Packet::operator<< (const Blob& v){
-	OSCTRY("Packet::<<Blob",  (*mImpl) << ::osc::Blob(v.data, v.size);)
+	OSCTRY("Packet::<<Blob", (*mImpl) << ::osc::Blob(v.data, v.size);)
 	return *this;
 }
 
 Packet& Packet::beginMessage(const std::string& addr){
-	OSCTRY("Packet::beginMessage",  (*mImpl) << ::osc::BeginMessage(addr.c_str());)
+	OSCTRY("Packet::beginMessage", (*mImpl) << ::osc::BeginMessage(addr.c_str());)
 	return *this;
 }
 
 Packet& Packet::endMessage(){
-	OSCTRY("Packet::endMessage",   (*mImpl) << ::osc::EndMessage;) return *this;
+	OSCTRY("Packet::endMessage", (*mImpl) << ::osc::EndMessage;)
+	return *this;
 }
 
 Packet& Packet::beginBundle(TimeTag timeTag){
-	OSCTRY("Packet::beginBundle",  (*mImpl) << ::osc::BeginBundle(timeTag);) return *this;
+	OSCTRY("Packet::beginBundle", (*mImpl) << ::osc::BeginBundle(timeTag);)
+	return *this;
 }
 
 Packet& Packet::endBundle(){
-	OSCTRY("Packet::endBundle",  (*mImpl) << ::osc::EndBundle;) return *this;
+	OSCTRY("Packet::endBundle", (*mImpl) << ::osc::EndBundle;)
+	return *this;
 }
 
 Packet& Packet::clear(){
@@ -152,6 +155,8 @@ Packet& Packet::clear(){
 const char * Packet::data() const {
 	return mImpl->Data();
 }
+
+int Packet::size() const { return mImpl->Size(); }
 
 bool Packet::isBundle() const {
 	return ::osc::ReceivedPacket(data(), size()).IsBundle();
@@ -168,9 +173,6 @@ void Packet::printRaw() const {
 		if((i+1)%4 == 0) printf("\n");
 	}
 }
-
-int Packet::size() const { return mImpl->Size(); }
-
 
 
 class Message::Impl : public ::osc::ReceivedMessage {
@@ -190,47 +192,44 @@ public:
 Message::Message(const char * message, int size, const TimeTag& timeTag, const char *senderAddr)
 :	mImpl(new Impl(message, size)), mTimeTag(timeTag)
 {
-	OSCTRY("Message()",
-		mAddressPattern = mImpl->AddressPattern();
-		mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
-		resetStream();
-	)
-	if (senderAddr != nullptr) {
-		strncpy(mSenderAddr, senderAddr, 32);
+	mAddressPattern = mImpl->AddressPattern();
+	mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
+	resetStream();
+
+	if(senderAddr){
+		strncpy(mSenderAddr, senderAddr, sizeof(mSenderAddr));
 	} else {
 		mSenderAddr[0] = '\0';
 	}
 }
 
 Message::~Message() {
-	OSCTRY("~Message()", delete mImpl;)
+	delete mImpl;
 }
 
 void Message::print() const {
-	OSCTRY("Message::print",
-		printf("%s, %s %" AL_PRINTF_LL "d from %s\n",
-			addressPattern().c_str(), typeTags().c_str(), timeTag(), mSenderAddr);
+	printf("%s, %s %" AL_PRINTF_LL "d from %s\n",
+		addressPattern().c_str(), typeTags().c_str(), timeTag(), mSenderAddr);
 
-		::osc::ReceivedMessageArgumentIterator it = mImpl->ArgumentsBegin();
+	::osc::ReceivedMessageArgumentIterator it = mImpl->ArgumentsBegin();
 
-		printf("\targs = (");
-		for(unsigned i=0; i<typeTags().size(); ++i){
-			char tag = typeTags()[i];
-			switch(tag){
-				case 'f': {float v = it->AsFloat(); printf("%g", v);} break;
-				case 'i': {long v = it->AsInt32(); printf("%ld", v);} break;
-				case 'h': {long long v = it->AsInt64(); printf("%" AL_PRINTF_LL "d", v);} break;
-				case 'c': {char v = it->AsChar(); printf("'%c' (=%3d)", isprint(v) ? v : ' ', v);} break;
-				case 'd': {double v = it->AsDouble(); printf("%g", v);} break;
-				case 's': {const char * v = it->AsString(); printf("%s", v);} break;
-				case 'b': printf("blob"); break;
-				default:  printf("?");
-			}
-			if(i < (typeTags().size() - 1)) printf(", ");
-			++it;
+	printf("\targs = (");
+	for(unsigned i=0; i<typeTags().size(); ++i){
+		char tag = typeTags()[i];
+		switch(tag){
+			case 'f': {float v = it->AsFloat(); printf("%g", v);} break;
+			case 'i': {long v = it->AsInt32(); printf("%ld", v);} break;
+			case 'h': {long long v = it->AsInt64(); printf("%" AL_PRINTF_LL "d", v);} break;
+			case 'c': {char v = it->AsChar(); printf("'%c' (=%3d)", isprint(v) ? v : ' ', v);} break;
+			case 'd': {double v = it->AsDouble(); printf("%g", v);} break;
+			case 's': {const char * v = it->AsString(); printf("%s", v);} break;
+			case 'b': printf("blob"); break;
+			default:  printf("?");
 		}
-		printf(")\n");
-	)
+		if(i < (typeTags().size() - 1)) printf(", ");
+		++it;
+	}
+	printf(")\n");
 }
 
 Message& Message::resetStream(){ mImpl->args = mImpl->ArgumentStream(); return *this; }

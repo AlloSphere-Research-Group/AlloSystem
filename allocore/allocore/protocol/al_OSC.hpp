@@ -95,11 +95,11 @@ public:
     bool isMessage() const;			///< Whether packet is a message
     bool isBundle() const;			///< Whether packet is a bundle
 
-	/// Pretty-print raw packet bytes
-	void printRaw() const;
-
 	/// Get number of bytes of current packet data
 	int size() const;
+
+	/// Clear current packet contents
+	Packet& clear();
 
 	/// Begin a new bundle
 	Packet& beginBundle(TimeTag timeTag=1);
@@ -169,11 +169,11 @@ public:
 	Packet& operator<< (const std::string& v);	///< Add string to message
 	Packet& operator<< (const Blob& v);			///< Add Blob to message
 
-	/// Clear current packet contents
-	Packet& clear();
+	/// Pretty-print raw packet bytes
+	void printRaw() const;
 
 protected:
-	class Impl; Impl * mImpl;
+	class Impl; Impl * mImpl = nullptr;
 	std::vector<char> mData;
 };
 
@@ -218,7 +218,7 @@ public:
 	Message& operator>> (Blob& v);			///< Extract next stream element as Blob
 
 protected:
-	class Impl; Impl * mImpl;
+	class Impl; Impl * mImpl = nullptr;
 	std::string mAddressPattern;
 	std::string mTypeTags;
 	TimeTag mTimeTag;
