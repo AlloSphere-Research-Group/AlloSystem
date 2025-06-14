@@ -262,68 +262,133 @@ int utMath(){
 
 	// Mat
 	{
-		/*#define CHECK(mat, a,b,c, d,e,f, g,h,i){\
-			const auto& m = mat;\
-			assert(eq(m(0,0),a)); assert(eq(m(0,1),b)); assert(eq(m(0,2),c));\
-			assert(eq(m(1,0),d)); assert(eq(m(1,1),e)); assert(eq(m(1,2),f));\
-			assert(eq(m(2,0),g)); assert(eq(m(2,1),h)); assert(eq(m(2,2),i));\
-		}*/
 		#define CHECK(mat, a,b,c, d,e,f, g,h,i)\
-			assert(eq(mat, Mat3d(a,b,c, d,e,f, g,h,i)))
+			assert(eq(mat, decltype(mat)(a,b,c, d,e,f, g,h,i)))
 
-		// factory functions
+		const Mat3d c(	1,2,3,
+						4,5,6,
+						7,8,9  );
+
+		{ // constructors
+			CHECK(c, 1,2,3, 4,5,6, 7,8,9);
+			double arr[] = { 1,4,7, 2,5,8, 3,6,9 }; // should be col-maj
+			CHECK(Mat3d(arr), 1,2,3, 4,5,6, 7,8,9);
+			auto b = c;
+			CHECK(b, 1,2,3, 4,5,6, 7,8,9);
+			CHECK(Mat3f(2), 2,0,0, 0,2,0, 0,0,2);
+		}
+
+		{ // info
+			assert(c.order() == 3);
+			assert(c.size() == 9);
+		}
+
+		{ // access
+			assert(c == Mat3d(1,2,3, 4,5,6, 7,8,9));
+			assert(c != Mat3d(1,2,3, 4,5,6, 7,8,0));
+			assert(c == c);
+
+			assert(c[0] == 1);
+			assert(c[c.size()-1] == 9);
+
+			assert(c(1,2) == 6);
+			assert(c(2,1) == 8);
+			assert((c.at<0,2>()) == 3);
+			assert((c.at<2,0>()) == 7);
+
+			assert(c.col(0) == Vec3d(1,4,7));
+			assert(c.col(1) == Vec3d(2,5,8));
+			assert(c.col(2) == Vec3d(3,6,9));
+			assert(c.row(0) == Vec3d(1,2,3));
+			assert(c.row(1) == Vec3d(4,5,6));
+			assert(c.row(2) == Vec3d(7,8,9));
+
+			assert(c.col<0>() == c.col(0));
+			assert(c.row<0>() == c.row(0));
+
+			assert(c.diagonal() == Vec3d(1,5,9));
+
+			assert(c.sub<2>() == Mat2d(1,2, 4,5));
+			assert(c.submatrix(0,0) == Mat2d(5,6, 8,9));
+			assert(c.submatrix(1,1) == Mat2d(1,3, 7,9));
+		}
+
+		{ // setters
+			Mat3d a;
+
+			a.set(1,2,3, 4,5,6, 7,8,9); CHECK(a, 1,2,3, 4,5,6, 7,8,9);
+
+			a.setIdentity();		CHECK(a, 1,0,0, 0,1,0, 0,0,1);
+			a = Mat2d(1,2, 3,4);	CHECK(a, 1,2,0, 3,4,0, 0,0,1);
+			a = Mat4d(2);			CHECK(a, 2,0,0, 0,2,0, 0,0,2);
+
+			a.set(7);				CHECK(a, 7,7,7, 7,7,7, 7,7,7);
+			a.diagonal(4);			CHECK(a, 4,0,0, 0,4,0, 0,0,4);
+
+			a.setIdentity();
+			a.swapCol(0,1);			CHECK(a,	0,1,0,
+												1,0,0,
+												0,0,1);
+			a.setIdentity();
+			a.swapCol<1,2>();		CHECK(a,	1,0,0,
+												0,0,1,
+												0,1,0);
+		}
+
+		{ // arithmetic
+			Mat3d a(1);
+
+			a += 2;		CHECK(a, 3,2,2, 2,3,2, 2,2,3);
+			a -= 1;		CHECK(a, 2,1,1, 1,2,1, 1,1,2);
+			a *= 2;		CHECK(a, 4,2,2, 2,4,2, 2,2,4);
+			a /= 2;		CHECK(a, 2,1,1, 1,2,1, 1,1,2);
+
+			a.setIdentity();
+			a = a+2;	CHECK(a, 3,2,2, 2,3,2, 2,2,3);
+			a = a-1;	CHECK(a, 2,1,1, 1,2,1, 1,1,2);
+			a = a*2;	CHECK(a, 4,2,2, 2,4,2, 2,2,4);
+			a = a/2;	CHECK(a, 2,1,1, 1,2,1, 1,1,2);
+
+			a.setIdentity();
+			a = 2.+a;	CHECK(a, 3,2,2, 2,3,2, 2,2,3);
+			a = 4.-a;	CHECK(a, 1,2,2, 2,1,2, 2,2,1);
+			a = 2.*a;	CHECK(a, 2,4,4, 4,2,4, 4,4,2);
+
+			a.setIdentity();
+			assert(eq(a*c, c));
+			assert(eq(c*a, c));
+
+			Mat2d x(1,2,
+					3,4);
+			Mat2d y(5,6,
+					7,8);
+			assert(eq(x+y, Mat2d(6,8, 10,12)));
+			assert(eq(y-x, Mat2d(4,4, 4,4)));
+			assert(eq(x*y, Mat2d(19,22, 43,50)));
+
+			CHECK(c*Mat3d(2,0,0, 0,2,0, 0,0,2), 2,4,6, 8,10,12, 14,16,18);
+		}
+
+		// transforms
+		CHECK(c.transposed(),					1,4,7, 2,5,8, 3,6,9);
 		CHECK(Mat3d::identity(),				1,0,0, 0,1,0, 0,0,1);
 		CHECK(Mat3d::scaling(2),				2,0,0, 0,2,0, 0,0,1);
 		CHECK(Mat3d::scaling(2,3),				2,0,0, 0,3,0, 0,0,1);
 		CHECK(Mat3d::scaling(Vec2d(2,3)),		2,0,0, 0,3,0, 0,0,1);
 		CHECK(Mat3d::translation(2,3),			1,0,2, 0,1,3, 0,0,1);
 		CHECK(Mat3d::translation(Vec2d(2,3)),	1,0,2, 0,1,3, 0,0,1);
-		CHECK(Mat3d::rotation(M_PI/2, 0,1),		0,-1,0,1,0,0, 0,0,1);
+		CHECK(Mat3d::rotation(M_PI/2, 0,1),		0,-1,0, 1,0,0, 0,0,1);
+		CHECK(Mat3d::rotation90(),				0,-1,0, 1,0,0, 0,0,1);
+		CHECK(Mat3d::rotation180(),				-1,0,0, 0,-1,0, 0,0,1);
+		CHECK(Mat4d::identity().rotation(),		1,0,0, 0,1,0, 0,0,1);
 
-		Mat3d a;//, b;
+		assert(eq(Mat3d::translation(7,8).transformPoint(Vec2d(1,2)), Vec2d(8,10)));
+		assert(eq(Mat3d::translation(7,8).transformVector(Vec2d(1,2)), Vec2d(1,2)));
 
-		a.setIdentity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
+		// special ops
 
-		assert(a.trace() == 3);
+		assert(c.trace() == 15);
 
-		a += 2;		CHECK(a, 3,2,2, 2,3,2, 2,2,3);
-		a -= 1;		CHECK(a, 2,1,1, 1,2,1, 1,1,2);
-		a *= 2;		CHECK(a, 4,2,2, 2,4,2, 2,2,4);
-		a /= 2;		CHECK(a, 2,1,1, 1,2,1, 1,1,2);
-
-		a.setIdentity();
-		a = a+2;	CHECK(a, 3,2,2, 2,3,2, 2,2,3);
-		a = a-1;	CHECK(a, 2,1,1, 1,2,1, 1,1,2);
-		a = a*2;	CHECK(a, 4,2,2, 2,4,2, 2,2,4);
-		a = a/2;	CHECK(a, 2,1,1, 1,2,1, 1,1,2);
-
-		a.setIdentity();
-		a = 2.+a;	CHECK(a, 3,2,2, 2,3,2, 2,2,3);
-		a = 4.-a;	CHECK(a, 1,2,2, 2,1,2, 2,2,1);
-		a = 2.*a;	CHECK(a, 2,4,4, 4,2,4, 4,4,2);
-
-		a.set(	1,2,3,
-				4,5,6,
-				7,8,9
-		);
-
-		assert(a.col(0) == Vec3d(1,4,7));
-		assert(a.col(1) == Vec3d(2,5,8));
-		assert(a.col(2) == Vec3d(3,6,9));
-		assert(a.row(0) == Vec3d(1,2,3));
-		assert(a.row(1) == Vec3d(4,5,6));
-		assert(a.row(2) == Vec3d(7,8,9));
-
-		a.transpose();
-
-		assert(a.col(0) == Vec3d(1,2,3));
-		assert(a.col(1) == Vec3d(4,5,6));
-		assert(a.col(2) == Vec3d(7,8,9));
-		assert(a.row(0) == Vec3d(1,4,7));
-		assert(a.row(1) == Vec3d(2,5,8));
-		assert(a.row(2) == Vec3d(3,6,9));
-
-		// test special operations
 		{
 			Mat<2,double> m(
 				2,4,
