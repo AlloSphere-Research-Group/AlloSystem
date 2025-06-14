@@ -488,74 +488,6 @@ public:
 	Vec<N,Vec<N,T>>& nest(){ return as<Vec<N,Vec<N,T>>>(); }
 
 
-	//--------------------------------------------------------------------------
-	// Basic Arithmetic Operations
-
-	Mat& operator *= (const Mat& v){ return multiply(*this, Mat(*this),v); }
-	Mat& operator += (const Mat& v){ IT(size()){ (*this)[i] += v[i]; } return *this; }
-	Mat& operator -= (const Mat& v){ IT(size()){ (*this)[i] -= v[i]; } return *this; }
-	Mat& operator += (const T& v){ IT(size()){ (*this)[i] += v; } return *this; }
-	Mat& operator -= (const T& v){ IT(size()){ (*this)[i] -= v; } return *this; }
-	Mat& operator *= (const T& v){ IT(size()){ (*this)[i] *= v; } return *this; }
-	Mat& operator /= (const T& v){ IT(size()){ (*this)[i] /= v; } return *this; }
-
-	Mat operator - () const { Mat r(MAT_NO_INIT); IT(size()){ r[i]=-(*this)[i]; } return r; }
-	Mat operator + (const Mat& v) const { return Mat(*this) += v; }
-	Mat operator - (const Mat& v) const { return Mat(*this) -= v; }
-	Mat operator * (const Mat& v) const { return Mat(*this) *= v; }
-	Mat operator + (const T& v) const { return Mat(*this) += v; }
-	Mat operator - (const T& v) const { return Mat(*this) -= v; }
-	Mat operator * (const T& v) const { return Mat(*this) *= v; }
-	Mat operator / (const T& v) const { return Mat(*this) /= v; }
-
-	/// Computes matrix product r = a * b
-
-	/// Returns reference to result
-	///
-	static Mat& multiply(Mat& r, const Mat& a, const Mat& b){
-		for(int j=0; j<N; ++j){
-			const Vec<N,T>& bcol = b.col(j);
-			for(int i=0; i<N; ++i){
-				r(i,j) = a.row(i).dot(bcol);
-			}
-		}
-		return r;
-	}
-
-	/// Computes product of matrix multiplied by column vector, r = m * vCol
-	template <class U>
-	static Vec<N,U>& multiply(Vec<N,U>& r, const Mat& m, const Vec<N,U>& vCol){
-		IT(N){ r[i] = m.row(i).dot(vCol); }
-		return r;
-	}
-
-	/// Computes product of row vector multiplied by matrix, r = vRow * m
-	template <class U>
-	static Vec<N,U>& multiply(Vec<N,U>& r, const Vec<N,U>& vRow, const Mat& m){
-		IT(N){ r[i] = vRow.dot(m.col(i)); }
-		return r;
-	}
-
-	/// Transform a point by this matrix treated as a homogeneous transform
-	template <class U>
-	Vec<N-1,U> transformPoint(const Vec<N-1,U>& v) const {
-		Vec<N-1,U> r;
-		IT(N-1){
-			auto mrow = row(i);
-			r[i] = mrow.template sub<N-1>().dot(v) + mrow[N-1];
-		}
-		return r;
-	}
-
-	/// Transform a vector by this matrix treated as a homogeneous transform
-	template <class U>
-	Vec<N-1,U> transformVector(const Vec<N-1,U>& v) const {
-		Vec<N-1,U> r;
-		IT(N-1){ r[i] = row(i).template sub<N-1>().dot(v); }
-		return r;
-	}
-	
-
 	/// Set elements from different sized matrix
 
 	/// Only the corresponding elements are copied from the source. Extra
@@ -686,6 +618,84 @@ public:
 			(*this)[i*N + j] = T(0);
 		}}
 		return *this;
+	}
+
+
+	//--------------------------------------------------------------------------
+	// Basic Arithmetic Operations
+
+	bool operator == (const Mat& v) const {
+		if(&v != this){
+			IT(size()){
+				if((*this)[i] != v[i]) return false;
+			}
+		}
+		return true;
+	}
+	bool operator != (const Mat& v) const { return !(*this == v); }
+
+	Mat& operator *= (const Mat& v){ return multiply(*this, Mat(*this),v); }
+	Mat& operator += (const Mat& v){ IT(size()){ (*this)[i] += v[i]; } return *this; }
+	Mat& operator -= (const Mat& v){ IT(size()){ (*this)[i] -= v[i]; } return *this; }
+	Mat& operator += (const T& v){ IT(size()){ (*this)[i] += v; } return *this; }
+	Mat& operator -= (const T& v){ IT(size()){ (*this)[i] -= v; } return *this; }
+	Mat& operator *= (const T& v){ IT(size()){ (*this)[i] *= v; } return *this; }
+	Mat& operator /= (const T& v){ IT(size()){ (*this)[i] /= v; } return *this; }
+
+	Mat operator - () const { Mat r(MAT_NO_INIT); IT(size()){ r[i]=-(*this)[i]; } return r; }
+	Mat operator + (const Mat& v) const { return Mat(*this) += v; }
+	Mat operator - (const Mat& v) const { return Mat(*this) -= v; }
+	Mat operator * (const Mat& v) const { return Mat(*this) *= v; }
+	Mat operator + (const T& v) const { return Mat(*this) += v; }
+	Mat operator - (const T& v) const { return Mat(*this) -= v; }
+	Mat operator * (const T& v) const { return Mat(*this) *= v; }
+	Mat operator / (const T& v) const { return Mat(*this) /= v; }
+
+	/// Computes matrix product r = a * b
+
+	/// Returns reference to result
+	///
+	static Mat& multiply(Mat& r, const Mat& a, const Mat& b){
+		for(int j=0; j<N; ++j){
+			const Vec<N,T>& bcol = b.col(j);
+			for(int i=0; i<N; ++i){
+				r(i,j) = a.row(i).dot(bcol);
+			}
+		}
+		return r;
+	}
+
+	/// Computes product of matrix multiplied by column vector, r = m * vCol
+	template <class U>
+	static Vec<N,U>& multiply(Vec<N,U>& r, const Mat& m, const Vec<N,U>& vCol){
+		IT(N){ r[i] = m.row(i).dot(vCol); }
+		return r;
+	}
+
+	/// Computes product of row vector multiplied by matrix, r = vRow * m
+	template <class U>
+	static Vec<N,U>& multiply(Vec<N,U>& r, const Vec<N,U>& vRow, const Mat& m){
+		IT(N){ r[i] = vRow.dot(m.col(i)); }
+		return r;
+	}
+
+	/// Transform a point by this matrix treated as a homogeneous transform
+	template <class U>
+	Vec<N-1,U> transformPoint(const Vec<N-1,U>& v) const {
+		Vec<N-1,U> r(VEC_NO_INIT);
+		IT(N-1){
+			auto mrow = row(i);
+			r[i] = mrow.template sub<N-1>().dot(v) + mrow.back();
+		}
+		return r;
+	}
+
+	/// Transform a vector by this matrix treated as a homogeneous transform
+	template <class U>
+	Vec<N-1,U> transformVector(const Vec<N-1,U>& v) const {
+		Vec<N-1,U> r(VEC_NO_INIT);
+		IT(N-1){ r[i] = row(i).template sub<N-1>().dot(v); }
+		return r;
 	}
 
 
