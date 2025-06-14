@@ -246,7 +246,7 @@ public:
 	/// Get a scaling transform matrix
 	template <int M, class V>
 	static Mat scaling(const Vec<M,V>& v){
-		static_assert(M <= N-1, "Invalid vector size");
+		static_assert(M < N, "Invalid vector size");
 		Mat m(T(1));
 		for(int r=0; r<M; ++r) m(r,r) = v[r];
 		return m;
@@ -267,7 +267,7 @@ public:
 	/// Get a translation transform matrix
 	template <int M, class V>
 	static Mat translation(const Vec<M,V>& v){
-		static_assert(M <= N-1, "Invalid vector size");
+		static_assert(M < N, "Invalid vector size");
 		Mat m(T(1));
 		for(int r=0; r<M; ++r) m(r,N-1) = v[r];
 		return m;
@@ -289,8 +289,7 @@ public:
 	/// it may be multiplied on the right by additional rotation matrices.
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat SRT(const Vec<N-1,T>& s, double cosAngle, double sinAngle, const Vec<N-1,T>& t = T(0)){
-		Mat m(T(1)); // I
-		for(int i=0; i<N-1; ++i) m(i,i) = s[i]; // S
+		Mat m = Mat::scaling(s); // S
 		m.at<Dim1,Dim1>() = cosAngle * s.template at<Dim1>(); // SR
 		m.at<Dim2,Dim1>() = sinAngle * s.template at<Dim1>();
 		m.at<Dim1,Dim2>() =-sinAngle * s.template at<Dim2>();
