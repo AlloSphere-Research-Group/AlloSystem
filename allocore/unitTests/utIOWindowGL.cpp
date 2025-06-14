@@ -7,10 +7,10 @@ static Graphics gl;
 
 struct MyWindow : Window{
 
-	int frameNum;
-	int onCreateCalls;
-	int onDestroyCalls;
-	int onResizeCalls;
+	int frameNum = 0;
+	int onCreateCalls = 0;
+	int onDestroyCalls = 0;
+	int onResizeCalls = 0;
 
 	static const Window::Dim& defaultDim(){
 		static Window::Dim res(40,50, 400,300);
@@ -22,22 +22,18 @@ struct MyWindow : Window{
 		return res;
 	}
 
-	MyWindow(){
-		onCreateCalls = onDestroyCalls = onResizeCalls = 0;
-		frameNum = 0;
-	}
 
-	bool onCreate(){
+	bool onCreate() override {
 		++onCreateCalls;
 		return true;
 	}
 
-	bool onDestroy(){
+	bool onDestroy() override {
 		++onDestroyCalls;
 		return true;
 	}
 
-	bool onResize(int dw, int dh){
+	bool onResize(int dw, int dh) override {
 		assert(onCreateCalls);	// at least one onCreate called
 		if(onCreateCalls == 1){
 			assert(dw == dimensions().w);
@@ -47,16 +43,16 @@ struct MyWindow : Window{
 		return true;
 	}
 
-	bool onVisibility(bool v){ return true; }
+	bool onVisibility(bool v) override { return true; }
 
-	bool onKeyDown(const Keyboard& k){ return true; }
-	bool onKeyUp(const Keyboard& k){ return true; }
-	bool onMouseDown(const Mouse& m){ return true; }
-	bool onMouseUp(const Mouse& m){ return true; }
-	bool onMouseDrag(const Mouse& m){ return true; }
-	bool onMouseMove(const Mouse& m){ return true; }
+	bool onKeyDown(const Keyboard& k) override { return true; }
+	bool onKeyUp(const Keyboard& k) override { return true; }
+	bool onMouseDown(const Mouse& m) override { return true; }
+	bool onMouseUp(const Mouse& m) override { return true; }
+	bool onMouseDrag(const Mouse& m) override { return true; }
+	bool onMouseMove(const Mouse& m) override { return true; }
 
-	bool onFrame(){
+	bool onFrame() override {
 
 		assert(onCreateCalls != 0);
 		assert(onResizeCalls != 0);
