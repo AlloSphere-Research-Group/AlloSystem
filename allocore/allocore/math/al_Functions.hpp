@@ -801,9 +801,10 @@ TEM inline T slope(const T& x1, const T& y1, const T& x2, const T& y2){ return (
 TEM inline void sort(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } }
 
 TEM inline T sumOfSquares(T n){
-	static const T c1_6 = 1/T(6);
-	static const T c2_6 = c1_6*T(2);
-	return n*(n+1)*(c2_6*n+c1_6);
+	// 0^2 + 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6
+	static constexpr double c1_6 = 1./6.;
+	static constexpr double c2_6 = 2./6.;
+	return n*(n+T(1))*(c2_6*n+c1_6);
 }
 
 inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -v); }

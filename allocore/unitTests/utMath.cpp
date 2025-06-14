@@ -24,6 +24,8 @@ inline bool eq(const T* x, const T* y, int n, T eps=0.0000001){
 	return true;
 }
 
+inline bool eq(int x, int y){ return x==y; }
+
 template <class T>
 inline bool eq(const Quat<T>& a, const Quat<T>& b, T eps=0.000001){
 	return eq(&a[0], &b[0], 4, eps);
@@ -725,8 +727,9 @@ int utMath(){
 		sort(x,y); assert(x==0 && y==1);
 	}
 
-	#define T(x,y) assert(al::sumOfSquares(x) == y);
-	T(1., 1.) T(2., 1*1+2*2) T(3., 1*1+2*2+3*3) T(4., 1*1+2*2+3*3+4*4) T(5., 1*1+2*2+3*3+4*4+5*5)
+	#define T(x,y) assert(eq(al::sumOfSquares(x), y));
+	T(1., 1.) T(2., 1*1+2*2.) T(3., 1*1+2*2+3*3.) T(4., 1*1+2*2+3*3+4*4.) T(5., 1*1+2*2+3*3+4*4+5*5.)
+	T(1, 1) T(5, 1*1+2*2+3*3+4*4+5*5)
 	#undef T
 
 	#define T(x,r) assert(al::trailingZeroes(x) == r);
