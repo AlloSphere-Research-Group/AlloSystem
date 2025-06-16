@@ -279,6 +279,22 @@ public:
 		return translation(Vec<sizeof...(Vals),T>(vals...));
 	}
 
+	/// Get scaling-rotation (SR) transform matrix
+
+	/// This returns the transform matrix R*S where the respective matrices are
+	/// a rotation and scaling. Due to the simplicity of the matrices involved,
+	/// it is possible to form the lumped transform directly with only four
+	/// multiplies versus N^3 if using matrix multiplication.
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat SR(const Vec<N-1,T>& s, double cosAngle, double sinAngle){
+		Mat m = Mat::scaling(s);
+		m.at<Dim1,Dim1>() = cosAngle * s.template at<Dim1>(); // SR
+		m.at<Dim2,Dim1>() = sinAngle * s.template at<Dim1>();
+		m.at<Dim1,Dim2>() =-sinAngle * s.template at<Dim2>();
+		m.at<Dim2,Dim2>() = cosAngle * s.template at<Dim2>();
+		return m;
+	}
+
 	/// Get scaling-rotation-translation (SRT) transform matrix
 
 	/// This returns the transform matrix T*R*S where the respective matrices
@@ -289,12 +305,8 @@ public:
 	/// it may be multiplied on the right by additional rotation matrices.
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat SRT(const Vec<N-1,T>& s, double cosAngle, double sinAngle, const Vec<N-1,T>& t = T(0)){
-		Mat m = Mat::scaling(s); // S
-		m.at<Dim1,Dim1>() = cosAngle * s.template at<Dim1>(); // SR
-		m.at<Dim2,Dim1>() = sinAngle * s.template at<Dim1>();
-		m.at<Dim1,Dim2>() =-sinAngle * s.template at<Dim2>();
-		m.at<Dim2,Dim2>() = cosAngle * s.template at<Dim2>();
-		m.col<N-1>().template sub<-1>() = t; // TSR
+		Mat m = SR<Dim1,Dim2>(s, cosAngle, sinAngle); // SR
+		m.col<N-1>().template sub<-1>() = t; // SRT
 		return m;
 	}
 
