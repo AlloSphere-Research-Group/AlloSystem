@@ -17,6 +17,7 @@ else
 fi
 
 for libdir in $LIB_DIRS; do
+	[ -d "$libdir" ] || continue # skip if directory does not exist
 	cd $libdir
 	${EM_DIR}emmake make install $* PLATFORM=em ARCH=none SDL_VERSION=3 WINDOW_BINDING=SDL AUDIO_BINDING=SDL USE_HID=0 USE_MIDI=0 USE_ZEROCONF=0 NO_AUDIO_IO=1 BUILD_DIR=$BUILD_DIR DESTDIR=$BUILD_DIR
 	cd $ALLO_DIR
