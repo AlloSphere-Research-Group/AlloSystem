@@ -17,7 +17,7 @@ RUN_DIR ?= $(dir $(lastword $(MAKECMDGOALS)))
 
 ifeq ($(PLATFORM), em)
 
-CPPFLAGS += -DRUN_MAIN_SOURCE_DIR="\"./\""
+RUN_CPPFLAGS += -DRUN_MAIN_SOURCE_DIR="\"./\""
 
 # Req'd for window, mouse/keyboard and audio
 RUN_LDFLAGS += --use-port=sdl3
@@ -53,7 +53,7 @@ RUN_LDFLAGS += -sEXPORTED_RUNTIME_METHODS=ccall
 else
 
 # For RUN_MAIN_SOURCE_DIR, use directory of target and convert single drive designators /c/ to c:/ to be compatible with Windows file I/O
-CPPFLAGS += -DRUN_MAIN_SOURCE_DIR="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
+RUN_CPPFLAGS += -DRUN_MAIN_SOURCE_DIR="\"$(shell echo $(realpath $(@D)) | sed 's_/\(.\)/_\1:/_')/\""
 
 endif
 
@@ -62,7 +62,7 @@ RUN_SRC_DIRS := $(addsuffix /, $(realpath $(RUN_SRC_DIRS)))
 
 # Add user specified source dirs to global Make vars
 VPATH += $(RUN_SRC_DIRS)
-CPPFLAGS += $(addprefix -I, $(RUN_SRC_DIRS))
+RUN_CPPFLAGS += $(addprefix -I, $(RUN_SRC_DIRS))
 
 # Create list of all valid source files found in RUN_SRC_DIRS
 RUN_SRCS  = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
@@ -103,7 +103,7 @@ endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	$(CXX) $(ALL_CXXFLAGS) -o $(EXE_DIR)$(*F)$(EXE_EXT) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(RUN_LDFLAGS) $(RUN_USER_LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
+	$(CXX) $(ALL_CXXFLAGS) $(RUN_CPPFLAGS) -o $(EXE_DIR)$(*F)$(EXE_EXT) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(RUN_LDFLAGS) $(RUN_USER_LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
     ifneq ($(BUILD_CONFIG), Debugger)
 	@cd $(BIN_DIR) && ./$(*F)
