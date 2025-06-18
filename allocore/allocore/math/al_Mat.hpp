@@ -71,6 +71,55 @@ typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 static struct MatNoInit{} MAT_NO_INIT;
 
 
+/// Combined rotation and uniform scaling
+
+/// This class provides a uniform way of representing a rotation and scaling.
+/// It is essentially a complex number, z, where arg(z) is the rotation angle
+/// and |z| is the scaling amount. The transform is stored in rectangular form
+/// for efficiency reasons. When building rotation matrices, we typically need
+/// to compute cos(angle) and sin(angle), so these are essentially cached here.
+/// The scaling part is optional, but comes for free, so is included.
+template <class T>
+class Rotoscale{
+public:
+	using value_type = T;
+
+	T r, i;
+
+	Rotoscale(){}
+	Rotoscale(const Rotoscale& v): r(v.r), i(v.i){}
+	Rotoscale(T ang){ angle(ang); }
+
+	/// Set from angle in radians
+	Rotoscale& angle(T v){ return set(std::cos(v), std::sin(v)); }
+
+	/// Set from angle in turns in [0,1]
+	Rotoscale& turn(T v){ return angle(v*T(6.283185307179586)); }
+
+	/// Set from angle in degrees
+	Rotoscale& deg (T v){ return angle(v*T(0.017453292519943)); }
+
+	template <int Mul=1>
+	Rotoscale& deg90(){
+		static constexpr T x = (~Mul&1) * (1-2*((Mul&2)>>1));
+		static constexpr T y = ( Mul&1) * (1-2*((Mul&2)>>1));
+		return set(x,y);
+	}
+
+	/// Set directly from real/imag parts
+	Rotoscale& set(T re, T im){ r = re; i = im; return *this; }
+
+	Rotoscale dup() const { return Rotoscale(*this); }
+
+	/// Scale by amount
+	Rotoscale& operator*= (T v){ r*=v; i*=v; return *this; }
+	Rotoscale operator* (T v) const { return dup() *= v; }
+};
+
+typedef Rotoscale< float> Rotoscalef;
+typedef Rotoscale<double> Rotoscaled;
+
+
 /// Fixed-size n-by-n square matrix
 
 /// Elements are stored in column-major format.
@@ -177,39 +226,33 @@ public:
 		return Mat(T(1));
 	}
 
-	static Mat rotation(double cosAngle, double sinAngle, unsigned dim1, unsigned dim2){
+	/// Get a rotation transform matrix
+
+	/// @param[in] r		rotation (or angle in radians)
+	/// @param[in] dim1		first ("from") basis vector of rotation plane
+	/// @param[in] dim2		second ("to") basis vector of rotation plane
+	static Mat rotation(const Rotoscale<T>& r, unsigned dim1, unsigned dim2){
 		Mat m(T(1));
-		m(dim1,dim1) = cosAngle;
-		m(dim2,dim1) = sinAngle;
-		m(dim1,dim2) =-sinAngle;
-		m(dim2,dim2) = cosAngle;
+		m(dim1,dim1) = r.r;
+		m(dim2,dim1) = r.i;
+		m(dim1,dim2) =-r.i;
+		m(dim2,dim2) = r.r;
 		return m;
 	}
 
 	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat rotation(double cosAngle, double sinAngle){
+	static Mat rotation(const Rotoscale<T>& r){
 		static_assert_plane<Dim1,Dim2>();
-		return rotation(cosAngle, sinAngle, Dim1, Dim2);
+		return rotation(r, Dim1, Dim2);
 	}
 
 	/// Get a rotation transform matrix
 
-	/// @param[in] angle	rotation angle in radians
-	/// @param[in] dim1		first ("from") basis vector of rotation plane
-	/// @param[in] dim2		second ("to") basis vector of rotation plane
-	static Mat rotation(double angle, unsigned dim1, unsigned dim2){
-		return rotation(std::cos(angle), std::sin(angle), dim1, dim2);
-	}
-
-	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat rotation(double angle){
-		static_assert_plane<Dim1,Dim2>();
-		return rotation(angle, Dim1, Dim2);
-	}
-
-	static Mat<4,T> rotation(double cosAngle, double sinAngle, const Vec<3,T>& axis){
-		T c = cosAngle;
-		T s = sinAngle;
+	/// @param[in] r		rotation (or angle in radians)
+	/// @param[in] axis		rotation axis; should be a unit vector
+	static Mat<4,T> rotation(const Rotoscale<T>& r, const Vec<3,T>& axis){
+		T c = r.r;
+		T s = r.i;
 		T t = T(1)-c;
 		T x = axis[0], y = axis[1], z = axis[2];
 		T tx = t*x, ty = t*y, tz = t*z;
@@ -223,24 +266,16 @@ public:
 		};
 	}
 
-	/// Get a rotation transform matrix
-
-	/// @param[in] angle	rotation angle in radians
-	/// @param[in] axis		rotation axis; should be a unit vector
-	static Mat<4,T> rotation(double angle, const Vec<3,T>& axis){
-		return rotation(std::cos(angle), std::sin(angle), axis);
-	}
-
 	/// Get a 90-degree rotation transform matrix
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat rotation90(){
-		return rotation<Dim1,Dim2>(0.,1.);
+		return rotation<Dim1,Dim2>(Rotoscale<T>().deg90());
 	}
 
 	/// Get a 180-degree rotation transform matrix
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat rotation180(){
-		return rotation<Dim1,Dim2>(-1.,0.);
+		return rotation<Dim1,Dim2>(Rotoscale<T>().template deg90<2>());
 	}
 
 	/// Get a scaling transform matrix
@@ -286,12 +321,12 @@ public:
 	/// it is possible to form the lumped transform directly with only four
 	/// multiplies versus N^3 if using matrix multiplication.
 	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat SR(const Vec<N-1,T>& s, double cosAngle, double sinAngle){
+	static Mat SR(const Vec<N-1,T>& s, const Rotoscale<T>& r){
 		Mat m = Mat::scaling(s);
-		m.at<Dim1,Dim1>() = cosAngle * s.template at<Dim1>(); // SR
-		m.at<Dim2,Dim1>() = sinAngle * s.template at<Dim1>();
-		m.at<Dim1,Dim2>() =-sinAngle * s.template at<Dim2>();
-		m.at<Dim2,Dim2>() = cosAngle * s.template at<Dim2>();
+		m.at<Dim1,Dim1>() = r.r * s.template at<Dim1>(); // SR
+		m.at<Dim2,Dim1>() = r.i * s.template at<Dim1>();
+		m.at<Dim1,Dim2>() =-r.i * s.template at<Dim2>();
+		m.at<Dim2,Dim2>() = r.r * s.template at<Dim2>();
 		return m;
 	}
 
@@ -304,21 +339,12 @@ public:
 	/// In 2D, this transform forms a complete "model" matrix. In 3D and above,
 	/// it may be multiplied on the right by additional rotation matrices.
 	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat SRT(const Vec<N-1,T>& s, double cosAngle, double sinAngle, const Vec<N-1,T>& t = T(0)){
-		Mat m = SR<Dim1,Dim2>(s, cosAngle, sinAngle); // SR
+	static Mat SRT(const Vec<N-1,T>& s, const Rotoscale<T>& r, const Vec<N-1,T>& t = T(0)){
+		Mat m = SR<Dim1,Dim2>(s, r); // SR
 		m.col<N-1>().template sub<-1>() = t; // SRT
 		return m;
 	}
 
-	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat SRT(const Vec<N-1,T>& s, double angle, const Vec<N-1,T>& t = T(0)){
-		return SRT<Dim1,Dim2>(s, std::cos(angle), std::sin(angle), t);
-	}
-
-	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat SRT(const T& s, double angle, const Vec<N-1,T>& t = T(0)){
-		return SRT<Dim1,Dim2>(Vec<N-1,T>(s), angle, t);
-	}
 
 
 	//--------------------------------------------------------------------------
