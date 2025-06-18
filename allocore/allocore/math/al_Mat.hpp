@@ -101,8 +101,8 @@ public:
 
 	template <int Mul=1>
 	Rotoscale& deg90(){
-		static constexpr T x = (~Mul&1) * (1-2*((Mul&2)>>1));
-		static constexpr T y = ( Mul&1) * (1-2*((Mul&2)>>1));
+		static constexpr T x = (~Mul&1) * (1-(Mul&2));
+		static constexpr T y = ( Mul&1) * (1-(Mul&2));
 		return set(x,y);
 	}
 
