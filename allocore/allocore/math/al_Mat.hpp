@@ -89,6 +89,7 @@ public:
 	Rotoscale(){}
 	Rotoscale(const Rotoscale& v): r(v.r), i(v.i){}
 	Rotoscale(T ang){ angle(ang); }
+	Rotoscale(T re, T im): r(re), i(im){}
 
 	/// Set from angle in radians
 	Rotoscale& angle(T v){ return set(std::cos(v), std::sin(v)); }
