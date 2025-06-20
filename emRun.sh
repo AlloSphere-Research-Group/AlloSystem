@@ -4,8 +4,8 @@
 # Note that the first time running this may take some time as Emscripten configures its libraries.
 
 if [ $# -eq 0 ]; then
-	echo "Usage: ./$(basename "$0") [SOURCE FILE]"
-	exit
+	echo "Usage: ./$(basename "$0") SOURCE_FILE [MAKE_ARGS]"
+	exit 1
 fi
 
 if [[ `echo $EM_CONFIG` ]]; then
@@ -52,20 +52,27 @@ OPTIONS="${OPTIONS//RUN_MAIN_SOURCE_DIR/$SOURCE_DIR}"
 OPTIONS="$(echo "$OPTIONS" | sed 's/^[[:blank:]]*//;s/[[:blank:]]*$//' | tr '\n' ' ' | sed 's/ $//')"
 #echo "[$OPTIONS]"; exit
 
-# Note the := on RUN_DIRS seems to be required to prevent /c/ from changing to C:/
+# Call make and forward all command-line args to it
 ${EM_DIR}emmake make $@ PLATFORM=em ARCH=none BUILD_DIR=$BUILD_DIR AUTORUN=0 EXE_DIR=$OUTPUT_DIR EXE_EXT=.js RUN_DIRS=$SOURCE_DIR CXX=${EM_DIR}emcc RUN_USER_LDFLAGS="$OPTIONS" LDFLAGS=
 
 # Exit if compilation errors...
 if [[ $? != 0 ]]; then exit $?; fi
 
+HTML_NAME=$PROJ_NAME
+
+# Check for HTML_NAME specified in arguments
+# It will be passed to make above, but does nothing there.
+for arg in "$@"; do
+	if [ "${arg%%=*}" = "HTML_NAME" ]; then
+		HTML_NAME="${arg##*=}"
+		break
+	fi
+done
+
 # Create a minimal HTML page
-sed s/PROJ_NAME/$PROJ_NAME/g emMain.html > $OUTPUT_DIR/$PROJ_NAME.html
+sed s/PROJ_NAME/$PROJ_NAME/g emMain.html > $OUTPUT_DIR/$HTML_NAME.html
 
 # Run HTML
 # You cannot simply double-click the .html since you need a local server.
 # Note that this blocks in terminal even after page close!
-$EM_RUN $OUTPUT_DIR/$PROJ_NAME.html
-
-# Run local server
-#python -m SimpleHTTPServer 8888
-#http://localhost:8888/
+$EM_RUN $OUTPUT_DIR/$HTML_NAME.html
