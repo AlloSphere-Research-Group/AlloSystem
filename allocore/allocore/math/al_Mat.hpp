@@ -346,7 +346,19 @@ public:
 		return m;
 	}
 
-
+	/// Get translation-scaling-rotation (TSR) transform matrix
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat<N,T> TSR(const Vec<N-1,T>& t, const Vec<N-1,T>& s, const Rotoscale<T>& r){
+		Mat m = SR<Dim1,Dim2>(s, r);
+		// We have SR and need to compute TSR
+		auto& c = m.col<N-1>().template sub<-1>();
+		// Compute contribution of diagonal components
+		for(int i=0; i<N-1; ++i) c[i] = m(i,i) * t[i];
+		// Compute contribution of off-diagonal components
+		c.template at<Dim1>() += m.at<Dim1,Dim2>() * t.template at<Dim2>();
+		c.template at<Dim2>() += m.at<Dim2,Dim1>() * t.template at<Dim1>();
+		return m;
+	}
 
 	//--------------------------------------------------------------------------
 	// Access/Memory Operations
