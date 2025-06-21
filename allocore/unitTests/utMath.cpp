@@ -385,8 +385,20 @@ int utMath(){
 		assert(eq(Mat3d::translation(7,8).transformPoint(Vec2d(1,2)), Vec2d(8,10)));
 		assert(eq(Mat3d::translation(7,8).transformVector(Vec2d(1,2)), Vec2d(1,2)));
 
-		// special ops
+		{
+			// non-trivial rigid transform
+			auto A = Mat4d::translation(1,2,3) * Mat4d::rotation<1,2>(1) * Mat4d::rotation<0,1>(2);
 
+			Vec3d s(6,5,4);
+			assert(eq(A * Mat4d::scaling(s), A.dup().scale(s)));
+			assert(eq(Mat4d::scaling(s) * A, A.dup().scaleGlobal(s)));
+
+			Vec3d t(6,5,4);
+			assert(eq(A * Mat4d::translation(t), A.dup().translate(t)));
+			assert(eq(Mat4d::translation(t) * A, A.dup().translateGlobal(t)));
+		}
+
+		// special ops
 		assert(c.trace() == 15);
 
 		{
