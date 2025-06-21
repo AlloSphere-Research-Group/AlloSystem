@@ -871,14 +871,12 @@ public:
 	/// Scale transformation matrix
 
 	/// This applies a non-uniform scaling to the matrix. Specifically, given
-	/// matrix A, it applies A' = S*A where S is a scaling matrix.
+	/// matrix A, it applies A' = A*S where S is a scaling matrix. This is far
+	/// more efficient than matrix multiplication requiring only (N-1)^2 madds.
 	template<class V>
 	Mat& scale(const Vec<N-1,V>& amount){
-		for(int C=0; C<N-1; ++C){
-			for(int R=0; R<N-1; ++R){
-				(*this)(R,C) *= amount[C];
-			}
-		}
+		for(int C=0; C<N-1; ++C)
+			col(C).template sub<N-1>() *= amount[C];
 		return *this;
 	}
 
@@ -893,23 +891,26 @@ public:
 	/// Scale transformation matrix global coordinates
 
 	/// This applies a non-uniform scaling to the matrix. Specifically, given
-	/// matrix A, it applies A' = A*S where S is a scaling matrix.
+	/// matrix A, it applies A' = S*A where S is a scaling matrix. This is far
+	/// more efficient than matrix multiplication requiring only N(N-1) madds.
 	template<class V>
 	Mat& scaleGlobal(const Vec<N-1,V>& amount){
-		for(int R=0; R<N-1; ++R){
-			for(int C=0; C<N-1; ++C){
-				(*this)(R,C) *= amount[R];
-			}
-		}
+		for(int C=0; C<N; ++C)
+			col(C).template sub<N-1>() *= amount;
 		return *this;
 	}
 
+	template<typename... Vals>
+	Mat& scaleGlobal(Vals... vals){ return scaleGlobal(Vec<(sizeof...(Vals)),T>(vals...)); }
+
 	/// Translate transformation matrix in local coordinates
+
+	/// This applies A' = A*T, where T is a translation matrix, in only (N-1)^2
+	/// madds.
 	template<class V>
 	Mat& translate(const Vec<N-1,V>& amount){
-		for(int R=0; R<N-1; ++R){
-			(*this)(R,N-1) += this->row(R).template sub<N-1>().dot(amount);
-		}
+		for(int R=0; R<N-1; ++R)
+			(*this)(R,N-1) += row(R).template sub<N-1>().dot(amount);
 		return *this;
 	}
 
@@ -921,15 +922,19 @@ public:
 	template<typename... Vals>
 	Mat& translate(Vals... vals){ return translate(Vec<(sizeof...(Vals)),T>(vals...)); }
 
-	/// Translate transformation matrix in global coordinate
+	/// Translate transformation matrix in global coordinates
+
+	/// This applies A' = T*A, where T is a translation matrix, in only N-1
+	/// additions.
 	template<class V>
 	Mat& translateGlobal(const Vec<N-1,V>& amount){
-		for(int R=0; R<N-1; ++R){
+		for(int R=0; R<N-1; ++R)
 			(*this)(R, N-1) += amount[R];
-		}
 		return *this;
 	}
 
+	template<typename... Vals>
+	Mat& translateGlobal(Vals... vals){ return translateGlobal(Vec<(sizeof...(Vals)),T>(vals...)); }
 
 	/// Print to file (stream)
 	void print(FILE * file = stdout) const;
