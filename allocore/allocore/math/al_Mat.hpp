@@ -393,16 +393,22 @@ public:
 	T* elems(){ return mElems; }
 
 	/// Set element at index with no bounds checking
-	T& operator[](int i){ return elems()[i];}
+	T& operator[](int i){ return mElems[i];}
 
 	/// Get element at index with no bounds checking
-	const T& operator[](int i) const { return elems()[i]; }
+	const T& operator[](int i) const { return mElems[i]; }
 
 	/// Set element at row i, column j
-	T& operator()(int i, int j){ return (*this)[j*N+i]; }
+	T& operator()(int i, int j){ return at(i,j); }
 
 	/// Get element at row i, column j
-	const T& operator()(int i, int j) const { return (*this)[j*N+i]; }
+	const T& operator()(int i, int j) const { return at(i,j); }
+
+	/// Set element at row i, column j
+	T& at(int i, int j){ return mElems[j*N+i]; }
+
+	/// Get element at row i, column j
+	const T& at(int i, int j) const { return mElems[j*N+i]; }
 
 	template <int Row, int Col>
 	T& at(){
@@ -488,7 +494,7 @@ public:
 		Mat<M,T> res(MAT_NO_INIT);
 		for(int j=0; j<M; ++j){
 		for(int i=0; i<M; ++i){
-			res(j,i) = (*this)(j+row, i+col);
+			res(j,i) = at(j+row, i+col);
 		}}
 		return res;
 	}
@@ -500,7 +506,7 @@ public:
 			js += int(js==row);
 			for(int i=0, is=0; i<N-1; ++i, ++is){
 				is += int(is==col);
-				res(j,i) = (*this)(js,is);
+				res(j,i) = at(js,is);
 			}
 		}
 		return res;
@@ -552,7 +558,7 @@ public:
 		constexpr auto L = N<M ? N : M;
 		for(int r=0; r<L; ++r)
 			for(int c=0; c<L; ++c)
-				(*this)(c,r) = v(c,r);
+				at(c,r) = v(c,r);
 		return *this;
 	}
 
@@ -636,25 +642,25 @@ public:
 	/// Set a (sub)column
 	Mat& setCol2(const T& v1, const T& v2, int col=0, int row=0){
 		static_assert(N>=2, "Attempt to set matrix elements out of bounds");
-		(*this)(row  , col) = v1;
-		(*this)(row+1, col) = v2; return *this;
+		at(row  , col) = v1;
+		at(row+1, col) = v2; return *this;
 	}
 
 	/// Set a (sub)column
 	Mat& setCol3(const T& v1, const T& v2, const T& v3, int col=0, int row=0){
 		static_assert(N>=3, "Attempt to set matrix elements out of bounds");
-		(*this)(row  , col) = v1;
-		(*this)(row+1, col) = v2;
-		(*this)(row+2, col) = v3; return *this;
+		at(row  , col) = v1;
+		at(row+1, col) = v2;
+		at(row+2, col) = v3; return *this;
 	}
 
 	/// Set a (sub)column
 	Mat& setCol4(const T& v1, const T& v2, const T& v3, const T& v4, int col=0, int row=0){
 		static_assert(N>=4, "Attempt to set matrix elements out of bounds");
-		(*this)(row,   col) = v1;
-		(*this)(row+1, col) = v2;
-		(*this)(row+2, col) = v3;
-		(*this)(row+3, col) = v4; return *this;
+		at(row,   col) = v1;
+		at(row+1, col) = v2;
+		at(row+2, col) = v3;
+		at(row+3, col) = v4; return *this;
 	}
 
 	/// Set elements on diagonal to one and all others to zero
@@ -858,8 +864,8 @@ public:
 		double cs = cos(angle);
 		double sn = sin(angle);
 		for(int C=0; C<M; ++C){
-			auto& v1 = (*this)(dim1, C);
-			auto& v2 = (*this)(dim2, C);
+			auto& v1 = at(dim1, C);
+			auto& v2 = at(dim2, C);
 			T t= v1*cs - v2*sn;
 			v2 = v2*cs + v1*sn;
 			v1 = t;
@@ -913,7 +919,7 @@ public:
 	template<class V>
 	Mat& translate(const Vec<N-1,V>& amount){
 		for(int R=0; R<N-1; ++R)
-			(*this)(R,N-1) += row(R).template sub<N-1>().dot(amount);
+			at(R,N-1) += row(R).template sub<N-1>().dot(amount);
 		return *this;
 	}
 
@@ -932,7 +938,7 @@ public:
 	template<class V>
 	Mat& translateGlobal(const Vec<N-1,V>& amount){
 		for(int R=0; R<N-1; ++R)
-			(*this)(R, N-1) += amount[R];
+			at(R, N-1) += amount[R];
 		return *this;
 	}
 
