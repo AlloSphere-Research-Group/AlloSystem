@@ -813,37 +813,35 @@ public:
 
 	// Affine transformations
 
-	/// Rotate transformation matrix on a local plane (A' = AR)
+	/// Rotate transformation matrix on a local plane
 
-	/// @param[in] angle	angle of rotation, in radians
+	/// This efficiently computes A' = A*R with only 2(N-1) complex muls
+	/// (or about 4(N-1) madds). The translation part is left unaffected.
+	///
+	/// @param[in] r		rotation (or angle in radians)
 	/// @param[in] dim1		local coordinate frame axis to rotate away from
 	/// @param[in] dim2		local coordinate frame axis to rotate towards
-	Mat& rotate(double angle, int dim1, int dim2){
-		return rotate(cos(angle), sin(angle), dim1, dim2);
-	}
-
-	Mat& rotate(double cosAngle, double sinAngle, int dim1, int dim2){
+	Mat& rotate(const Rotoscale<T>& r, int dim1, int dim2){
 		for(int R=0; R<N-1; ++R){
-			auto& v1 = (*this)(R, dim1);
-			auto& v2 = (*this)(R, dim2);
-			T t= v1*cosAngle + v2*sinAngle;
-			v2 = v2*cosAngle - v1*sinAngle;
-			v1 = t;
+			auto& a = at(R, dim1);
+			auto& b = at(R, dim2);
+			T t=a*r.r + b*r.i;
+			b = b*r.r - a*r.i;
+			a = t;
 		}
 		return *this;
 	}
 
 	template <int Dim1=0, int Dim2=1>
-	Mat& rotate(double angle){
+	Mat& rotate(const Rotoscale<T>& r){
 		static_assert_plane_homog<Dim1,Dim2>();
-		return rotate(angle, Dim1, Dim2);
+		return rotate(r, Dim1, Dim2);
 	}
 
-	template <int Dim1=0, int Dim2=1>
-	Mat& rotate(double cosAngle, double sinAngle){
-		return rotate<Dim1,Dim2>(cosAngle, sinAngle);
-	}
+	/// Rotate by 90 degrees on local plane
 
+	/// This very efficiently applies A' = A*R, where R is a rotation matrix of
+	/// 90 degrees, with only a swap and negation.
 	Mat& rotate90(int dim1, int dim2){
 		auto& col1 = col(dim1).template sub<N-1>();
 		auto& col2 = col(dim2).template sub<N-1>();
@@ -858,30 +856,37 @@ public:
 		return rotate90(Dim1, Dim2);
 	}
 
-	/// Rotate submatrix on a global plane (A' = RA)
-	template <int M>
-	Mat& rotateGlobal(double angle, int dim1, int dim2){
-		double cs = cos(angle);
-		double sn = sin(angle);
+	/// Rotate (submatrix) on a global plane
+
+	/// This efficiently applies A' = R*A with only 2N complex muls
+	/// (or about 4N madds). The translation part is affected.
+	///
+	/// @param[in] r		rotation (or angle in radians)
+	/// @param[in] dim1		global axis to rotate away from
+	/// @param[in] dim2		global axis to rotate towards
+	template <int M=N>
+	Mat& rotateGlobal(const Rotoscale<T>& r, int dim1, int dim2){
+		static_assert(M<=N, "Invalid submatrix size");
 		for(int C=0; C<M; ++C){
-			auto& v1 = at(dim1, C);
-			auto& v2 = at(dim2, C);
-			T t= v1*cs - v2*sn;
-			v2 = v2*cs + v1*sn;
-			v1 = t;
+			auto& a = at(dim1, C);
+			auto& b = at(dim2, C);
+			T t=r.r*a - r.i*b;
+			b = r.i*a + r.r*b;
+			a = t;
 		}
 		return *this;
 	}
 
-	/// Rotate transformation matrix on a global plane (A' = RA)
-	Mat& rotateGlobal(double angle, int dim1, int dim2){
-		return rotateGlobal<N-1>(angle,dim1,dim2); }
+	template <int Dim1=0, int Dim2=1, int M=N>
+	Mat& rotateGlobal(const Rotoscale<T>& r){
+		static_assert_plane_homog<Dim1,Dim2>();
+		return rotateGlobal<M>(r, Dim1, Dim2);
+	}
 
 	/// Scale transformation matrix
 
-	/// This applies a non-uniform scaling to the matrix. Specifically, given
-	/// matrix A, it applies A' = A*S where S is a scaling matrix. This is far
-	/// more efficient than matrix multiplication requiring only (N-1)^2 madds.
+	/// This efficiently applies A' = A*S, where S is a non-uniform scaling
+	/// matrix, in only (N-1)^2 madds. The translation part is never affected.
 	template<class V>
 	Mat& scale(const Vec<N-1,V>& amount){
 		for(int C=0; C<N-1; ++C)
@@ -899,9 +904,8 @@ public:
 
 	/// Scale transformation matrix global coordinates
 
-	/// This applies a non-uniform scaling to the matrix. Specifically, given
-	/// matrix A, it applies A' = S*A where S is a scaling matrix. This is far
-	/// more efficient than matrix multiplication requiring only N(N-1) madds.
+	/// This efficiently applies A' = S*A, where S is a non-uniform scaling
+	/// matrix, in only N(N-1) madds. The translation part is also scaled.
 	template<class V>
 	Mat& scaleGlobal(const Vec<N-1,V>& amount){
 		for(int C=0; C<N; ++C)
@@ -914,8 +918,8 @@ public:
 
 	/// Translate transformation matrix in local coordinates
 
-	/// This applies A' = A*T, where T is a translation matrix, in only (N-1)^2
-	/// madds.
+	/// This efficiently applies A' = A*T, where T is a translation matrix, in
+	/// only (N-1)^2 madds. The rotation/scaling part is never affected.
 	template<class V>
 	Mat& translate(const Vec<N-1,V>& amount){
 		for(int R=0; R<N-1; ++R)
@@ -933,8 +937,8 @@ public:
 
 	/// Translate transformation matrix in global coordinates
 
-	/// This applies A' = T*A, where T is a translation matrix, in only N-1
-	/// additions.
+	/// This efficiently applies A' = T*A, where T is a translation matrix, in
+	/// only N-1 additions. The rotation/scaling part is never affected.
 	template<class V>
 	Mat& translateGlobal(const Vec<N-1,V>& amount){
 		for(int R=0; R<N-1; ++R)
