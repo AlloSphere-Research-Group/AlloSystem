@@ -72,9 +72,8 @@ struct MIDIIn::Impl{
 
 #endif // AL_MIDI_RTMIDI
 
-
-double noteToHz(double noteNumber){
-	return std::pow(2., (noteNumber - 69.)/12.) * 440.;
+double al::noteToHz(double noteNumber){
+	return std::exp2((noteNumber - 69.)/12.) * 440.;
 }
 
 const char * MIDIByte::messageTypeString(unsigned char statusByte){
