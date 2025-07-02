@@ -298,8 +298,11 @@ template<class T> T pow7(const T& v);		///< Returns value to the 7th power
 template<class T> T pow8(const T& v);		///< Returns value to the 8th power
 template<class T> T pow9(const T& v);		///< Returns value to the 9th power
 template<class T> T pow16(const T& v);		///< Returns value to the 16th power
+template<class T> T pow17(const T& v);		///< Returns value to the 17th power
 template<class T> T pow32(const T& v);		///< Returns value to the 32nd power
+template<class T> T pow33(const T& v);		///< Returns value to the 33rd power
 template<class T> T pow64(const T& v);		///< Returns value to the 64th power
+template<class T> T pow65(const T& v);		///< Returns value to the 65th power
 
 /// Returns value to a positive integer power
 
@@ -748,8 +751,11 @@ TEM inline T pow7 (const T& v){ return v * pow6(v); }
 TEM inline T pow8 (const T& v){ return pow4(pow2(v)); }
 TEM inline T pow9 (const T& v){ return v * pow8(v); }
 TEM inline T pow16(const T& v){ return pow4(pow4(v)); }
+TEM inline T pow17(const T& v){ return pow16(v)*v; }
 TEM inline T pow32(const T& v){ return pow4(pow8(v)); }
+TEM inline T pow33(const T& v){ return pow32(v)*v; }
 TEM inline T pow64(const T& v){ return pow8(pow8(v)); }
+TEM inline T pow65(const T& v){ return pow64(v)*v; }
 
 TEM inline T powN(T base, unsigned power){
 	switch(power){
