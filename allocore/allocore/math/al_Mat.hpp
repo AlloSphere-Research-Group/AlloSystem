@@ -315,6 +315,18 @@ public:
 		return translation(Vec<sizeof...(Vals),T>(vals...));
 	}
 
+	/// Get scaling-translation (ST) transform matrix
+
+	/// This returns the transform matrix T*S where the respective matrices are
+	/// a translation and scaling. The lumped transform is created with only
+	/// 2(N-1) assignments.
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat ST(const Vec<N-1,T>& s, const Vec<N-1,T>& t){
+		Mat m = Mat::scaling(s);
+		m.col<N-1>().template sub<N-1>() = t;
+		return m;
+	}
+
 	/// Get scaling-rotation (SR) transform matrix
 
 	/// This returns the transform matrix R*S where the respective matrices are
