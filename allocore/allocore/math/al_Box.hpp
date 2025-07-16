@@ -46,10 +46,11 @@
 
 namespace al {
 
+namespace{
 template <class T> T Box__bigVal();
 template <> float Box__bigVal<float>(){ return 3.4e38; }
 template <> double Box__bigVal<double>(){ return 1.7e308; }
-
+}
 
 /// @addtogroup allocore
 /// @{
