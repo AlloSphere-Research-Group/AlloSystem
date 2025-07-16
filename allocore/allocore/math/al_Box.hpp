@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_AABOX_HPP
-#define INCLUDE_AL_AABOX_HPP
+#ifndef INCLUDE_AL_BOX_HPP
+#define INCLUDE_AL_BOX_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
@@ -36,7 +36,7 @@
 
 
 	File description:
-	Axis-aligned bounding box
+	Geometric box (hyperrectangle)
 
 	File author(s):
 	Lance Putnam, 2025, putnam.lance@gmail.com
@@ -46,17 +46,21 @@
 
 namespace al {
 
-template <class T> T AABox__bigVal();
-template <> float AABox__bigVal<float>(){ return 3.4e38; }
-template <> double AABox__bigVal<double>(){ return 1.7e308; }
+template <class T> T Box__bigVal();
+template <> float Box__bigVal<float>(){ return 3.4e38; }
+template <> double Box__bigVal<double>(){ return 1.7e308; }
 
 
 /// @addtogroup allocore
 /// @{
 
-/// Axis-aligned bounding box
+/// Geometric box shape
+
+/// In geometry, a box or hyperrectangle is an n-dimensional generalization of
+/// a rectangle. In one, two and three dimensions it is an interval, rectangle
+/// and cuboid, respectively. Here, the box is axis-aligned.
 template <int N=3, class T=float>
-class AABox{
+class Box{
 public:
 
 	using vec = Vec<N,T>;
@@ -73,26 +77,26 @@ public:
 	}
 
 
-	AABox(){ reset(); }
-	AABox(const AABox& b){ *this = b; }
+	Box(){ reset(); }
+	Box(const Box& b){ *this = b; }
 
 
 	/// Return a copy
-	AABox dup() const { return *this; }
+	Box dup() const { return *this; }
 
-	AABox& operator= (const AABox& b){
+	Box& operator= (const Box& b){
 		mMin = b.mMin;
 		mMax = b.mMax;
 		return *this;
 	}
 
-	#define AABOX_DEF_OP(op)\
-		AABox& operator op##= (vec v){ mMin op##= v; mMax op##= v; return *this; }\
-		AABox operator op (vec v) const { return dup() op##= v; }
+	#define AL_BOX_DEF_OP(op)\
+		Box& operator op##= (vec v){ mMin op##= v; mMax op##= v; return *this; }\
+		Box operator op (vec v) const { return dup() op##= v; }
 
-	AABOX_DEF_OP(+) AABOX_DEF_OP(-) AABOX_DEF_OP(*) AABOX_DEF_OP(/)
+	AL_BOX_DEF_OP(+) AL_BOX_DEF_OP(-) AL_BOX_DEF_OP(*) AL_BOX_DEF_OP(/)
 
-	#undef AABOX_DEF_OP
+	#undef AL_BOX_DEF_OP
 
 	/// Get min corner
 	const vec& min() const { return mMin; }
@@ -107,7 +111,7 @@ public:
 
 	/// Fit bounds to a set of points
 	template <class GetPointAtIndex>
-	AABox& fit(const GetPointAtIndex& getPointAtIndex, int numPoints, int offset=0){
+	Box& fit(const GetPointAtIndex& getPointAtIndex, int numPoints, int offset=0){
 		reset();
 		for(int i=offset; i<offset+numPoints; ++i){
 			adjust(getPointAtIndex(i));
@@ -116,11 +120,11 @@ public:
 	}
 
 	/// Reset the bounds (to be fitted again)
-	AABox& reset(){ mMin=AABox__bigVal<T>(); mMax=-mMin; return *this; }
+	Box& reset(){ mMin=Box__bigVal<T>(); mMax=-mMin; return *this; }
 
 	/// Adjust box to include point
 	template <class Tvec>
-	AABox& adjust(const Tvec& point){
+	Box& adjust(const Tvec& point){
 		static_assert_vec<Tvec>();
 		for(unsigned i=0; i<size(); ++i){
 			if(point[i] < mMin[i]) mMin[i] = point[i];
@@ -131,7 +135,7 @@ public:
 
 	/// Adjust box to include sphere
 	template <class Tvec>
-	AABox& adjustSphere(const Tvec& pos, float rad){
+	Box& adjustSphere(const Tvec& pos, float rad){
 		static_assert_vec<Tvec>();
 		for(unsigned i=0; i<size(); ++i){
 			auto lo = pos[i] - rad;
@@ -154,7 +158,7 @@ public:
 	}
 
 	/// Test whether we intersect with another box
-	bool intersects(const AABox& other) const {
+	bool intersects(const Box& other) const {
 		for(unsigned i=0; i<size(); ++i){
 			if(other.mMax[i] < mMin[i] || other.mMin[i] > mMax[i])
 				return false;
@@ -174,7 +178,7 @@ public:
 	}
 
 	/// Add padding amount to box (changes all AA radii by this amount)
-	AABox& pad(T v){
+	Box& pad(T v){
 		mMin -= v;
 		mMax += v;
 		return *this;
