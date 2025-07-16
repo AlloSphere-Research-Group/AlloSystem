@@ -85,10 +85,18 @@ public:
 	Box dup() const { return *this; }
 
 	Box& operator= (const Box& b){
-		mMin = b.mMin;
-		mMax = b.mMax;
+		return set(b.mMin, b.mMax);
+	}
+
+	/// Set from min and max corners
+	Box& set(vec min, vec max){
+		mMin = min;
+		mMax = max;
 		return *this;
 	}
+
+	/// Set max with min at origin
+	Box& set(vec ext){ return set(vec(0), ext); }
 
 	#define AL_BOX_DEF_OP(op)\
 		Box& operator op##= (vec v){ mMin op##= v; mMax op##= v; return *this; }\
