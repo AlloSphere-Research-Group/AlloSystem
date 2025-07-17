@@ -330,8 +330,7 @@ public:
 	/// Get scaling-rotation (SR) transform matrix
 
 	/// This returns the transform matrix R*S where the respective matrices are
-	/// a rotation and scaling. Due to the simplicity of the matrices involved,
-	/// it is possible to form the lumped transform directly with only four
+	/// a rotation and scaling. The lumped transform is created with only four
 	/// multiplies versus N^3 if using matrix multiplication.
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat SR(const Vec<N-1,T>& s, const Rotoscale<T>& r){
@@ -346,8 +345,7 @@ public:
 	/// Get scaling-rotation-translation (SRT) transform matrix
 
 	/// This returns the transform matrix T*R*S where the respective matrices
-	/// are a translation, rotation and scaling. Due to the simplicity of the
-	/// matrices involved, it is possible to form the lumped transform directly
+	/// are a translation, rotation and scaling. The lumped transform is created
 	/// with only four multiplies versus 2(N^3) if using matrix multiplication.
 	/// In 2D, this transform forms a complete "model" matrix. In 3D and above,
 	/// it may be multiplied on the right by additional rotation matrices.
@@ -359,6 +357,10 @@ public:
 	}
 
 	/// Get translation-scaling-rotation (TSR) transform matrix
+
+	/// This returns the transform matrix R*S*T where the respective matrices
+	/// are a rotation, scaling and translation. The lumped transform is created
+	/// with only 5+N multiplies versus 2(N^3) if using matrix multiplication.
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat<N,T> TSR(const Vec<N-1,T>& t, const Vec<N-1,T>& s, const Rotoscale<T>& r){
 		Mat m = SR<Dim1,Dim2>(s, r);
@@ -369,6 +371,19 @@ public:
 		// Compute contribution of off-diagonal components
 		c.template at<Dim1>() += m.at<Dim1,Dim2>() * t.template at<Dim2>();
 		c.template at<Dim2>() += m.at<Dim2,Dim1>() * t.template at<Dim1>();
+		return m;
+	}
+
+	/// Get translation-scaling-rotation-translation (TSRT) transform matrix
+
+	/// This returns the transform matrix T*R*S*T where the respective matrices
+	/// are a translation, rotation, scaling and translation. The lumped 
+	/// transform is created with only 5+N multiplies versus 3(N^3) if using
+	/// matrix multiplication.
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat<N,T> TSRT(const Vec<N-1,T>& t1, const Vec<N-1,T>& s, const Rotoscale<T>& r, const Vec<N-1,T>& t2){
+		Mat m = TSR<Dim1,Dim2>(t1, s, r);
+		m.col<N-1>().template sub<-1>() += t2;
 		return m;
 	}
 
