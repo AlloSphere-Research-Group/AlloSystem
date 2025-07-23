@@ -31,6 +31,32 @@ Vec transform(
 	return uint8_t((u.i & 0x007fffff) >> 15);
 }
 
+Colori& Colori::fromHex(const char * s){
+	auto h2d = [](char h) -> unsigned char {
+		if('0'<=h && h<='9') return h-'0';
+		if('a'<=h && h<='f') return h-'a'+10;
+		if('A'<=h && h<='F') return h-'A'+10;
+		return 0;
+	};
+	auto hh2d = [&](const char * hh){
+		return (h2d(hh[0])<<4) + h2d(hh[1]);
+	};
+
+	int len=0;
+	for(; len<8; ++len){
+		if(s[len] == '\0') break;
+	}
+
+	// valid strings: fff, fffa, ffffff, ffffffaa
+	switch(len){
+	case 3: return set(h2d(s[0])*17, h2d(s[1])*17, h2d(s[2])*17, 255);
+	case 4: return set(h2d(s[0])*17, h2d(s[1])*17, h2d(s[2])*17, h2d(s[3])*17);
+	case 6:	return set(hh2d(s), hh2d(s+2), hh2d(s+4), 255);
+	case 8: return set(hh2d(s), hh2d(s+2), hh2d(s+4), hh2d(s+6));
+	default:return *this;
+	}
+};
+
 Colori Colori::mix(const Colori& v, float amt) const {
 	Colori res;
 	uint8_t f = toi(amt);

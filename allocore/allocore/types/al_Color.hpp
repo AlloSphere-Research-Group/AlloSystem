@@ -430,6 +430,14 @@ struct Colori {
 		return *this;
 	}
 
+	/// Set from hexadecimal string
+
+	/// Supported string formats include "RRGGBB", "RRGGBBAA", "RGB" and "RGBA"
+	/// where each character is a hexadecimal digit in [0,f]. Shorthand formats
+	/// get expanded into longhand format by duplicating digits. For example,
+	/// "8a0" is interpreted as "88aa00".
+	Colori& fromHex(const char * s);
+
 	/// Returns inverted color
 	Colori inverse() const { return Colori(*this).invert(); }
 

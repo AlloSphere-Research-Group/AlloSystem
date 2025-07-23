@@ -535,6 +535,13 @@ int utTypes(){
 		assert(Colori(10) == Colori(10,10,10));
 		assert(Colori(10).a == 255);
 		assert(Colori(10,20,30).mix(Colori(10,10,10), 0.5) == Colori(10,15,20));
+
+		//{ auto c=Colori().fromHex("100"); printf("%u %u %u %u\n", c.r, c.g, c.b, c.a); }
+		assert(Colori().fromHex("fff") == Colori(255,255,255));
+		assert(Colori().fromHex("abc") == Color(10./15., 11./15., 12./15.));
+		assert(Colori().fromHex("ffff") == Colori(255));
+		assert(Colori().fromHex("FFFFFF") == Colori(255));
+		assert(Colori().fromHex("0020a0cc") == Colori(0, 2*16, 10*16, 12*16+12));
 	}
 
 	return 0;
