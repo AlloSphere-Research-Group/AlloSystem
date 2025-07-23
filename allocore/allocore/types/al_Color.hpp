@@ -438,6 +438,15 @@ struct Colori {
 	/// "8a0" is interpreted as "88aa00".
 	Colori& fromHex(const char * s);
 
+	struct HexString{
+		char data[9] = {'\0'};
+		const char * c_str() const { return data; }
+		operator const char *() const { return data; }
+	};
+
+	/// Convert to hexadecimal string
+	HexString toHex() const;
+
 	/// Returns inverted color
 	Colori inverse() const { return Colori(*this).invert(); }
 

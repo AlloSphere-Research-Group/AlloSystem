@@ -1,3 +1,4 @@
+#include <cstring> // strcmp
 #include "utAllocore.h"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Buffer.hpp"
@@ -542,9 +543,11 @@ int utTypes(){
 		assert(Colori().fromHex("ffff") == Colori(255));
 		assert(Colori().fromHex("FFFFFF") == Colori(255));
 		assert(Colori().fromHex("0020a0cc") == Colori(0, 2*16, 10*16, 12*16+12));
+
+		//printf("%s\n", Colori(128,64,32).toHex().c_str());
+		assert(strcmp(Colori(128).toHex(), "808080ff") == 0);
+		assert(strcmp(Colori(10*16, 11*16, 12*16, 14*16+14).toHex(), "a0b0c0ee") == 0);
 	}
 
 	return 0;
 }
-
-

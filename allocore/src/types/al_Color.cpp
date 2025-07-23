@@ -55,7 +55,21 @@ Colori& Colori::fromHex(const char * s){
 	case 8: return set(hh2d(s), hh2d(s+2), hh2d(s+4), hh2d(s+6));
 	default:return *this;
 	}
-};
+}
+
+Colori::HexString Colori::toHex() const {
+	HexString s;
+	const char * d2h = "0123456789abcdef";
+	auto d2hh = [&](unsigned char d, char * hh){
+		hh[0] = d2h[(d>>4)&0xf];
+		hh[1] = d2h[(d   )&0xf];
+	};
+	d2hh(r, s.data);
+	d2hh(g, s.data+2);
+	d2hh(b, s.data+4);
+	d2hh(a, s.data+6);
+	return s;
+}
 
 Colori Colori::mix(const Colori& v, float amt) const {
 	Colori res;
