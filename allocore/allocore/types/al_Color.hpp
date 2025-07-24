@@ -439,13 +439,17 @@ struct Colori {
 	Colori& fromHex(const char * s);
 
 	struct HexString{
-		char data[9] = {'\0'};
+		char data[9];
+		HexString(){ data[8]='\0'; }
 		const char * c_str() const { return data; }
 		operator const char *() const { return data; }
 	};
 
 	/// Convert to hexadecimal string
-	HexString toHex() const;
+
+	/// \param[in] len	Length of returned string. Options are
+	///					3 for RGB, 4 for RGBA, 6 for RRGGBB and 8 for RRGGBBAA.
+	HexString toHex(unsigned len=8) const;
 
 	/// Returns inverted color
 	Colori inverse() const { return Colori(*this).invert(); }

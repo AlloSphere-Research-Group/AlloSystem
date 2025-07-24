@@ -47,7 +47,7 @@ Colori& Colori::fromHex(const char * s){
 		if(s[len] == '\0') break;
 	}
 
-	// valid strings: fff, fffa, ffffff, ffffffaa
+	// valid strings: rgb, rgba, rrggbb, rrggbbaa
 	switch(len){
 	case 3: return set(h2d(s[0])*17, h2d(s[1])*17, h2d(s[2])*17, 255);
 	case 4: return set(h2d(s[0])*17, h2d(s[1])*17, h2d(s[2])*17, h2d(s[3])*17);
@@ -57,17 +57,31 @@ Colori& Colori::fromHex(const char * s){
 	}
 }
 
-Colori::HexString Colori::toHex() const {
+Colori::HexString Colori::toHex(unsigned len) const {
 	HexString s;
 	const char * d2h = "0123456789abcdef";
 	auto d2hh = [&](unsigned char d, char * hh){
 		hh[0] = d2h[(d>>4)&0xf];
 		hh[1] = d2h[(d   )&0xf];
 	};
-	d2hh(r, s.data);
-	d2hh(g, s.data+2);
-	d2hh(b, s.data+4);
-	d2hh(a, s.data+6);
+	switch(len){
+	default:
+		len=8;
+		d2hh(a, s.data+6);
+	case 6:
+		d2hh(r, s.data);
+		d2hh(g, s.data+2);
+		d2hh(b, s.data+4);
+		break;
+	case 4:
+		s.data[3] = d2h[a>>4];
+	case 3:
+		s.data[0] = d2h[r>>4];
+		s.data[1] = d2h[g>>4];
+		s.data[2] = d2h[b>>4];
+		break;
+	}
+	s.data[len] = '\0';
 	return s;
 }
 

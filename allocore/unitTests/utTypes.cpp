@@ -547,6 +547,9 @@ int utTypes(){
 		//printf("%s\n", Colori(128,64,32).toHex().c_str());
 		assert(strcmp(Colori(128).toHex(), "808080ff") == 0);
 		assert(strcmp(Colori(10*16, 11*16, 12*16, 14*16+14).toHex(), "a0b0c0ee") == 0);
+		assert(strcmp(Colori(0,16,32,255).toHex(3), "012") == 0);
+		assert(strcmp(Colori(0,16,32,255).toHex(4), "012f") == 0);
+		assert(strcmp(Colori(0,16,32,255).toHex(6), "001020") == 0);
 	}
 
 	return 0;
