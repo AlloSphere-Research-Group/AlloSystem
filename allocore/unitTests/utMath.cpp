@@ -3,6 +3,7 @@
 #include "allocore/math/al_Complex.hpp"
 #include "allocore/math/al_Functions.hpp"
 #include "allocore/math/al_Frustum.hpp"
+#include "allocore/math/al_Interpolation.hpp"
 #include "allocore/math/al_Interval.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Plane.hpp"
@@ -1003,6 +1004,24 @@ int utMath(){
 		assert(i.min()==11 && i.max()==12);
 	}
 
+	// Interpolation
+	{
+		using namespace al::ipl;
+
+		assert(eq(linear(0.0, 0., 10.), 0.));
+		assert(eq(linear(0.5, 0., 10.), 5.));
+		assert(eq(linear(1.0, 0., 10.),10.));
+
+		double a[] = {10.,9.,8.,7.};
+		auto len = sizeof(a)/sizeof(*a);
+		//printf("%g\n", linear(0.5, a,len));
+		assert(eq(linear(0.0/(len-1), a,len), a[0]));
+		assert(eq(linear(1.0/(len-1), a,len), a[1]));
+		assert(eq(linear(1.5/(len-1), a,len), (a[1]+a[2])*0.5));
+		assert(eq(linear(1.0, a,len), a[len-1]));
+
+		assert(eq(linear(4./8., {1., 2., 3., 4.}), 2.5));
+	}
 
 	// Random
 	{

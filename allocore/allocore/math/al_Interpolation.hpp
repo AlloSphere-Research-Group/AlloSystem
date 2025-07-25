@@ -142,6 +142,16 @@ Tv linear(Tf frac, const Tv& x, const Tv& y);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
+/// Linear interpolation into an array
+template <class Tf, class Tv>
+Tv linear(Tf frac, const Tv * src, int len);
+
+/// Linear interpolation into an array
+template <class Tf, class Arr>
+typename Arr::value_type linear(Tf frac, const Arr& src){
+	return linear(frac, &src[0], src.size());
+}
+
 /// Linear interpolation into a list
 template <class Tf, class Tv>
 Tv linear(Tf frac, const std::initializer_list<Tv>& src);
@@ -427,14 +437,17 @@ inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 }
 
 template <class Tf, class Tv>
-inline Tv linear(Tf frac, const std::initializer_list<Tv>& src){
-	if(frac >= Tf(1)) return *(src.end()-1);
-	int N = src.size();
-	Tf idxf = (N-1)*frac;
+Tv linear(Tf frac, const Tv * src, int len){
+	if(frac >= Tf(1)) return src[len-1];
+	Tf idxf = (len-1)*frac;
 	int i0 = int(idxf);
 	int i1 = i0+1;
-	Tf f = idxf - i0;
-	return linear(f, *(src.begin()+i0), *(src.begin()+i1));
+	return linear(idxf-i0, src[i0], src[i1]);
+}
+
+template <class Tf, class Tv>
+inline Tv linear(Tf frac, const std::initializer_list<Tv>& src){
+	return linear(frac, src.begin(), src.size());
 }
 
 template <class Tf, class Tv>
