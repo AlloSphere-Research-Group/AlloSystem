@@ -806,6 +806,12 @@ public:
 		return std::atan2(at<Dim2>(), at<Dim1>());
 	}
 
+	/// Get polar angle on plane, in [-180,180] degrees
+	template <int Dim1=0, int Dim2=1>
+	T angleDeg() const {
+		return angle<Dim1,Dim2>() * 57.29577951308;
+	}
+
 	/// Get polar angle on plane, in [0,1]
 	template <int Dim1=0, int Dim2=1>
 	T angleUnit() const {
