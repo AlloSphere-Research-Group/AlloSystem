@@ -133,6 +133,11 @@ public:
 
 	struct NamedGroup : public Group{
 		std::string name;
+		NamedGroup& operator= (Group g){
+			this->begin = g.begin;
+			this->end = g.end;
+			return *this;
+		}
 	};
 
 	typedef Buffer<NamedGroup> NamedGroups;
@@ -672,8 +677,18 @@ public:
 	Mesh& visible(bool v){ mVisible=v; return *this; }
 	Mesh& visibleToggle(){ mVisible^=true; return *this; }
 
+	/// Get named groups
 	const NamedGroups& groups() const { return mGroups; }
 	NamedGroups& groups(){ return mGroups; }
+
+	/// Add named group of vertices added in function
+	template <class Func>
+	NamedGroup& addGroup(const Func& f){
+		mGroups.emplace_back();
+		auto& g = mGroups.back();
+		g = group(f);
+		return g;
+	}
 
 	/// Print information about Mesh
 	void print(FILE * dst = stdout) const;
