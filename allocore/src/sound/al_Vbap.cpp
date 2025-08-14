@@ -408,11 +408,8 @@ void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float 
 	unsigned currentTripletIndex = 0;
 	// unsigned currentTripletIndex = mCachedTripletIndex; // Cached source placement, so it starts searching from there.
 
-	auto pos = listeningPose.pos();
-
 	//Rotate vector according to listener-rotation
-	auto srcRot = listeningPose.quat();
-	pos = srcRot.rotate(pos).get<0,2,1>();
+	auto pos = getDir(listeningPose).get<0,2,1>();
 
 	//Silent by default
 	Vec3d gains;
@@ -482,17 +479,12 @@ void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, float sample
 //	unsigned currentTripletIndex = src.cachedIndex();
 	//unsigned currentTripletIndex = mCachedTripletIndex; // Cached source placement, so it starts searching from there.
 	unsigned currentTripletIndex = 0;
-	auto pos = listeningPose.pos();
 
 	//Rotate vector according to listener-rotation
-	auto srcRot = listeningPose.quat();
-	pos = srcRot.rotate(pos).normalize();
+	auto pos = getDir(listeningPose).get<0,2,1>().normalize();
 
-	// now transform to audio positions
-	pos = pos.get<0,2,1>();
 	//Silent by default
 	Vec3d gains;
-//	Vec3d gainsTemp;
 
 	// Search thru the triplets array in search of a match for the source position.
 	for (unsigned count = 0; count < mTriplets.size(); ++count) {
@@ -559,8 +551,7 @@ void Vbap::print() {
 	}
 }
 
-void Vbap::makeTriple(int s1, int s2, int s3)
-{
+void Vbap::makeTriple(int s1, int s2, int s3){
 	SpeakerTriple triple;
 	triple.s1 = s1;
 	triple.s2 = s2;
@@ -568,8 +559,8 @@ void Vbap::makeTriple(int s1, int s2, int s3)
 	triple.loadVectors(mSpeakers);
 	addTriple(triple);
 }
-std::vector<SpeakerTriple> Vbap::triplets() const
-{
+
+std::vector<SpeakerTriple> Vbap::triplets() const {
 	return mTriplets;
 }
 

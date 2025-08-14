@@ -14,6 +14,10 @@ Spatializer::Spatializer(const SpeakerLayout& sl){
 	}
 };
 
+/*static*/ Vec3d Spatializer::getDir(const Pose& pose){
+	return pose.quat().rotate(pose.pos()).get<0,2,1>();
+}
+
 
 
 void AudioSceneObject::updateHistory(){

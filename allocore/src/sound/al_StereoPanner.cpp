@@ -26,43 +26,34 @@ void equalPowerPan(const Vec3d& relPos, float &gainL, float &gainR){
 }
 
 void StereoPanner::renderSample(AudioIOData& io, const Pose& listeningPose, float sample, int frameIndex){
-	auto pos = listeningPose.pos();
-	auto srcRot = listeningPose.quat();
-	pos = srcRot.rotate(pos);
-	if(mNumSpeakers == 2 && mEnabled)
-	{
+
+	auto pos = getDir(listeningPose);
+
+	if(2==mNumSpeakers && mEnabled){
 		float gainL, gainR;
 		equalPowerPan(pos, gainL, gainR);
-
 		io.bufferOut().at(frameIndex,0) += gainL*sample;
 		io.bufferOut().at(frameIndex,1) += gainR*sample;
-	}
-	else // don't pan
-	{
-		for(int i = 0; i < mNumSpeakers; i++)
+	} else { // don't pan
+		for(int i=0; i<mNumSpeakers; ++i)
 			io.bufferOut().at(frameIndex,i) = sample;
 	}
 }
 
 void StereoPanner::renderBuffer(AudioIOData& io, const Pose& listeningPose, const float *samples, int numFrames){
-	auto pos = listeningPose.pos();
-	auto srcRot = listeningPose.quat();
-	pos = srcRot.rotate(pos);
-	if(mNumSpeakers == 2 && mEnabled)
-	{
+
+	auto pos = getDir(listeningPose);
+
+	if(2==mNumSpeakers && mEnabled){
 		float gainL, gainR;
 		equalPowerPan(pos, gainL, gainR);
-
-		for(int i = 0; i < numFrames; i++)
-		{
+		for(int i=0; i<numFrames; ++i){
 			io.bufferOut().at(i,0) += gainL*samples[i];
 			io.bufferOut().at(i,1) += gainR*samples[i];
 		}
-	}
-	else // dont pan
-	{
-		for(int j = 0; j < mNumSpeakers; j++){
-			for(int i = 0; i < numFrames; i++){
+	} else { // don't pan
+		for(int j=0; j<mNumSpeakers; ++j){
+			for(int i=0; i<numFrames; ++i){
 				io.bufferOut().at(i,j) = samples[i];
 			}
 		}

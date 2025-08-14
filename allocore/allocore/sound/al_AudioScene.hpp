@@ -348,20 +348,15 @@ public:
 protected:
 	// LJP: What is perform for? Subclasses seem to all be using render* virtuals.
 	// Render each source per sample
-	virtual void perform(AudioIOData& io,
-	                     SoundSource& src,
-	                     Vec3d& reldir,
-	                     const int& frameIndex
-	                     ) {
+	virtual void perform(AudioIOData& io, SoundSource& src, Vec3d& reldir, const int& frameIndex){
 		renderSample(io, reldir, src.readSample(frameIndex), frameIndex);
 	}
 
 	// Render each source per buffer
-	virtual void perform(AudioIOData& io,
-	                     SoundSource& src,
-	                     Vec3d& reldir,
-	                     float gain
-	                     );
+	virtual void perform(AudioIOData& io, SoundSource& src, Vec3d& reldir, float gain);
+
+	// Argument is usually a listening pose
+	static Vec3d getDir(const Pose& pose);
 
 	Speakers mSpeakers;
 	std::vector<float> mBuffer;	// temporary frame buffer

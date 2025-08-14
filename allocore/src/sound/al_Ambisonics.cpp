@@ -436,15 +436,12 @@ void AmbisonicsSpatializer::renderBuffer(
 //		l.mQuatHistory[i].toVectorZ(axis);
 //		double rf = urel.dot(axis);
 //		//*/
-	auto pos = listeningPose.pos();
 
 	//Rotate vector according to listener-rotation
-	auto srcRot = listeningPose.quat();
-	pos = srcRot.rotate(pos);
+	auto dir = getDir(listeningPose);
+	dir.yz().rotate90();
 
-//	pos = Vec4d(pos.x, -pos.z, pos.y);
-
-	mEncoder.direction(pos.x, -pos.z, pos.y);
+	mEncoder.direction(dir.x, dir.y, dir.z);
 
 	mEncoder.encode(ambiChans(), samples, numFrames);
 //	for(int i = 0; i < numFrames; i++){
@@ -478,17 +475,16 @@ void AmbisonicsSpatializer::renderSample(
 //    //						double rf = urel.dot(axis);
 
 //    // cheaper:
-//    Vec3d direction = mListener->quatHistory()[frameIndex].rotateTransposed(urel);
-	Vec3d direction = listeningPose.pos();
+//    auto dir = mListener->quatHistory()[frameIndex].rotateTransposed(urel);
 
-	//Rotate vector according to listener-rotation
-	Quatd srcRot = listeningPose.quat();
-	direction = srcRot.rotate(direction).get<0,2,1>();
+	//Rotate vector according to listener orientation
+	auto dir = getDir(listeningPose);
+	dir.yz().rotate90();
 
     //mEncoder.direction(azimuth, elevation);
     //mEncoder.direction(-rf, -rr, ru);
-//    mEncoder.direction(-direction[2], -direction[0], direction[1]);
-	mEncoder.direction(direction[0], direction[1], direction[2]);
+//    mEncoder.direction(-dir.z, -dir.x, dir.y);
+	mEncoder.direction(dir.x, dir.y, dir.z);
     mEncoder.encode(ambiChans(), io.framesPerBuffer(), frameIndex, sample);
 
 	float *outs = io.bufferOut().data();
