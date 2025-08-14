@@ -80,7 +80,7 @@ public:
 
 	/// Translate and rotate by argument
 	Pose& operator*= (const Pose& v){
-		mVec += v.vec();
+		mPos += v.pos();
 		mQuat*= v.quat();
 		return *this;
 	}
@@ -102,21 +102,17 @@ public:
 
 
 
-	/// Get "position" vector
-	Vec3d& pos(){ return mVec; }
-	const Vec3d& pos() const { return mVec; }
+	/// Get position
+	Vec3d& pos(){ return mPos; }
+	const Vec3d& pos() const { return mPos; }
 
-	/// Get vector component
-	Vec3d& vec(){ return mVec; }
-	const Vec3d& vec() const { return mVec; }
-
-	/// Get quaternion component (represents orientation)
+	/// Get orientation (as a quaternion)
 	Quatd& quat(){ return mQuat; }
 	const Quatd& quat() const { return mQuat; }
 
-	double x() const { return mVec[0]; }
-	double y() const { return mVec[1]; }
-	double z() const { return mVec[2]; }
+	double x() const { return mPos.x; }
+	double y() const { return mPos.y; }
+	double z() const { return mPos.z; }
 
 	/// Convert to 4x4 projection space matrix
 
@@ -164,7 +160,7 @@ public:
 	Vec3d uf() const { return -uz(); }
 
 	// Overloaded cast operators
-	operator Vec3d() const { return mVec; }
+	operator Vec3d() const { return mPos; }
 	operator Quatd() const { return mQuat; }
 
 	/// Get a linear-interpolated Pose between this and another
@@ -179,14 +175,10 @@ public:
 
 	/// Set position
 	template <class T>
-	Pose& pos(const Vec<3,T>& v){ return vec(v); }
+	Pose& pos(const Vec<3,T>& v){ mPos = v; return *this; }
 
 	/// Set position from individual components
-	Pose& pos(double x, double y, double z) { return vec(Vec3d(x,y,z)); }
-
-	/// Set vector component
-	template <class T>
-	Pose& vec(const Vec<3,T>& v){ mVec = v; return *this; }
+	Pose& pos(double x, double y, double z) { return pos(Vec3d(x,y,z)); }
 
 	/// Set quaternion component
 	template <class T>
@@ -198,7 +190,7 @@ public:
 	template <class T>
 	Pose& fromMatrix(const Mat<4,T>& v){
 		mQuat.fromMatrix(v); // just reads upper 3x3
-		mVec = v.template col<3>().xyz();
+		mPos = v.template col<3>().xyz();
 		return *this;
 	}
 
@@ -206,7 +198,7 @@ public:
 	void print() const;
 
 protected:
-	Vec3d mVec;		// position in 3-space
+	Vec3d mPos;		// position in 3-space
 	Quatd mQuat;	// orientation of reference frame as a quaternion (relative to global axes)
 };
 

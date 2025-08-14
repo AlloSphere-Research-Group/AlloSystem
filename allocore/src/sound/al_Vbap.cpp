@@ -408,18 +408,18 @@ void Vbap::renderBuffer(AudioIOData &io, const Pose &listeningPose, const float 
 	unsigned currentTripletIndex = 0;
 	// unsigned currentTripletIndex = mCachedTripletIndex; // Cached source placement, so it starts searching from there.
 
-	Vec3d vec = listeningPose.vec();
+	auto pos = listeningPose.pos();
 
 	//Rotate vector according to listener-rotation
-	Quatd srcRot = listeningPose.quat();
-	vec = srcRot.rotate(vec).get<0,2,1>();
+	auto srcRot = listeningPose.quat();
+	pos = srcRot.rotate(pos).get<0,2,1>();
 
 	//Silent by default
 	Vec3d gains;
 
 	// Search thru the triplets array in search of a match for the source position.
 	for (unsigned count = 0; count < mTriplets.size(); ++count) {
-		gains = computeGains(vec, mTriplets[currentTripletIndex]);
+		gains = computeGains(pos, mTriplets[currentTripletIndex]);
 		if ((gains[0] >= 0) && (gains[1] >= 0) && (!mIs3D || (gains[2] >= 0)) ){
 			gains.normalize();
 
@@ -482,21 +482,21 @@ void Vbap::renderSample(AudioIOData &io, const Pose &listeningPose, float sample
 //	unsigned currentTripletIndex = src.cachedIndex();
 	//unsigned currentTripletIndex = mCachedTripletIndex; // Cached source placement, so it starts searching from there.
 	unsigned currentTripletIndex = 0;
-	Vec3d vec = listeningPose.vec();
+	auto pos = listeningPose.pos();
 
 	//Rotate vector according to listener-rotation
-	Quatd srcRot = listeningPose.quat();
-	vec = srcRot.rotate(vec).normalize();
+	auto srcRot = listeningPose.quat();
+	pos = srcRot.rotate(pos).normalize();
 
 	// now transform to audio positions
-	vec = vec.get<0,2,1>();
+	pos = pos.get<0,2,1>();
 	//Silent by default
 	Vec3d gains;
 //	Vec3d gainsTemp;
 
 	// Search thru the triplets array in search of a match for the source position.
 	for (unsigned count = 0; count < mTriplets.size(); ++count) {
-		gains = computeGains(vec, mTriplets[currentTripletIndex]);
+		gains = computeGains(pos, mTriplets[currentTripletIndex]);
 		if ((gains[0] >= 0) && (gains[1] >= 0) && (!mIs3D || (gains[2] >= 0)) ){
 			gains.normalize();
 			break;

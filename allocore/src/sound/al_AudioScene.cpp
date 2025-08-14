@@ -75,8 +75,8 @@ int SoundSource::bufferSize(double samplerate, double speedOfSound, double dista
 float SoundSource::getNextSample(const Pose& listeningPose) {
 
 	float s = 0.0f;
-	auto dist = listeningPose.vec().mag(); //Compute distance in world-space units
-	auto relDirection = posHistory()[0] - listeningPose.vec();
+	auto dist = listeningPose.pos().mag(); //Compute distance in world-space units
+	auto relDirection = posHistory()[0] - listeningPose.pos();
 
 	auto srcRot = listeningPose.quat();
 	relDirection = srcRot.rotate(relDirection);
@@ -87,7 +87,7 @@ float SoundSource::getNextSample(const Pose& listeningPose) {
 		samplesAgo = dist * distanceToSample;
 	} else if(dopplerType() == DOPPLER_PHYSICAL) {
 		// FIXME AC Can we use the current pose here for distance or should we calculate from listener history?
-		auto prevDistance = (posHistory()[1] - listeningPose.vec()).mag();
+		auto prevDistance = (posHistory()[1] - listeningPose.pos()).mag();
 		auto sourceVel = (dist - prevDistance)*mSampleRate; //positive when moving away, negative moving toward
 //			if(sourceVel == -mSpeedOfSound) sourceVel -= 0.001; //prevent divide by 0 / inf freq
 		auto sumSpeed = mSpeedOfSound + sourceVel;

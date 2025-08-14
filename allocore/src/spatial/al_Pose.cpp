@@ -4,8 +4,8 @@
 
 namespace al{
 
-Pose::Pose(const Vec3d& v, const Quatd& q)
-:	mVec(v), mQuat(q)
+Pose::Pose(const Vec3d& p, const Quatd& q)
+:	mPos(p), mQuat(q)
 {}
 
 void Pose::faceToward(const Vec3d& point, double amt){
@@ -41,7 +41,7 @@ void Pose::faceToward(const Vec3d& point, const Vec3d& up, double amt){
 
 Mat4d Pose::matrix() const {
 	auto m = quat().toMatrix();
-	m.col<3>().xyz() = vec();
+	m.col<3>().xyz() = mPos;
 	return m;
 }
 
@@ -60,7 +60,7 @@ Pose Pose::lerp(const Pose& target, double amt) const {
 
 void Pose::toAED(const Vec3d& to, double& az, double& el, double& dist) const {
 
-	auto rel = to - vec();
+	auto rel = to - mPos;
 	dist = rel.mag();
 
 	if(dist > quat().eps()*2.){
@@ -85,7 +85,7 @@ void Pose::toAED(const Vec3d& to, double& az, double& el, double& dist) const {
 
 Pose& Pose::setIdentity(){
 	mQuat.setIdentity();
-	mVec = 0;
+	mPos = 0;
 	return *this;
 }
 
@@ -96,7 +96,7 @@ Pose& Pose::fromEuler(double azimuth, double elevation, double bank){
 
 void Pose::print() const {
 	printf("Vec3d(%f, %f, %f);\nQuatd(%f, %f, %f, %f);\n",
-		mVec[0], mVec[1], mVec[2], mQuat[0], mQuat[1], mQuat[2], mQuat[3]);
+		mPos.x, mPos.y, mPos.z, mQuat.w, mQuat.x, mQuat.y, mQuat.z);
 }
 
 
