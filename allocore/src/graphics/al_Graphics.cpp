@@ -1568,9 +1568,4 @@ void Graphics::onCreate(){
 void Graphics::onDestroy(){
 }
 
-// deprecated
-void Graphics::draw(int num_vertices, const Mesh& m){
-	draw(m, num_vertices);
-}
-
 } // al::

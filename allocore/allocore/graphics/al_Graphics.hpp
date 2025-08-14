@@ -603,6 +603,7 @@ public:
 	/// @param[in] count	Number of vertices or indices to draw
 	/// @param[in] begin	Begin index of vertices or indices to draw (inclusive)
 	void draw(const Mesh& m, int count=-1, int begin=0);
+	void draw(const Mesh& m, const Mesh::Group& group);
 
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
@@ -815,10 +816,6 @@ protected:
 
 	void onCreate() override; // GPUObject
 	void onDestroy() override; // GPUObject
-
-public:
-	/// \deprecated
-	void draw(int numVertices, const Mesh& m);
 };
 
 
