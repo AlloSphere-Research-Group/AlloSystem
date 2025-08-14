@@ -857,6 +857,7 @@ inline void Graphics::scale(float x, float y, float z){ mBackend->scale(x,y,z); 
 inline void Graphics::pointSize(float v){ mBackend->pointSize(v); }
 inline void Graphics::pointAtten(float c2, float c1, float c0){ mBackend->pointAtten(c2,c1,c0); }
 inline void Graphics::draw(const Mesh& m, int count, int begin){ mBackend->draw(m, count, begin); }
+inline void Graphics::draw(const Mesh& m, const Mesh::Group& g){ draw(m, g.count(),g.begin); }
 inline bool Graphics::prepareDraw(){ return mBackend->prepareDraw(); }
 
 #ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
