@@ -1654,6 +1654,28 @@ bool loadPLY(Mesh& mesh, std::istream& is){
 bool loadOBJ(Mesh& mesh, std::istream& is){
 	using namespace std;
 
+	/*
+	# Example: Bowtie made from two triangles each in its own group
+	v -1  1 0
+	v -1 -1 0
+	v  0  0 0
+	vn 0 0 1
+	g leftSide
+	usemtl red
+	f 1//1 2//1 3//1
+
+	v 1 -1 0
+	v 1  1 0
+	v 0  0 0
+	vn 0 0 1
+	g rightSide
+	usemtl red
+	f 4//1 5//1 6//1
+	*/
+
+	// Reference:
+	// https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml
+
 	mesh.reset();
 	string buf;
 	vector<string> tokens;
@@ -1668,15 +1690,15 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 	std::vector<Vec3f> Ns;
 	char attr = 0; // 'p', 'n', 't', 'f'
 
-	int groupIdx = 0;
+	Mesh::NamedGroup * currGroup = nullptr;
 
 	auto addGroup = [&](const std::string& name){
 		Mesh::NamedGroup g;
 		g.name = name;
-		g.begin = groupIdx;
-		g.end = mesh.vertices().size();
-		groupIdx = g.end;
+		g.begin = mesh.indices().size();
+		g.end = g.begin;
 		mesh.groups().push_back(g);
+		currGroup = &mesh.groups().back();
 	};
 
 	while(is){
@@ -1695,7 +1717,8 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 			auto x = std::stod(tokens[1]);
 			auto y = std::stod(tokens[2]);
 			auto z = std::stod(tokens[3]);
-			Ps.emplace_back(x,y,z);
+			//Ps.emplace_back(x,y,z);
+			mesh.vertex(x,y,z);
 		} else if("vt"==tokens[0] && tokens.size()>=3){
 			attr = 't';
 			auto u = std::stod(tokens[1]);
@@ -1720,10 +1743,16 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 					if(faceTokens.size()>=2 && !faceTokens[1].empty()){
 						auto t = std::stoi(faceTokens[1]) - 1;
 						if(t < Ts.size()) idx.t = t;
+						// ensure texCoord buf is same size as position buf
+						if(mesh.texCoord2s().size() < mesh.vertices().size())
+							mesh.texCoord2s().resize(mesh.vertices().size());
 					}
 					if(faceTokens.size()>=3 && !faceTokens[2].empty()){
 						auto n = std::stoi(faceTokens[2]) - 1;
 						if(n < Ns.size()) idx.n = n;
+						// ensure normal buf is same size as position buf
+						if(mesh.normals().size() < mesh.vertices().size())
+							mesh.normals().resize(mesh.vertices().size());
 					}
 					face.push_back(idx);
 				}
@@ -1733,21 +1762,18 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 					auto i0 = face[0];
 					auto i1 = face[i];
 					auto i2 = face[i+1];
-					mesh.vertex(Ps[i0.p]);
-					mesh.vertex(Ps[i1.p]);
-					mesh.vertex(Ps[i2.p]);
+					mesh.index(i0.p, i1.p, i2.p);
+					if(currGroup) currGroup->end = mesh.indices().size();
 					if(i0.n>=0 && i1.n>=0 && i2.n>=0){
-						mesh.normal(Ns[i0.n]);
-						mesh.normal(Ns[i1.n]);
-						mesh.normal(Ns[i2.n]);
+						mesh.normals()[i0.p] = Ns[i0.n];
+						mesh.normals()[i1.p] = Ns[i1.n];
+						mesh.normals()[i2.p] = Ns[i2.n];
 					}
 					if(i0.t>=0 && i1.t>=0 && i2.t>=0){
-						mesh.texCoord(Ts[i0.t]);
-						mesh.texCoord(Ts[i1.t]);
-						mesh.texCoord(Ts[i2.t]);
+						mesh.texCoord2s()[i0.p] = Ns[i0.t];
+						mesh.texCoord2s()[i1.p] = Ns[i1.t];
+						mesh.texCoord2s()[i2.p] = Ns[i2.t];
 					}
-					// We can't easily use indices since attribute arrays can have different lengths
-					//mesh.index(i0.p, i1.p, i2.p);
 				}
 			}
 		} else if("o"==tokens[0]){ // object
