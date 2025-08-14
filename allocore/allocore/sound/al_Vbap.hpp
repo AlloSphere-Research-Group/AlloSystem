@@ -83,6 +83,8 @@ struct SpeakerTriple{
 class Vbap : public Spatializer{
 public:
 
+	using Triplets = std::vector<SpeakerTriple>;
+
 	/// @param[in] sl	A speaker layout
 	Vbap(const SpeakerLayout &sl, bool is3D = false);
 
@@ -111,12 +113,12 @@ public:
 
 
 	//Returns vector of triplets
-	std::vector<SpeakerTriple> triplets() const;
+	const Triplets& triplets() const { return mTriplets; }
 
 private:
-	std::vector<SpeakerTriple> mTriplets;
+	Triplets mTriplets;
 	std::map<int, std::vector<int> > mPhantomChannels;
-	Listener* mListener;
+	Listener * mListener;
 	bool mIs3D;
 
 	//	void setIs3D(bool is3D){mIs3D = is3D;}

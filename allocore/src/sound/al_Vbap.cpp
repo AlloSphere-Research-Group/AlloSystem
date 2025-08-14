@@ -560,9 +560,4 @@ void Vbap::makeTriple(int s1, int s2, int s3){
 	addTriple(triple);
 }
 
-std::vector<SpeakerTriple> Vbap::triplets() const {
-	return mTriplets;
-}
-
-
 } // al::
