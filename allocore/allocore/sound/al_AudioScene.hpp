@@ -364,10 +364,9 @@ protected:
 	                     );
 
 	Speakers mSpeakers;
-	bool mEnabled;
-
 	std::vector<float> mBuffer;	// temporary frame buffer
 	int mNumFrames;
+	bool mEnabled = true;
 };
 
 
