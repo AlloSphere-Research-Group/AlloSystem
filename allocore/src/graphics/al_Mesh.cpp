@@ -1675,6 +1675,7 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 
 	// Reference:
 	// https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml
+	// https://paulbourke.net/dataformats/obj/
 
 	mesh.reset();
 	string buf;
@@ -1734,22 +1735,27 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 			attr = 'f';
 			auto numVerts = tokens.size()-1;
 			face.clear();
+			// convert OBJ 1-based ASCII index to al::Mesh 0-based integer index
+			auto getIndex = [](const std::string& s, int count){
+				int i = std::stoi(s);
+				if(i>count) return -1; // error: index exceeds element count
+				if(i>0) return i-1; // absolute
+				return count+i; // relative to last element
+			};
 			if(numVerts>=3){ // tris, quads and other polygons
 				for(int j=1; j<tokens.size(); ++j){
 					getTokens(faceTokens, tokens[j], '/', false);
 					// face types: v, v/t, v/t/n, v//n
 					Index idx;
-					idx.p = std::stoi(faceTokens[0]) - 1;
+					idx.p = getIndex(faceTokens[0], mesh.vertices().size());
 					if(faceTokens.size()>=2 && !faceTokens[1].empty()){
-						auto t = std::stoi(faceTokens[1]) - 1;
-						if(t < Ts.size()) idx.t = t;
+						idx.t = getIndex(faceTokens[1], Ts.size());
 						// ensure texCoord buf is same size as position buf
 						if(mesh.texCoord2s().size() < mesh.vertices().size())
 							mesh.texCoord2s().resize(mesh.vertices().size());
 					}
 					if(faceTokens.size()>=3 && !faceTokens[2].empty()){
-						auto n = std::stoi(faceTokens[2]) - 1;
-						if(n < Ns.size()) idx.n = n;
+						idx.n = getIndex(faceTokens[2], Ns.size());
 						// ensure normal buf is same size as position buf
 						if(mesh.normals().size() < mesh.vertices().size())
 							mesh.normals().resize(mesh.vertices().size());
