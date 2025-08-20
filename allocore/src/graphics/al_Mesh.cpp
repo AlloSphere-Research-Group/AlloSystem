@@ -1777,9 +1777,9 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 						mesh.normals()[i2.p] = Ns[i2.n];
 					}
 					if(i0.t>=0 && i1.t>=0 && i2.t>=0){
-						mesh.texCoord2s()[i0.p] = Ns[i0.t];
-						mesh.texCoord2s()[i1.p] = Ns[i1.t];
-						mesh.texCoord2s()[i2.p] = Ns[i2.t];
+						mesh.texCoord2s()[i0.p] = Ts[i0.t];
+						mesh.texCoord2s()[i1.p] = Ts[i1.t];
+						mesh.texCoord2s()[i2.p] = Ts[i2.t];
 					}
 				}
 			}
