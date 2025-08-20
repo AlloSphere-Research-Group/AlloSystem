@@ -1693,11 +1693,12 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 
 	Mesh::NamedGroup * currGroup = nullptr;
 
-	auto addGroup = [&](const std::string& name){
+	auto addGroup = [&](const std::string& name, char type){
 		Mesh::NamedGroup g;
 		g.name = name;
 		g.begin = mesh.indices().size();
 		g.end = g.begin;
+		g.type = type;
 		mesh.groups().push_back(g);
 		currGroup = &mesh.groups().back();
 	};
@@ -1783,9 +1784,9 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 				}
 			}
 		} else if("o"==tokens[0]){ // object
-			addGroup(tokens[1]);
+			addGroup(tokens[1], 'o');
 		} else if("g"==tokens[0]){ // group (typically just before faces)
-			addGroup(tokens[1]);
+			addGroup(tokens[1], 'g');
 		} else if("usemtl"==tokens[0]){ // material identifier (typically after a "g")
 
 		}

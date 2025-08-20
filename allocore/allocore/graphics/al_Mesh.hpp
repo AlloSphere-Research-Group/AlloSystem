@@ -133,6 +133,7 @@ public:
 
 	struct NamedGroup : public Group{
 		std::string name;
+		char type = 'g';
 		NamedGroup& operator= (Group g){
 			this->begin = g.begin;
 			this->end = g.end;
