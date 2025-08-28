@@ -103,7 +103,8 @@ template <class T>
 void equalize(Buffer<T>& b, int N){
 	auto M = b.size();
 	if(M){
-		for(int i=M; i<N; ++i) b.append(b[M-1]);
+		auto v = b.back();
+		for(int i=M; i<N; ++i) b.append(v);
 	}
 }
 
@@ -1740,8 +1741,8 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 			auto getIndex = [](const std::string& s, int count){
 				int i = std::stoi(s);
 				if(i>count) return -1; // error: index exceeds element count
-				if(i>0) return i-1; // absolute
-				return count+i; // relative to last element
+				if(i>0) return i-1; // positive: absolute
+				return count+i; // negative: relative to last element
 			};
 			if(numVerts>=3){ // tris, quads and other polygons
 				for(int j=1; j<tokens.size(); ++j){
