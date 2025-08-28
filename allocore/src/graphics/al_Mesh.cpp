@@ -1793,6 +1793,9 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 		}
 	}
 
+	// In case final face defs are missing attributes present in other faces
+	mesh.equalizeBuffers();
+
 	return true;
 }
 
