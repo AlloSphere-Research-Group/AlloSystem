@@ -1687,7 +1687,6 @@ bool loadOBJ(Mesh& mesh, std::istream& is){
 
 	// temp buffers
 	std::vector<Index> face; // face indices (of convex polygon)
-	std::vector<Vec3f> Ps;
 	std::vector<Vec2f> Ts;
 	std::vector<Vec3f> Ns;
 	char attr = 0; // 'p', 'n', 't', 'f'
