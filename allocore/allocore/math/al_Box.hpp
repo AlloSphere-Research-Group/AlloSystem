@@ -166,6 +166,16 @@ public:
 		return true;
 	}
 
+	/// Test whether we fully contain another box
+	bool contains(const Box& other) const {
+		for(unsigned i=0; i<size(); ++i){
+			if(other.mMin[i] < mMin[i] || other.mMax[i] > mMax[i])
+				return false;
+		}
+		return true;
+		//return intersects(other.dup().flip());
+	}
+
 	/// Test whether we intersect with another box
 	bool intersects(const Box& other) const {
 		for(unsigned i=0; i<size(); ++i){
