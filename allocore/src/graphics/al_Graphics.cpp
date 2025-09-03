@@ -210,6 +210,7 @@ public:
 	}
 
 	void matrixMode(MatrixMode mode) override { mMatrixMode=mode; }
+	MatrixMode matrixMode() const override { return mMatrixMode; }
 	void pushMatrix() override {
 		//printf("push %s (%d/%d)\n", mMatrixMode==MODELVIEW?"MV":"Proj", (int)currentMatrixStack().get().size(), (int)maxStackSize(mMatrixMode));
 		if(currentMatrixStack().get().size() < maxStackSize(mMatrixMode)){
@@ -832,6 +833,14 @@ public:
 		case MODELVIEW:		glMatrixMode(GL_MODELVIEW); break;
 		case PROJECTION:	glMatrixMode(GL_PROJECTION); break;
 		default:			glMatrixMode(mode); break;
+		}
+	}
+	MatrixMode matrixMode() const override {
+		auto mode = Graphics::paramInt(GL_MATRIX_MODE);
+		switch(mode){
+		case GL_MODELVIEW: return MODELVIEW;
+		case GL_PROJECTION: return PROJECTION;
+		default: return MatrixMode(mode);
 		}
 	}
 	void pushMatrix() override { glPushMatrix(); }

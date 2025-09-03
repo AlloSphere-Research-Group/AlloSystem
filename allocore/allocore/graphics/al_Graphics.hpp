@@ -444,8 +444,13 @@ public:
 	/// Get current viewport
 	Viewport viewport() const;
 
+	/// Get current transform matrix (depending on matrix mode)
+	const Mat4f& matrix() const;
+	/// Get current model-view matrix
 	const Mat4f& modelView() const;
+	/// Get current projection matrix
 	const Mat4f& projection() const;
+	/// Get product of model-view and projection matrices (as P*V*M)
 	Mat4f modelViewProjection() const { return projection()*modelView(); }
 
 	/// Set current matrix
@@ -743,6 +748,7 @@ protected:
 		virtual const Mat4f& modelView() const = 0;
 		virtual const Mat4f& projection() const = 0;
 		virtual void matrixMode(MatrixMode mode){}
+		virtual MatrixMode matrixMode() const = 0;
 		virtual void pushMatrix(){}
 		virtual void popMatrix(){}
 		virtual void loadIdentity(){}
@@ -840,6 +846,14 @@ const char * toString(Graphics::Primitive v);
 inline void Graphics::enable(Capability v){ mBackend->enable(v); }
 inline void Graphics::disable(Capability v){ mBackend->disable(v); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ mBackend->currentColor(r,g,b,a); }
+inline const Mat4f& Graphics::matrix() const {
+	static Mat4f identity{1.f};
+	switch(mBackend->matrixMode()){
+	case MODELVIEW: return mBackend->modelView();
+	case PROJECTION: return mBackend->projection();
+	default: return identity;
+	}
+}
 inline const Mat4f& Graphics::modelView() const { return mBackend->modelView(); }
 inline const Mat4f& Graphics::projection() const { return mBackend->projection(); }
 inline void Graphics::matrixMode(MatrixMode mode){ mBackend->matrixMode(mode); }
