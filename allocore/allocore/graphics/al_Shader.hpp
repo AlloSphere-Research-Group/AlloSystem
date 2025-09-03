@@ -238,8 +238,6 @@ public:
 	const std::string& sourceFrag() const { return mFragSource; }
 	const std::string& sourceGeom() const { return mGeomSource; }
 
-	const ShaderProgram& use();
-
 	/// Get whether program is active
 	bool active() const { return mActive; }
 

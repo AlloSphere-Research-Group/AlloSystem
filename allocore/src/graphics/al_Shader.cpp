@@ -338,22 +338,14 @@ void ShaderProgram::onDestroy(){
 	//glDeleteObjectARB((GLhandleARB)handle());
 }
 
-void ShaderProgram::use(unsigned programID){
+/*static*/ void ShaderProgram::use(unsigned programID){
 	glUseProgram(programID);
-}
-
-const ShaderProgram& ShaderProgram::use(){
-	//if(active()){
-		validate();
-		use(id());
-	//}
-	//glUseProgramObjectARB((GLhandleARB)handle());
-	return *this;
 }
 
 bool ShaderProgram::begin(){
 	if(active()){
-		use();
+		validate();
+		use(id());
 		return true;
 	}
 	return false;
@@ -361,7 +353,7 @@ bool ShaderProgram::begin(){
 
 void ShaderProgram::end(){
 	if(active()){
-		glUseProgram(0);
+		use(0);
 		mOnce = false;
 	}
 }
