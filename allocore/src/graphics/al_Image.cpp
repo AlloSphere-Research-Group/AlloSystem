@@ -9,8 +9,8 @@ class Image::Impl {
 public:
 	Impl(){}
 	~Impl(){}
-	bool load(const std::string& filename, Array &arr){
-		return false;
+	FileType load(const std::string& filename, Array &arr){
+		return FILE_TYPE_INVALID;
 	}
 	bool save(const std::string& filename, const Array& arr, int compressFlags, int paletteSize){
 		return false;
@@ -59,53 +59,50 @@ public:
 		destroy();
 	}
 
-	bool load(const std::string& filename, Array& arr){
+	FileType load(const std::string& filename, Array& arr){
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
 		if(type == FIF_UNKNOWN) {
 			AL_WARN("image format not recognized: %s", filename.c_str());
-			return false;
+			return FILE_TYPE_INVALID;
 		}
-		if(!FreeImage_FIFSupportsReading(type)) {
+		if(!FreeImage_FIFSupportsReading(type)){
 			AL_WARN("image format not supported: %s", filename.c_str());
-			return false;
+			return FILE_TYPE_INVALID;
 		}
 
 		destroy();
 		mFIBitmap = FreeImage_Load(type, filename.c_str(), 0);
-		if (mFIBitmap == NULL) {
+		if(mFIBitmap == NULL){
 			AL_WARN("image failed to load: %s", filename.c_str());
-			return false;
+			return FILE_TYPE_INVALID;
 		}
 
 		FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(mFIBitmap);
-		switch(colorType) {
+		switch(colorType){
 			case FIC_MINISBLACK:
 			case FIC_MINISWHITE: {
-					FIBITMAP *res = FreeImage_ConvertToGreyscale(mFIBitmap);
+					FIBITMAP * res = FreeImage_ConvertToGreyscale(mFIBitmap);
 					FreeImage_Unload(mFIBitmap);
 					mFIBitmap = res;
 				}
 				break;
 
-			case FIC_PALETTE: {
-					if(FreeImage_IsTransparent(mFIBitmap)) {
-						FIBITMAP *res = FreeImage_ConvertTo32Bits(mFIBitmap);
-						FreeImage_Unload(mFIBitmap);
-						mFIBitmap = res;
-					}
-					else {
-						FIBITMAP *res = FreeImage_ConvertTo24Bits(mFIBitmap);
-						FreeImage_Unload(mFIBitmap);
-						mFIBitmap = res;
-					}
+			case FIC_PALETTE:
+				if(FreeImage_IsTransparent(mFIBitmap)) {
+					FIBITMAP * res = FreeImage_ConvertTo32Bits(mFIBitmap);
+					FreeImage_Unload(mFIBitmap);
+					mFIBitmap = res;
+				}
+				else {
+					FIBITMAP * res = FreeImage_ConvertTo24Bits(mFIBitmap);
+					FreeImage_Unload(mFIBitmap);
+					mFIBitmap = res;
 				}
 				break;
 
-			case FIC_CMYK: {
-					AL_WARN("CMYK images currently not supported");
-					return false;
-				}
-				break;
+			case FIC_CMYK:
+				AL_WARN("CMYK images currently not supported");
+				return FILE_TYPE_INVALID;
 
 			default:
 				break;
@@ -210,14 +207,21 @@ public:
 			default:
 				AL_WARN("image data not understood");
 				destroy();
-				return false;
+				return FILE_TYPE_INVALID;
 		}
-		return true;
+
+		switch(type){
+		case FIF_PNG: return PNG;
+		case FIF_TARGA: return TGA;
+		case FIF_BMP: return BMP;
+		case FIF_JPEG: return JPG;
+		default: return FILE_TYPE_UNKNOWN;
+		}
 	}
 
 	// TODO
-	bool load(const unsigned char * src, int len, Array& arr){
-		return false;
+	FileType load(const unsigned char * src, int len, Array& arr){
+		return FILE_TYPE_UNKNOWN;
 	}
 
 
@@ -505,8 +509,22 @@ namespace al{
 class Image::Impl {
 public:
 
-	// Reader suppports: JPG PNG BMP TGA GIF HDR PSD PIC PNM
-	// Writer suppports: JPG PNG BMP TGA GIF HDR
+	// Reader supports: JPG PNG BMP TGA GIF HDR PSD PIC PNM
+	// Writer supports: JPG PNG BMP TGA GIF HDR
+
+	FileType fileTypeFromName(const std::string& s){
+		auto pos = s.find_last_of('.');
+		if(pos != std::string::npos){
+			++pos;
+			auto ext = s.substr(pos, s.size()-pos);
+			for(auto& c : ext) c = std::tolower(c);
+			     if("png"==ext) return PNG;
+			else if("tga"==ext) return TGA;
+			else if("jpg"==ext || "jpeg"==ext) return JPG;
+			else if("bmp"==ext) return BMP;
+		}
+		return FILE_TYPE_UNKNOWN;
+	}
 
 	template <class Func, class... Args>
 	bool loadData(Array& arr, Func loadFunc, Args... args){
@@ -523,12 +541,19 @@ public:
 		return false;
 	}
 
-	bool load(const std::string& filePath, Array& arr){
-		return loadData(arr, stbi_load, filePath.c_str());
+	FileType load(const std::string& filePath, Array& arr){
+		if(loadData(arr, stbi_load, filePath.c_str())){
+			return fileTypeFromName(filePath);
+		}
+		return FILE_TYPE_INVALID;
 	}
 
-	bool load(const unsigned char * src, int len, Array& arr){
-		return loadData(arr, stbi_load_from_memory, src, len);
+	FileType load(const unsigned char * src, int len, Array& arr){
+		if(loadData(arr, stbi_load_from_memory, src, len)){
+			// STB loader detects file format, but does not expose result
+			return FILE_TYPE_UNKNOWN;
+		}
+		return FILE_TYPE_INVALID;
 	}
 
 	bool save(const std::string& filePath, const Array& pix, int compressFlags, int paletteSize){
@@ -641,17 +666,25 @@ Image::~Image() {
 	if(mImpl) delete mImpl;
 }
 
-bool Image::load(const std::string& filename){
+Image::FileType Image::load(const std::string& filename){
 	if(!mImpl) mImpl = new Impl();
-	mLoaded = mImpl->load(filename, mArray);
-	if(mLoaded) mFilename = filename;
-	return mLoaded;
+
+	auto fileType = mImpl->load(filename, mArray);
+	if(fileType){
+		mFilename = filename;
+		mLoaded = true;
+	} else {
+		mLoaded = false;
+	}
+
+	return fileType;
 }
 
-bool Image::load(const unsigned char * src, int len){
+Image::FileType Image::load(const unsigned char * src, int len){
 	if(!mImpl) mImpl = new Impl();
-	mLoaded = mImpl->load(src, len, mArray);
-	return mLoaded;
+	auto fileType = mImpl->load(src, len, mArray);
+	mLoaded = fileType;
+	return fileType;
 }
 
 bool Image::save(const std::string& filename){
@@ -725,7 +758,7 @@ Image::Format Image::getFormat(int planes){
 		case 4:		return RGBA;
 		default:;
 	}
-	return UNKNOWN_FORMAT;
+	return FORMAT_INVALID;
 }
 
 } // al::

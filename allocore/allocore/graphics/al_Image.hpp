@@ -57,18 +57,21 @@ public:
 		Image data formats.
 	*/
 	enum Format {
-		LUMINANCE = 0,	//!< Luminance (1-plane)
+		FORMAT_INVALID = 0,
+		LUMINANCE,		//!< Luminance (1-plane)
 		LUMALPHA,		//!< Luminance/alpha (2-plane)
 		RGB,			//!< RGB (3-plane)
 		RGBA,			//!< RGBA (4-plane)
-		UNKNOWN_FORMAT
+
 	};
 
 	enum FileType {
+		FILE_TYPE_INVALID = 0,
 		PNG,
 		TGA,
 		BMP,
-		JPG
+		JPG,
+		FILE_TYPE_UNKNOWN
 	};
 
 	template<typename T>
@@ -92,16 +95,16 @@ public:
 
 	/// @param[in] filePath		File to load. Image type determined by file 
 	///							extension.
-    /// \returns true for success or print error message and return false
-	bool load(const std::string& filePath);
+    /// \returns detected file type
+	FileType load(const std::string& filePath);
 
 	/// Load image from memory source
 
 	/// @param[in] src		Source array
 	/// @param[in] len		Number of bytes
-    /// \returns true for success or print error message and return false
-	bool load(const unsigned char * src, int len);
-	bool load(const ByteArray& src){ return load(&src[0], src.size()); }
+    /// \returns detected file type
+	FileType load(const unsigned char * src, int len);
+	FileType load(const ByteArray& src){ return load(&src[0], src.size()); }
 
 
 	/// Save image to disk
