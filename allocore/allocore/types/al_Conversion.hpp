@@ -63,18 +63,24 @@ char base10To36(int dec10);
 /// Convert ascii base-36 character to decimal integer
 int base36To10(char ascii36);
 
+enum{
+	BASE64_URL_SAFE,	///< 62 = '-', 63 = '_'
+	BASE64_STANDARD,	///< 62 = '+', 63 = '/'
+	BASE64_MIME = BASE64_STANDARD
+};
+
 /// Convert value bits (in machine order) to base-64 string
 
 /// Any pad bits at the end of the returned string will have the value zero.
 /// The conversion is endian agnostic, so that the byte order of the resulting
 /// string will match that of the input.
-std::string toBase64(const void * data, int numBytes);
+std::string toBase64(const void * data, int numBytes, int enc=BASE64_URL_SAFE);
 
-std::string toBase64(const std::string& s);
+std::string toBase64(const std::string& s, int enc=BASE64_URL_SAFE);
 
 template <class T>
-std::string toBase64(const T& v){
-	return toBase64(&v, sizeof(T));
+std::string toBase64(const T& v, int enc=BASE64_URL_SAFE){
+	return toBase64(&v, sizeof(T), enc);
 }
 
 /// Convert base-64 string to value of specified type

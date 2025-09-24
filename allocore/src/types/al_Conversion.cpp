@@ -33,9 +33,14 @@ int base36To10(char v){
 	return 0;	// non-alphanumeric
 }
 
-std::string toBase64(const void * data, int numBytes){
-	static const char * lut =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+std::string toBase64(const void * data, int numBytes, int enc){
+	const char * lut;
+	switch(enc){
+	case BASE64_URL_SAFE:
+		lut = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"; break;
+	default:
+		lut = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; break;
+	}
 
 	const auto * bytes = (const unsigned char *)data;
 	std::string s;
@@ -59,8 +64,8 @@ std::string toBase64(const void * data, int numBytes){
 	return s;
 }
 
-std::string toBase64(const std::string& s){
-	return toBase64(s.data(), s.size());
+std::string toBase64(const std::string& s, int enc){
+	return toBase64(s.data(), s.size(), enc);
 }
 
 void fromBase64(void * dst, const std::string& src, unsigned numDstBytes){
@@ -75,8 +80,8 @@ void fromBase64(void * dst, const std::string& src, unsigned numDstBytes){
 		if('A'<=c && c<='Z') return c-'A';
 		if('a'<=c && c<='z') return c-'a'+26;
 		if('0'<=c && c<='9') return c-'0'+52;
-		if('-'==c) return 62;
-		else return 63;
+		if('-'==c || '+'==c) return 62;
+		else return 63; // typically '/' or '_'
 	};
 
 	// sextet    0     1     2     3     4     5
