@@ -48,7 +48,7 @@ static void scaleVerts(Mesh& m, float radius, int N){
 template <class Func>
 static void noAttribScope(Mesh& m, Mesh::Attrib attribs, const Func& f){
 	auto a = m.attribHint();
-	m.attribHint(Mesh::Attrib(a & (~attribs)));
+	m.attribHint(a & (~attribs));
 	f();
 	m.attribHint(a);
 }
@@ -361,7 +361,6 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 
 	} else { // for texturing: edges must have duplicate vertices
 		noAttribScope(m, Mesh::NORMAL | Mesh::TANGENT, [&](){
-printf("N:%d T:%d\n", m.wants(Mesh::NORMAL), m.wants(Mesh::TANGENT));
 			addSurface(m, slices+1,stacks+1, 1,1, 0.5,0.5);
 		});
 
