@@ -38,21 +38,22 @@ struct Graphics::RawMeshData{
 	int primitive = 0;
 	float stroke = 1;
 	int count=0, begin=0;
-	int Nv=0, Nn=0, Nc=0, Nci=0, Nt1=0, Nt2=0, Nt3=0, Ni=0;
-	const char	* vertices = NULL, * normals = NULL,
-				* colors = NULL, * coloris = NULL,
-				* texCoord1s = NULL, * texCoord2s = NULL, * texCoord3s = NULL,
-				* indices = NULL;
+	int Nv=0, Nn=0, Nt=0, Nc=0, Nci=0, Nt1=0, Nt2=0, Nt3=0, Ni=0;
+	const char	* vertices = nullptr, * normals = nullptr, * tangents = nullptr,
+				* colors = nullptr, * coloris = nullptr,
+				* texCoord1s = nullptr, * texCoord2s = nullptr, * texCoord3s = nullptr,
+				* indices = nullptr;
 
 	RawMeshData(){}
 
 	RawMeshData(const Mesh& m)
 	:	primitive(m.primitive()), stroke(m.stroke()),
-		Nv(m.vertices().size()), Nn(m.normals().size()), Nc(m.colors().size()),	Nci(m.coloris().size()), Nt1(m.texCoord1s().size()), Nt2(m.texCoord2s().size()), Nt3(m.texCoord3s().size()), Ni(m.indices().size())
+		Nv(m.vertices().size()), Nn(m.normals().size()), Nt(m.tangents().size()), Nc(m.colors().size()),	Nci(m.coloris().size()), Nt1(m.texCoord1s().size()), Nt2(m.texCoord2s().size()), Nt3(m.texCoord3s().size()), Ni(m.indices().size())
 	{
 		count = Ni ? Ni : Nv;
 		if(Nv ) vertices = decltype(vertices)(&m.vertices()[0][0]);
 		if(Nn ) normals = decltype(normals)(&m.normals()[0][0]);
+		if(Nt ) tangents = decltype(tangents)(&m.tangents()[0][0]);
 		if(Nc ) colors = decltype(colors)(&m.colors()[0][0]);
 		if(Nci) coloris = decltype(coloris)(&m.coloris()[0][0]);
 		if(Nt1) texCoord1s = decltype(texCoord1s)(&m.texCoord1s()[0]);
@@ -102,6 +103,7 @@ public:
 		Nv = m.vertices().size();
 		if(0 == Nv) return;
 		Nn = m.normals().size();
+		Nt = m.tangents().size();
 		Nc = m.colors().size();
 		Nci= m.coloris().size();
 		Nt1= m.texCoord1s().size();
@@ -120,6 +122,11 @@ public:
 		if(Nn){
 			normals = vertices + b;
 			b = mVBO.subData(&m.normals()[0], Nn, b);
+		}
+
+		if(Nt){
+			tangents = vertices + b;
+			b = mVBO.subData(&m.tangents()[0], Nt, b);
 		}
 
 		if(Nc){
@@ -262,6 +269,7 @@ mPreamble
 const float pi = 3.141592653589793;
 varying vec3 vpos;		// position (eye space)
 varying vec3 vnrm;		// normal (eye space)
+varying vec3 vtan;		// tangent (eye space)
 varying vec3 vposObj;	// position (object space)
 varying vec4 vcol;
 varying vec2 vtc2;
@@ -276,6 +284,13 @@ struct Fog{
 };
 uniform Fog fog;// = Fog(vec3(0.), 0., 1., 1.);
 varying float fogMix;
+
+vec2 al_transform(mat3 m, vec2 v, float w){
+	return (m*vec3(v,w)).xy;
+}
+vec3 al_transform(mat4 m, vec3 v, float w){
+	return (m*vec4(v,w)).xyz;
+}
 )"
 			);
 
@@ -289,8 +304,10 @@ uniform mat3 normalMatrix;
 uniform vec4 singleColor;
 uniform float pointSize;
 uniform bool hasNormals;
+uniform bool hasTangents;
 attribute vec3 posIn;
 attribute vec3 nrmIn;
+attribute vec3 tanIn;
 attribute vec4 colIn;
 attribute vec2 tcIn;
 
@@ -298,12 +315,13 @@ void main(){
 	vposObj = posIn;
 	vcol = singleColor.a==8192. ? colIn : singleColor;
 	vnrm = hasNormals ? normalMatrix * nrmIn : vec3(1.,0.,0.);
+	vtan = hasTangents ? al_transform(MV, tanIn,0.) : vec3(0.,1.,0.);
 	if(doTex2) vtc2 = tcIn;
 	gl_PointSize = pointSize;
 )" +
 	mOnVertex +
 R"(
-	vpos = (MV * vec4(vposObj,1.)).xyz; // to eye space
+	vpos = al_transform(MV, vposObj,1.); // to eye space
 	gl_Position = P * vec4(vpos,1.); // to screen space
 
 	// fogMix: [0,1] -> [start, end]
@@ -515,11 +533,14 @@ R"(
 				mGraphics.mFog.loc().scale = mShader.uniform("fog.scale");
 				mPointSize.loc() = mShader.uniform("pointSize");
 				// init uniforms
-				mShader.begin();
-					mShader.uniform("colorMaterial", true);
-					mShader.uniform("hasNormals", true);
-					mShader.uniform("singleColor", Color(0,0,0,colorArrayAlpha));
-				mShader.end();
+				mShader.scope([&](auto& s){
+					s.uniform(
+						"colorMaterial", true,
+						"hasNormals", true,
+						"hasTangents", false,
+						"singleColor", Color(0,0,0,colorArrayAlpha)
+					);
+				});
 			} else {
 				printf("Critical error: al::Graphics failed to compile shader\n");
 				mShader.printLog();
@@ -659,6 +680,12 @@ R"(
 			glVertexAttribPointer(mAttribLocs.nrm(), 3, GL_FLOAT, 0, 0, m.normals);
 		}
 
+		const bool hasTan = m.Nt >= m.Nv && mAttribLocs.tan;
+		if(hasTan){
+			glEnableVertexAttribArray(mAttribLocs.tan());
+			glVertexAttribPointer(mAttribLocs.tan(), 3, GL_FLOAT, 0, 0, m.tangents);
+		}
+
 		Color singleColor(0,0,0,colorArrayAlpha); // if unchanged, triggers read from array
 
 		bool hasCol = false;
@@ -712,9 +739,12 @@ R"(
 
 		if(mShaderAutoBind) shader.begin();
 			if(&shader == &mShader){ // using built-in shader
-				shader.uniform("singleColor", singleColor);
-				shader.uniform("hasNormals", hasNrm);
-				shader.uniform("doTex2", hasTxc);
+				shader.uniform(
+					"singleColor", singleColor,
+					"hasNormals", hasNrm,
+					"hasTangents", hasTan,
+					"doTex2", hasTxc
+				);
 	
 				// Should go in prepareDraw, but only seems to work here???
 				if(mPointSize.handleUpdate()){
@@ -735,8 +765,9 @@ R"(
 		if(mShaderAutoBind) shader.end();
 
 		glDisableVertexAttribArray(mAttribLocs.pos());
-		if(hasCol) glDisableVertexAttribArray(mAttribLocs.col());
 		if(hasNrm) glDisableVertexAttribArray(mAttribLocs.nrm());
+		if(hasTan) glDisableVertexAttribArray(mAttribLocs.tan());
+		if(hasCol) glDisableVertexAttribArray(mAttribLocs.col());
 		if(hasTxc) glDisableVertexAttribArray(mAttribLocs.txc());
 	}
 
@@ -769,11 +800,12 @@ protected:
 		RemoteID& operator= (int v){ value=v; return *this; }
 	};
 	struct AttribLocs{
-		RemoteID pos, col, nrm, txc;
+		RemoteID pos, col, nrm, tan, txc;
 		void fromShader(const ShaderProgram& s){
 			pos = s.attribute("posIn");
 			col = s.attribute("colIn");
 			nrm = s.attribute("nrmIn");
+			tan = s.attribute("tanIn");
 			txc = s.attribute("tcIn");
 			//printf("%d %d %d %d\n", pos(), col(), nrm(), txc());
 		}
