@@ -526,7 +526,7 @@ public:
 	/// Convert triangle strip to triangles
 	Mesh& toTriangles();
 
-	/// Generates normals for a set of vertices
+	/// Generate normals numerically from vertex positions
 
 	/// This method will generate a normal for each vertex in the buffer
 	/// assuming the drawing primitive is either triangles or a triangle strip.
@@ -561,6 +561,16 @@ public:
 		return mesh;
 	}
 
+	/// Generate tangents numerically
+
+	/// This function requires the mesh be a triangle primitive and contain 
+	/// positions, normals and texture coordinates. If these requirements are 
+	/// not met, no tangents are generated.
+	Mesh& generateTangents();
+
+	/// Generate tangents if they do not exist
+	Mesh& ensureTangents();
+
 	/// Flip the winding order (of triangles)
 	Mesh& flipWinding();
 
@@ -569,7 +579,7 @@ public:
 	/// This smooths a triangle mesh using Laplacian (low-pass) filtering.
 	/// New vertex positions are a weighted sum of their nearest neighbors. 
 	/// The number of vertices is not changed.
-	/// @param[in] amount		interpolation fraction between original and smoothed result
+	/// @param[in] amount		Interpolation fraction between original and smoothed result
 	/// @param[in] weighting	0 = equal weight, 1 = inverse distance weight
 	Mesh& smooth(float amount=1, int weighting=0);
 
@@ -625,8 +635,8 @@ public:
 	/// normals) as a list of triangular facets.
 	/// This implementation saves an ASCII (as opposed to binary) STL file.
 	///
-	/// @param[in] filePath		path of file to save to
-	/// @param[in] solidName	solid name defined within the file (optional)
+	/// @param[in] filePath		Path of file to save to
+	/// @param[in] solidName	Solid name defined within the file (optional)
 	/// \returns true on successful save, otherwise false
 	bool saveSTL(const std::string& filePath, const std::string& solidName = "") const;
 
@@ -635,8 +645,8 @@ public:
 	/// This implementation supports only line and point primitives. Since SVG
 	/// is a 2D format, only the XY projection is written out.
 	///
-	/// @param[in] filePath		path of file to save to
-	/// @param[in] opt			options specific to SVG
+	/// @param[in] filePath		Path of file to save to
+	/// @param[in] opt			Options specific to SVG
 	/// \returns true on successful save, otherwise false
 	bool saveSVG(const std::string& filePath, const SVGOptions& opt = {}) const;
 

@@ -306,6 +306,66 @@ Mesh& Mesh::invertNormals(){
 	return *this;
 }
 
+Mesh& Mesh::generateTangents(){
+	// Code adapted from
+	// https://terathon.com/blog/tangent-space.html
+	// https://foundationsofgameenginedev.com/#fged2 (see ComputeTangents)
+
+	if(!isTriangleType() || !mTexCoord2s.size() || !mNormals.size()) return *this;
+
+	const auto Nv = mVertices.size();
+	std::vector<Tangent> temp(Nv*2, {0});
+	auto * tans = temp.data();
+	auto * bits = temp.data() + Nv; // bitangent
+
+	forEachFace([&](int v1, int v2, int v3){
+		auto p1 = mVertices[v1];
+		auto p2 = mVertices[v2];
+		auto p3 = mVertices[v3];
+		auto c1 = mTexCoord2s[v1];
+		auto c2 = mTexCoord2s[v2];
+		auto c3 = mTexCoord2s[v3];
+		auto e1 = p2-p1;
+		auto e2 = p3-p1;
+		auto d1 = c2-c1;
+		auto d2 = c3-c1;
+
+		auto r = d1.x*d2.y - d2.x*d1.y;
+		//if(std::abs(r) < 1e-16){} // bad: results may be unreliable
+		//printf("%g\n", r);
+		r = 1./r;
+
+		auto t = (e1 * d2.y - e2 * d1.y) * r;
+		auto b = (e2 * d1.x - e1 * d2.x) * r;
+
+		tans[v1] += t;
+		tans[v2] += t;
+		tans[v3] += t;
+		bits[v1] += b;
+		bits[v2] += b;
+		bits[v3] += b;
+	});
+
+	mTangents.resize(Nv);
+
+	forEachVertex([&](int i){
+		auto N = mNormals[i];
+		auto T = tans[i].rej1(N).dir(); // orthogonalize T w.r.t. N
+		mTangents[i] = T;
+
+		// compute handedness (should ensure same for all vertices)
+		//auto h = bits[i].dot(N.cross(tans[i])) < 0.f ? -1.f : 1.f;
+		//printf("handedness %g\n", h);
+	});
+
+	return *this;
+}
+
+Mesh& Mesh::ensureTangents(){
+	if(mTangents.empty()) generateTangents();
+	return *this;
+}
+
 Mesh& Mesh::repeatLast(){
 	if(indexed()){
 		index(mIndices.last());
