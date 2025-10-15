@@ -174,7 +174,8 @@ void Array::print(FILE * fp) const {
 	for(int i=0; i<Ndim; i++){
 		fprintf(fp,"%u%s", stride(i), (i!=(Ndim-1)) ? " x " : "");
 	}
-	fprintf(fp," bytes\n");
+	fprintf(fp," bytes");
+	fprintf(fp," (align: %d bytes)\n", alignment());
 	fprintf(fp,"  data:   %p, %u bytes\n", data.ptr, (unsigned)size());
 }
 
