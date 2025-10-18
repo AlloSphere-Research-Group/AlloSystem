@@ -1,5 +1,8 @@
 #!/bin/sh
 
+#NOTE: emmake and emar shell scripts removed as of version 4.0.13! Therefore, if using version 4.0.13 or higher, this script will fail. The latest supported emscripten is 4.0.12:
+#https://github.com/emscripten-core/emscripten/tree/4.0.12
+
 # List of libraries to compile
 LIB_DIRS="../Gamma allocore"
 
