@@ -42,7 +42,7 @@ RUN_LDFLAGS += -sALLOW_MEMORY_GROWTH=1
 RUN_LDFLAGS += -sEXPORTED_FUNCTIONS=_main,_malloc,_free
 
 # Req'd to call C functions from JS
-RUN_LDFLAGS += -sEXPORTED_RUNTIME_METHODS=ccall
+RUN_LDFLAGS += -sEXPORTED_RUNTIME_METHODS=ccall,HEAPU8
 
 # Other flags:
 # -sASSERTIONS=1		Get more info on runtime errors
