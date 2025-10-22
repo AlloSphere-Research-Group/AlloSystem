@@ -476,6 +476,10 @@ void main(){
 	vec3 pos = vpos;
 	vec4 col = vcol;
 	vec2 tc2 = vtc2;
+	vec3 N = normalize(vnrm);
+	vec3 V = normalize(-pos); // surface to eye
+	// Two-sided lighting: make normal always face eye
+	if(lightTwoSided && !gl_FrontFacing) N=-N;
 )" +
 	mOnFragmentPre +
 R"(
@@ -486,10 +490,6 @@ R"(
 	mOnAlpha +
 R"(
 	if(doLighting){
-		vec3 N = normalize(vnrm);
-		vec3 V = normalize(-pos); // surface to eye
-		// Two-sided lighting: make normal always face eye
-		if(lightTwoSided && !gl_FrontFacing) N=-N;
 		Material material;
 		if(gl_FrontFacing || materialOneSided) material = materials[0];
 		else material = materials[1];
