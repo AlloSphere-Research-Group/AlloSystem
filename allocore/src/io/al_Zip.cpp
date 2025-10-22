@@ -18,9 +18,12 @@ struct ZipReader::Impl{
 
 ZipReader::ZipReader(){}
 
-bool ZipReader::open(const std::string& path){
+bool ZipReader::open(const void * mem, int len, const std::string& path){
 	auto * zip = &mImpl->zip;
-	auto status = mz_zip_reader_init_file(zip, path.c_str(), 0);
+	auto status = mem 
+		? mz_zip_reader_init_mem(zip, mem, len, 0)
+		: mz_zip_reader_init_file(zip, path.c_str(), 0)
+	;
 	if(status){
 		int numFiles = mz_zip_reader_get_num_files(zip);
 		mFilePaths.clear();
@@ -32,6 +35,14 @@ bool ZipReader::open(const std::string& path){
 		return true;
 	}
 	return false;
+}
+
+bool ZipReader::open(const std::string& path){
+	return open(nullptr,0, path);
+}
+
+bool ZipReader::open(const void * mem, int len){
+	return open(mem,len, {});
 }
 
 bool ZipReader::extract(

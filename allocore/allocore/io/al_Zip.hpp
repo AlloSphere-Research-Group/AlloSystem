@@ -60,6 +60,9 @@ public:
 	/// Open archive file
 	bool open(const std::string& path);
 
+	/// Open archive from memory source
+	bool open(const void * mem, int len);
+
 	/// Extract file in archive to heap memory
 	bool extract(		
 		const std::string& fileName,
@@ -103,6 +106,8 @@ private:
 	Pimpl<Impl> mImpl;
 
 	std::vector<std::string> mFilePaths;
+
+	bool open(const void * mem, int len, const std::string& path);
 };
 
 
