@@ -389,34 +389,12 @@ Texture& Texture::allocate(unsigned align){
 
 Texture& Texture::allocate(const Array& src, bool reconfigure){
 
-	// Here we reconfigure the internal Array to match the passed in Array
+	// Reconfigure the internal Array to match the passed in Array
 	if(reconfigure){
-		//printf("allocating & reconfiguring %p from\n", this); src.print();
 		shapeFrom(src.header, true /*reallocate*/);
 
-		//printf("allocating & reconfigured %p\n", this); mArray.print();
-
-		// FIXME:
-		// re-allocate array:
-		//allocate(src.alignment());
-		/*
-		Texture::allocate does this:
-			mArray.dataFree();
-			resetArray(align);
-			mArray.dataCalloc();
-			mPixelsUpdated = true;
-		*/
-
-		//printf("allocated & reconfigured %p\n", this);
-		//mArray.print();
-
-	// Here we ???
 	} else {
-
-		// TODO: read the source into the dst without changing dst layout
-		//printf("allocating without reconfiguring %p\n", this);
-
-		// ensure that array matches texture:
+		// Bail if source array does not match in shape
 		if(!src.isFormat(mArray.header)){
 			AL_WARN("couldn't allocate array, mismatch format");
 			mArray.print();
@@ -424,18 +402,15 @@ Texture& Texture::allocate(const Array& src, bool reconfigure){
 			return *this;
 		}
 
-		// re-allocate array:
+		// Source array shape matches, so just ensure internal array allocated
 		allocate();
 	}
 
-	//src.print();
-	//mArray.print();
-
-	// Perform a deep copy of data:
-	// The Array formats must match for this to make sense!
+	// Perform a deep copy of data
+	// Source and dest array shapes will match if we got here
 	memcpy(mArray.data.ptr, src.data.ptr, src.size());
+	mPixelsUpdated = true;
 
-	//printf("copied to mArray %p\n", this);
 	return *this;
 }
 
