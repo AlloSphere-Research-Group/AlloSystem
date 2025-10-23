@@ -701,7 +701,7 @@ public:
 	/// Insert code in fragment shader just after all inputs set ('pos', 'col' and 'tc2')
 	Graphics& shaderOnFragmentPre(const std::string& s);
 	/// Insert code in fragment shader just after computing the base color; useful for alpha discard
-	Graphics& shaderOnAlpha(const std::string& s);
+	Graphics& shaderOnBaseColor(const std::string& s);
 	/// Insert code to customize the material
 	Graphics& shaderOnMaterial(const std::string& s);
 	/// Insert code to customize the lighting

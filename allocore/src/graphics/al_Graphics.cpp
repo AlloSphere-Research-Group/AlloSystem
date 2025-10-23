@@ -487,7 +487,7 @@ R"(
 		col *= texture2D(tex2, tc2);
 	}
 )" +
-	mOnAlpha +
+	mOnBaseColor +
 R"(
 	if(doLighting){
 		Material material;
@@ -811,7 +811,7 @@ protected:
 		}
 	};
 	AttribLocs mDefaultAttribLocs, mAttribLocs;
-	std::string mPreamble, mOnVertex, mOnFragmentPre, mOnAlpha, mOnMaterial, mOnLight;
+	std::string mPreamble, mOnVertex, mOnFragmentPre, mOnBaseColor, mOnMaterial, mOnLight;
 	Color mCurrentColor;
 	ShaderData<float> mPointSize{1};
 	std::vector<Colori> mColorArray;
@@ -1221,8 +1221,8 @@ Graphics& Graphics::shaderOnFragmentPre(const std::string& s){
 	if(mBackends[PROG]) backendProg()->mOnFragmentPre = s;
 	return *this;
 }
-Graphics& Graphics::shaderOnAlpha(const std::string& s){
-	if(mBackends[PROG]) backendProg()->mOnAlpha = s;
+Graphics& Graphics::shaderOnBaseColor(const std::string& s){
+	if(mBackends[PROG]) backendProg()->mOnBaseColor = s;
 	return *this;
 }
 Graphics& Graphics::shaderOnMaterial(const std::string& s){
