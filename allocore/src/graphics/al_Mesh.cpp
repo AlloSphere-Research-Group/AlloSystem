@@ -309,7 +309,7 @@ Mesh& Mesh::invertNormals(){
 Mesh& Mesh::generateTangents(){
 	// Code adapted from
 	// https://terathon.com/blog/tangent-space.html
-	// https://foundationsofgameenginedev.com/#fged2 (see ComputeTangents)
+	// https://foundationsofgameenginedev.com/FGED2-code.cpp (see CalculateTangents)
 
 	if(!isTriangleType() || !mTexCoord2s.size() || !mNormals.size()) return *this;
 
@@ -352,8 +352,7 @@ Mesh& Mesh::generateTangents(){
 		auto N = mNormals[i];
 		auto T = tans[i].rej1(N).dir(); // orthogonalize T w.r.t. N
 		mTangents[i] = T;
-
-		// compute handedness (should ensure same for all vertices)
+		// Compute handedness to later derive correct bitangent as h (N x T)
 		//auto h = bits[i].dot(N.cross(tans[i])) < 0.f ? -1.f : 1.f;
 		//printf("handedness %g\n", h);
 	});
