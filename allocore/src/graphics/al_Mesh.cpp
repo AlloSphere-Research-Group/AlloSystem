@@ -139,18 +139,10 @@ Mesh& Mesh::addVectorMesh(const Mesh& src, Attrib attrib, float length){
 }
 
 void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
-
-	auto initMesh = [](Mesh& m, int numNormals){
-		m.mVertices.resize(numNormals*2);
-		m.reset();
-		m.lines();
-	};
-
 	// Generate normal lines based on faces (ignoring existing normals)
 	if(perFace){
 		if(isTriangleType()){
-			int Nn = std::max(mVertices.size(), mIndices.size())/3;
-			initMesh(mesh, Nn);
+			mesh.reset().lines();
 
 			forEachFace([&](int i1, int i2, int i3){
 				if(i1==i2 || i2==i3 || i3==i1) return; // skip degenerate
@@ -171,14 +163,7 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
 
 	// Generate normal lines based on existing normals in mesh (if any)
 	} else {
-		int Nn = std::min(mVertices.size(), mNormals.size());
-		initMesh(mesh, Nn);
-
-		for(int i=0; i<Nn; ++i){
-			auto& v = mVertices[i];
-			mesh.vertex(v);
-			mesh.vertex(v + mNormals[i]*length);
-		}
+		mesh.reset().addVectorMesh(*this, normals(), length);
 	}
 }
 
