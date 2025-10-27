@@ -108,7 +108,7 @@ void equalize(Buffer<T>& b, int N){
 	}
 }
 
-Mesh& Mesh::equalizeBuffers() {
+Mesh& Mesh::equalizeBuffers(){
 	auto Nv = mVertices.size();
 	equalize(mNormals, Nv);
 	equalize(mTangents, Nv);
@@ -515,18 +515,24 @@ Mesh& Mesh::smooth(float amount, int weighting){
 
 
 Mesh& Mesh::flipWinding(){
+	Group g;
+	g.begin = 0;
+	g.end = indexed() ? mIndices.size() : mVertices.size();
+	return flipWinding(g);
+}
+
+Mesh& Mesh::flipWinding(Group g){
 	if(isTriangles()){
 		if(indexed()){
-			for(int i=0; i<mIndices.size(); i+=3)
+			for(int i=g.begin; i<g.end; i+=3)
 				std::swap(mIndices[i], mIndices[i+2]);
 		} else {
-			for(int i=0; i<mVertices.size(); i+=3)
+			for(int i=g.begin; i<g.end; i+=3)
 				std::swap(mVertices[i], mVertices[i+2]);
 		}
 	}
 	return *this;
 }
-
 
 Mesh& Mesh::append(const Mesh& src){
 	// TODO: only do if source and dest are well-formed

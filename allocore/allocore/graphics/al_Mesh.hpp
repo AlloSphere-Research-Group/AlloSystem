@@ -573,6 +573,7 @@ public:
 
 	/// Flip the winding order (of triangles)
 	Mesh& flipWinding();
+	Mesh& flipWinding(Group g);
 
 	/// Smooths a triangle mesh
 
