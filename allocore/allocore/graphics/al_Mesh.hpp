@@ -526,6 +526,10 @@ public:
 	/// Convert triangle strip to triangles
 	Mesh& toTriangles();
 
+	/// Add vertex vectors (normals, tangents) as lines
+	Mesh& addVectorMesh(const Mesh& src, const Buffer<UnitVector>& vecs, float length=0.1f);
+	Mesh& addVectorMesh(const Mesh& src, Attrib attrib, float length=0.1f);
+
 	/// Generate normals numerically from vertex positions
 
 	/// This method will generate a normal for each vertex in the buffer

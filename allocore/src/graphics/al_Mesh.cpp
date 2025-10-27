@@ -120,6 +120,24 @@ Mesh& Mesh::equalizeBuffers(){
 	return *this;
 }
 
+Mesh& Mesh::addVectorMesh(const Mesh& src, const Buffer<UnitVector>& vecs, float length){
+	int N = std::min(src.mVertices.size(), vecs.size());
+	lines();
+	for(int i=0; i<N; ++i){
+		auto p = src.mVertices[i];
+		vertex(p);
+		vertex(p + vecs[i]*length);
+	}
+	return *this;
+}
+
+
+Mesh& Mesh::addVectorMesh(const Mesh& src, Attrib attrib, float length){
+	     if(attrib & Mesh::NORMAL ) addVectorMesh(src, src.normals() , length);
+	else if(attrib & Mesh::TANGENT) addVectorMesh(src, src.tangents(), length);
+	return *this;
+}
+
 void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) const {
 
 	auto initMesh = [](Mesh& m, int numNormals){
