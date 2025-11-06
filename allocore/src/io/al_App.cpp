@@ -395,23 +395,41 @@ double App::appTime() const {
 	return timeNow() - mStartTime;
 }
 
-float mousePos1(const App * app, int window, int coord, bool clip){
-	if(window < app->windows().size()){
-		const auto& w = app->window(window);
-		if(w.created() && w.width() && w.height()){
-			float v = coord==0 ? float(w.mouse().x())/w.width() : float(w.mouse().y())/w.height();
-			return clip ? (v<0.f ? 0.f : v>1.f ? 1.f : v) : v;
-		}
+App& App::forValidWindow(int i, const std::function<void(ViewpointWindow&)>& f){
+	if(i < windows().size()){
+		auto& win = window(i);
+		if(win.created() && win.width() && win.height()) f(win);
 	}
+	return *this;
+}
+
+const App& App::forValidWindow(int i, const std::function<void(const ViewpointWindow&)>& f) const {
+	//return const_cast<App *>(this)->forValidWindow(i,f);
+	if(i < windows().size()){
+		const auto& win = window(i);
+		if(win.created() && win.width() && win.height()) f(win);
+	}
+	return *this;
+}
+
+float mousePos1(const App * app, int window, int coord, bool clip){
+	app->forValidWindow(window, [&](auto& win){
+		float v = coord==0 ? float(win.mouse().x())/win.width() : float(win.mouse().y())/win.height();
+		return clip ? (v<0.f ? 0.f : v>1.f ? 1.f : v) : v;
+	});
 	return 0.f;
 }
 
-float App::mouseX1(int window, bool clip){
+float App::mouseX1(int window, bool clip) const {
 	return mousePos1(this, window, 0, clip);
 }
 
-float App::mouseY1(int window, bool clip){
+float App::mouseY1(int window, bool clip) const {
 	return mousePos1(this, window, 1, clip);
+}
+
+Vec2f App::mouse1(int window, bool clip) const {
+	return {mouseX1(), mouseY1()};
 }
 
 osc::Recv& App::oscRecv(){ return *mOSCRecv; }

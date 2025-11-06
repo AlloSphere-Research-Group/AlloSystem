@@ -338,10 +338,16 @@ public:
 	ViewpointWindow& window(int i=0){ return *(windows()[i]); }
 	const ViewpointWindow& window(int i=0) const { return *(windows()[i]); }
 
+	/// Call function if and only if window is valid and sized
+	App& forValidWindow(int i, const std::function<void(ViewpointWindow&)>& f);
+	const App& forValidWindow(int i, const std::function<void(const ViewpointWindow&)>& f) const;
+
 	/// Get mouse x coordinate in [0,1]
-	float mouseX1(int window=0, bool clip=true);
+	float mouseX1(int window=0, bool clip=true) const;
 	/// Get mouse y coordinate in [0,1]
-	float mouseY1(int window=0, bool clip=true);
+	float mouseY1(int window=0, bool clip=true) const;
+	/// Get mouse coordinates in [0,1]
+	Vec2f mouse1(int window=0, bool clip=true) const;
 
 
 	/// Get graphics renderer
