@@ -670,35 +670,43 @@ R"(
 
 		DRAW_BEGIN;
 
-		// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
-		glEnableVertexAttribArray(mAttribLocs.pos());
-		glVertexAttribPointer(mAttribLocs.pos(), 3, GL_FLOAT, 0, 0, m.vertices);
+		auto bindAttribArray = [](int loc, int comps, GLenum type, const GLvoid * buf, int normalize=0){
+			glEnableVertexAttribArray(loc);
+			// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
+			glVertexAttribPointer(loc, comps, type, normalize, 0, buf);
+		};
+
+		auto bindAttribPhantom = [&](int loc){
+			if(mPhantomBuf.size() < m.Nv) mPhantomBuf.resize(m.Nv);
+			bindAttribArray(loc, 1, GL_UNSIGNED_BYTE, &mPhantomBuf[0]);
+		};
+
+		bindAttribArray(mAttribLocs.pos(), 3, GL_FLOAT, m.vertices);
 
 		const bool hasNrm = m.Nn >= m.Nv && mAttribLocs.nrm;
-		if(hasNrm){
-			glEnableVertexAttribArray(mAttribLocs.nrm());
-			glVertexAttribPointer(mAttribLocs.nrm(), 3, GL_FLOAT, 0, 0, m.normals);
-		}
+		if(hasNrm) bindAttribArray(mAttribLocs.nrm(), 3, GL_FLOAT, m.normals);
 
-		const bool hasTan = m.Nt >= m.Nv && mAttribLocs.tan;
-		if(hasTan){
-			glEnableVertexAttribArray(mAttribLocs.tan());
-			glVertexAttribPointer(mAttribLocs.tan(), 3, GL_FLOAT, 0, 0, m.tangents);
+		bool hasTan = m.Nt >= m.Nv && mAttribLocs.tan;
+		if(hasTan) bindAttribArray(mAttribLocs.tan(), 3, GL_FLOAT, m.tangents);
+		#ifdef AL_OSX
+		// On Mac, we get a silent error if an attribute is present in the shader, but nothing is bound to it! Therefore, we pass a phantom buffer to keep the shader content, even though it's not used.
+		else {
+			bindAttribPhantom(mAttribLocs.tan());
+			hasTan = true; // to disable attrib array
 		}
+		#endif
 
 		Color singleColor(0,0,0,colorArrayAlpha); // if unchanged, triggers read from array
 
 		bool hasCol = false;
 		if(m.Nc >= m.Nv){
 			if((hasCol = mAttribLocs.col)){
-				glEnableVertexAttribArray(mAttribLocs.col());
-				glVertexAttribPointer(mAttribLocs.col(), 4, GL_FLOAT, 0, 0, m.colors);
+				bindAttribArray(mAttribLocs.col(), 4, GL_FLOAT, m.colors);
 			}
 		}
 		else if(m.Nci >= m.Nv){
 			if((hasCol = mAttribLocs.col)){
-				glEnableVertexAttribArray(mAttribLocs.col());
-				glVertexAttribPointer(mAttribLocs.col(), 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, m.coloris);
+				bindAttribArray(mAttribLocs.col(), 4, GL_UNSIGNED_BYTE, m.coloris, GL_TRUE);
 			}
 		}
 		else if(0 == m.Nc && 0 == m.Nci){
@@ -708,7 +716,7 @@ R"(
 			singleColor = m.Nc ? *(Color*)m.colors : Color(*(Colori*)m.coloris);
 		}
 
-		// There is a strange bug on OSX where we cannot switch between single
+		// There is a strange bug on Mac where we cannot switch between single
 		// and array color reads in a shader. Thus, we must create a separate
 		// color buffer if in single color mode.
 		#ifdef AL_OSX
@@ -723,17 +731,13 @@ R"(
 			if(currentGPUMesh && currentGPUMesh->bound()){
 				// TODO: if VBO bound, must bind a separate color VBO
 			} else if((hasCol = mAttribLocs.col)){
-				glEnableVertexAttribArray(mAttribLocs.col());
-				glVertexAttribPointer(mAttribLocs.col(), 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, &mColorArray[0]);
+				bindAttribArray(mAttribLocs.col(), 4, GL_UNSIGNED_BYTE, &mColorArray[0], GL_TRUE);
 			}
 		}
 		#endif
 
 		const bool hasTxc = m.Nt2 >= m.Nv && mAttribLocs.txc;
-		if(hasTxc){
-			glEnableVertexAttribArray(mAttribLocs.txc());
-			glVertexAttribPointer(mAttribLocs.txc(), 2, GL_FLOAT, 0, 0, m.texCoord2s);
-		}
+		if(hasTxc) bindAttribArray(mAttribLocs.txc(), 2, GL_FLOAT, m.texCoord2s);
 
 		auto& shader = *mDrawShader;
 
@@ -807,7 +811,7 @@ protected:
 			nrm = s.attribute("nrmIn");
 			tan = s.attribute("tanIn");
 			txc = s.attribute("tcIn");
-			//printf("%d %d %d %d\n", pos(), col(), nrm(), txc());
+			//printf("p:%d n:%d t:%d c:%d x:%d\n", pos(), nrm(), tan(), col(), txc());
 		}
 	};
 	AttribLocs mDefaultAttribLocs, mAttribLocs;
@@ -815,6 +819,7 @@ protected:
 	Color mCurrentColor;
 	ShaderData<float> mPointSize{1};
 	std::vector<Colori> mColorArray;
+	std::vector<unsigned char> mPhantomBuf;
 	bool mCompileShader = true;
 	bool mShaderAutoBind = true;
 };
