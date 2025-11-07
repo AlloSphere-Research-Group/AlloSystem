@@ -413,11 +413,12 @@ const App& App::forValidWindow(int i, const std::function<void(const ViewpointWi
 }
 
 float mousePos1(const App * app, int window, int coord, bool clip){
+	float res = 0.f;
 	app->forValidWindow(window, [&](auto& win){
 		float v = coord==0 ? float(win.mouse().x())/win.width() : float(win.mouse().y())/win.height();
-		return clip ? (v<0.f ? 0.f : v>1.f ? 1.f : v) : v;
+		res = clip ? (v<0.f ? 0.f : v>1.f ? 1.f : v) : v;
 	});
-	return 0.f;
+	return res;
 }
 
 float App::mouseX1(int window, bool clip) const {
@@ -429,7 +430,7 @@ float App::mouseY1(int window, bool clip) const {
 }
 
 Vec2f App::mouse1(int window, bool clip) const {
-	return {mouseX1(), mouseY1()};
+	return {mouseX1(window,clip), mouseY1(window,clip)};
 }
 
 osc::Recv& App::oscRecv(){ return *mOSCRecv; }
