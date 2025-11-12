@@ -427,10 +427,16 @@ LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in Material m
 	}
 
 	// Diffuse/specular
-	float diffAmt = (max(dot(N,L), 0.) + light.ambient) * intens;
+	float NdotL = dot(N,L);
+	float diffAmt = (max(NdotL, 0.) + light.ambient) * intens;
 	vec3 H = normalize(L + V); // half-vector
 	float specAmt = pow(max(dot(N,H), 0.), mat.shininess) * intens; // Blinn-Phong
 	//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), mat.shininess*0.25) * intens; // Phong
+
+	#ifdef LIGHT_SPECULAR_CORRECTION
+		float k = 0.0397887; // 1/(8pi)
+		specAmt *= (mat.shininess+8.)*k*NdotL; // energy-conserving normalized Blinn-Phong
+	#endif
 
 	/* Specular approx [Lyon, 1993. "Phong Shading Reformulation"]
 	vec3 R = reflect(-L,N), D = R-V;
