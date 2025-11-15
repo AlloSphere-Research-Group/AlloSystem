@@ -1170,18 +1170,21 @@ void Graphics::FrameBuffer::clear(){
 	return pixelAlign(width*numBytes(f,t));
 }
 
+#define ALIGN_DOWNLOAD	GL_PACK_ALIGNMENT
+#define ALIGN_UPLOAD	GL_UNPACK_ALIGNMENT
+
 void setPixelAlign(unsigned which, unsigned v){
 	if(v!=1 && v!=2 && v!=4 && v!=8){
-		AL_WARN("Pixel alignment must be 1, 2, 4 or 8");
+		AL_WARN("Pixel alignment must be 1, 2, 4 or 8. Got %d for %sload.", v, which==ALIGN_DOWNLOAD?"down":"up");
 		return;
 	}
 	glPixelStorei(which, v);
 }
 
-/*static*/ unsigned Graphics::pixelAlignDownload(){ return paramInt(GL_PACK_ALIGNMENT); }
-/*static*/ void Graphics::pixelAlignDownload(unsigned v){ setPixelAlign(GL_PACK_ALIGNMENT, v); }
-/*static*/ unsigned Graphics::pixelAlignUpload(){ return paramInt(GL_UNPACK_ALIGNMENT); }
-/*static*/ void Graphics::pixelAlignUpload(unsigned v){ setPixelAlign(GL_UNPACK_ALIGNMENT, v); }
+/*static*/ unsigned Graphics::pixelAlignDownload(){ return paramInt(ALIGN_DOWNLOAD); }
+/*static*/ void Graphics::pixelAlignDownload(unsigned v){ setPixelAlign(ALIGN_DOWNLOAD, v); }
+/*static*/ unsigned Graphics::pixelAlignUpload(){ return paramInt(ALIGN_UPLOAD); }
+/*static*/ void Graphics::pixelAlignUpload(unsigned v){ setPixelAlign(ALIGN_UPLOAD, v); }
 
 void Graphics::pipeline(Pipeline p){
 	switch(p){
