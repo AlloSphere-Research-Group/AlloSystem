@@ -10,25 +10,30 @@ Not supported under OpenGL ES 2.0:
   - Feedback 
   - Display lists
 
-					ES1.1	ES2		GL3
-Shader				-		X		X
-  VertexAttrib		-		X		X
-Fixed Pipeline [1]	X		-		X
-  gl*Pointer		X		-		X
-AlphaFunc			X		-		X
-TexImage2D [2]		X		X		X
-  TexParameter [3]	X		X		X
-  CubeMap			-		X		X
-Texture 1D			-		-		X
-Texture 3D			-		-		X
-VBO					-		X		X
-FBO					-		X		X
-DrawArrays			X		X		X
-DrawElements [4]	X 		X		X
-PointSize			X		-		X
-  PointParameterf	X		-		X
-LineWidth			X		X		X
-GL_DOUBLE			-		-		-
+					ES1.1	ES2		ES3.0	ES3.1	ES3.2	GL2		GL3		GL4
+Shader				-		X		X		X		X		X		X		X
+  VertexAttrib		-		X		X		X		X		X		X		X
+Fixed Pipeline [1]	X		-		-		-		-		X		-		-
+  gl*Pointer		X		-		-		-		-		X		-		-
+GL_DOUBLE [5]		-		-		-		-		-		X		X		X
+AlphaFunc			X		-		-		-		-		X		X		-
+TexImage2D [3]		X		X		X		X		X		X		X		X
+  TexParameter [4]	X		X		X		X		X		X		X		X
+  CubeMap			-		X		X		X		X		X		X		X
+Texture 1D			-		-		-		-		-		X		X		X
+Texture 3D			-		-		X		X		X		X		X		X
+VBO					X		X		X		X		X		X		X		X
+PBO					-		-		X		X		X		X		X		X
+  MapBuffer			-		-		-		-		-		X		X		X
+DrawArrays			X		X		X		X		X		X		X		X
+DrawElements [5]	X 		X		X		X		X		X		X		X
+FBO					-		X		X		X		X		-		X		X
+PointSize			X		-		-		-		-		X		X		X
+  PointParameter	X		-		-		-		-		X		X		X
+LineWidth			X		X		X		X		X		X		X		X
+Geom shader			-		-		-		-		X		-		X		X
+Tess shader			-		-		-		-		X		-		-		X
+Compute shader		-		-		-		X		X		-		-		X
 
 Supported on all:
 Depth, Stencil, Scissor, Viewport, ColorMask, Blend, CullFace, Texture 2D
@@ -52,13 +57,16 @@ Ortho
 Rotatef, Scalef, Translatef
 PointSize
 
-[2] TexImage2D
+[2] GL_DOUBLE
+Used with glVertexAttribPointer.
+
+[3] TexImage2D
 ES1.1 and ES2 support only ALPHA, RGB, RGBA, LUMINANCE and LUMINANCE_ALPHA
 ES1.1 and ES2 support only UNSIGNED_BYTE, UNSIGNED_SHORT_5_6_5, UNSIGNED_SHORT_4_4_4_4 and UNSIGNED_SHORT_5_5_5_1.
 ES1.1 dimensions must be power of two.
 
-[3] TexParameter
-ES1.1 and ES2 support only TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, EXTURE_WRAP_S, and TEXTURE_WRAP_T.
+[4] TexParameter
+ES1.1 and ES2 support only TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, TEXTURE_WRAP_S, and TEXTURE_WRAP_T.
 
-[4] DrawElements
+[5] DrawElements
 ES1.1 and ES2 support only UNSIGNED_BYTE or UNSIGNED_SHORT for index type.
