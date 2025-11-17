@@ -44,7 +44,20 @@
 
 #include "allocore/system/al_Config.h"
 
-#if !(defined(AL_GRAPHICS_USE_DEFAULT_BACKEND) || defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES1) || defined(AL_GRAPHICS_USE_OPENGLES2))
+/* Optional preprocessor constants:
+
+AL_GRAPHICS_USE_OPENGL_EXT
+Include OpenGL extensions for target flavor of OpenGL. Not included by default to speed up compilation.
+*/
+
+#if !(     defined(AL_GRAPHICS_USE_DEFAULT_BACKEND)\
+		|| defined(AL_GRAPHICS_USE_OPENGL)\
+		|| defined(AL_GRAPHICS_USE_OPENGLES1)\
+		|| defined(AL_GRAPHICS_USE_OPENGLES2)\
+		|| defined(AL_GRAPHICS_USE_OPENGLES3)\
+		|| defined(AL_GRAPHICS_USE_OPENGLES3_1)\
+		|| defined(AL_GRAPHICS_USE_OPENGLES3_2)\
+	)
 	#define AL_GRAPHICS_USE_DEFAULT_BACKEND
 #endif
 
@@ -56,7 +69,9 @@
 		#define GL_SILENCE_DEPRECATION
 		#include <OpenGL/OpenGL.h>
 		#include <OpenGL/gl.h>
-		#include <OpenGL/glext.h>
+		#ifdef AL_GRAPHICS_USE_OPENGL_EXT
+			#include <OpenGL/glext.h>
+		#endif
 		#define AL_GRAPHICS_INIT_CONTEXT
 	#else
 		#error "Specified graphics backend not supported on this platform"
@@ -69,7 +84,9 @@
 	#ifdef AL_GRAPHICS_USE_OPENGL
 		#include <GL/glew.h> // needed for certain parts of OpenGL API
 		#include <GL/gl.h>
-		#include <GL/glext.h>
+		#ifdef AL_GRAPHICS_USE_OPENGL_EXT
+			#include <GL/glext.h>
+		#endif
 		#include <time.h>
 		#define AL_GRAPHICS_INIT_CONTEXT\
 			{	GLenum err = glewInit();\
@@ -109,17 +126,30 @@
 	#ifdef AL_GRAPHICS_USE_DEFAULT_BACKEND
 		#define AL_GRAPHICS_USE_OPENGLES2
 	#endif
-	#ifdef AL_GRAPHICS_USE_OPENGLES2
-		//#define GL_GLEXT_PROTOTYPES 1
+	#if   defined AL_GRAPHICS_USE_OPENGLES3_2
+		#include <GLES3/gl32.h>
+	#elif defined AL_GRAPHICS_USE_OPENGLES3_1
+		#include <GLES3/gl31.h>
+	#elif defined AL_GRAPHICS_USE_OPENGLES3
+		#include <GLES3/gl3.h>
+	#elif defined AL_GRAPHICS_USE_OPENGLES2
 		#include <GLES2/gl2.h>
-		//#include <GLES2/gl2ext.h> // just include core API for now
-		#define AL_GRAPHICS_INIT_CONTEXT
 	#elif defined AL_GRAPHICS_USE_OPENGLES1
 		#include <GLES/gl.h>
-		#define AL_GRAPHICS_INIT_CONTEXT
 	#else
 		#error "Specified graphics backend not supported on this platform"
 	#endif
+
+	#ifdef AL_GRAPHICS_USE_OPENGL_EXT
+		//#define GL_GLEXT_PROTOTYPES 1
+		#ifdef AL_GRAPHICS_USE_OPENGLES1
+			#include <GLES/glext.h>
+		#else
+			#include <GLES2/gl2ext.h> // yes, ES2 version for ES2 *and* ES3
+		#endif
+	#endif
+
+	#define AL_GRAPHICS_INIT_CONTEXT
 
 #elif defined __IPHONE_2_0
 	#ifdef AL_GRAPHICS_USE_DEFAULT_BACKEND
@@ -127,7 +157,9 @@
 	#endif
 	#ifdef AL_GRAPHICS_USE_OPENGLES1
 		#import <OpenGLES/ES1/gl.h>
-		#import <OpenGLES/ES1/glext.h>
+		#ifdef AL_GRAPHICS_USE_OPENGL_EXT
+			#import <OpenGLES/ES1/glext.h>
+		#endif
 	#else
 		#error "Specified graphics backend not supported on this platform"
 	#endif
@@ -138,7 +170,9 @@
 	#endif
 	#ifdef AL_GRAPHICS_USE_OPENGLES2
 		#import <OpenGLES/ES2/gl.h>
-		#import <OpenGLES/ES2/glext.h>
+		#ifdef AL_GRAPHICS_USE_OPENGL_EXT
+			#import <OpenGLES/ES2/glext.h>
+		#endif
 	#else
 		#error "Specified graphics backend not supported on this platform"
 	#endif
@@ -153,13 +187,12 @@ A bit on GLenum allocations:
 https://www.khronos.org/registry/OpenGL/docs/enums.html
 */
 
-#if defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
-	#define AL_GRAPHICS_USE_PROG_PIPELINE
-#else
-	#define AL_GRAPHICS_USE_FIXED_PIPELINE
+#if defined(AL_GRAPHICS_USE_OPENGLES3) || defined(AL_GRAPHICS_USE_OPENGLES3_1) || defined(AL_GRAPHICS_USE_OPENGLES3_2)
+	// Any GLES version
+	#define AL_GRAPHICS_USE_OPENGLES3_X
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 	#define AL_GRAPHICS_SUPPORTS_SHADER
 	#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3_2)
@@ -174,8 +207,14 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 #endif
 
+#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
+	#define AL_GRAPHICS_USE_FIXED_PIPELINE
+#else
+	#define AL_GRAPHICS_USE_PROG_PIPELINE
+#endif
+
 // GL_INT and GL_UNSIGNED support as used with, e.g., glTexSubImage2D
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_INT32
 #endif
 
@@ -199,43 +238,53 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_SHADE_MODEL
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3)
-	#define AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
+#if defined(AL_GRAPHICS_USE_OPENGL)
+	//see glDrawBuffer
+	#define AL_GRAPHICS_SUPPORTS_SET_W_BUFFER
+#endif
+
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
+	//see glReadBuffer
+	#define AL_GRAPHICS_SUPPORTS_SET_R_BUFFER
 #endif
 
 #if defined(AL_GRAPHICS_USE_OPENGL)
 	#define AL_GRAPHICS_SUPPORTS_LR_BUFFERS
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_DEPTH_COMP
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_DEPTH_COMP24
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_DEPTH_COMP16
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+#ifndef AL_GRAPHICS_USE_OPENGLES1
 	#define AL_GRAPHICS_SUPPORTS_BLEND_EQ
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+#ifndef AL_GRAPHICS_USE_OPENGLES1
 	#define AL_GRAPHICS_SUPPORTS_STREAM_DRAW
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_DRAW_RANGE
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_FBO
+	#ifndef AL_GRAPHICS_USE_OPENGLES2
+		//see glBindFramebuffer
+		#define AL_GRAPHICS_SUPPORTS_FBO_RW_BIND
+	#endif
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL)
+#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_PBO
 #endif
 
@@ -246,20 +295,24 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 #if defined(AL_GRAPHICS_USE_OPENGL)
 	#define AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	#define AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-	#define AL_GRAPHICS_SUPPORTS_WRAP_CLAMP_EXTRA
-	#define AL_GRAPHICS_SUPPORTS_WRAP_REPEAT_EXTRA
+	//see glTexParameteri(?,GL_TEXTURE_WRAP_S,___)
+	#define AL_GRAPHICS_SUPPORTS_WRAP_CLAMP_EXTRA // CLAMP, CLAMP_TO_BORDER
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGLES3)
+#if defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-	#define AL_GRAPHICS_SUPPORTS_WRAP_REPEAT_EXTRA
 #endif
 
-#if !defined(AL_GRAPHICS_USE_OPENGLES2) && !defined(AL_GRAPHICS_USE_OPENGLES3)
+#ifndef AL_GRAPHICS_USE_OPENGLES1
+	#define AL_GRAPHICS_SUPPORTS_WRAP_REPEAT_EXTRA // MIRRORED_REPEAT
+#endif
+
+#if !defined(AL_GRAPHICS_USE_OPENGLES2) && !defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_TEXTURE_NEEDS_ENABLE
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2)
+#ifndef AL_GRAPHICS_USE_OPENGLES1
+	//see glTexParameteri(?,GL_TEXTURE_MIN_FILTER,___)
 	#define AL_GRAPHICS_SUPPORTS_MIPMAP
 #endif
 

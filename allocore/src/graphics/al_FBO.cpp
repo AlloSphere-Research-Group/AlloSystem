@@ -107,7 +107,7 @@ FBO& FBO::copyTo(FBO& dst,
 	int dstX0, int dstY0, int dstX1, int dstY1,
 	Graphics::AttributeBit mask, bool nicest
 ){
-	#ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
+	#ifdef AL_GRAPHICS_SUPPORTS_FBO_RW_BIND
 	// Scissor test affects blit operation!
 	GLboolean scissorTest;
 	glGetBooleanv(GL_SCISSOR_TEST, &scissorTest);
@@ -150,10 +150,10 @@ const char * FBO::statusString(){ return statusString(status()); }
 	CS(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
 	CS(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
 	CS(GL_FRAMEBUFFER_UNSUPPORTED)
-	#ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFER
+	/*#ifdef AL_GRAPHICS_SUPPORTS_FBO_RW_BIND
 		CS(GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER)
 		CS(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER)
-	#endif
+	#endif*/
 	#ifdef GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
 		CS(GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE)
 	#endif

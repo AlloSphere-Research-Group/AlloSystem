@@ -157,9 +157,9 @@ PBO::PBO(bool packMode, BufferUsage usage)
 :	BufferObject(packMode ? PIXEL_PACK_BUFFER : PIXEL_UNPACK_BUFFER, usage)
 {}
 
-//void PBO::enable(){ glEnableClientState(ArrayType::Vertex); }
-//void PBO::disable(){ glDisableClientState(ArrayType::Vertex); }
-void PBO::onAction(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
+//void PBO::enable(){}
+//void PBO::disable(){}
+//void PBO::onAction(){}
 #endif
 
 

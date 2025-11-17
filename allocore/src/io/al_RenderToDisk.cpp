@@ -405,7 +405,7 @@ void RenderToDisk::saveImage(
 
 	unsigned char * pixs = &mPixels[0];
 
-	#ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
+	#ifdef AL_GRAPHICS_SUPPORTS_SET_R_BUFFER
 	// Set read buffer
 	//glReadBuffer(GL_COLOR_ATTACHMENT0); // for FBO
 	//glReadBuffer(GL_BACK);

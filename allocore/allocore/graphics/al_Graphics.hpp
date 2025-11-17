@@ -874,13 +874,16 @@ inline void Graphics::draw(const Mesh& m, int count, int begin){ mBackend->draw(
 inline void Graphics::draw(const Mesh& m, const Mesh::Group& g){ draw(m, g.count(),g.begin); }
 inline bool Graphics::prepareDraw(){ return mBackend->prepareDraw(); }
 
-#ifdef AL_GRAPHICS_SUPPORTS_SET_RW_BUFFERS
-inline void Graphics::drawBuffer(Direction d){ glDrawBuffer(d); }
-inline void Graphics::readBuffer(Direction d){ glReadBuffer(d); }
-#else
-inline void Graphics::drawBuffer(Direction d){}
-inline void Graphics::readBuffer(Direction d){}
+inline void Graphics::readBuffer(Direction d){
+#ifdef AL_GRAPHICS_SUPPORTS_SET_R_BUFFER
+	glReadBuffer(d);
 #endif
+}
+inline void Graphics::drawBuffer(Direction d){
+#ifdef AL_GRAPHICS_SUPPORTS_SET_W_BUFFER
+	glDrawBuffer(d);
+#endif
+}
 
 #ifdef AL_GRAPHICS_SUPPORTS_POLYGON_MODE
 inline void Graphics::polygonMode(PolygonMode m, Direction d){ glPolygonMode(d,m); }
