@@ -172,8 +172,8 @@ public:
 	/// Get status of frame buffer object
 	GLenum status();
 	const char * statusString();
-	const char * statusString(GLenum stat);
 
+	static const char * statusString(GLenum stat);
 	static void bind(unsigned fboID, int target);
 	static void renderBuffer(unsigned rboID, Attachment attach);
 	static void texture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);

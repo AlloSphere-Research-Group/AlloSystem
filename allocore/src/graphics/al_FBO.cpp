@@ -136,14 +136,14 @@ FBO& FBO::copyTo(FBO& dst,
 
 GLenum FBO::status(){
 	bind();
-	int r = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	auto r = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	unbind();
 	return r;
 }
 
 const char * FBO::statusString(){ return statusString(status()); }
 
-const char * FBO::statusString(GLenum stat){
+/*static*/ const char * FBO::statusString(GLenum stat){
 	#define CS(v) case v: return #v;
 	switch(stat){
 	CS(GL_FRAMEBUFFER_COMPLETE)
