@@ -44,13 +44,29 @@ const ShaderProgram& ShaderProgram::attribute4(int loc, const double * v) const{
 
 #endif
 
+#ifdef AL_GRAPHICS_SUPPORTS_GEOMETRY_SHADER
+#ifdef AL_GRAPHICS_GEOMETRY_SHADER_EXT
+	// Mainly for Mac where geometry shaders are an extension
+	#define AL_GEOMETRY_SHADER 			GL_GEOMETRY_SHADER_EXT
+	#define AL_GEOMETRY_INPUT_TYPE		GL_GEOMETRY_INPUT_TYPE_EXT
+	#define AL_GEOMETRY_OUTPUT_TYPE		GL_GEOMETRY_OUTPUT_TYPE_EXT
+	#define AL_GEOMETRY_VERTICES_OUT	GL_GEOMETRY_VERTICES_OUT_EXT
+	#define GL_PROGRAM_PARAMETERI		glProgramParameteriEXT
+#else
+	#define AL_GEOMETRY_SHADER 			GL_GEOMETRY_SHADER
+	#define AL_GEOMETRY_INPUT_TYPE		GL_GEOMETRY_INPUT_TYPE
+	#define AL_GEOMETRY_OUTPUT_TYPE		GL_GEOMETRY_OUTPUT_TYPE
+	#define AL_GEOMETRY_VERTICES_OUT	GL_GEOMETRY_VERTICES_OUT
+	#define GL_PROGRAM_PARAMETERI		glProgramParameteri
+#endif
+#endif
 
 GLenum gl_shader_type(Shader::Type v) {
 	switch(v){
 		case Shader::FRAGMENT:	return GL_FRAGMENT_SHADER;
 		case Shader::VERTEX:	return GL_VERTEX_SHADER;
 		#ifdef AL_GRAPHICS_SUPPORTS_GEOMETRY_SHADER
-		case Shader::GEOMETRY:	return GL_GEOMETRY_SHADER_EXT;
+		case Shader::GEOMETRY:	return AL_GEOMETRY_SHADER;
 		#endif
 		default: return 0;
 	}
@@ -181,9 +197,9 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 
 	#ifdef AL_GRAPHICS_SUPPORTS_GEOMETRY_SHADER
 	if (s.type() == Shader::GEOMETRY) {
-		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT, mInPrim);
-		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT, mOutPrim);
-		glProgramParameteriEXT(id(),GL_GEOMETRY_VERTICES_OUT_EXT,mOutVertices);
+		GL_PROGRAM_PARAMETERI(id(),AL_GEOMETRY_INPUT_TYPE, mInPrim);
+		GL_PROGRAM_PARAMETERI(id(),AL_GEOMETRY_OUTPUT_TYPE, mOutPrim);
+		GL_PROGRAM_PARAMETERI(id(),AL_GEOMETRY_VERTICES_OUT,mOutVertices);
 	}
 	#endif
 

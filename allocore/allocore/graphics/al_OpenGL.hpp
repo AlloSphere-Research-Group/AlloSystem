@@ -72,6 +72,8 @@ Include OpenGL extensions for target flavor of OpenGL. Not included by default t
 		#ifdef AL_GRAPHICS_USE_OPENGL_EXT
 			#include <OpenGL/glext.h>
 		#endif
+		// Seems on all Mac versions geometry shaders are an extension
+		#define AL_GRAPHICS_GEOMETRY_SHADER_EXT
 		#define AL_GRAPHICS_INIT_CONTEXT
 	#else
 		#error "Specified graphics backend not supported on this platform"

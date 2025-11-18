@@ -406,18 +406,20 @@ void RenderToDisk::saveImage(
 	unsigned char * pixs = &mPixels[0];
 
 	#ifdef AL_GRAPHICS_SUPPORTS_SET_R_BUFFER
-	// Set read buffer
-	//glReadBuffer(GL_COLOR_ATTACHMENT0); // for FBO
-	//glReadBuffer(GL_BACK);
-	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	/*
-	GLint drawBuffer;
-	glGetIntegerv(GL_DRAW_BUFFER, &drawBuffer);
-	glReadBuffer(drawBuffer);
-	//*/
-	if(mGraphicsBuf != GLenum(-1)){
-		glReadBuffer(mGraphicsBuf);
-	}
+		// Set read buffer
+		//glReadBuffer(GL_COLOR_ATTACHMENT0); // for FBO
+		//glReadBuffer(GL_BACK);
+		//glPixelStorei(GL_PACK_ALIGNMENT, 1);
+		/*
+		GLint drawBuffer;
+		glGetIntegerv(GL_DRAW_BUFFER, &drawBuffer);
+		glReadBuffer(drawBuffer);
+		//*/
+		if(mGraphicsBuf != GLenum(-1)){
+			glReadBuffer(mGraphicsBuf);
+		}
+	#else
+		// What if we can't set the readback buffer?
 	#endif
 
 	bool readPixels = false;
@@ -438,33 +440,41 @@ void RenderToDisk::saveImage(
 	http://stackoverflow.com/questions/12157646/how-to-render-offscreen-on-opengl
 	*/
 	if(usePBO){
+		auto pboTarget = GL_PIXEL_PACK_BUFFER;
 		if(0 == mPBOs[0]){ // create PBOs
 			auto * glPBOs = (GLuint *)mPBOs;
 			glGenBuffers(Npbos, glPBOs);
 			for(auto& pbo : mPBOs){
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
-				glBufferData(GL_PIXEL_PACK_BUFFER, numBytes, NULL, GL_STREAM_READ);
+				glBindBuffer(pboTarget, pbo);
+				glBufferData(pboTarget, numBytes, NULL, GL_STREAM_READ);
 			}
-			glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+			glBindBuffer(pboTarget, 0);
 		}
 
 		//printf("PBO %d %s\n", mPBOIdx, mReadPBO ? "(read back)" : "");
 		auto pbo = mPBOs[mPBOIdx];
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
+		glBindBuffer(pboTarget, pbo);
 
 		if(mReadPBO){
 			// Get pointer to data in currently bound PBO
 			// (This will block until glReadPixels finishes from last time the PBO was bound)
-			auto * ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
-			std::memcpy(pixs, ptr, numBytes);
-			glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-			readPixels = true;
+			// (Note: MapBuffer only on GL2,3,4. MapBufferRange only on GL3,4 and ES3
+			#ifdef AL_GRAPHICS_SUPPORTS_MAP_BUFFER
+				auto * ptr = glMapBuffer(pboTarget, GL_READ_ONLY);
+			#else
+				auto * ptr = glMapBufferRange(pboTarget, 0, numBytes, GL_MAP_READ_BIT);
+			#endif
+			if(ptr){
+				std::memcpy(pixs, ptr, numBytes);
+				glUnmapBuffer(pboTarget);
+				readPixels = true;
+			}
 		}
 
 		// This will perform asynchronously into the bound PBO
 		downloadPixels(0);
 
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+		glBindBuffer(pboTarget, 0);
 
 		mPBOIdx = (mPBOIdx + 1) % Npbos;
 		mReadPBO = mReadPBO || (mPBOIdx == 0); // written to all PBOs at least once
