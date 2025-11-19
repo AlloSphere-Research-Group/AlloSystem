@@ -61,7 +61,7 @@ class RBO : public GPUObject{
 public:
 
 	/// @param[in] format	internal format of buffer
-	RBO(Graphics::Format format = Graphics::DEPTH_COMPONENT);
+	RBO(Graphics::Format format = Graphics::DEPTH_COMPONENT_OFFSCREEN);
 
 	/// Get internal pixel format
 	Graphics::Format format() const;

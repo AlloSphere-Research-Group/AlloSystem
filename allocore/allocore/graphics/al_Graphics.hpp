@@ -63,10 +63,8 @@
 	#define AL_MAX_LIGHTS 4
 #endif
 
-/*!
-	\def AL_GRAPHICS_ERROR(msg, ID)
+/*!	\def AL_GRAPHICS_ERROR(msg, ID)
 	Used for reporting graphics errors from source files
-
 */
 #ifdef AL_ENABLE_DEBUG
 #define AL_GRAPHICS_ERROR(msg, ID)\
@@ -191,6 +189,14 @@ public:
 		#elif defined AL_GRAPHICS_SUPPORTS_DEPTH_COMP16
 		DEPTH_COMPONENT			= GL_DEPTH_COMPONENT16		/**< */
 		#endif
+		#ifdef AL_GRAPHICS_MAX_DEPTH_OFFSCREEN
+			#if AL_GRAPHICS_MAX_DEPTH_OFFSCREEN == 16
+			DEPTH_COMPONENT_OFFSCREEN = GL_DEPTH_COMPONENT16
+			#endif
+		#else
+		DEPTH_COMPONENT_OFFSCREEN = DEPTH_COMPONENT
+		#endif
+
 	};
 
 	enum MatrixMode {

@@ -266,6 +266,10 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_DEPTH_COMP16
 #endif
 
+#if defined(AL_GRAPHICS_USE_OPENGLES2)
+	#define AL_GRAPHICS_MAX_DEPTH_OFFSCREEN 16
+#endif
+
 #ifndef AL_GRAPHICS_USE_OPENGLES1
 	#define AL_GRAPHICS_SUPPORTS_BLEND_EQ
 #endif
