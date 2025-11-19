@@ -129,8 +129,6 @@ struct EasyFBO {
 		return *this;
 	}
 
-
-
 	/// Get color buffer texture
 	const Texture& texture() const { return mTexture; }
 	Texture& texture(){ return mTexture; }
@@ -192,6 +190,7 @@ private:
 				mFBO.detachRBO(FBO::DEPTH_ATTACHMENT);
 			}
 			//printf("fbo status %s\n", mFBO.statusString());
+			AL_GRAPHICS_ERROR("EasyFBO::sync", -1);
 		}
 	}
 };
