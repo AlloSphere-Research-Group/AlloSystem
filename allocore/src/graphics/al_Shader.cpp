@@ -292,13 +292,27 @@ bool ShaderProgram::compile(
 	std::string ver = mVersion.empty() ? "" : "#version " + mVersion + "\n";
 
 	auto sourceString = [&](const std::string& macro, const std::string& source){
-		return ver + macro + mPreamble + source;
+		return ver
+		+ "#ifdef GL_ES\n"
+		+ "#define AL_FRAG_FLOATP mediump\n"
+		+ "#else\n"
+		+ "#define AL_FRAG_FLOATP\n"
+		+ "#endif\n"
+		+ macro + mPreamble + source;
 	};
 
 	Shader mShaderV, mShaderF, mShaderG;
+
 	mShaderV.source(sourceString(mVertMacro, vertSource), al::Shader::VERTEX);
 	attach(mShaderV);
-	mShaderF.source(sourceString(mFragMacro, fragSource), al::Shader::FRAGMENT);
+
+	// ES needs a default float precision defined in the fragment program
+	std::string fragPrec =
+		"#if defined(GL_ES) && !defined(AL_DEF_FRAG_PREC)\n"
+		"precision AL_FRAG_FLOATP float;\n"
+		"#endif\n"
+	;
+	mShaderF.source(sourceString(fragPrec + mFragMacro, fragSource), al::Shader::FRAGMENT);
 	attach(mShaderF);
 	
 	bool bGeom = geomSource[0];

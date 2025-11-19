@@ -259,11 +259,6 @@ public:
 // Note: Presence of backslashes '\' anywhere in code, including comments, are
 // known to trip up compilation in Firefox 74.
 			mShader.preamble(
-R"(
-#ifdef GL_ES
-precision mediump float; // req'd by ES2
-#endif
-)" +
 mPreamble
 + R"(
 const float pi = 3.141592653589793;
@@ -278,9 +273,9 @@ uniform mat4 view;		// view matrix (convert from world to eye space)
 uniform bool doTex2;
 
 struct Fog{
-	vec3 color;
-	float start, end;
-	float scale; // 1/(end-start)
+	AL_FRAG_FLOATP vec3 color;
+	AL_FRAG_FLOATP float start, end;
+	AL_FRAG_FLOATP float scale; // 1/(end-start)
 };
 uniform Fog fog;// = Fog(vec3(0.), 0., 1., 1.);
 varying float fogMix;
