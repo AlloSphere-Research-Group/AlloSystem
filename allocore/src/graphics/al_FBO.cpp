@@ -43,15 +43,17 @@ bool RBO::resize(unsigned w, unsigned h){
 
 /*static*/ void RBO::bind(unsigned id){
 	glBindRenderbuffer(GL_RENDERBUFFER, id);
+	AL_GRAPHICS_ERROR("RBO::bind (glBindRenderbuffer)", id);
 }
 
 /*static*/ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 	unsigned mx = maxSize();
 	if(w > mx || h > mx) return false;
+	//AL_GRAPHICS_ERROR("before RBO::resize", -1);
 	glRenderbufferStorage(GL_RENDERBUFFER, format, w, h);
+	AL_GRAPHICS_ERROR("RBO::resize (glRenderbufferStorage)", -1);
 	return true;
 }
-
 
 
 
@@ -169,10 +171,12 @@ const char * FBO::statusString(){ return statusString(status()); }
 
 /*static*/ void FBO::renderBuffer(unsigned rboID, Attachment att){
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, att, GL_RENDERBUFFER, rboID);
+	AL_GRAPHICS_ERROR("FBO::renderBuffer (glFramebufferRenderbuffer)", rboID);
 }
 
 /*static*/ void FBO::texture2D(GLuint texID, Attachment att, int level){
 	glFramebufferTexture2D(GL_FRAMEBUFFER, att, GL_TEXTURE_2D, texID, level);
+	AL_GRAPHICS_ERROR("FBO::texture2D (glFramebufferTexture2D)", texID);
 }
 
 } // al::
