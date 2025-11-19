@@ -41,13 +41,13 @@ public:
 			float m = 1 - al::clip(hypot(x,y));
 			float a = al::wrap(atan2(y,x)/M_2PI);
 
-			Color col = HSV(a,1,m);
+			Colori col = HSV(a,1,m);
 
 			int idx = j*Nx + i;
 			int stride = tex.numComponents();
-			pixels[idx*stride + 0] = col.r * 255.;
-			pixels[idx*stride + 1] = col.g * 255.;
-			pixels[idx*stride + 2] = col.b * 255.;
+			pixels[idx*stride + 0] = col.r;
+			pixels[idx*stride + 1] = col.g;
+			pixels[idx*stride + 2] = col.b;
 			pixels[idx*stride + 3] = col.a;
 		}}
 
