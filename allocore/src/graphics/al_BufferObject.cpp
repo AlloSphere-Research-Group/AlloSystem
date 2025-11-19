@@ -98,6 +98,7 @@ VBO::VBO(BufferUsage usage)
 {}
 
 void VBO::onAction(){
+	// need run-time branch if both prog and fixed pipeline available (e.g. GL2)
 	if(true){ // using shader attributes
 		#ifdef AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 		glVertexAttribPointer(VERTEX_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0);
@@ -135,20 +136,20 @@ void EBO::onAction(){
 #endif
 
 #ifdef AL_GRAPHICS_USE_PROG_PIPELINE
-void VBO::enable(){ glEnableVertexAttribArray(VERTEX_ARRAY); }
-void VBO::disable(){ glDisableVertexAttribArray(VERTEX_ARRAY); }
+/*static*/ void VBO::enable(){ glEnableVertexAttribArray(VERTEX_ARRAY); }
+/*static*/ void VBO::disable(){ glDisableVertexAttribArray(VERTEX_ARRAY); }
 //void VBO::onAction(){ glVertexAttribPointer(VERTEX_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0); }
 
-void CBO::enable(){ glEnableVertexAttribArray(COLOR_ARRAY); }
-void CBO::disable(){ glDisableVertexAttribArray(COLOR_ARRAY); }
+/*static*/ void CBO::enable(){ glEnableVertexAttribArray(COLOR_ARRAY); }
+/*static*/ void CBO::disable(){ glDisableVertexAttribArray(COLOR_ARRAY); }
 void CBO::onAction(){ glVertexAttribPointer(COLOR_ARRAY, mNumComps, mDataType, GL_FALSE, 0, 0); }
 #else
-void VBO::enable(){ glEnableClientState(VERTEX_ARRAY); }
-void VBO::disable(){ glDisableClientState(VERTEX_ARRAY); }
+/*static*/ void VBO::enable(){ glEnableClientState(VERTEX_ARRAY); }
+/*static*/ void VBO::disable(){ glDisableClientState(VERTEX_ARRAY); }
 //void VBO::onAction(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
 
-void CBO::enable(){ glEnableClientState(COLOR_ARRAY); }
-void CBO::disable(){ glDisableClientState(COLOR_ARRAY); }
+/*static*/ void CBO::enable(){ glEnableClientState(COLOR_ARRAY); }
+/*static*/ void CBO::disable(){ glDisableClientState(COLOR_ARRAY); }
 void CBO::onAction(){ glColorPointer(mNumComps, mDataType, 0, 0); }
 #endif
 
@@ -157,9 +158,7 @@ PBO::PBO(bool packMode, BufferUsage usage)
 :	BufferObject(packMode ? PIXEL_PACK_BUFFER : PIXEL_UNPACK_BUFFER, usage)
 {}
 
-//void PBO::enable(){}
-//void PBO::disable(){}
-//void PBO::onAction(){}
+void PBO::onAction(){}
 #endif
 
 
