@@ -453,15 +453,13 @@ void Texture::sendParams(bool force){
 	if(mParamsUpdated || force){
 		glTexParameteri(target(), GL_TEXTURE_MAG_FILTER, filterMag());
 		glTexParameteri(target(), GL_TEXTURE_MIN_FILTER, filterMin());
-		glTexParameteri(target(), GL_TEXTURE_WRAP_S, mWrapS);
-		glTexParameteri(target(), GL_TEXTURE_WRAP_T, mWrapT);
-		#ifdef GL_TEXTURE_WRAP_R
-		glTexParameteri(target(), GL_TEXTURE_WRAP_R, mWrapR);
+		switch(target()){
+		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
+		case TEXTURE_3D: glTexParameteri(target(), GL_TEXTURE_WRAP_R, mWrapR);
 		#endif
-		/*if(filterMin() != LINEAR && filterMin() != NEAREST){
-			// deprecated in OpenGL 3.0 and above
-			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
-		}*/
+		case TEXTURE_2D: glTexParameteri(target(), GL_TEXTURE_WRAP_T, mWrapT);
+		default:         glTexParameteri(target(), GL_TEXTURE_WRAP_S, mWrapS);
+		}
 			AL_GRAPHICS_ERROR("Texture::sendParams (glTexParameteri)", id());
 		mParamsUpdated = false;
 	}
