@@ -268,7 +268,7 @@ varying vec3 vposObj;	// position (object space)
 varying vec4 vcol;
 varying vec2 vtc2;
 
-uniform highp mat4 view; // view matrix (convert from world to eye space)
+uniform AL_HIGHP mat4 view; // view matrix (convert from world to eye space)
 uniform bool doTex2;
 
 struct Fog{

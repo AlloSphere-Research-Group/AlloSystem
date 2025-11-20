@@ -293,11 +293,24 @@ bool ShaderProgram::compile(
 
 	auto sourceString = [&](const std::string& macro, const std::string& source){
 		return ver
-		+ "#ifdef GL_ES\n"
-		+ "#define AL_FRAG_FLOATP mediump\n"
-		+ "#else\n"
-		+ "#define AL_FRAG_FLOATP\n"
-		+ "#endif\n"
+		+ R"(
+#ifndef AL_FRAG_FLOATP
+	#ifdef GL_ES
+		#define AL_FRAG_FLOATP mediump
+	#else
+		#define AL_FRAG_FLOATP
+	#endif
+#endif
+#ifdef GL_ES
+	#define AL_LOWP lowp
+	#define AL_MEDIUMP mediump
+	#define AL_HIGHP highp
+#else
+	#define AL_LOWP
+	#define AL_MEDIUMP
+	#define AL_HIGHP
+#endif
+		)"
 		+ macro + mPreamble + source;
 	};
 
