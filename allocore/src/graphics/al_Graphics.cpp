@@ -259,8 +259,7 @@ public:
 // Note: Presence of backslashes '\' anywhere in code, including comments, are
 // known to trip up compilation in Firefox 74.
 			mShader.preamble(
-mPreamble
-+ R"(
+mPreamble + R"(
 const float pi = 3.141592653589793;
 varying vec3 vpos;		// position (eye space)
 varying vec3 vnrm;		// normal (eye space)
@@ -292,7 +291,7 @@ vec3 al_transform(mat4 m, vec3 v, float w){
 			mShader.compile(
 // VERTEX PROGRAM
 // ==============
-R"(
+mPreambleVert + R"(
 uniform mat4 MV;
 uniform mat4 P;
 uniform mat3 normalMatrix;
@@ -314,7 +313,7 @@ void main(){
 	if(doTex2) vtc2 = tcIn;
 	gl_PointSize = pointSize;
 )" +
-	mOnVertex +
+	mOnVert +
 R"(
 	vpos = al_transform(MV, vposObj,1.); // to eye space
 	gl_Position = P * vec4(vpos,1.); // to screen space
@@ -329,7 +328,7 @@ R"(
 // ================
 "#define MAX_LIGHTS " + std::to_string(AL_MAX_LIGHTS) + "\n" +
 
-R"(
+mPreambleFrag + R"(
 #ifndef MAX_LIGHTS
 #define MAX_LIGHTS 4
 #endif
@@ -482,7 +481,7 @@ void main(){
 	// Two-sided lighting: make normal always face eye
 	if(lightTwoSided && !gl_FrontFacing) N=-N;
 )" +
-	mOnFragmentPre +
+	mOnFragPre +
 R"(
 	if(doTex2){
 		col *= texture2D(tex2, tc2);
@@ -816,7 +815,7 @@ protected:
 		}
 	};
 	AttribLocs mDefaultAttribLocs, mAttribLocs;
-	std::string mPreamble, mOnVertex, mOnFragmentPre, mOnBaseColor, mOnMaterial, mOnLight;
+	std::string mPreamble, mPreambleVert, mPreambleFrag, mOnVert, mOnFragPre, mOnBaseColor, mOnMaterial, mOnLight;
 	Color mCurrentColor;
 	ShaderData<float> mPointSize{1};
 	std::vector<Colori> mColorArray;
@@ -1222,12 +1221,20 @@ Graphics& Graphics::shaderPreamble(const std::string& s){
 	if(mBackends[PROG]) backendProg()->mPreamble = s;
 	return *this;
 }
-Graphics& Graphics::shaderOnVertex(const std::string& s){
-	if(mBackends[PROG]) backendProg()->mOnVertex = s;
+Graphics& Graphics::shaderPreambleVert(const std::string& s){
+	if(mBackends[PROG]) backendProg()->mPreambleVert = s;
 	return *this;
 }
-Graphics& Graphics::shaderOnFragmentPre(const std::string& s){
-	if(mBackends[PROG]) backendProg()->mOnFragmentPre = s;
+Graphics& Graphics::shaderPreambleFrag(const std::string& s){
+	if(mBackends[PROG]) backendProg()->mPreambleFrag = s;
+	return *this;
+}
+Graphics& Graphics::shaderOnVert(const std::string& s){
+	if(mBackends[PROG]) backendProg()->mOnVert = s;
+	return *this;
+}
+Graphics& Graphics::shaderOnFragPre(const std::string& s){
+	if(mBackends[PROG]) backendProg()->mOnFragPre = s;
 	return *this;
 }
 Graphics& Graphics::shaderOnBaseColor(const std::string& s){

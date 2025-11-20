@@ -700,12 +700,14 @@ public:
 
 	/// Insert code in global scope of all shader stages
 	Graphics& shaderPreamble(const std::string& s);
+	Graphics& shaderPreambleVert(const std::string& s);
+	Graphics& shaderPreambleFrag(const std::string& s);
 
 	/// Insert code in vertex stage; output variables are 'vposObj', 'vcol', 'vnrm' and 'vtc2'
-	Graphics& shaderOnVertex(const std::string& s);
+	Graphics& shaderOnVert(const std::string& s);
 
 	/// Insert code in fragment shader just after all inputs set ('pos', 'col' and 'tc2')
-	Graphics& shaderOnFragmentPre(const std::string& s);
+	Graphics& shaderOnFragPre(const std::string& s);
 	/// Insert code in fragment shader just after computing the base color; useful for alpha discard
 	Graphics& shaderOnBaseColor(const std::string& s);
 	/// Insert code to customize the material
