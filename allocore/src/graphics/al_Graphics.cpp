@@ -342,17 +342,19 @@ struct Light{
 	float strength;		// Overall strength of light
 	vec3 diffuse;		// Component scattered off surface
 	vec3 specular;		// Component bounced/reflected off surface
-	float ambient;		// Amount of light bounced off walls (uses diffuse color)
+	vec3 ambient;		// Component bounced off walls
 };
 
 struct LightFall{ // For storing intermediate results
 	vec3 diffuse;
 	vec3 specular;
+	vec3 ambient;
 };
 
 void zero(inout LightFall l){
 	l.diffuse = vec3(0.);
 	l.specular = vec3(0.);
+	l.ambient = vec3(0.);
 }
 
 // Surface material
@@ -362,6 +364,7 @@ struct Material{
 	vec3 emission;		// Component emitted from surface
 	float shininess;	// Concentration of specular (its lack of scattering)
 	float reflectance;	// Reflectance coef for Fresnel specular factor
+	vec3 ambient;
 };
 
 uniform Light lights[MAX_LIGHTS];
@@ -380,14 +383,25 @@ Material lerp(in Material m1, in Material m2, float frac){
 	m.emission   = mix(m1.emission,   m2.emission,   frac);
 	m.shininess  = mix(m1.shininess,  m2.shininess,  frac);
 	m.reflectance= mix(m1.reflectance,m2.reflectance,frac);
+	m.ambient    = mix(m1.ambient,    m2.ambient,    frac);
 	return m;
 }
 
 float _pow5(float x){ float xx=x*x; return xx*xx*x; }
 
-/* OpenGL fixed pipeline lighting (li = light i, m = material):
+/* OpenGL fixed pipeline lighting (from OpenGL Programming Guide 2nd edition):
 	Em + Ag Am +
 	sum_i{ ali [Ali Am + max(L.N, 0) Dli Dm + max(H.N, 0)^s Sli Sm] }
+
+	*li		light i attrib
+	*m		material attrib
+	a		attenuation
+	A		ambient
+	D		diffuse
+	S		specular
+	L		light-to-surface vector
+	N		normal vector
+	H		half vector
 */
 
 /// Blinn-Phong lighting
@@ -402,30 +416,12 @@ LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in Material m
 	vec3 lightVec = light.pos - pos;
 	vec3 L = normalize(lightVec); // dir from surface to light
 
-	float intens = light.strength;
-
-	// Distance attenuation: 1/(1+[d/h]^2) = h^2 / (h^2 + d^2)
-	{	float hh = light.halfDist*light.halfDist;
-		intens *= hh / (hh + dot(lightVec,lightVec));
-	}
-
-	// Spotlight
-	if(light.spread < 180.){
-		float coneAmt = -dot(light.dir, L); // cos of angle: [1,-1] -> [coincident, opposing]
-		//coneAmt = coneAmt*-0.5+0.5; // [1,-1] -> [0,1]
-		float cosMax = cos(light.spread * pi/180.);
-		float coneDist = (1.-coneAmt)/(1.-cosMax); // apx dist from cone center [0,1]
-		//float coneAmp = 1.-min(coneDist,1.); // linear falloff
-		float coneAmp = min(coneDist,1.)-1.; coneAmp*=coneAmp; // parabolic falloff
-		intens *= coneAmp;
-	}
-
 	// Diffuse/specular
 	float NdotL = dot(N,L);
-	float diffAmt = (max(NdotL, 0.) + light.ambient) * intens;
+	float diffAmt = max(NdotL, 0.);
 	vec3 H = normalize(L + V); // half-vector
-	float specAmt = pow(max(dot(N,H), 0.), mat.shininess) * intens; // Blinn-Phong
-	//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), mat.shininess*0.25) * intens; // Phong
+	float specAmt = pow(max(dot(N,H), 0.), mat.shininess); // Blinn-Phong
+	//float specAmt = pow(max(dot(reflect(-L,N),V), 0.), mat.shininess*0.25); // Phong
 
 	#ifdef LIGHT_SPECULAR_CORRECTION
 		float k = 0.0397887; // 1/(8pi)
@@ -438,15 +434,34 @@ LightFall light(in vec3 pos, in vec3 N, in vec3 V, in Light light, in Material m
 	//float c = 1.-min(1.,mat.shininess*0.25*0.5*dot(D,D)); // 1st order apx
 	float c = 1.-min(1.,mat.shininess*0.25*0.25*dot(D,D)); c*=c; // 2nd order apx
 	//float c = 1.-min(1.,mat.shininess*0.25*0.125*dot(D,D)); c*=c; c*=c; // 3rd order apx
-	float specAmt = c * intens;
+	float specAmt = c;
 	//*/
 
 	// Fresnel "specular grazing" using Schlick apx
 	specAmt *= mix(mat.reflectance, 1., _pow5(1. - dot(H,V)));
 
+	float atten = light.strength;
+
+	// Distance attenuation: 1/(1+[d/h]^2) = h^2 / (h^2 + d^2)
+	{	float hh = light.halfDist*light.halfDist;
+		atten *= hh / (hh + dot(lightVec,lightVec));
+	}
+
+	// Spotlight
+	if(light.spread < 180.){
+		float coneAmt = -dot(light.dir, L); // cos of angle: [1,-1] -> [coincident, opposing]
+		//coneAmt = coneAmt*-0.5+0.5; // [1,-1] -> [0,1]
+		float cosMax = cos(light.spread * pi/180.);
+		float coneDist = (1.-coneAmt)/(1.-cosMax); // apx dist from cone center [0,1]
+		//float coneAmp = 1.-min(coneDist,1.); // linear falloff
+		float coneAmp = min(coneDist,1.)-1.; coneAmp*=coneAmp; // parabolic falloff
+		atten *= coneAmp;
+	}
+
 	LightFall fall;
-	fall.diffuse  = light.diffuse  * diffAmt;
-	fall.specular = light.specular * specAmt;
+	fall.diffuse  = light.diffuse  * (diffAmt * atten);
+	fall.specular = light.specular * (specAmt * atten);
+	fall.ambient  = light.ambient * atten;
 )" +
 	mOnLight +
 R"(
@@ -464,11 +479,17 @@ vec3 lightColor(
 			LightFall l = light(pos, N, V, lights[i], material);
 			lsum.diffuse += l.diffuse;
 			lsum.specular += l.specular;
+			lsum.ambient += l.ambient;
 		}
 	}
-
+/*
 	return (lsum.diffuse + globalAmbient) * material.diffuse
 		+ lsum.specular * material.specular
+		+ material.emission;
+*/
+	return lsum.diffuse * material.diffuse
+		+ lsum.specular * material.specular
+		+ (lsum.ambient + globalAmbient) * material.ambient
 		+ material.emission;
 }
 
@@ -524,7 +545,7 @@ R"(
 				for(int i=0; i<2; ++i){
 					auto& o = mGraphics.mMaterials[i];
 					std::string pre = "materials[" + std::to_string(i) + "].";
-					SET_LOC(diffuse) SET_LOC(emission) SET_LOC(specular) SET_LOC(shininess) SET_LOC(reflectance)
+					SET_LOC(diffuse) SET_LOC(emission) SET_LOC(specular) SET_LOC(shininess) SET_LOC(reflectance) SET_LOC(ambient)
 				}
 				mGraphics.mMaterialOneSided.loc() = mShader.uniform("materialOneSided");
 				mGraphics.mFog.loc().color = mShader.uniform("fog.color");
@@ -623,7 +644,7 @@ R"(
 							mShader.uniform(l.loc().spread, l.get().spread());
 							mShader.uniform(l.loc().diffuse, l.get().diffuse().rgb());
 							mShader.uniform(l.loc().specular, l.get().specular().rgb());
-							mShader.uniform(l.loc().ambient, max(l.get().ambient().rgb()));
+							mShader.uniform(l.loc().ambient, l.get().ambient().rgb());
 							if(Light::sGlobalAmbientUpdate){
 								Light::sGlobalAmbientUpdate = false;
 								mShader.uniform("globalAmbient", Light::globalAmbient().rgb());
@@ -639,11 +660,12 @@ R"(
 					if(mMaterialOneSided.handleUpdate()){
 						mShader.uniform(mMaterialOneSided.loc(), mMaterialOneSided.get());
 					}
-					mShader.uniform(m.loc().diffuse, m.get().diffuse().rgb() + m.get().ambient().rgb());
+					mShader.uniform(m.loc().diffuse, m.get().diffuse().rgb());
 					mShader.uniform(m.loc().emission, m.get().emission().rgb());
 					mShader.uniform(m.loc().specular, m.get().specular().rgb());
 					mShader.uniform(m.loc().shininess, m.get().shininess());
 					mShader.uniform(m.loc().reflectance, m.get().reflectance());
+					mShader.uniform(m.loc().ambient, m.get().ambient().rgb());
 				}
 			}
 

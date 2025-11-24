@@ -810,7 +810,7 @@ protected:
 	ShaderData<Light,LightLocs> mLights[AL_MAX_LIGHTS];
 	ShaderData<bool> mDoLighting{false};
 
-	struct MaterialLocs{int diffuse,emission,specular,shininess,reflectance;};
+	struct MaterialLocs{int diffuse,emission,specular,shininess,reflectance,ambient;};
 	ShaderData<Material,MaterialLocs> mMaterials[2];
 	ShaderData<bool> mMaterialOneSided{true};
 
