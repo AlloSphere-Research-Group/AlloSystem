@@ -278,6 +278,7 @@ public:
 	/// This is useful for initializing uniforms.
 	///
 	bool once() const { return mOnce; }
+	ShaderProgram& once(bool v){ mOnce=v; return *this; }
 
 	/// Call a function wrapped inside begin/end calls once after compile
 

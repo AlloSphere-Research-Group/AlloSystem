@@ -540,7 +540,7 @@ R"(
 						"hasTangents", false,
 						"singleColor", Color(0,0,0,colorArrayAlpha)
 					);
-				});
+				}).once(true); // give user a chance to use this :)
 			} else {
 				printf("Critical error: al::Graphics failed to compile shader\n");
 				mShader.printLog();
