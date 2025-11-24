@@ -407,26 +407,29 @@ bool ShaderProgram::linked() const {
 	return (v == GL_TRUE);
 }
 
-#define GET_LOC(map, glGetFunc)\
-	int loc;\
-	auto it = map.find(name);\
-	if(it != map.end()){\
-		loc = it->second;\
-	}\
-	else{\
-		loc = glGetFunc(id(), name);\
-		map[name] = loc;\
+// Search local cache for key 'name', otherwise query GPU and cache
+template <class Cache, class OnQueryRemote>
+static int getLoc(const char * name, Cache& cache, const OnQueryRemote& q){
+	int loc;
+	auto it = cache.find(name);
+	if(it != cache.end()){
+		loc = it->second;
+	} else {
+		loc = q();
+		cache[name] = loc;
 	}
+	return loc;
+}
 
 int ShaderProgram::uniform(const char * name) const {
-	GET_LOC(mUniformLocs, glGetUniformLocation);
+	auto loc = getLoc(name, mUniformLocs, [&](){ return glGetUniformLocation(id(), name); });
 	if(warnings() && -1 == loc)
 		AL_WARN_ONCE("ShaderProgram %s has no uniform \"%s\"", idString().c_str(), name);
 	return loc;
 }
 
 int ShaderProgram::attribute(const char * name) const {
-	GET_LOC(mAttribLocs, glGetAttribLocation);
+	auto loc = getLoc(name, mAttribLocs, [&](){ return glGetAttribLocation(id(), name); });
 	if(warnings() && -1 == loc)
         AL_WARN_ONCE("ShaderProgram %s has no attribute \"%s\"", idString().c_str(), name);
 	return loc;
