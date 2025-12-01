@@ -131,6 +131,11 @@ Material::Material(int faceDir)
 :	mFace(faceDir)
 {}
 
+Material& Material::ior(float v){
+	v = (v-1.f)/(v+1.f);
+	return reflectance(v*v);
+}
+
 Material& Material::ambientAndDiffuse(const Color& v){
 	ambient(v);
 	return diffuse(v);

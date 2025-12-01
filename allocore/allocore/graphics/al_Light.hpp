@@ -72,8 +72,18 @@ public:
 	/// Set specular exponent [0, 128]
 	Material& shininess(float v);
 
-	/// Set reflectance at non-grazing viewing angles; in [0,1]
+	/// Set reflectance at non-grazing viewing angles
+
+	/// This value should be low (0.04) for plastics/dielectrics and high 
+	/// (0.7-1) for metals/conductors.
 	Material& reflectance(float v){ mReflectance=v; return *this; }
+
+	/// Set index of refraction (IOR) (sets reflectance)
+
+	/// Plastics have a value around 1.52 and most fabrics a value around 1.54.
+	/// Metals should not use this function directly, but rather be set to a
+	/// high reflectance.
+	Material& ior(float v);
 
 	Material& ambientAndDiffuse(const Color& v);
 	Material& ambient(const Color& v);
