@@ -482,15 +482,12 @@ vec3 lightColor(
 			lsum.ambient += l.ambient;
 		}
 	}
-/*
-	return (lsum.diffuse + globalAmbient) * material.diffuse
-		+ lsum.specular * material.specular
-		+ material.emission;
-*/
+
 	return lsum.diffuse * material.diffuse
 		+ lsum.specular * material.specular
 		+ (lsum.ambient + globalAmbient) * material.ambient
-		+ material.emission;
+		+ material.emission
+	;
 }
 
 void main(){
@@ -514,7 +511,13 @@ R"(
 		Material material;
 		if(gl_FrontFacing || materialOneSided) material = materials[0];
 		else material = materials[1];
-		if(colorMaterial) material.diffuse *= col.rgb;
+		if(colorMaterial){
+			// Should "track" (replace) color, but that is less flexible than mul blend.
+			// Also, assuming mapping to diffuse and ambient.
+			// https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glColorMaterial.xml
+			material.diffuse *= col.rgb;
+			material.ambient *= col.rgb;
+		}
 )" +
 		mOnMaterial +
 R"(
@@ -522,7 +525,6 @@ R"(
 	}
 	col.rgb = mix(col.rgb, fog.color, clamp(fogMix,0.,1.));
 	gl_FragColor = col;
-	//gl_FragColor = vec4(1.,0.,0.,1.); //debug
 }
 )"
 			);
@@ -665,7 +667,7 @@ R"(
 					mShader.uniform(m.loc().specular, m.get().specular().rgb());
 					mShader.uniform(m.loc().shininess, m.get().shininess());
 					mShader.uniform(m.loc().reflectance, m.get().reflectance());
-					mShader.uniform(m.loc().ambient, m.get().ambient().rgb());
+					mShader.uniform(m.loc().ambient, m.get().useColorMaterial() ? m.get().diffuse().rgb() : m.get().ambient().rgb());
 				}
 			}
 
