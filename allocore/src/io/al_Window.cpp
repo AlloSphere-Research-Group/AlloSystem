@@ -47,7 +47,7 @@ void Keyboard::print() const {
 }
 
 
-Mouse::Mouse(): mX(0), mY(0), mButton(LEFT){
+Mouse::Mouse(): mX(0), mY(0), mButton(LEFT), mWheelX(0), mWheelY(0){
 	for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i){
 		mBX[i] = mBY[i] = 0; mB[i] = false;
 	}
@@ -70,8 +70,12 @@ bool Mouse::any() const {
 	return false;
 }
 
-void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=mY; } }
+short Mouse::wheelX() const { return mWheelX; }
+short Mouse::wheelY() const { return mWheelY; }
+
 void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
+void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=mY; } }
+void Mouse::wheel(short dx, short dy){ mWheelX=dx; mWheelY=dy; }
 
 
 
@@ -444,6 +448,7 @@ void Window::callHandlersOnMouseDown(){ CALL(onMouseDown(mMouse)); }
 void Window::callHandlersOnMouseDrag(){ CALL(onMouseDrag(mMouse)); }
 void Window::callHandlersOnMouseMove(){ CALL(onMouseMove(mMouse)); }
 void Window::callHandlersOnMouseUp(){ CALL(onMouseUp(mMouse)); }
+void Window::callHandlersOnMouseWheel(){ CALL(onMouseWheel(mMouse)); }
 void Window::callHandlersOnKeyDown(){ CALL(onKeyDown(mKeyboard)); }
 void Window::callHandlersOnKeyUp(){ CALL(onKeyUp(mKeyboard)); }
 #undef CALL
@@ -452,6 +457,7 @@ void Window::callHandlersOnKeyUp(){ CALL(onKeyUp(mKeyboard)); }
 void Window::callHandlersOnFrame(){
 	CALL(onFrame());
 	mKeyboard.mEvents.clear();
+	mMouse.wheel(0,0);
 }
 void Window::callHandlersOnCreate(){
 	contextCreate();

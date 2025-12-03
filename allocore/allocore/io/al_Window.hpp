@@ -168,18 +168,24 @@ public:
 	bool right() const;			///< Get whether right button is down
 	bool any() const;			///< Get whether any button is down
 
+	short wheelX() const;		///< Get wheel change in x direction (+ right, - left)
+	short wheelY() const;		///< Get wheel change in y direction (+ up, - down)
+	
 protected:
+	friend class Window;
 	friend class WindowImpl;
 
 	int mX, mY;						// x,y positions
 	int mDX, mDY;					// change in x,y positions
 	int mButton;					// most recent button changed
+	short mWheelX, mWheelY;			// wheel delta values
 	int mBX[AL_MOUSE_MAX_BUTTONS];	// button down xs
 	int mBY[AL_MOUSE_MAX_BUTTONS];	// button down ys
 	bool mB[AL_MOUSE_MAX_BUTTONS];	// button states
 
-	void button(int b, bool v);
 	void position(int x, int y);
+	void button(int b, bool v);
+	void wheel(short dx, short dy);
 };
 
 
@@ -248,6 +254,9 @@ public:
 
 	/// Called when a mouse button is released
 	virtual bool onMouseUp(const Mouse& m){ return true; }
+
+	/// Called when a mouse wheel is moved
+	virtual bool onMouseWheel(const Mouse& m){ return true; }
 
 
 	/// Return self
@@ -521,6 +530,7 @@ protected:
 	void callHandlersOnMouseDrag();
 	void callHandlersOnMouseMove();
 	void callHandlersOnMouseUp();
+	void callHandlersOnMouseWheel();
 	void callHandlersOnKeyDown();
 	void callHandlersOnKeyUp();
 

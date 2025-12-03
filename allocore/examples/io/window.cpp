@@ -34,12 +34,13 @@ struct MyWindow : Window {
 
 	bool onMouseDown(const Mouse& m){	printTitle(); printf("onMouseDown  "); printMouse(); return 1;}
 	bool onMouseUp(const Mouse& m){		printTitle(); printf("onMouseUp    "); printMouse(); return 1;}
+	bool onMouseWheel(const Mouse& m){	printTitle(); printf("onMouseWheel "); printMouse(); return 1; }
 	bool onMouseDrag(const Mouse& m){	printTitle(); printf("onMouseDrag  "); printMouse(); return 1;}
 	//bool onMouseMove(const Mouse& m){	printTitle(); printf("onMouseMove  "); printMouse(); return 1;}
 
 	void printMouse(){
 		const Mouse& m = mouse();
-		printf("x:%4d y:%4d b:%d,%d\n", m.x(), m.y(), m.button(), m.down());
+		printf("x:%4d y:%4d b:%d,%d w:%d,%d\n", m.x(), m.y(), m.button(), m.down(), m.wheelX(), m.wheelY());
 	}
 
 	void printKey(){
