@@ -264,6 +264,10 @@ public:
 	virtual void onMouseMove(const ViewpointWindow& w, const Mouse& m){ onMouseMove(m); }
 	virtual void onMouseMove(const Mouse& m){}
 
+	/// Called when a mouse wheel moves
+	virtual void onMouseWheel(const ViewpointWindow& w, const Mouse& m){ onMouseWheel(m); }
+	virtual void onMouseWheel(const Mouse& m){}
+
 
 	/// Called upon creation of a window
 	virtual void onCreate(const ViewpointWindow& win){}

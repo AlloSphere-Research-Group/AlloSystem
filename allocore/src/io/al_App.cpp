@@ -102,6 +102,7 @@ struct SceneInputHandler : public InputEventHandler{
 	bool onMouseUp(const Mouse& m) override { app.onMouseUp(win,m); return true;}
 	bool onMouseDrag(const Mouse& m) override { app.onMouseDrag(win,m); return true;}
 	bool onMouseMove(const Mouse& m) override { app.onMouseMove(win,m); return true;}
+	bool onMouseWheel(const Mouse& m) override { app.onMouseWheel(win,m); return true;}
 };
 
 // attached to each ViewpointWindow
