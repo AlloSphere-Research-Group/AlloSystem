@@ -294,8 +294,11 @@ private:
 				buttonDown ? win.callHandlersOnMouseDown() : win.callHandlersOnMouseUp();
 			}	break;
 
-			case EV_MOUSE_WHEEL: //printf("Mouse wheel: %d\n", ev.wheel.y);
-				break;
+			case EV_MOUSE_WHEEL:{ //printf("Mouse wheel: %f %f\n", ev.wheel.x, ev.wheel.y);
+				auto sgn = [](float v){ return v==0.f?0:v>0.f?1:-1; };
+				win.mMouse.wheel(sgn(ev.wheel.x), sgn(ev.wheel.y));
+				win.callHandlersOnMouseWheel();
+				} break;
 
 			case EV_MOUSE_MOTION: //printf("Mouse motion: %d %d\n", ev.motion.x, ev.motion.y);
 			{	if(!mUsingTouch) win.mMouse.position(ev.motion.x, ev.motion.y);
