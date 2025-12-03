@@ -373,24 +373,38 @@ public:
 		//printf("GLUT: mouse click x:%d y:%d bt:#%d,%d\n", ax,ay, btn, state==GLUT_DOWN);
 		Window * win = getWindow();
 		if(win){
-			switch(btn){
-				case GLUT_LEFT_BUTTON:		btn = Mouse::LEFT; break;
-				case GLUT_MIDDLE_BUTTON:	btn = Mouse::MIDDLE; break;
-				case GLUT_RIGHT_BUTTON:		btn = Mouse::RIGHT; break;
-				default:					btn = Mouse::EXTRA;		// unrecognized button
-			}
-
 			// update modifiers here for shift-mouse etc.
 			WindowImpl::setModifiers(win->mKeyboard);
 
 			Mouse& m = win->mMouse;
-			if(GLUT_DOWN == state){
-				m.position(ax, ay); m.button(btn, true);
-				win->callHandlersOnMouseDown();
-			}
-			else if(GLUT_UP == state){
-				m.position(ax, ay);	m.button(btn, false);
-				win->callHandlersOnMouseUp();
+
+			// Mouse wheel typically on 3-6
+			if(3<=btn && btn<=6){
+				if(GLUT_UP == state) return; // redundant
+				int dx, dy;
+				     if(3==btn) dx= 1, dy= 0;
+				else if(4==btn) dx=-1, dy= 0;
+				else if(5==btn) dx= 0, dy= 1;
+				else if(6==btn) dx= 0, dy=-1;
+				m.wheel(dx, dy);
+				win->callHandlersOnMouseWheel();
+	
+			} else {
+				switch(btn){
+					case GLUT_LEFT_BUTTON:		btn = Mouse::LEFT; break;
+					case GLUT_MIDDLE_BUTTON:	btn = Mouse::MIDDLE; break;
+					case GLUT_RIGHT_BUTTON:		btn = Mouse::RIGHT; break;
+					default:					btn = Mouse::EXTRA;		// unrecognized button
+				}
+
+				if(GLUT_DOWN == state){
+					m.position(ax, ay); m.button(btn, true);
+					win->callHandlersOnMouseDown();
+				}
+				else if(GLUT_UP == state){
+					m.position(ax, ay);	m.button(btn, false);
+					win->callHandlersOnMouseUp();
+				}
 			}
 		}
 	}
