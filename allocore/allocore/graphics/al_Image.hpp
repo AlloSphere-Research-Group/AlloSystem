@@ -136,11 +136,15 @@ public:
 	/// @param[in] pixels		pixel data
 	/// @param[in] nx			number of pixels along the x dimension
 	/// @param[in] ny			number of pixels along the y dimension
-	/// @param[in] fmt			pixel format
+	/// @param[in] nc			number of components
 	/// @param[in] compressFlags level of compression in [0,100] and other flags
 	/// @param[in] paletteSize	number of colors in palette, in [2,256]
 	template <class T>
-	static bool save(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compressFlags=50, int paletteSize=-1);
+	static bool save(const std::string& filePath, const T * pixels, int nx, int ny, int nc, int compressFlags=50, int paletteSize=-1);
+
+	/// Save pixel data to memory
+	template <class T>
+	static bool save(FileType t, ByteArray& dst, const T * pixels, int nx, int ny, int nc, int compressFlags=50, int paletteSize=-1);
 
 
 	/// File path to image
@@ -261,39 +265,40 @@ protected:
 	int mCompression = 50;
 	int mPaletteSize = -1;	// number of colors in palette
 	bool mLoaded = false;	// true after image data is loaded
+
+	template <class T, class OnArray>
+	static bool arrayScope(const T * pixels, int nx, int ny, int nc, const OnArray& onArray){
+		if(!pixels) return false;
+		if(nx<=0 || ny<=0) return false;
+		if(nc<=0 || nc>=5) return false;
+		Array a;
+		a.ref(const_cast<T *>(pixels), nc, nx, ny);
+		return onArray(a);
+	}
 };
 
 
 
 
 // Implementation ______________________________________________________________
-inline int Image::components(Format v){
-	switch(v){
-	case LUMINANCE:	return 1;
-	case LUMALPHA:	return 2;
-	case RGB:		return 3;
-	case RGBA:		return 4;
-	default:;
-	}
-	return 0;
+
+template <class T>
+/*static*/ bool Image::save(
+	const std::string& filePath, const T * pixels, int nx, int ny, int nc, int compress, int paletteSize
+){
+	return arrayScope(pixels, nx,ny,nc, [&](auto& a){
+		return save(filePath, a, compress, paletteSize);
+	});
 }
 
 template <class T>
-bool Image::save(
-	const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compress, int paletteSize
+/*static*/ bool Image::save(
+	FileType t, ByteArray& dst, const T * pixels, int nx, int ny, int nc, int compress, int paletteSize
 ){
-	Array a;
-	a.data.ptr			= (char *)const_cast<T *>(pixels);
-	a.header.type		= Array::type<T>();
-	a.header.components	= Image::components(fmt);
-	allo_array_setdim2d(&a.header, nx, ny);
-	allo_array_setstride(&a.header, 1);
-
-	bool res = save(filePath, a, compress, paletteSize);
-	a.data.ptr = NULL; // prevent ~Array from deleting data
-	return res;
+	return arrayScope(pixels, nx,ny,nc, [&](auto& a){
+		return save(t, dst, a, compress, paletteSize);
+	});
 }
-
 
 } // al::
 

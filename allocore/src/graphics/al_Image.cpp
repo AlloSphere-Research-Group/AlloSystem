@@ -716,22 +716,6 @@ bool saveFromArray(const Array& src, int compress, int paletteSize, const OnSave
 /*static*/ bool Image::save(
 	const std::string& filePath, const Array& src, int compress, int paletteSize
 ){
-	/*return save(
-		filePath,
-		src.data.ptr, src.width(), src.height(), getFormat(src.components()),
-		compress
-	);*/
-
-	/*Image img;
-	Array& a = img.array();
-	a.configure(src.header); // copy over header information
-	a.data.ptr = src.data.ptr;
-	img.compression(compress);
-	img.paletteSize(paletteSize);
-	bool res = img.save(filePath);
-	a.data.ptr = NULL; // prevent ~Array from deleting data
-	return res;*/
-
 	return saveFromArray(src, compress, paletteSize, [&](auto& img){
 		return img.save(filePath);
 	});
@@ -750,7 +734,7 @@ Image::Format Image::format() const {
 	return getFormat(array().components());
 }
 
-Image::Format Image::getFormat(int planes){
+/*static*/ Image::Format Image::getFormat(int planes){
 	switch(planes) {
 		case 1:		return LUMINANCE;
 		case 2:		return LUMALPHA;
@@ -759,6 +743,17 @@ Image::Format Image::getFormat(int planes){
 		default:;
 	}
 	return FORMAT_INVALID;
+}
+
+/*static*/ int Image::components(Format v){
+	switch(v){
+	case LUMINANCE:	return 1;
+	case LUMALPHA:	return 2;
+	case RGB:		return 3;
+	case RGBA:		return 4;
+	default:;
+	}
+	return 0;
 }
 
 } // al::
