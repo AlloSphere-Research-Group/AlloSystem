@@ -47,7 +47,7 @@ void Keyboard::print() const {
 }
 
 
-Mouse::Mouse(): mX(0), mY(0), mButton(LEFT), mWheelX(0), mWheelY(0){
+Mouse::Mouse(): mX(0), mY(0), mDX(0), mDY(0), mButton(LEFT), mWheelX(0), mWheelY(0){
 	for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i){
 		mBX[i] = mBY[i] = 0; mB[i] = false;
 	}
