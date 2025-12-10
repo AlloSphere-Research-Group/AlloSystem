@@ -225,6 +225,10 @@ public:
 	/// Set pixel (color) format
 	Texture& format(Format v);
 
+	/// Set number of components (chooses best format)
+	template <unsigned Count>
+	Texture& components();
+
 	/// Set texel (color) format
 	Texture& texelFormat(int v){ update(v, mTexelFormat, mShapeUpdated); return *this; }
 

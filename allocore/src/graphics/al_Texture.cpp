@@ -110,6 +110,11 @@ Texture& Texture::format(Format v){
 	return *this;
 }
 
+template<> Texture& Texture::components<1>(){ return format(Graphics::LUMINANCE); }
+template<> Texture& Texture::components<2>(){ return format(Graphics::LUMINANCE_ALPHA); }
+template<> Texture& Texture::components<3>(){ return format(Graphics::RGB); }
+template<> Texture& Texture::components<4>(){ return format(Graphics::RGBA); }
+
 Texture& Texture::type(DataType v){
 	if(update(v, mType, mShapeUpdated) && mArray.hasData())
 		allocate();
