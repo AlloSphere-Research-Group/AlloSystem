@@ -246,6 +246,11 @@ public:
 	/// Append vertex to vertex buffer
 	Mesh& vertex(float x, float y, float z=0){ return vertex(Vertex(x,y,z)); }
 
+	/// Append variable number of vertices as triplets
+	template <class T1, class T2, class T3, class... Ts>
+	Mesh& vertex3(T1 x1, T2 y1, T3 z1, Ts... xnynzn){ return vertex(x1, y1, z1).vertex3(xnynzn...); }
+	Mesh& vertex3(){ return *this; } // terminal case
+
 	/// Append vertex to vertex buffer
 	Mesh& vertex(const Vertex& v){ vertices().append(v); return *this; }
 
