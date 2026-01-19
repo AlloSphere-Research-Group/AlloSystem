@@ -61,7 +61,10 @@ public:
 	bool open(const std::string& path);
 
 	/// Open archive from memory source
-	bool open(const void * mem, int len);
+
+	/// \param[in] mem	Pointer to memory containing full archive
+	/// \param[in] size	Size in bytes of archive
+	bool open(const void * mem, int size);
 
 	/// Extract file in archive to heap memory
 	bool extract(		
@@ -78,23 +81,43 @@ public:
 	);
 
 
-	/// Extract file in zip archive to heap memory
+	/// Extract file in archive file to heap memory
 
 	/// This is the simplest way to extract a single file from an archive.
 	/// If extracting multiple files from the same archive, create an object
 	/// and call extract for each file.
+	///
+	/// \param[in] zipPath	Path to archive file to extract from
+	/// \param[in] fileName	Name of file in archive to extract
+	/// \param[in] onData	Function called upon successful discovery and 
+	///						extraction of specified file in archive.
+	/// \returns whether file was extracted successfully
 	static bool extract(
 		const std::string& zipPath,
 		const std::string& fileName,
 		const std::function<void(const void * data, int size)>& onData
 	);
 
-	/// Extract all files in archive to heap memory
+	/// Extract all files in archive file to heap memory
 
+	/// \param[in] zipPath	Path to archive file to extract from
+	/// \param[in] onData	Function called for each file successfully extracted
+	///						from archive.
 	/// \returns number of files extracted
-	///
 	static int extractAll(
 		const std::string& zipPath,
+		const std::function<void(const std::string& fileName, const void * data, int size)>& onData
+	);
+
+	/// Extract all files in archive residing in memory to heap memory
+
+	/// \param[in] mem		Pointer to memory containing full archive
+	/// \param[in] size		Size in bytes of archive
+	/// \param[in] onData	Function called for each file successfully extracted
+	///						from archive.
+	/// \returns number of files extracted
+	static int extractAll(
+		const void * mem, int size,
 		const std::function<void(const std::string& fileName, const void * data, int size)>& onData
 	);
 

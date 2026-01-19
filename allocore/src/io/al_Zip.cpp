@@ -89,7 +89,13 @@ int ZipReader::extractAll(
 	return zip.open(zipPath) ? zip.extractAll(onData) : 0;
 }
 
-
+/*static*/ int ZipReader::extractAll(
+	const void * mem, int size,
+	const std::function<void(const std::string&, const void *, int)>& onData
+){
+	ZipReader zip;
+	return zip.open(mem,size) ? zip.extractAll(onData) : 0;
+}
 
 struct ZipWriter::Impl{
 	mz_zip_archive zip;
