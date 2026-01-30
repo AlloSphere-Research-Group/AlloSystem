@@ -51,7 +51,7 @@ namespace al{
 
 template <class T> class SphereCoord;
 
-/// @addtogroup allocore
+/// \addtogroup allocore
 /// @{
 
 typedef SphereCoord<float> SphereCoordf;	///< float SphereCoord
@@ -61,9 +61,9 @@ typedef SphereCoord<double> SphereCoordd;	///< double SphereCoord
 
 /// Convert spherical to Cartesian coordinates in-place
 
-/// @param[in,out] r2x		radius to x coordinate
-/// @param[in,out] t2y		theta (angle on xy plane), in [-pi, pi], to z coordinate
-/// @param[in,out] p2z		phi (angle from z axis), in [0, pi], to y coordinate
+/// \param[in,out] r2x		radius to x coordinate
+/// \param[in,out] t2y		theta (angle on xy plane), in [-pi, pi], to z coordinate
+/// \param[in,out] p2z		phi (angle from z axis), in [0, pi], to y coordinate
 template<class T> void sphericalToCart(T& r2x, T& t2y, T& p2z);
 
 /// Convert spherical to Cartesian coordinates in-place
@@ -71,9 +71,9 @@ template<class T> void sphericalToCart(T * vec3);
 
 /// Convert Cartesian to spherical coordinates in-place
 
-/// @param[in,out] x2r		x coordinate to radius
-/// @param[in,out] y2t		y coordinate to theta (angle on xy plane), in [-pi, pi]
-/// @param[in,out] z2p		z coordinate to phi (angle from z axis), in [0, pi]
+/// \param[in,out] x2r		x coordinate to radius
+/// \param[in,out] y2t		y coordinate to theta (angle on xy plane), in [-pi, pi]
+/// \param[in,out] z2p		z coordinate to phi (angle from z axis), in [0, pi]
 template<class T> void cartToSpherical(T& x2r, T& y2t, T& z2p);
 
 /// Convert Cartesian to spherical coordinates in-place
@@ -83,7 +83,7 @@ template<class T> void cartToSpherical(T * vec3);
 
 /// \tparam N		dimensions of sphere
 /// \tparam T		element type
-/// @param[in] v	unit n-vector describing point on n-sphere
+/// \param[in] v	unit n-vector describing point on n-sphere
 /// \returns		vector describing projected coordinate on n-1 hyperplane
 template <int N, class T>
 Vec<N-1,T> sterProj(const Vec<N,T>& v);
@@ -103,7 +103,7 @@ public:
 	C t;	///< Theta component, longitudinal angle (angle from +x towards +y)
 	C p;	///< Phi component, latitudinal angle (angle from +z axis)
 
-	///
+
 	SphereCoord(const C& theta =C(1,0), const C& phi =C(1,0))
 	:	t(theta), p(phi){}
 
@@ -111,7 +111,7 @@ public:
 	/// Get copy
 	SphereCoord dup() const { return *this; }
 
-	/// @param[in] v	Cartesian position
+	/// \param[in] v	Cartesian position
 	template <class U>
 	SphereCoord(const Vec<3,U>& v){ fromCart(v); }
 
@@ -143,9 +143,9 @@ public:
 
 	/// Set from two angles, in radians, and radius
 
-	/// @param[in] theta	longitudinal angle (angle from +x towards +y)
-	/// @param[in] phi		latitudinal angle (angle from +z axis)
-	/// @param[in] radius	radius
+	/// \param[in] theta	longitudinal angle (angle from +x towards +y)
+	/// \param[in] phi		latitudinal angle (angle from +z axis)
+	/// \param[in] radius	radius
 	SphereCoord& fromAngle(const T& theta, const T& phi, const T& radius =T(1)){
 		t.fromPolar(theta);
 		p.fromPolar(radius, phi);
@@ -186,10 +186,10 @@ public:
 
 	/// Evaluate spherical harmonic
 
-	/// @param[in] l		number of nodal lines
-	/// @param[in] m		number of latitudinal nodal lines, |m| <= l
-	/// @param[in] ctheta	unit magnitude complex number describing longitudinal angle in [0, 2pi]
-	/// @param[in] cphi		unit magnitude complex number describing latitudinal angle in [0, pi]
+	/// \param[in] l		number of nodal lines
+	/// \param[in] m		number of latitudinal nodal lines, |m| <= l
+	/// \param[in] ctheta	unit magnitude complex number describing longitudinal angle in [0, 2pi]
+	/// \param[in] cphi		unit magnitude complex number describing latitudinal angle in [0, pi]
 	template <class T>
 	Complex<T> operator()(int l, int m, const Complex<T>& ctheta, const Complex<T>& cphi) const {
 		return coef(l,m) * al::legendreP(l, al::abs(m), cphi.r, cphi.i) * expim(m, ctheta);
