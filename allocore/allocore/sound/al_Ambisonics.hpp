@@ -405,7 +405,7 @@ template<typename T>
 void AmbiBase::resize(T *& a, int n){
 	delete[] a;
 	a = new T[n];
-	memset(a, 0, n*sizeof(T));
+	memset((void *)a, 0, n*sizeof(T));
 }
 
 
