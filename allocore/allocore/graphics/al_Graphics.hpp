@@ -279,6 +279,12 @@ public:
 	/// Turn scissor testing on/off
 	void scissorTest(bool b);
 
+	/// Set scissor region
+	void scissor(int left, int bottom, int width, int height);
+
+	/// Set scissor region
+	void scissor(const Viewport& v);
+
 	/// Turn face culling on/off
 	void cullFace(bool b);
 

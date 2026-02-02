@@ -1572,14 +1572,22 @@ const Material& Graphics::materialBack() const {
 	return mMaterials[1].get();
 }
 
-void Graphics::viewport(int x, int y, int width, int height) {
-	glViewport(x, y, width, height);
+void Graphics::scissor(int x, int y, int w, int h){
+	glScissor(x,y, w,h);
+}
+
+void Graphics::scissor(const Viewport& v){
+	scissor(v.l,v.b, v.w,v.h);
+}
+
+void Graphics::viewport(int x, int y, int w, int h){
+	glViewport(x,y, w,h);
 	enable(SCISSOR_TEST);
-	glScissor(x, y, width, height);
+	scissor(x,y, w,h);
 }
 
 void Graphics::viewport(const Viewport& v){
-	viewport(v.l,v.b,v.w,v.h);
+	viewport(v.l,v.b, v.w,v.h);
 }
 
 Viewport Graphics::viewport() const {
@@ -1593,7 +1601,7 @@ void Graphics::drawNormals(const Mesh& m, float length){
 }
 
 // Immediate Mode
-void Graphics::begin(Primitive v) {
+void Graphics::begin(Primitive v){
 	// clear buffers
 	mMesh.reset();
 
@@ -1602,43 +1610,34 @@ void Graphics::begin(Primitive v) {
 	mInImmediateMode = true;
 }
 
-void Graphics::end() {
+void Graphics::end(){
 	draw(mMesh);
 	mInImmediateMode = false;
 }
 
-void Graphics::vertex(double x, double y, double z) {
-	if(mInImmediateMode) {
+void Graphics::vertex(double x, double y, double z){
+	if(mInImmediateMode){
 		// make sure all buffers are the same size if > 0
 		mMesh.vertex(x, y, z);
 		mMesh.equalizeBuffers();
 	}
 }
 
-void Graphics::texCoord(double u, double v) {
-	if(mInImmediateMode) {
-		mMesh.texCoord(u, v);
-	}
+void Graphics::texCoord(double u, double v){
+	if(mInImmediateMode) mMesh.texCoord(u, v);
 }
 
-void Graphics::texCoord(double s, double t, double r) {
-	if(mInImmediateMode) {
-		mMesh.texCoord(s, t, r);
-	}
+void Graphics::texCoord(double s, double t, double r){
+	if(mInImmediateMode) mMesh.texCoord(s, t, r);
 }
 
-void Graphics::normal(double x, double y, double z) {
-	if(mInImmediateMode) {
-		mMesh.normal(x, y, z);
-	}
+void Graphics::normal(double x, double y, double z){
+	if(mInImmediateMode) mMesh.normal(x, y, z);
 }
 
-void Graphics::color(double r, double g, double b, double a) {
-	if(mInImmediateMode) {
-		mMesh.color(r, g, b, a);
-	} else {
-		currentColor(r, g, b, a);
-	}
+void Graphics::color(double r, double g, double b, double a){
+	if(mInImmediateMode) mMesh.color(r, g, b, a);
+	else                 currentColor(r, g, b, a);
 }
 
 void Graphics::onCreate(){
