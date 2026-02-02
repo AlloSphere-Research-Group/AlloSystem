@@ -190,20 +190,20 @@ bool SceneWindowHandler::onFrame(){
 			// If we don't clear it, then if depth testing is enabled we won't
 			// get the expected overdraw blend. By clearing it, we effectively
 			// "flatten" the previous scene.
-			glEnable(GL_SCISSOR_TEST);
-			glScissor(vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			glDisable(GL_SCISSOR_TEST);
+			g.scissorTest(true);
+			g.scissor(vp.viewport());
+			g.clear(Graphics::DEPTH_BUFFER_BIT);
+			g.scissorTest(false);
 
 			if(stereo.clearColor().a != 0){
-				glViewport(vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
+				g.viewport(vp.viewport());
 				g.pushMatrix(g.MODELVIEW);
 				g.loadIdentity();
 				g.pushMatrix(g.PROJECTION);
 				g.loadIdentity();
 					Mesh& mesh = g.mesh();
 					mesh.reset();
-					mesh.primitive(Graphics::TRIANGLE_STRIP);
+					mesh.triangleStrip();
 					mesh.color(stereo.clearColor());
 					mesh.vertex(-1,-1);
 					mesh.vertex( 1,-1);
