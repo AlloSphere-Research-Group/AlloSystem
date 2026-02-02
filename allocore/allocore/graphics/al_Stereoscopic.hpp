@@ -43,6 +43,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
+#include <functional>
 #include "allocore/graphics/al_Viewport.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Matrix4.hpp"
@@ -52,17 +53,18 @@
 namespace al{
 
 class Graphics;
+class Drawable;
 class Lens;
 class Pose;
 
 ///	Higher-level utility class to manage various stereo rendering techniques
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 class Stereoscopic {
 public:
 
 	/// Stereoscopic mode
-	enum StereoMode{
+	enum StereoMode : unsigned char {
 		ANAGLYPH=0,		/**< Red (left eye) / cyan (right eye) stereo */
 		ACTIVE,			/**< Active quad-buffered stereo */
 		DUAL,			/**< Dual side-by-side stereo */
@@ -71,7 +73,7 @@ public:
 	};
 
 	/// Anaglyph mode
-	enum AnaglyphMode {
+	enum AnaglyphMode : unsigned char {
 		RED_CYAN,		/**< Left eye red, right eye cyan (the norm) */
 		RED_BLUE,		/**< Left eye red, right eye blue */
 		RED_GREEN,		/**< Left eye red, right eye green */
@@ -83,13 +85,13 @@ public:
 
 	/// Draw the scene according to the stored stereographic mode
 
-	/// @param[in] g		graphics interface
-	/// @param[in] lens		local viewing frustum
-	/// @param[in] pose		viewer position and orientation
-	/// @param[in] vp		region of screen to render to
-	/// @param[in] draw		function object with drawing commands
-	/// @param[in] clear	whether to clear the color/depth buffers
-	/// @param[in] pixelaspect	additional aspect multipler (for non-square pixels)
+	/// \param[in] g		graphics interface
+	/// \param[in] lens		local viewing frustum
+	/// \param[in] pose		viewer position and orientation
+	/// \param[in] vp		region of screen to render to
+	/// \param[in] draw		function object with drawing commands
+	/// \param[in] clear	whether to clear the color/depth buffers
+	/// \param[in] pixelaspect	additional aspect multipler (for non-square pixels)
 	void draw			(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 
 	/// Draw mono
@@ -129,15 +131,18 @@ public:
 	/// Set anaglyph mode
 	Stereoscopic& anaglyphMode(AnaglyphMode v){ mAnaglyphMode=v; return *this; }
 
-	/// Set omnigraphic mode
-	/// slices: sets number of sub-viewport slices to render
-	/// fov (degrees) sets field of view (horizontal)
-	/// NOTE: cam.fovy will be ignored in omni mode
-	Stereoscopic& omni(bool enable) { mOmni = enable; return *this; }
-	Stereoscopic& omni(bool enable, unsigned slices, double fov=360){
-		mOmni = enable; mSlices = slices; mOmniFov = fov; return *this; }
-	Stereoscopic& omniFov( double fov ) { mOmniFov = fov; return *this; }
-	Stereoscopic& omniSlices( int slices ) { mSlices = slices; return *this; }
+	/// Set omni mode
+	///
+	/// \param[in] enable	Whether mode is enabled
+	/// \param[in] slices	Sets number of sub-viewport slices to render
+	/// \param[in] fov		Sets field of horizontal view in degrees. 
+	///						Any other FOV will be ignored.
+	Stereoscopic& omni(bool enable, unsigned char slices, double fov=360){
+		return omni(enable).omniSlices(slices).omniFov(fov);
+	}
+	Stereoscopic& omni(bool enable){ mOmni = enable; return *this; }
+	Stereoscopic& omniFov(float fov){ mOmniFovX = fov; return *this; }
+	Stereoscopic& omniSlices(unsigned char slices){ mSlices = slices; return *this; }
 
 
 	/// Get background clear color
@@ -159,23 +164,18 @@ public:
 	bool omni() const { return mOmni; }
 
 	/// Get current omni fov:
-	double omniFov() { return mOmniFov; }
+	float omniFov() { return mOmniFovX; }
 
-	// These accessors will be valid only during the Drawable's onDraw() event
-	// they can be useful to simulate the OpenGL pipeline transforms
-	//	e.g. Matrix4d::multiply(Vec4d eyespace, stereo.modelView(), Vec4d objectspace);
-	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.projection(), Vec4d eyespace);
-	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.modelViewProjection(), Vec4d objectspace);
-	// to convert in the opposite direction, use Matrix4::inverse().
+	// These accessors will be valid only during the Drawable's onDraw() event.
 
 	/// Get current projection matrix
-	const Matrix4d& projection() const { return mProjection; }
+	const Matrix4d& projection() const { return mProj; }
 
 	/// Get current view matrix
 	const Matrix4d& view() const { return mView; }
 
 	/// Get current view-projection matrix
-	Matrix4d viewProjection() const { return mProjection * mView; }
+	Matrix4d viewProjection() const { return mProj * mView; }
 	Matrix4d MVP() const { return viewProjection(); }
 
 	/// Get current eye position
@@ -219,32 +219,48 @@ public:
 	Vec3d toNDCSpace() const;
 
 protected:
+	Matrix4d mProj{1}, mView{1};
+	Vec3d mEye;
+	Viewport mVP;
+	Color mClearColor{0};
+	float mOmniFovX = 360; // field of view of omni
+	unsigned char mSlices = 24; // number of omni slices
 	StereoMode mMode = ANAGLYPH;
 	AnaglyphMode mAnaglyphMode = RED_CYAN;
-	Color mClearColor{0};
-	unsigned mSlices = 24;	// number of omni slices
-	double mOmniFov = 360;	// field of view of omnigraphics
-	Matrix4d mProjection{1}, mView{1};
-	Vec3d mEye;
-	unsigned mEyeNumber = 0;
-	Viewport mVP;
+	unsigned char mEyeNumber = 0;
 	bool mStereo = false;
 	bool mOmni = false;
 
+	// onDraw wrapped in push/pop calls
 	void pushDrawPop(Graphics& g, Drawable& draw);
+	// set scissor/viewport regions
 	void sendViewport(Graphics& g, const Viewport& vp);
+	// clear color/depth buffers based on current viewport
 	void sendClear(Graphics& g);
+	// sets eye and view members
+	void setView(const Pose& pose, double eyeShift=0.);
 
 	void drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
 
+	struct ViewSlice{
+		Viewport vp;
+		double fovy;
+		double aspect;
+		Quatd ori;
+	};
+
 	double angleOfOmniSlice(int slice) const; // angle at center of slice
+
+	ViewSlice omniSlice(int i, const Viewport& vp, double pixelAspect) const;
+
+	void forEachViewSlice(const std::function<void(ViewSlice)>& onSlice, const Lens& lens, const Viewport& vp, double pixelAspect) const;
 
 public:
 	// \deprecated Use view()
 	const Matrix4d& modelView() const { return mView; }
 
 	// Get product of current projection and modelview matrices
-	Matrix4d modelViewProjection() const { return mProjection * mView; }
+	Matrix4d modelViewProjection() const { return mProj * mView; }
 };
 
 

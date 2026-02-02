@@ -6,8 +6,8 @@
 namespace al{
 
 Vec3d Stereoscopic::unproject(const Vec3d& screenPos) const {
-	auto invprojview = modelViewProjection().inverse();
-	auto worldPos4 = invprojview * Vec4d(screenPos, 1.);
+	auto invProjView = modelViewProjection().inverse();
+	auto worldPos4 = invProjView * Vec4d(screenPos, 1.);
 	return worldPos4.xyz() / worldPos4.w;
 }
 
@@ -22,8 +22,8 @@ void Stereoscopic::pushDrawPop(Graphics& g, Drawable& draw){
 }
 
 void Stereoscopic::sendViewport(Graphics& g, const Viewport& vp){
-	glScissor(vp.l, vp.b, vp.w, vp.h);
-	g.viewport(vp.l, vp.b, vp.w, vp.h);
+	g.scissor(vp);
+	g.viewport(vp);
 	mVP = vp;
 }
 
@@ -33,8 +33,15 @@ void Stereoscopic::sendClear(Graphics& g){
 	g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
 }
 
+void Stereoscopic::setView(const Pose& pose, double eyeShift){
+	mView = pose.matrix(); // head pose
+	mView.Mat4d::translateGlobal(pose.ux()*eyeShift); // translate head to eye
+	mEye = mView.col(3); // eye pos
+	invertRigid(mView); // convert eye pose to view
+};
+
 double Stereoscopic::angleOfOmniSlice(int slice) const {
-	return mOmniFov * (0.5-((slice+0.5)/double(mSlices)));
+	return mOmniFovX * (0.5-((slice+0.5)/double(mSlices)));
 }
 
 void Stereoscopic :: draw(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
@@ -53,53 +60,53 @@ void Stereoscopic :: draw(Graphics& g, const Lens& lens, const Pose& pose, const
 	}
 }
 
-void Stereoscopic :: drawMono(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
-{
-	const auto& pos = pose.pos();
+Stereoscopic::ViewSlice Stereoscopic::omniSlice(int i, const Viewport& vp, double pixelAspect) const {
+	ViewSlice s;
 
+	int l = vp.l + vp.w * double(i  )/mSlices;
+	int r = vp.l + vp.w * double(i+1)/mSlices;
+
+	s.vp = Viewport(l, vp.b, r-l, vp.h);
+	s.aspect = s.vp.aspect()*pixelAspect;
+	s.fovy = Lens::getFovyForFovX(mOmniFovX * (s.vp.w)/(double)vp.w, s.aspect);
+
+	auto angle = angleOfOmniSlice(i);
+	s.ori = Quatd().fromAxisAngle(M_DEG2RAD * angle, 0,1,0);
+
+	return s;
+}
+
+void Stereoscopic::forEachViewSlice(
+	const std::function<void(Stereoscopic::ViewSlice)>& onSlice,
+	const Lens& lens, const Viewport& vp, double pixelAspect
+) const {
+	if(omni()){
+		// Iterate slices starting on left of viewport
+		for(unsigned i=0; i<mSlices; i++)
+			onSlice(omniSlice(i, vp, pixelAspect));
+	} else {
+		ViewSlice s;
+		s.vp = vp;
+		s.fovy = lens.fovy();
+		s.aspect = vp.aspect() * pixelAspect;
+		s.ori.setIdentity();
+		onSlice(s);
+	}
+}
+
+void Stereoscopic::drawMono(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelAspect)
+{
 	// We must configure scissoring BEFORE clearing buffers
 	g.scissorTest(true);
-	sendViewport(g, vp);
+	// g.drawBuffer(Graphics::BACK);	// breaks usage under FBO
 
-	// g.drawBuffer(Graphics::BACK);	// << breaks usage under FBO
-	if(clear) sendClear(g);
-
-	mEye = pos;
-
-	if (omni()) {
-		int wx = vp.l;
-		double fovx = mOmniFov;
-		for(unsigned i=0; i<mSlices; i++){
-
-			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
-			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			auto aspect = vp1.aspect() * pixelaspect;
-			auto fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
-			mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
-
-			// TODO: lerp quat instead of computing anew each iteration
-			auto angle = angleOfOmniSlice(i);
-			mView = (pose * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0)).matrix();
-			invertRigid(mView);
-
-			sendViewport(g, vp1);
-			if(clear) sendClear(g);
-
-			pushDrawPop(g,draw);
-
-			wx = wx1;
-		}
-
-	} else {
-		auto fovy = lens.fovy();
-		auto aspect = vp.aspect() * pixelaspect;
-		mProjection = Matrix4d::perspective(fovy, aspect, lens.near(), lens.far());
-		
-		mView = pose.matrix();
-		invertRigid(mView);
-
+	forEachViewSlice([&](auto slice){
+		mProj = Matrix4d::perspective(slice.fovy, slice.aspect, lens.near(), lens.far());
+		setView(omni() ? pose * slice.ori : pose);
+		sendViewport(g, slice.vp);
+		if(clear) sendClear(g);
 		pushDrawPop(g,draw);
-	}
+	}, lens, vp, pixelAspect);
 
 	g.scissorTest(false);
 }
@@ -112,15 +119,12 @@ appropriate draw buffer. Thus, to draw the right eye:
 	g.scissorTest(true);
 	g.drawBuffer(Graphics::BACK_RIGHT);
 
-	drawOffAxis(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelAspect);
 
 	g.drawBuffer(Graphics::BACK);
 	g.scissorTest(false);
 */
-void Stereoscopic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect){
-
-	const auto near = lens.near();
-	const auto far = lens.far();
+void Stereoscopic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelAspect){
 	const auto focal = lens.focalLength();
 	auto eyeShift = lens.eyeSep()*0.5;
 
@@ -128,60 +132,21 @@ void Stereoscopic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const 
 		mEyeNumber = 0;
 	}
 	else{
-		eyeShift = -eyeShift; // eyes only differ in sign in interocular distance
 		mEyeNumber = 1;
+		eyeShift = -eyeShift; // eyes only differ in sign in interocular distance
 	}
 
-	sendViewport(g, vp);		// set scissor/viewport regions
-	if(clear) sendClear(g);	// clear color/depth buffers
-
-	auto setView = [this](const Pose& pose, double eyeShift){
-		mView = pose.matrix(); // head pose
-		mView.Mat4d::translateGlobal(pose.ux()*eyeShift); // translate head to eye
-		mEye = mView.col(3); // eye pos
-		invertRigid(mView); // convert eye pose to view
-	};
-
-	// FIXME: geometry is not continuous at slice boundaries
-	if (omni()) {
-		// Position of left edge of slice
-		int wx = vp.l;
-		double fovx = mOmniFov;
-
-		// Render slices starting on left of viewport
-		for(unsigned i=0; i<mSlices; i++){
-			// Position of right edge of slice (exclusive)
-			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
-			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			auto aspect = vp1.aspect() * pixelaspect;
-			auto fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
-
-			mProjection = Matrix4d::perspectiveOffAxis(fovy, aspect, near, far, -eyeShift, focal);
-
-			auto angle = angleOfOmniSlice(i);
-			auto qrot = Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
-
-			setView(pose * qrot, eyeShift);
-
-			// Do the rendering
-			sendViewport(g, vp1);		// set scissor/viewport regions
-			pushDrawPop(g,draw);		// onDraw wrapped in push/pop calls
-
-			wx = wx1;
-		}
-
-	} else {
-		auto aspect = vp.aspect() * pixelaspect;
-		mProjection = Matrix4d::perspectiveOffAxis(lens.fovy(), aspect, near, far, -eyeShift, focal);
-		setView(pose, eyeShift);
-
-		// Do the rendering
-		pushDrawPop(g,draw);		// onDraw wrapped in push/pop
-	}
+	forEachViewSlice([&](auto slice){
+		mProj = Matrix4d::perspectiveOffAxis(slice.fovy, slice.aspect, lens.near(), lens.far(), -eyeShift, focal);
+		omni() ? setView(pose * slice.ori) : setView(pose, eyeShift);
+		sendViewport(g, slice.vp);
+		if(clear) sendClear(g);
+		pushDrawPop(g,draw);
+	}, lens, vp, pixelAspect);
 }
 
 
-void Stereoscopic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic::drawAnaglyph(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelAspect)
 {
 	g.scissorTest(true);
 
@@ -202,12 +167,12 @@ void Stereoscopic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& pos
 		default:		g.colorMask(1);
 	}
 
-	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, /*clear*/false, pixelaspect);
+	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, /*clear*/false, pixelAspect);
 
 	// Clear only depth buffer for second eye pass
 	// Note: This must be cleared regardless of the 'clear' argument since we
 	// only have one depth buffer and eye must have its own depth buffer.
-	g.viewport(vp.l, vp.b, vp.w, vp.h);
+	g.viewport(vp);
 	g.depthMask(true);
 	g.clear(g.DEPTH_BUFFER_BIT);
 
@@ -221,7 +186,7 @@ void Stereoscopic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& pos
 		default:		g.colorMask(1);
 	}
 
-	drawEye(LEFT_EYE, g, lens, pose, vp, draw, /*clear*/false, pixelaspect);
+	drawEye(LEFT_EYE, g, lens, pose, vp, draw, /*clear*/false, pixelAspect);
 
 	g.colorMask(1);
 	g.scissorTest(false);
@@ -229,16 +194,16 @@ void Stereoscopic :: drawAnaglyph(Graphics& g, const Lens& lens, const Pose& pos
 
 
 
-void Stereoscopic :: drawActive(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic::drawActive(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelAspect)
 {
 	#ifdef AL_GRAPHICS_SUPPORTS_LR_BUFFERS
 		g.scissorTest(true);
 
 		g.drawBuffer(Graphics::BACK_RIGHT);
-		drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+		drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelAspect);
 
 		g.drawBuffer(Graphics::BACK_LEFT);
-		drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+		drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelAspect);
 
 		g.drawBuffer(Graphics::BACK); // set back (?) to default
 		g.scissorTest(false);
@@ -249,22 +214,22 @@ void Stereoscopic :: drawActive(Graphics& g, const Lens& lens, const Pose& pose,
 }
 
 
-void Stereoscopic :: drawLeft(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic::drawLeft(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelAspect)
 {
 	g.scissorTest(true);
-	drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+	drawEye(LEFT_EYE, g, lens, pose, vp, draw, clear, pixelAspect);
 	g.scissorTest(false);
 }
 
-void Stereoscopic :: drawRight(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic::drawRight(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelAspect)
 {
 	g.scissorTest(true);
-	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelaspect);
+	drawEye(RIGHT_EYE, g, lens, pose, vp, draw, clear, pixelAspect);
 	g.scissorTest(false);
 }
 
 
-void Stereoscopic :: drawDual(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
+void Stereoscopic::drawDual(Graphics& g, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelAspect)
 {
 	g.scissorTest(true);
 
@@ -274,12 +239,11 @@ void Stereoscopic :: drawDual(Graphics& g, const Lens& lens, const Pose& pose, c
 		sendClear(g);
 	}
 
-	Viewport vpright(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
-	Viewport vpleft(vp.l, vp.b, vp.w*0.5, vp.h);
+	Viewport vpR(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
+	Viewport vpL(vp.l           , vp.b, vp.w*0.5, vp.h);
 
-	drawEye(RIGHT_EYE, g, lens, pose, vpright, draw, /*clear*/false, pixelaspect);
-
-	drawEye(LEFT_EYE, g, lens, pose, vpleft, draw, /*clear*/false, pixelaspect);
+	drawEye(RIGHT_EYE, g, lens, pose, vpR, draw, /*clear*/false, pixelAspect);
+	drawEye( LEFT_EYE, g, lens, pose, vpL, draw, /*clear*/false, pixelAspect);
 
 	g.scissorTest(false);
 }
@@ -288,7 +252,7 @@ void Stereoscopic :: drawDual(Graphics& g, const Lens& lens, const Pose& pose, c
 
 /// blue line sync for active stereo
 /// @see http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/GLUTStereo/glutStereo.cpp
-void Stereoscopic :: drawBlueLine(double window_width, double window_height){
+void Stereoscopic::drawBlueLine(double window_width, double window_height){
 // FIXME: This will not compile with OpenGL ES
 #if defined(AL_GRAPHICS_USE_OPENGL)
 	GLint i;
