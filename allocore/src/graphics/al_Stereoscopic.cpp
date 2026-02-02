@@ -100,11 +100,17 @@ void Stereoscopic::drawMono(Graphics& g, const Lens& lens, const Pose& pose, con
 	g.scissorTest(true);
 	// g.drawBuffer(Graphics::BACK);	// breaks usage under FBO
 
+	sendViewport(g, vp);
+	if(clear) sendClear(g);
+
 	forEachViewSlice([&](auto slice){
 		mProj = Matrix4d::perspective(slice.fovy, slice.aspect, lens.near(), lens.far());
-		setView(omni() ? pose * slice.ori : pose);
-		sendViewport(g, slice.vp);
-		if(clear) sendClear(g);
+		if(omni()){
+			setView(pose * slice.ori);
+			sendViewport(g, slice.vp);
+		} else {
+			setView(pose);
+		}
 		pushDrawPop(g,draw);
 	}, lens, vp, pixelAspect);
 
@@ -136,11 +142,17 @@ void Stereoscopic::drawEye(StereoMode eye, Graphics& g, const Lens& lens, const 
 		eyeShift = -eyeShift; // eyes only differ in sign in interocular distance
 	}
 
+	sendViewport(g, vp);
+	if(clear) sendClear(g);
+
 	forEachViewSlice([&](auto slice){
 		mProj = Matrix4d::perspectiveOffAxis(slice.fovy, slice.aspect, lens.near(), lens.far(), -eyeShift, focal);
-		omni() ? setView(pose * slice.ori) : setView(pose, eyeShift);
-		sendViewport(g, slice.vp);
-		if(clear) sendClear(g);
+		if(omni()){
+			setView(pose * slice.ori);
+			sendViewport(g, slice.vp);
+		} else {
+			setView(pose, eyeShift);
+		}
 		pushDrawPop(g,draw);
 	}, lens, vp, pixelAspect);
 }
