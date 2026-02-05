@@ -304,7 +304,11 @@ bool ShaderProgram::compile(
 #ifdef GL_ES
 	#define AL_LOWP lowp
 	#define AL_MEDIUMP mediump
-	#define AL_HIGHP highp
+	#ifdef GL_FRAGMENT_PRECISION_HIGH
+		#define AL_HIGHP highp
+	#else
+		#define AL_HIGHP mediump
+	#endif
 #else
 	#define AL_LOWP
 	#define AL_MEDIUMP
