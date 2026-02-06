@@ -70,3 +70,6 @@ ES1.1 and ES2 support only TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, TEXTURE_WRAP_
 
 [5] DrawElements
 ES1.1 and ES2 support only UNSIGNED_BYTE or UNSIGNED_SHORT for index type.
+
+References
+https://wikis.khronos.org/webgl/WebGL_and_OpenGL_Differences
