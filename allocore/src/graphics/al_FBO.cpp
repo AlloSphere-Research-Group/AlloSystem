@@ -49,7 +49,7 @@ bool RBO::resize(unsigned w, unsigned h){
 /*static*/ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 	unsigned mx = maxSize();
 	if(w > mx || h > mx) return false;
-	//AL_GRAPHICS_ERROR("before RBO::resize", -1);
+	AL_GRAPHICS_ERROR("before RBO::resize", -1);
 	glRenderbufferStorage(GL_RENDERBUFFER, format, w, h);
 	AL_GRAPHICS_ERROR("RBO::resize (glRenderbufferStorage)", -1);
 	return true;
