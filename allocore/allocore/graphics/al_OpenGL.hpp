@@ -127,6 +127,7 @@ Include OpenGL extensions for target flavor of OpenGL. Not included by default t
 #elif defined AL_EMSCRIPTEN
 	#ifdef AL_GRAPHICS_USE_DEFAULT_BACKEND
 		#define AL_GRAPHICS_USE_OPENGLES2
+		//#define AL_GRAPHICS_USE_OPENGLES3_2
 	#endif
 	#if   defined AL_GRAPHICS_USE_OPENGLES3_2
 		#include <GLES3/gl32.h>
@@ -268,6 +269,8 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 
 #if defined(AL_GRAPHICS_USE_OPENGLES2)
 	#define AL_GRAPHICS_MAX_DEPTH_OFFSCREEN 16
+#elif defined(AL_GRAPHICS_USE_OPENGLES3_X)
+	#define AL_GRAPHICS_MAX_DEPTH_OFFSCREEN 24
 #endif
 
 #ifndef AL_GRAPHICS_USE_OPENGLES1
