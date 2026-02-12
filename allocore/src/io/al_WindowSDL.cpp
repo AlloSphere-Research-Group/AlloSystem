@@ -483,9 +483,27 @@ bool Window::implCreate(){
 
 	// SDL setup code: https://wiki.libsdl.org/SDL_GL_SetAttribute
 
+	#define SET_ES(major, minor)\
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);\
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);\
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
+
+	#  if defined AL_GRAPHICS_USE_OPENGLES1
+		SET_ES(1,0)
+	#elif defined AL_GRAPHICS_USE_OPENGLES2
+		SET_ES(2,0)
+	#elif defined AL_GRAPHICS_USE_OPENGLES3
+		SET_ES(3,0)
+	#elif defined AL_GRAPHICS_USE_OPENGLES3_1
+		SET_ES(3,1)
+	#elif defined AL_GRAPHICS_USE_OPENGLES3_2
+		SET_ES(3,2)
+	#endif
+
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
