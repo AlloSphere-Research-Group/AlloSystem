@@ -177,11 +177,16 @@ public:
 	};
 
 	enum Format {
-		LUMINANCE				= GL_LUMINANCE,				/**< */
-		LUMINANCE_ALPHA			= GL_LUMINANCE_ALPHA,		/**< */
 		ALPHA					= GL_ALPHA,					/**< */
 		RGB						= GL_RGB,					/**< */
 		RGBA					= GL_RGBA,					/**< */
+		#ifdef AL_GRAPHICS_SUPPORTS_LUMINANCE_COMP
+		LUMINANCE				= GL_LUMINANCE,				/**< */
+		LUMINANCE_ALPHA			= GL_LUMINANCE_ALPHA,		/**< */
+		#else
+		LUMINANCE				= GL_RED,					/**< Not supported directly, so choose 1 channel option */
+		LUMINANCE_ALPHA			= GL_RG,					/**< Not supported directly, so choose 2 channel option */
+		#endif
 		#ifdef AL_GRAPHICS_SUPPORTS_DEPTH_COMP
 		DEPTH_COMPONENT			= GL_DEPTH_COMPONENT,		/**< */
 		#elif defined AL_GRAPHICS_SUPPORTS_DEPTH_COMP24

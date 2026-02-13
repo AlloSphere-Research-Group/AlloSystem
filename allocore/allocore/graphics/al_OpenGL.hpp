@@ -61,6 +61,11 @@ Include OpenGL extensions for target flavor of OpenGL. Not included by default t
 	#define AL_GRAPHICS_USE_DEFAULT_BACKEND
 #endif
 
+#ifndef AL_GRAPHICS_OPENGL_VERSION_MIN
+#define AL_GRAPHICS_OPENGL_VERSION_MIN 21
+//#define AL_GRAPHICS_OPENGL_VERSION_MIN 30
+#endif
+
 #if defined AL_OSX
 	#ifdef AL_GRAPHICS_USE_DEFAULT_BACKEND
 		#define AL_GRAPHICS_USE_OPENGL
@@ -68,12 +73,21 @@ Include OpenGL extensions for target flavor of OpenGL. Not included by default t
 	#ifdef AL_GRAPHICS_USE_OPENGL
 		#define GL_SILENCE_DEPRECATION
 		#include <OpenGL/OpenGL.h>
-		#include <OpenGL/gl.h>
-		#ifdef AL_GRAPHICS_USE_OPENGL_EXT
-			#include <OpenGL/glext.h>
+		// We only have two options here: gl.h for 2.1 and below or gl3.h for 3.0 and above. There is no "compatibility" profile for 3.0 that includes everything in 2.1 and below---we only get "core".
+		#if AL_GRAPHICS_OPENGL_VERSION_MIN <= 21
+			#include <OpenGL/gl.h> // 2.1 and below (includes fixed pipeline)
+			#ifdef AL_GRAPHICS_USE_OPENGL_EXT
+				#include <OpenGL/glext.h>
+			#endif
+			// Geometry shaders are an extension
+			#define AL_GRAPHICS_GEOMETRY_SHADER_EXT
+		#else
+			#include <OpenGL/gl3.h> // 3.0-4.1 (no fixed pipeline)
+			#ifdef AL_GRAPHICS_USE_OPENGL_EXT
+				#include <OpenGL/gl3ext.h>
+			#endif
 		#endif
-		// Seems on all Mac versions geometry shaders are an extension
-		#define AL_GRAPHICS_GEOMETRY_SHADER_EXT
+
 		#define AL_GRAPHICS_INIT_CONTEXT
 	#else
 		#error "Specified graphics backend not supported on this platform"
@@ -126,7 +140,9 @@ Include OpenGL extensions for target flavor of OpenGL. Not included by default t
 
 #elif defined AL_EMSCRIPTEN
 	#ifdef AL_GRAPHICS_USE_DEFAULT_BACKEND
-		#define AL_GRAPHICS_USE_OPENGLES2
+		//#define AL_GRAPHICS_USE_OPENGLES2
+		//#define AL_GRAPHICS_USE_OPENGLES3
+		#define AL_GRAPHICS_USE_OPENGLES3_1
 		//#define AL_GRAPHICS_USE_OPENGLES3_2
 	#endif
 	#if   defined AL_GRAPHICS_USE_OPENGLES3_2
@@ -195,6 +211,7 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_USE_OPENGLES3_X
 #endif
 
+// Programmable pipeline support
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_PROG_PIPELINE
 	#define AL_GRAPHICS_SUPPORTS_SHADER
@@ -206,7 +223,8 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#endif
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES1)
+// Fixed pipeline support
+#if (defined(AL_GRAPHICS_USE_OPENGL) && AL_GRAPHICS_OPENGL_VERSION_MIN <= 21) || defined(AL_GRAPHICS_USE_OPENGLES1)
 	#define AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
 #endif
 
@@ -233,11 +251,11 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_POLYGON_SMOOTH
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES1)
+#if (defined(AL_GRAPHICS_USE_OPENGL) && AL_GRAPHICS_OPENGL_VERSION_MIN <= 21) || defined(AL_GRAPHICS_USE_OPENGLES1)
 	#define AL_GRAPHICS_SUPPORTS_STROKE_SMOOTH
 #endif
 
-#if defined(AL_GRAPHICS_USE_OPENGL)
+#if defined(AL_GRAPHICS_USE_OPENGL) && AL_GRAPHICS_OPENGL_VERSION_MIN <= 21
 	#define AL_GRAPHICS_SUPPORTS_SHADE_MODEL
 #endif
 
@@ -253,6 +271,10 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 
 #if defined(AL_GRAPHICS_USE_OPENGL)
 	#define AL_GRAPHICS_SUPPORTS_LR_BUFFERS
+#endif
+
+#if (defined(AL_GRAPHICS_USE_OPENGL) && AL_GRAPHICS_OPENGL_VERSION_MIN <= 21) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
+	#define AL_GRAPHICS_SUPPORTS_LUMINANCE_COMP
 #endif
 
 #if defined(AL_GRAPHICS_USE_OPENGL) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
@@ -304,8 +326,10 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 #if defined(AL_GRAPHICS_USE_OPENGL)
 	#define AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	#define AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-	//see glTexParameteri(?,GL_TEXTURE_WRAP_S,___)
-	#define AL_GRAPHICS_SUPPORTS_WRAP_CLAMP_EXTRA // CLAMP, CLAMP_TO_BORDER
+	#if AL_GRAPHICS_OPENGL_VERSION_MIN <= 21
+		//see glTexParameteri(?,GL_TEXTURE_WRAP_S,___)
+		#define AL_GRAPHICS_SUPPORTS_WRAP_CLAMP_EXTRA // CLAMP, CLAMP_TO_BORDER
+	#endif
 #endif
 
 #if defined(AL_GRAPHICS_USE_OPENGLES3_X)

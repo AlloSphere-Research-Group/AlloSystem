@@ -266,7 +266,7 @@ void Stereoscopic::drawDual(Graphics& g, const Lens& lens, const Pose& pose, con
 /// @see http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/GLUTStereo/glutStereo.cpp
 void Stereoscopic::drawBlueLine(double window_width, double window_height){
 // FIXME: This will not compile with OpenGL ES
-#if defined(AL_GRAPHICS_USE_OPENGL)
+#if defined(AL_GRAPHICS_USE_OPENGL) && defined(AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE)
 	GLint i;
 	unsigned long buffer;
 
