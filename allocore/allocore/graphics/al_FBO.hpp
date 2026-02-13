@@ -164,6 +164,12 @@ public:
 	/// Unbind object
 	void unbind();
 
+	/// Call function between bind and unbind calls
+	template <class Func>
+	FBO& scope(const Func& f){ bind(); f(); unbind(); return *this; }
+	template <class Func>
+	FBO& scope(int target, const Func& f){ bind(target); f(); unbind(); return *this; }
+
 	/// Copy data to another FBO
 	FBO& copyTo(FBO& dst,
 		int srcX0, int srcY0, int srcX1, int srcY1,

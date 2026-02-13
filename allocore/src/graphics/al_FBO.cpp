@@ -74,24 +74,21 @@ void FBO::onDestroy(){
 }
 
 FBO& FBO::attachRBO(const RBO& rbo, Attachment att){
-	bind();
-	renderBuffer(rbo.id(), att);
-	unbind();
-	return *this;
+	return scope([&](){
+		renderBuffer(rbo.id(), att);
+	});
 }
 
 FBO& FBO::detachRBO(Attachment att){
-	bind();
-	renderBuffer(0, att);
-	unbind();
-	return *this;
+	return scope([&](){
+		renderBuffer(0, att);
+	});
 }
 
 FBO& FBO::attachTexture2D(unsigned texID, Attachment att, int level){
-	bind();
-	texture2D(texID, att, level);
-	unbind();
-	return *this;
+	return scope([&](){
+		texture2D(texID, att, level);
+	});
 }
 
 FBO& FBO::detachTexture2D(Attachment att, int level){
@@ -119,16 +116,14 @@ FBO& FBO::copyTo(FBO& dst,
 	bool scissorTest = Graphics::paramBool(GL_SCISSOR_TEST);
 	if(scissorTest) glDisable(GL_SCISSOR_TEST);
 
-	bind(GL_READ_FRAMEBUFFER);
-	AL_GRAPHICS_ERROR("FBO::copyTo bind source", id());
-	dst.bind(GL_DRAW_FRAMEBUFFER);
-	AL_GRAPHICS_ERROR("FBO::copyTo bind dest", dst.id());
-	
-	glBlitFramebuffer(srcX0,srcY0,srcX1,srcY1, dstX0,dstY0,dstX1,dstY1, mask, nicest ? GL_LINEAR : GL_NEAREST);
-	AL_GRAPHICS_ERROR("FBO::copyTo (glBlitFramebuffer)", id());
-
-	unbind();
-	dst.unbind();
+	scope(GL_READ_FRAMEBUFFER, [&](){
+		AL_GRAPHICS_ERROR("FBO::copyTo bind source", id());
+		dst.scope(GL_DRAW_FRAMEBUFFER, [&](){
+			AL_GRAPHICS_ERROR("FBO::copyTo bind dest", dst.id());
+			glBlitFramebuffer(srcX0,srcY0,srcX1,srcY1, dstX0,dstY0,dstX1,dstY1, mask, nicest ? GL_LINEAR : GL_NEAREST);
+			AL_GRAPHICS_ERROR("FBO::copyTo (glBlitFramebuffer)", id());
+		});
+	});
 
 	if(scissorTest) glEnable(GL_SCISSOR_TEST);
 	#endif
