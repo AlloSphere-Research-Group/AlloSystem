@@ -38,9 +38,7 @@ bool RBO::resize(unsigned w, unsigned h){
 }
 
 /*static*/ unsigned RBO::maxSize(){
-	int s;
-	glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &s);
-	return s;
+	return Graphics::paramInt(GL_MAX_RENDERBUFFER_SIZE);
 }
 
 /*static*/ void RBO::bind(unsigned id){
@@ -118,8 +116,7 @@ FBO& FBO::copyTo(FBO& dst,
 ){
 	#ifdef AL_GRAPHICS_SUPPORTS_FBO_RW_BIND
 	// Scissor test affects blit operation!
-	GLboolean scissorTest;
-	glGetBooleanv(GL_SCISSOR_TEST, &scissorTest);
+	bool scissorTest = Graphics::paramBool(GL_SCISSOR_TEST);
 	if(scissorTest) glDisable(GL_SCISSOR_TEST);
 
 	bind(GL_READ_FRAMEBUFFER);
