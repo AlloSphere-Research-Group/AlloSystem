@@ -1447,9 +1447,11 @@ AlloTy Graphics::toAlloTy(Graphics::DataType v) {
 
 
 /*static*/ int Graphics::paramInt(int param){
-	GLint val;
-	glGetIntegerv(param, &val);
-	return val;
+	GLint v; glGetIntegerv(param, &v); return v;
+}
+
+/*static*/ bool Graphics::paramBool(int param){
+	GLboolean v; glGetBooleanv(param, &v); return v;
 }
 
 /*static*/ const char * Graphics::errorString(bool verbose){
