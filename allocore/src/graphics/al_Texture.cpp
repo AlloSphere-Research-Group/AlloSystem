@@ -734,14 +734,17 @@ Texture& Texture::copyFrameBuffer(
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	case TEXTURE_1D:
 		glCopyTexSubImage1D(GL_TEXTURE_1D, 0, texx, fbx,fby, w);
+			AL_GRAPHICS_ERROR("Texture::copyFrameBuffer (glCopyTexSubImage1D)", id());
 		break;
 	#endif
 	case TEXTURE_2D:
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, texx,texy, fbx,fby, w, h);
+			AL_GRAPHICS_ERROR("Texture::copyFrameBuffer (glCopyTexSubImage2D)", id());
 		break;
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 	case TEXTURE_3D:
 		glCopyTexSubImage3D(GL_TEXTURE_3D, 0, texx,texy,texz, fbx,fby, w, h);
+			AL_GRAPHICS_ERROR("Texture::copyFrameBuffer (glCopyTexSubImage3D)", id());
 		break;
 	#endif
 	default:;
