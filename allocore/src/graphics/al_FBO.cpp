@@ -24,13 +24,15 @@ Graphics::Format RBO::format() const { return mFormat; }
 
 RBO& RBO::format(Graphics::Format v){ mFormat=v; return *this; }
 
+RBO& RBO::samples(unsigned n){ mSamples=n; return *this; }
+
 void RBO::bind(){ validate(); bind(id()); }
 
 void RBO::unbind(){ bind(0); }
 
 bool RBO::resize(unsigned w, unsigned h){
 	bind();
-	bool r = resize(format(), w, h);
+	bool r = resize(mFormat, w, h, mSamples);
 	unbind();
 	return r;
 }
@@ -46,12 +48,17 @@ bool RBO::resize(unsigned w, unsigned h){
 	AL_GRAPHICS_ERROR("RBO::bind (glBindRenderbuffer)", id);
 }
 
-/*static*/ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
+/*static*/ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h, unsigned samples){
 	unsigned mx = maxSize();
 	if(w > mx || h > mx) return false;
 	AL_GRAPHICS_ERROR("before RBO::resize", -1);
-	glRenderbufferStorage(GL_RENDERBUFFER, format, w, h);
-	AL_GRAPHICS_ERROR("RBO::resize (glRenderbufferStorage)", -1);
+	if(0 == samples){
+		glRenderbufferStorage(GL_RENDERBUFFER, format, w, h);
+		AL_GRAPHICS_ERROR("RBO::resize (glRenderbufferStorage)", -1);
+	} else {
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, format, w,h);
+		AL_GRAPHICS_ERROR("RBO::resize (glRenderbufferStorageMultisample)", -1);
+	}
 	return true;
 }
 
@@ -116,9 +123,12 @@ FBO& FBO::copyTo(FBO& dst,
 	if(scissorTest) glDisable(GL_SCISSOR_TEST);
 
 	bind(GL_READ_FRAMEBUFFER);
+	AL_GRAPHICS_ERROR("FBO::copyTo bind source", id());
 	dst.bind(GL_DRAW_FRAMEBUFFER);
+	AL_GRAPHICS_ERROR("FBO::copyTo bind dest", dst.id());
 	
 	glBlitFramebuffer(srcX0,srcY0,srcX1,srcY1, dstX0,dstY0,dstX1,dstY1, mask, nicest ? GL_LINEAR : GL_NEAREST);
+	AL_GRAPHICS_ERROR("FBO::copyTo (glBlitFramebuffer)", id());
 
 	unbind();
 	dst.unbind();

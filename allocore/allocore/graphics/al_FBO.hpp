@@ -69,6 +69,12 @@ public:
 	/// Set internal pixel format
 	RBO& format(Graphics::Format v);
 
+	/// Get number of samples for multisampling
+	unsigned samples() const;
+
+	/// Set number of samples for multisampling (0 for no multisampling)
+	RBO& samples(unsigned n);
+
 	/// Bind object
 	void bind();
 
@@ -87,10 +93,11 @@ public:
 	static unsigned maxSize();
 
 	static void bind(unsigned id);
-	static bool resize(Graphics::Format format, unsigned width, unsigned height);
+	static bool resize(Graphics::Format format, unsigned width, unsigned height, unsigned samples=0);
 
 protected:
 	Graphics::Format mFormat;
+	unsigned mSamples = 0;
 
 	virtual void onCreate();
 	virtual void onDestroy();
