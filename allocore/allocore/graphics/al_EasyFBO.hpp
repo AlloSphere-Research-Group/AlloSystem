@@ -77,6 +77,12 @@ struct EasyFBO {
 	:	EasyFBO(wh,wh, format,type)
 	{}
 
+
+	/// Get height
+	int width() const { return mTexture.width(); }
+	/// Get width
+	int height() const { return mTexture.height(); }
+
 	/// Resize and configure color buffer
 	EasyFBO& resize(
 		int w, int h,
@@ -94,10 +100,18 @@ struct EasyFBO {
 		return *this;
 	}
 
-	/// Get height
-	int width() const { return mTexture.width(); }
-	/// Get width
-	int height() const { return mTexture.height(); }
+	/// Set multisample count (or 0 to disable multisampling)
+	EasyFBO& samples(unsigned n){
+		if(samples() != n){
+			mColorRBO_MS.samples(n);
+			mDepthRBO_MS.samples(n);
+			mNeedsSync = true;
+		}
+		return *this;
+	}
+
+	/// Get multisample count
+	unsigned samples() const { return mColorRBO_MS.samples(); }
 
 	/// Get modelview matrix
 	const Matrix4d& modelView() const { return mMV; }
@@ -147,7 +161,7 @@ struct EasyFBO {
 		g.pushMatrix(Graphics::MODELVIEW);
 		auto oldVP = g.viewport();
 
-		mFBO.scope([&](){
+		auto drawScene = [&]{
 			g.viewport(0, 0, width(), height());
 			if(mDoClear){
 				g.clearColor(mClearColor);
@@ -158,7 +172,14 @@ struct EasyFBO {
 			g.projection(mProj);
 			g.modelView(mMV);
 			drawFunc();
-		});
+		};
+
+		if(0 == samples()){
+			mFBO.scope([&]{ drawScene(); });
+		} else {
+			mFBO_MS.scope([&]{ drawScene(); });
+			mFBO_MS.copyTo(mFBO, width(),height(), Graphics::COLOR_BUFFER_BIT);
+		}
 
 		g.popMatrix(Graphics::PROJECTION);
 		g.popMatrix(Graphics::MODELVIEW);
@@ -169,7 +190,10 @@ private:
 
 	FBO mFBO;
 	Texture mTexture; // for color buffer (read-write)
-	RBO mRBO; // for depth buffer (write-only)
+	RBO mDepthRBO; // for depth buffer (write-only)
+	FBO mFBO_MS;
+	RBO mDepthRBO_MS;
+	RBO mColorRBO_MS;
 	Matrix4d mMV{1};
 	Matrix4d mProj = Matrix4d::ortho(-1,1, -1,1, -1,1);
 	Color mClearColor = Color(0,0,0,1);
@@ -183,11 +207,23 @@ private:
 			// both depth and color attachees must be valid on the GPU before use:
 			mTexture.submit();
 			mFBO.attachTexture2D(mTexture, FBO::COLOR_ATTACHMENT0);
-			if(mUseDepth){
-				mRBO.resize(width(), height());
-				mFBO.attachRBO(mRBO, FBO::DEPTH_ATTACHMENT);
+
+			if(0 == samples()){
+				if(mUseDepth){
+					mDepthRBO.resize(width(), height());
+					mFBO.attachRBO(mDepthRBO, FBO::DEPTH_ATTACHMENT);
+				} else {
+					mFBO.detachRBO(FBO::DEPTH_ATTACHMENT);
+				}
 			} else {
-				mFBO.detachRBO(FBO::DEPTH_ATTACHMENT);
+				mColorRBO_MS.format(mTexture.format()).resize(width(), height());
+				mFBO_MS.attachRBO(mColorRBO_MS, FBO::COLOR_ATTACHMENT0);
+				if(mUseDepth){
+					mDepthRBO_MS.resize(width(), height());
+					mFBO_MS.attachRBO(mDepthRBO_MS, FBO::DEPTH_ATTACHMENT);
+				} else {
+					mFBO_MS.detachRBO(FBO::DEPTH_ATTACHMENT);
+				}
 			}
 			//printf("fbo status %s\n", mFBO.statusString());
 			AL_GRAPHICS_ERROR("EasyFBO::sync", -1);
