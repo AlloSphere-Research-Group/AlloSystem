@@ -181,6 +181,10 @@ public:
 		int dstW, int dstH,
 		Graphics::AttributeBit mask = Graphics::COLOR_BUFFER_BIT, bool nicest=false
 	);
+	FBO& copyTo(FBO& dst,
+		int w, int h,
+		Graphics::AttributeBit mask = Graphics::COLOR_BUFFER_BIT, bool nicest=false
+	);
 
 	/// Get status of frame buffer object
 	GLenum status();

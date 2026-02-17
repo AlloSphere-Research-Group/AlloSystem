@@ -138,6 +138,13 @@ FBO& FBO::copyTo(FBO& dst,
 	return copyTo(dst, 0,0,srcW,srcH, 0,0,dstW,dstH, mask, nicest);
 }
 
+FBO& FBO::copyTo(FBO& dst,
+	int w, int h,
+	Graphics::AttributeBit mask, bool nicest
+){
+	return copyTo(dst, w,h, w,h, mask, nicest);
+}
+
 GLenum FBO::status(){
 	bind();
 	auto r = glCheckFramebufferStatus(GL_FRAMEBUFFER);
