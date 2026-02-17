@@ -24,6 +24,8 @@ Graphics::Format RBO::format() const { return mFormat; }
 
 RBO& RBO::format(Graphics::Format v){ mFormat=v; return *this; }
 
+unsigned RBO::samples() const { return mSamples; }
+
 RBO& RBO::samples(unsigned n){ mSamples=n; return *this; }
 
 void RBO::bind(){ validate(); bind(id()); }
