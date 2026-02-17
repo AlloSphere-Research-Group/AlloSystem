@@ -73,6 +73,9 @@ public:
 	unsigned samples() const;
 
 	/// Set number of samples for multisampling (0 for no multisampling)
+
+	/// All RBOs attached to an FBO must have the same number of samples
+	/// regardless of their format---this is left up to the user to ensure.
 	RBO& samples(unsigned n);
 
 	/// Bind object
