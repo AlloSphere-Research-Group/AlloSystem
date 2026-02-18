@@ -273,6 +273,26 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#define AL_GRAPHICS_SUPPORTS_LR_BUFFERS
 #endif
 
+#if   defined(AL_GRAPHICS_USE_OPENGLES2)
+	// Pixels all have 16-bits
+	#define AL_GRAPHICS_COLOR1_OFFSCREEN GL_RGB565
+	#define AL_GRAPHICS_COLOR2_OFFSCREEN GL_RGB565
+	#define AL_GRAPHICS_COLOR3_OFFSCREEN GL_RGB565
+	#define AL_GRAPHICS_COLOR4_OFFSCREEN GL_RGBA4
+#elif defined(AL_GRAPHICS_USE_OPENGLES3_X)
+	// Must be a sized format; default to max sizes
+	#define AL_GRAPHICS_COLOR1_OFFSCREEN GL_R8
+	#define AL_GRAPHICS_COLOR2_OFFSCREEN GL_RG8
+	#define AL_GRAPHICS_COLOR3_OFFSCREEN GL_RGB8
+	#define AL_GRAPHICS_COLOR4_OFFSCREEN GL_RGBA8
+#else
+	// Normal GL is much more forgiving, but we will go LCDs to maximize support
+	#define AL_GRAPHICS_COLOR1_OFFSCREEN GL_RED
+	#define AL_GRAPHICS_COLOR2_OFFSCREEN GL_RG
+	#define AL_GRAPHICS_COLOR3_OFFSCREEN GL_RGB
+	#define AL_GRAPHICS_COLOR4_OFFSCREEN GL_RGBA
+#endif
+
 #if (defined(AL_GRAPHICS_USE_OPENGL) && AL_GRAPHICS_OPENGL_VERSION_MIN <= 21) || defined(AL_GRAPHICS_USE_OPENGLES2) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
 	#define AL_GRAPHICS_SUPPORTS_LUMINANCE_COMP
 #endif
@@ -312,6 +332,7 @@ https://www.khronos.org/registry/OpenGL/docs/enums.html
 	#ifndef AL_GRAPHICS_USE_OPENGLES2
 		//see glBindFramebuffer
 		#define AL_GRAPHICS_SUPPORTS_FBO_RW_BIND
+		#define AL_GRAPHICS_SUPPORTS_RBO_MS
 	#endif
 #endif
 

@@ -52,11 +52,35 @@ bool RBO::resize(unsigned w, unsigned h){
 	unsigned mx = maxSize();
 	if(w > mx || h > mx) return false;
 	AL_GRAPHICS_ERROR("before RBO::resize", -1);
+
+	// Determine a suitable internal format which may differ from the passed in
+	// format. Note that this logic will likely fail if the format was 
+	// explicitly casted from some random GL format.
+	int ifmt;
+	if(Graphics::isColor(format)){
+		switch(Graphics::numComponents(format)){
+			default:ifmt = AL_GRAPHICS_COLOR4_OFFSCREEN; break;
+			case 3: ifmt = AL_GRAPHICS_COLOR3_OFFSCREEN; break;
+			case 2: ifmt = AL_GRAPHICS_COLOR2_OFFSCREEN; break;
+			case 1: ifmt = AL_GRAPHICS_COLOR1_OFFSCREEN; break;
+		}
+	} else { //assuming depth
+		ifmt = Graphics::DEPTH_COMPONENT_OFFSCREEN;
+	}
+
+	#ifdef AL_GRAPHICS_SUPPORTS_RBO_MS
+		#define AL_RBO_STORAGE_MS glRenderbufferStorageMultisample
+	#else
+		#define AL_RBO_STORAGE_MS(t,s,f,w,h)\
+			AL_WARN_ONCE("RBO multisampling not supported. Falling back to non-multisampled RBO.");\
+			glRenderbufferStorage(t,f,w,h)
+	#endif
+
 	if(0 == samples){
-		glRenderbufferStorage(GL_RENDERBUFFER, format, w, h);
+		glRenderbufferStorage(GL_RENDERBUFFER, ifmt, w,h);
 		AL_GRAPHICS_ERROR("RBO::resize (glRenderbufferStorage)", -1);
 	} else {
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, format, w,h);
+		AL_RBO_STORAGE_MS(GL_RENDERBUFFER, samples, ifmt, w,h);
 		AL_GRAPHICS_ERROR("RBO::resize (glRenderbufferStorageMultisample)", -1);
 	}
 	return true;
@@ -113,7 +137,7 @@ FBO& FBO::copyTo(FBO& dst,
 	int dstX0, int dstY0, int dstX1, int dstY1,
 	Graphics::AttributeBit mask, bool nicest
 ){
-	#ifdef AL_GRAPHICS_SUPPORTS_FBO_RW_BIND
+#ifdef AL_GRAPHICS_SUPPORTS_FBO_RW_BIND
 	// Scissor test affects blit operation!
 	bool scissorTest = Graphics::paramBool(GL_SCISSOR_TEST);
 	if(scissorTest) glDisable(GL_SCISSOR_TEST);
@@ -128,7 +152,11 @@ FBO& FBO::copyTo(FBO& dst,
 	});
 
 	if(scissorTest) glEnable(GL_SCISSOR_TEST);
-	#endif
+
+#else
+	AL_WARN_ONCE("FBO blitting not supported (in FBO::copyTo).");
+#endif
+
 	return *this;
 }
 
