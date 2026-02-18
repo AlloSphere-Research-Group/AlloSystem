@@ -1,5 +1,5 @@
-#ifndef __EASYFBO_HPP__
-#define __EASYFBO_HPP__
+#ifndef INCLUDE_AL_GRAPHICS_EASY_FBO_HPP
+#define INCLUDE_AL_GRAPHICS_EASY_FBO_HPP
 
 /*  Allocore --
   Multimedia / virtual environment application class library
