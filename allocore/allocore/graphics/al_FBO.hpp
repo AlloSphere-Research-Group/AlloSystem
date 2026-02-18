@@ -63,14 +63,24 @@ public:
 	/// @param[in] format	internal format of buffer
 	RBO(Graphics::Format format = Graphics::DEPTH_COMPONENT_OFFSCREEN);
 
-	/// Get internal pixel format
-	Graphics::Format format() const;
+
+	/// Set dimensions, in pixels
+
+	/// @param[in] width	width, in pixels
+	/// @param[in] height	height, in pixels
+	/// \returns whether the resize was successful
+	RBO& resize(unsigned width, unsigned height);
+
+	/// Get width in pixels
+	unsigned width() const;
+	/// Get height in pixels
+	unsigned height() const;
 
 	/// Set internal pixel format
 	RBO& format(Graphics::Format v);
 
-	/// Get number of samples for multisampling
-	unsigned samples() const;
+	/// Get internal pixel format
+	Graphics::Format format() const;
 
 	/// Set number of samples for multisampling (0 for no multisampling)
 
@@ -78,18 +88,17 @@ public:
 	/// regardless of their format---this is left up to the user to ensure.
 	RBO& samples(unsigned n);
 
+	/// Get number of samples for multisampling
+	unsigned samples() const;
+
 	/// Bind object
 	void bind();
 
 	/// Unbind object
 	void unbind();
 
-	/// Set dimensions, in pixels
-
-	/// @param[in] width	width, in pixels
-	/// @param[in] height	height, in pixels
-	/// \returns whether the resize was successful
-	bool resize(unsigned width, unsigned height);
+	/// Synchronize local with remote state
+	void sync();
 
 
 	/// Get maximum buffer size
@@ -99,8 +108,18 @@ public:
 	static bool resize(Graphics::Format format, unsigned width, unsigned height, unsigned samples=0);
 
 protected:
+	unsigned mWidth=0, mHeight=0;
 	Graphics::Format mFormat;
 	unsigned mSamples = 0;
+	bool mNeedsSync = true;
+
+	template <class T>
+	RBO& sync(T& dst, const T& src){
+		if(dst != src) dst=src, mNeedsSync=true;
+		return *this;
+	}
+
+	void onSync();
 
 	void onCreate() override;
 	void onDestroy() override;
@@ -140,7 +159,7 @@ public:
 
 
 	/// Attach RBO at specified attachment point
-	FBO& attachRBO(const RBO& rbo, Attachment attach);
+	FBO& attachRBO(RBO& rbo, Attachment attach);
 
 	/// Detach RBO at specified attachment point
 	FBO& detachRBO(Attachment attach);

@@ -20,23 +20,30 @@ void RBO::onDestroy(){
 	glDeleteRenderbuffers(1,&i);
 }
 
-Graphics::Format RBO::format() const { return mFormat; }
-
-RBO& RBO::format(Graphics::Format v){ mFormat=v; return *this; }
-
-unsigned RBO::samples() const { return mSamples; }
-
-RBO& RBO::samples(unsigned n){ mSamples=n; return *this; }
-
-void RBO::bind(){ validate(); bind(id()); }
+void RBO::bind(){ validate(); bind(id()); onSync(); }
 
 void RBO::unbind(){ bind(0); }
 
-bool RBO::resize(unsigned w, unsigned h){
-	bind();
-	bool r = resize(mFormat, w, h, mSamples);
-	unbind();
-	return r;
+void RBO::sync(){ bind(); unbind(); }
+
+RBO& RBO::resize(unsigned w, unsigned h){ return sync(mWidth,w).sync(mHeight,h); }
+
+unsigned RBO::width() const { return mWidth; }
+unsigned RBO::height() const { return mHeight; }
+
+Graphics::Format RBO::format() const { return mFormat; }
+
+RBO& RBO::format(Graphics::Format v){ return sync(mFormat,v); }
+
+unsigned RBO::samples() const { return mSamples; }
+
+RBO& RBO::samples(unsigned n){ return sync(mSamples,n); }
+
+void RBO::onSync(){
+	if(mNeedsSync){
+		mNeedsSync = false;
+		resize(mFormat, mWidth, mHeight, mSamples);
+	}
 }
 
 /*static*/ unsigned RBO::maxSize(){
@@ -99,8 +106,9 @@ void FBO::onDestroy(){
 	glDeleteFramebuffers(1,&i);
 }
 
-FBO& FBO::attachRBO(const RBO& rbo, Attachment att){
+FBO& FBO::attachRBO(RBO& rbo, Attachment att){
 	return scope([&](){
+		rbo.sync(); // must have valid remote configuration before attaching
 		renderBuffer(rbo.id(), att);
 	});
 }
