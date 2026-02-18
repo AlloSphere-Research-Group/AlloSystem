@@ -672,6 +672,9 @@ public:
 	/// Returns number of components for given color type
 	static int numComponents(Format v);
 
+	/// Returns whether format is color
+	static bool isColor(Format v);
+
 	/// Returns number of bytes for given data type
 	static int numBytes(DataType v);
 

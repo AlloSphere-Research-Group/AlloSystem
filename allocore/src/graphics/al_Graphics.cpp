@@ -1366,6 +1366,14 @@ const char * toString(Graphics::Primitive v){
 	};
 }
 
+/*static*/ bool Graphics::isColor(Format v){
+	switch(v){
+	case RGBA: case RGB: case LUMINANCE_ALPHA: case LUMINANCE: case ALPHA:
+		return true;
+	default: return false;
+	}
+}
+
 /*static*/ int Graphics::numBytes(DataType v){
 	#define CS(a,b) case a: return sizeof(b);
 	switch(v){
