@@ -204,7 +204,13 @@ private:
 	void sync(){
 		if(mNeedsSync){
 			mNeedsSync = false;
-			// both depth and color attachees must be valid on the GPU before use:
+
+			// Clear all attachments first
+			// If we make new attachments and their size does not match existing
+			// attachments, it can trigger an incomplete FBO.
+			mFBO.detachTexture2D(FBO::COLOR_ATTACHMENT0);
+			mFBO.detachRBO(FBO::DEPTH_ATTACHMENT);
+
 			mTexture.submit();
 			mFBO.attachTexture2D(mTexture, FBO::COLOR_ATTACHMENT0);
 
@@ -212,17 +218,16 @@ private:
 				if(mUseDepth){
 					mDepthRBO.resize(width(), height());
 					mFBO.attachRBO(mDepthRBO, FBO::DEPTH_ATTACHMENT);
-				} else {
-					mFBO.detachRBO(FBO::DEPTH_ATTACHMENT);
 				}
 			} else {
+				mFBO_MS.detachRBO(FBO::COLOR_ATTACHMENT0);
+				mFBO_MS.detachRBO(FBO::DEPTH_ATTACHMENT);
+
 				mColorRBO_MS.format(mTexture.format()).resize(width(), height());
 				mFBO_MS.attachRBO(mColorRBO_MS, FBO::COLOR_ATTACHMENT0);
 				if(mUseDepth){
 					mDepthRBO_MS.resize(width(), height());
 					mFBO_MS.attachRBO(mDepthRBO_MS, FBO::DEPTH_ATTACHMENT);
-				} else {
-					mFBO_MS.detachRBO(FBO::DEPTH_ATTACHMENT);
 				}
 			}
 			//printf("fbo status %s\n", mFBO.statusString());
