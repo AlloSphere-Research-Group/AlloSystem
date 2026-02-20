@@ -184,7 +184,7 @@ private:
 	case 'm': unitDiv=1000000; unitStr="ms"; break;\
 	default:;\
 	}\
-	std::cout << #__VA_ARGS__ ": " << Timer().timeFunc(blockSize,trials, [&](int i){ return __VA_ARGS__; })/unitDiv << " " << unitStr << "\n";\
+	std::cout << #__VA_ARGS__ ": " << al::Timer().timeFunc(blockSize,trials, [&](int i){ return __VA_ARGS__; })/unitDiv << " " << unitStr << "\n";\
 }
 
 
