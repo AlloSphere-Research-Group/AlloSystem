@@ -792,9 +792,11 @@ void Texture::quadViewport(
 }
 
 void Texture::iterate(const std::function<void(int i, int j, int k)>& onPixel){
-	for(int k=0; k< depth(); ++k){
-	for(int j=0; j<height(); ++j){
-	for(int i=0; i< width(); ++i){
+	auto D =  depth() ?  depth() : 1;
+	auto H = height() ? height() : 1;
+	for(int k=0; k<D; ++k){
+	for(int j=0; j<H; ++j){
+	for(int i=0; i<width(); ++i){
 		onPixel(i,j,k);
 	}}}
 }
