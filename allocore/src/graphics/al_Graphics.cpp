@@ -1233,7 +1233,7 @@ Graphics::BackendFixed * Graphics::backendFixed(){
 ShaderProgram& Graphics::shader(){
 	if(mBackends[PROG]){
 		auto * backend = backendProg();
-		backend->validateShader();
+		if(backend->mShader.created()) backend->validateShader();
 		return backend->mShader;
 	} else {
 		static ShaderProgram dummyShader;
