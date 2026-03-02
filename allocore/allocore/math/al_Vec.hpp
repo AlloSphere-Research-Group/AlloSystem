@@ -1157,22 +1157,33 @@ public:
 	Vec<2,T> extrema() const { return get(indicesOfExtrema()); }
 
 
+	/// Periodic sequence
+	template <class Array>
 	struct PSeq{
-		T * data;
+		Array data;
 		unsigned index = N-1;
 
-		PSeq(T * ptr): data(ptr){}
+		PSeq(const Array& src): data(src){}
 
 		T& operator()(){
-			index = (index+1) % N;
+			index = wrap(index+1);
 			return data[index];
 		}
 
-		const T& operator[](unsigned i) const { return data[i%N]; }
-		T& operator[](unsigned i){ return data[i%N]; }
+		const T& operator[](unsigned i) const { return data[wrap(i)]; }
+		T& operator[](unsigned i){ return data[wrap(i)]; }
+
+		static unsigned wrap(unsigned i){ return i%N; }
 	};
 
-	PSeq pseq(){ return PSeq(elems()); }
+	/// Get periodic sequence from vector (copies values)
+	auto pseq(){ return PSeq<Vec>(*this); }
+
+	/// Get periodic sequence from vector (references values)
+
+	/// This is a more efficient version that avoids copying elements, however,
+	/// it should not be used on temporary/r-values.
+	auto pseqRef(){ return PSeq<Vec&>(*this); }
 
 
 	/// debug printing
