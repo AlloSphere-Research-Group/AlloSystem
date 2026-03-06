@@ -712,7 +712,7 @@ public:
 	const Material& materialBack() const;
 
 	/// Set pipeline used for rendering meshes
-	void pipeline(Pipeline p);
+	Graphics& pipeline(Pipeline p);
 
 	ShaderProgram& shader();
 

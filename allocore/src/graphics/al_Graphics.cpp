@@ -1204,7 +1204,7 @@ void setPixelAlign(unsigned which, unsigned v){
 /*static*/ unsigned Graphics::pixelAlignUpload(){ return paramInt(ALIGN_UPLOAD); }
 /*static*/ void Graphics::pixelAlignUpload(unsigned v){ setPixelAlign(ALIGN_UPLOAD, v); }
 
-void Graphics::pipeline(Pipeline p){
+Graphics& Graphics::pipeline(Pipeline p){
 	switch(p){
 	case FIXED:
 		#ifdef AL_GRAPHICS_SUPPORTS_FIXED_PIPELINE
@@ -1221,6 +1221,7 @@ void Graphics::pipeline(Pipeline p){
 		#endif
 		break;
 	}
+	return *this;
 }
 
 Graphics::BackendProg * Graphics::backendProg(){
