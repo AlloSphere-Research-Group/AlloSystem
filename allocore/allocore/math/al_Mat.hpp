@@ -115,6 +115,10 @@ public:
 	/// Scale by amount
 	Rotoscale& operator*= (T v){ r*=v; i*=v; return *this; }
 	Rotoscale operator* (T v) const { return dup() *= v; }
+
+	Rotoscale& operator*= (Rotoscale v){ return set(r*v.r-i*v.i, i*v.r + r*v.i); }
+	Rotoscale operator* (Rotoscale v) const { return dup() *= v; }
+
 };
 
 typedef Rotoscale< float> Rotoscalef;
@@ -865,11 +869,9 @@ public:
 	/// \param[in] dim2		local coordinate frame axis to rotate towards
 	Mat& rotate(const Rotoscale<T>& r, int dim1, int dim2){
 		for(int R=0; R<N-1; ++R){
-			auto& a = at(R, dim1);
-			auto& b = at(R, dim2);
-			T t=a*r.r + b*r.i;
-			b = b*r.r - a*r.i;
-			a = t;
+			auto &a = at(R, dim2), &b = at(R, dim1);
+			auto t = Rotoscale<T>(a,b) * r;
+			a = t.r; b = t.i;
 		}
 		return *this;
 	}
@@ -911,11 +913,9 @@ public:
 	Mat& rotateGlobal(const Rotoscale<T>& r, int dim1, int dim2){
 		static_assert(M<=N, "Invalid submatrix size");
 		for(int C=0; C<M; ++C){
-			auto& a = at(dim1, C);
-			auto& b = at(dim2, C);
-			T t=r.r*a - r.i*b;
-			b = r.i*a + r.r*b;
-			a = t;
+			auto &a = at(dim1, C), &b = at(dim2, C);
+			auto t = r * Rotoscale<T>(a,b);
+			a = t.r; b = t.i;
 		}
 		return *this;
 	}
