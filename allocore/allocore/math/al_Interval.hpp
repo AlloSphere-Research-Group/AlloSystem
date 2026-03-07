@@ -51,7 +51,7 @@ namespace al {
 /// describes a 0-sphere. Order is strongly enforced so that the endpoints will
 /// always satisfy min <= max.
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 template <class T>
 class Interval{
 public:
@@ -61,8 +61,8 @@ public:
 	Interval()
 	:	mMin(0), mMax(1){}
 
-	/// @param[in] min	minimum endpoint
-	/// @param[in] max	maximum endpoint
+	/// \param[in] min	minimum endpoint
+	/// \param[in] max	maximum endpoint
 	Interval(const T& min, const T& max)
 	{ endpoints(min,max); }
 

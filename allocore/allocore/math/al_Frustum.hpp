@@ -61,7 +61,7 @@ typedef Frustum<double> Frustumd;	///< Double precision frustrum
 /// "OpenGL @ Lighthouse 3D - View Frustum Culling Tutorial",
 /// http://www.lighthouse3d.com/opengl/viewfrustum/index.php?intro
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 template <class T>
 class Frustum{
 public:
@@ -142,8 +142,8 @@ public:
 	/// Sometimes, boxes that are really outside will not be detected as so,
 	/// thus returning a false positive.
 	///
-	/// @param[in] min	minimum corner of box
-	/// @param[in] ext	extents (diameters) of box
+	/// \param[in] min	minimum corner of box
+	/// \param[in] ext	extents (diameters) of box
 	/// \returns OUTSIDE, INTERSECT or INSIDE
 	int testBox(const vec& min, const vec& ext) const;
 	int testBoxMinMax(const vec& min, const vec& max) const;

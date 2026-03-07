@@ -63,7 +63,7 @@
 
 namespace al {
 
-/// @addtogroup allocore
+/// \addtogroup allocore
 /// @{
 
 /// Returns absolute value
@@ -71,9 +71,9 @@ template<class T> T abs(const T& v);
 
 /// Return whether two floats are almost equal
 
-/// @param[in] a		first operand
-/// @param[in] b		second operand
-/// @param[in] maxULP	maximum "units in the last place"
+/// \param[in] a		first operand
+/// \param[in] b		second operand
+/// \param[in] maxULP	maximum "units in the last place"
 ///
 /// Algorithm from Dawson, B. "Comparing floating point numbers",
 /// http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
@@ -134,7 +134,7 @@ inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 template<class T> bool even(const T& v);
 
 /// The Gauss error function or probability integral
-/// @see http://en.wikipedia.org/wiki/Error_function
+/// \see http://en.wikipedia.org/wiki/Error_function
 template<class T> T erf(const T& v);
 
 /// Returns factorial. Argument must be less than or equal to 12.
@@ -179,7 +179,7 @@ bool coprime(const Ts&... vals){ return gcd(vals...) == 1; }
 /// The Gudermannian function
 
 /// Relates circular and hyperbolic functions without using complex numbers.
-/// @see http://en.wikipedia.org/wiki/Gudermannian_function
+/// \see http://en.wikipedia.org/wiki/Gudermannian_function
 template<class T> T gudermannian(const T& x);
 
 template <class T>
@@ -200,9 +200,9 @@ bool isPrime(unsigned n);
 
 /// Generalized Laguerre polynomial L{n,k}
 
-/// @param[in] n	degree, a non-negative integer
-/// @param[in] k	order
-/// @param[in] x	position
+/// \param[in] n	degree, a non-negative integer
+/// \param[in] k	order
+/// \param[in] x	position
 /// http://en.wikipedia.org/wiki/Laguerre_polynomials
 template<class T> T laguerreL(int n, int k, T x);
 
@@ -213,9 +213,9 @@ template<class T> T lcm(const T& x, const T& y);
 ///
 /// P_l^m(cos(t)) = (-1)^{l+m} / (2^l l!) sin^m(t) (d/d cos(t))^{l+m} sin^{2l}(t)
 ///
-/// @param[in]	l	degree where l >= 0
-/// @param[in]	m	order  where 0 <= m <= l
-/// @param[in]	t	angle in [0, pi]
+/// \param[in]	l	degree where l >= 0
+/// \param[in]	m	order  where 0 <= m <= l
+/// \param[in]	t	angle in [0, pi]
 ///
 /// http://comp.cs.ehime-u.ac.jp/~ogata/nac/index.html
 template<class T> T legendreP(int l, int m, T t);
@@ -306,8 +306,8 @@ template<class T> T pow65(const T& v);		///< Returns value to the 65th power
 
 /// Returns value to a positive integer power
 
-/// @param[in] base		the base value to exponentiate
-/// @param[in] power	the power to exponentiate by
+/// \param[in] base		the base value to exponentiate
+/// \param[in] power	the power to exponentiate by
 template<class T>
 T powN(T base, unsigned power);
 
@@ -521,7 +521,7 @@ TEM inline T clipS(const T& v, const T& hi){ return al::clip(v, hi, -hi); }
 
 TEM inline bool even(const T& v){ return 0 == al::odd(v); }
 
-/// @see http://en.wikipedia.org/wiki/Error_function
+/// \see http://en.wikipedia.org/wiki/Error_function
 TEM inline T erf(const T& x) {
 	const T x2 = x*x;
 	const T ax2 = T(0.147) * x2;
@@ -570,7 +570,7 @@ TEM T gcd(const T& x, const T& y){
 	return al::gcd(y, al::remainder(x,y));
 }
 
-/// @see http://en.wikipedia.org/wiki/Gudermannian_function
+/// \see http://en.wikipedia.org/wiki/Gudermannian_function
 TEM T gudermannian(const T& x) {
 	return T(2) * std::atan(exp(x)) - T(M_PI_2);
 }

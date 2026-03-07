@@ -49,30 +49,30 @@ namespace al {
 /// Utilities for interpolation
 namespace ipl{
 
-/// @addtogroup allocore
+/// \addtogroup allocore
 /// @{
 
 /// Bezier curve, 3-point quadratic
 
-/// @param[in] frac 	fraction between x2 and x0
+/// \param[in] frac 	fraction between x2 and x0
 ///
 template <class Tf, class Tv>
 Tv bezier(Tf frac, const Tv& x2, const Tv& x1, const Tv& x0);
 
 /// Bezier curve, 4-point cubic
 
-/// @param[in] frac 	fraction between x3 and x0
+/// \param[in] frac 	fraction between x3 and x0
 ///
 template <class Tf, class Tv>
 Tv bezier(Tf frac, const Tv& x3, const Tv& x2, const Tv& x1, const Tv& x0);
 
 ///	de Casteljau algorithm for four point interpolation
 
-///	@param frac		Interpolation factor [0, 1]
-///	@param a		First point
-///	@param b		Second point
-///	@param c		Third point
-///	@param d		Fourth point
+///	\param frac		Interpolation factor [0, 1]
+///	\param a		First point
+///	\param b		Second point
+///	\param c		Third point
+///	\param d		Fourth point
 template <class Tf, class Tv>
 Tv casteljau(const Tf& frac, const Tv& a, const Tv& b, const Tv& c, const Tv& d);
 
@@ -82,14 +82,14 @@ Tv casteljau(const Tf& frac, const Tv& a, const Tv& b, const Tv& c, const Tv& d)
 /// The interpolant lies between x and y.
 /// From https://paulbourke.net/miscellaneous/interpolation/ (Paul Bourke).
 ///
-/// @param[in] frac		Interpolation fraction in [0,1]
-/// @param[in] x		First value (previous value)
-/// @param[in] y		Second value (lower bound of interpolated value)
-/// @param[in] z		Third value (upper bound of interpolated value)
-/// @param[in] w		Fourth value (next value)
-/// @param[in] tension	Tightness of the interpolation function:
+/// \param[in] frac		Interpolation fraction in [0,1]
+/// \param[in] x		First value (previous value)
+/// \param[in] y		Second value (lower bound of interpolated value)
+/// \param[in] z		Third value (upper bound of interpolated value)
+/// \param[in] w		Fourth value (next value)
+/// \param[in] tension	Tightness of the interpolation function:
 ///						1 is high (linear), 0 normal (cubic), -1 is low.
-/// @param[in] bias		Tension bias: 0 is even, >0 is towards first segment
+/// \param[in] bias		Tension bias: 0 is even, >0 is towards first segment
 ///						<0 is towards second segment.
 template <class Tp, class Tv>
 Tv hermite(Tp frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension, Tp bias);
@@ -119,10 +119,10 @@ template <class T> void lagrange3(T * h, T delay);
 
 /// Compute weights for cubic cardinal spline
 
-/// @param[out] w	four output weights
-/// @param[ in] x	four input domain values; spline in [x[1], x[2]]
-/// @param[ in] f	fraction in [0,1]
-/// @param[ in] b	smoothness parameter in [-1,1]; 1 = Catmull-Rom
+/// \param[out] w	four output weights
+/// \param[ in] x	four input domain values; spline in [x[1], x[2]]
+/// \param[ in] f	fraction in [0,1]
+/// \param[ in] b	smoothness parameter in [-1,1]; 1 = Catmull-Rom
 template <class Tf, class Tv>
 void cardinalSpline(Tv * w, const Tv * x, const Tf& f, double b);
 
@@ -164,9 +164,9 @@ Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
 /// \tparam T			Sample type
 /// \tparam OnElem		Function that returns element i; signature T(int)
-/// @param[in] f		Fraction in [0,1)
-/// @param[in] len		Length of array
-/// @param[in] onElem	Array element accessor
+/// \param[in] f		Fraction in [0,1)
+/// \param[in] len		Length of array
+/// \param[in] onElem	Array element accessor
 template <class T, class OnElem>
 T linearCyclic(float f, int len, OnElem onElem);
 
@@ -222,7 +222,7 @@ inline Tv trilinear(
 
 /// Trilinear interpolation between values on corners of a hexahedron
 
-/// @param[in] f		3 element array of fractions along x, y, and z
+/// \param[in] f		3 element array of fractions along x, y, and z
 ///
 template <class Tf3, class Tv>
 inline Tv trilinear(

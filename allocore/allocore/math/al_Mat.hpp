@@ -125,7 +125,7 @@ typedef Rotoscale<double> Rotoscaled;
 
 /// Elements are stored in column-major format.
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 template <int N, class T>
 class Mat{
 public:
@@ -145,11 +145,11 @@ public:
 	/// Construct without initializing elements
 	Mat(const MatNoInit& v){}
 
-	/// @param[in] arr	one dimensional array in column-major
+	/// \param[in] arr	one dimensional array in column-major
 	template <class U>
 	Mat(const U * arr){ set(arr); }
 
-	/// @param[in] src	matrix with same dimension, but possibly different type
+	/// \param[in] src	matrix with same dimension, but possibly different type
 	template <class U>
 	Mat(const Mat<N,U>& src){ set(src.elems()); }
 
@@ -162,7 +162,7 @@ public:
 
 	/// Sets the diagonal elements to the input value and all other elements
 	/// to zero. The identity matrix is created by passing in a value of 1.
-	/// @param[in] diag		The value to place on the diagonal
+	/// \param[in] diag		The value to place on the diagonal
 	Mat(const T& diag){
 		diagonal(diag);
 	}
@@ -229,9 +229,9 @@ public:
 
 	/// Get a rotation transform matrix
 
-	/// @param[in] r		rotation (or angle in radians)
-	/// @param[in] dim1		first ("from") basis vector of rotation plane
-	/// @param[in] dim2		second ("to") basis vector of rotation plane
+	/// \param[in] r		rotation (or angle in radians)
+	/// \param[in] dim1		first ("from") basis vector of rotation plane
+	/// \param[in] dim2		second ("to") basis vector of rotation plane
 	static Mat rotation(const Rotoscale<T>& r, unsigned dim1, unsigned dim2){
 		Mat m(T(1));
 		m(dim1,dim1) = r.r;
@@ -249,8 +249,8 @@ public:
 
 	/// Get a rotation transform matrix
 
-	/// @param[in] r		rotation (or angle in radians)
-	/// @param[in] axis		rotation axis; should be a unit vector
+	/// \param[in] r		rotation (or angle in radians)
+	/// \param[in] axis		rotation axis; should be a unit vector
 	static Mat<4,T> rotation(const Rotoscale<T>& r, const Vec<3,T>& axis){
 		T c = r.r;
 		T s = r.i;
@@ -507,7 +507,7 @@ public:
 
 	/// Transpose elements
 
-	/// @param[in] size		Size of upper-left submatrix to transpose
+	/// \param[in] size		Size of upper-left submatrix to transpose
 	///
 	Mat& transpose(int size=N){
 		for(int j=0; j<size-1; ++j){	// row and column
@@ -617,10 +617,10 @@ public:
 
 	/// Set elements in column-major order from C array
 
-	/// @param[in] arr			1D array from which to copy (stride=1)
-	/// @param[in] numElements	number of elements to copy
-	/// @param[in] matOffset	index offset into matrix
-	/// @param[in] matStride	amount to stride through matrix
+	/// \param[in] arr			1D array from which to copy (stride=1)
+	/// \param[in] numElements	number of elements to copy
+	/// \param[in] matOffset	index offset into matrix
+	/// \param[in] matStride	amount to stride through matrix
 	template <class U>
 	Mat& set(const U * arr, int numElements, int matOffset, int matStride=1){
 		IT(numElements){ (*this)[i*matStride+matOffset]=arr[i]; } return *this;
@@ -860,9 +860,9 @@ public:
 	/// This efficiently computes A' = A*R with only 2(N-1) complex muls
 	/// (or about 4(N-1) madds). The translation part is left unaffected.
 	///
-	/// @param[in] r		rotation (or angle in radians)
-	/// @param[in] dim1		local coordinate frame axis to rotate away from
-	/// @param[in] dim2		local coordinate frame axis to rotate towards
+	/// \param[in] r		rotation (or angle in radians)
+	/// \param[in] dim1		local coordinate frame axis to rotate away from
+	/// \param[in] dim2		local coordinate frame axis to rotate towards
 	Mat& rotate(const Rotoscale<T>& r, int dim1, int dim2){
 		for(int R=0; R<N-1; ++R){
 			auto& a = at(R, dim1);
@@ -903,9 +903,9 @@ public:
 	/// This efficiently applies A' = R*A with only 2N complex muls
 	/// (or about 4N madds). The translation part is affected.
 	///
-	/// @param[in] r		rotation (or angle in radians)
-	/// @param[in] dim1		global axis to rotate away from
-	/// @param[in] dim2		global axis to rotate towards
+	/// \param[in] r		rotation (or angle in radians)
+	/// \param[in] dim1		global axis to rotate away from
+	/// \param[in] dim2		global axis to rotate towards
 	template <int M=N>
 	Mat& rotateGlobal(const Rotoscale<T>& r, int dim1, int dim2){
 		static_assert(M<=N, "Invalid submatrix size");
@@ -1049,7 +1049,7 @@ Vec<N-1,U> transformVector(const Vec<N-1,U>& v, const Mat<N,T>& A){
 /// This computes the determinant using cofactor (or Laplace) expansion.
 /// The algorithm operates by recursively computing determinants of submatrices.
 /// For small matrices, optimized versions are used.
-/// @ingroup allocore
+/// \ingroup allocore
 template<int N, class T>
 T determinant(const Mat<N,T>& m){
 	T res = 0;
@@ -1082,7 +1082,7 @@ T determinant(const Mat<3,T>& m){
 
 /// Invert matrix, returns whether matrix was able to be inverted
 /// For small matrices, optimized versions are used.
-/// @ingroup allocore
+/// \ingroup allocore
 template<int N, class T>
 bool invert(Mat<N,T>& m){
 	// Get cofactor matrix, C
@@ -1192,8 +1192,8 @@ template <int N, class T> Mat<N-1,T> normalMatrix(const Mat<N,T>& mv){
 
 /// Get rotation matrix that rotates one unit vector onto another
 
-/// @param[in] from		Unit vector to rotate from
-/// @param[in] to		Unit vector to rotate onto
+/// \param[in] from		Unit vector to rotate from
+/// \param[in] to		Unit vector to rotate onto
 template <class T>
 Mat<3,T> rotation(const Vec<3,T>& from, const Vec<3,T>& to){
 	// From https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d

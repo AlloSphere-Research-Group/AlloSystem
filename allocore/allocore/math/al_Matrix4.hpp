@@ -61,7 +61,7 @@ typedef Matrix4<float>	Matrix4f;	///< Single-precision 4-by-4 matrix
 /// All functions operate according to a right-handed coordinate system.
 /// Elements are stored in column-major format.
 /// Mathematical reference: http://www.glprogramming.com/red/appendixf.html
-/// @ingroup allocore
+/// \ingroup allocore
 template<typename T=double>
 class Matrix4 : public Mat<4, T> {
 public:
@@ -97,12 +97,12 @@ public:
 
 	/// Get a perspective projection matrix
 
-	/// @param[in] l	distance from center of near plane to left edge
-	/// @param[in] r	distance from center of near plane to right edge
-	/// @param[in] b	distance from center of near plane to bottom edge
-	/// @param[in] t	distance from center of near plane to top edge
-	/// @param[in] n	distance from eye to near plane
-	/// @param[in] f	distance from eye to far plane
+	/// \param[in] l	distance from center of near plane to left edge
+	/// \param[in] r	distance from center of near plane to right edge
+	/// \param[in] b	distance from center of near plane to bottom edge
+	/// \param[in] t	distance from center of near plane to top edge
+	/// \param[in] n	distance from eye to near plane
+	/// \param[in] f	distance from eye to far plane
 	static Matrix4 perspective(T l, T r, T b, T t, T n, T f){
 		T W = r-l;	T W2 = r+l;
 		T H = t-b;	T H2 = t+b;
@@ -119,10 +119,10 @@ public:
 
 	/// Get a perspective projection matrix
 
-	/// @param[in] fovy		field of view angle, in degrees, in the y direction
-	/// @param[in] aspect	aspect ratio
-	/// @param[in] near		distance from eye to near plane
-	/// @param[in] far		distance from eye to far plane
+	/// \param[in] fovy		field of view angle, in degrees, in the y direction
+	/// \param[in] aspect	aspect ratio
+	/// \param[in] near		distance from eye to near plane
+	/// \param[in] far		distance from eye to far plane
 	static Matrix4 perspective(T fovy, T aspect, T near, T far){
 		T f = std::tan((90.-fovy*0.5)*M_DEG2RAD); // tan(pi/2-x) = 1/tan(x)
 		T D = far-near;	T D2 = far+near;
@@ -140,13 +140,13 @@ public:
 	/// (nearBL, nearBR, nearTL, eye) all share the same coordinate system
 	/// (nearBR,nearBL) and (nearTL,nearBL) should form a right angle
 	/// (eye) can be set freely, allowing diverse off-axis projections
-	/// @see Generalized Perspective Projection, Robert Kooima, 2009, EVL
-	/// @param[in] nearBL	bottom-left near-plane coordinate (world-space)
-	/// @param[in] nearBR	bottom-right near-plane coordinate (world-space)
-	/// @param[in] nearTL	top-left near-plane coordinate (world-space)
-	/// @param[in] eye		eye coordinate (world-space)
-	/// @param[in] near		near plane distance from eye
-	/// @param[in] far		far plane distance from eye
+	/// \see Generalized Perspective Projection, Robert Kooima, 2009, EVL
+	/// \param[in] nearBL	bottom-left near-plane coordinate (world-space)
+	/// \param[in] nearBR	bottom-right near-plane coordinate (world-space)
+	/// \param[in] nearTL	top-left near-plane coordinate (world-space)
+	/// \param[in] eye		eye coordinate (world-space)
+	/// \param[in] near		near plane distance from eye
+	/// \param[in] far		far plane distance from eye
 	static Matrix4 perspective(
 		const Vec<3,T>& nearBL,
 		const Vec<3,T>& nearBR,
@@ -185,13 +185,13 @@ public:
 
 	/// Get an off-axis perspective projection matrix (for stereoscopy)
 
-	/// @param[in] fovy		field of view angle, in degrees, in the y direction
-	/// @param[in] aspect	aspect ratio
-	/// @param[in] near		near clipping plane coordinate
-	/// @param[in] far		far clipping plane coordinate
-	/// @param[in] xShift	amount to shift off x-axis
-	/// @param[in] yShift	amount to shift off y-axis
-	/// @param[in] focal	focal length
+	/// \param[in] fovy		field of view angle, in degrees, in the y direction
+	/// \param[in] aspect	aspect ratio
+	/// \param[in] near		near clipping plane coordinate
+	/// \param[in] far		far clipping plane coordinate
+	/// \param[in] xShift	amount to shift off x-axis
+	/// \param[in] yShift	amount to shift off y-axis
+	/// \param[in] focal	focal length
 	static Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T yShift, T focal){
 		T tanfovy = std::tan(fovy*M_DEG2RAD*0.5);
 		T t = near * tanfovy; // height of view at distance = near
@@ -219,12 +219,12 @@ public:
 
 	/// Get an orthographic projection matrix
 
-	/// @param[in] l	coordinate of left clipping plane
-	/// @param[in] r	coordinate of right clipping plane
-	/// @param[in] b	coordinate of bottom clipping plane
-	/// @param[in] t	coordinate of top clipping plane
-	/// @param[in] n	coordinate of near clipping plane
-	/// @param[in] f	coordinate of far clipping plane
+	/// \param[in] l	coordinate of left clipping plane
+	/// \param[in] r	coordinate of right clipping plane
+	/// \param[in] b	coordinate of bottom clipping plane
+	/// \param[in] t	coordinate of top clipping plane
+	/// \param[in] n	coordinate of near clipping plane
+	/// \param[in] f	coordinate of far clipping plane
 	static Matrix4 ortho(T l, T r, T b, T t, T n, T f){
 		T W = r-l;	T W2 = r+l;
 		T H = t-b;	T H2 = t+b;
@@ -252,10 +252,10 @@ public:
 	/// Get a two-dimensional orthographic projection matrix
 
 	/// This is identical to ortho with -1, 1 for the near, far distances.
-	/// @param[in] l	coordinate of left clipping plane
-	/// @param[in] r	coordinate of right clipping plane
-	/// @param[in] b	coordinate of bottom clipping plane
-	/// @param[in] t	coordinate of top clipping plane
+	/// \param[in] l	coordinate of left clipping plane
+	/// \param[in] r	coordinate of right clipping plane
+	/// \param[in] b	coordinate of bottom clipping plane
+	/// \param[in] t	coordinate of top clipping plane
 	static Matrix4 ortho2D(T l, T r, T b, T t){
 		T W = r-l;	T W2 = r+l;
 		T H = t-b;	T H2 = t+b;
@@ -269,10 +269,10 @@ public:
 
 	/// Get a view matrix based on an eye reference frame
 
-	/// @param[in] ur		eye right direction unit vector
-	/// @param[in] uu		eye up direction unit vector
-	/// @param[in] ub		eye backward direction unit vector
-	/// @param[in] eyePos	eye position
+	/// \param[in] ur		eye right direction unit vector
+	/// \param[in] uu		eye up direction unit vector
+	/// \param[in] ub		eye backward direction unit vector
+	/// \param[in] eyePos	eye position
 	static Matrix4 lookAt(const Vec<3,T>& ur, const Vec<3,T>& uu, const Vec<3,T>& ub, const Vec<3,T>& eyePos){
 		auto m = Matrix4(ur,uu,ub, eyePos);
 		invertRigid(m);
@@ -281,9 +281,9 @@ public:
 
 	/// Get a view matrix based on look-at parameters
 
-	/// @param[in] eyePos	eye position
-	/// @param[in] at		point being looked at
-	/// @param[in] up		up vector
+	/// \param[in] eyePos	eye position
+	/// \param[in] at		point being looked at
+	/// \param[in] up		up vector
 	static Matrix4 lookAt(const Vec<3,T>& eyePos, const Vec<3,T>& at, const Vec<3,T>& up){
 		auto ub = (eyePos - at).normalize();
 		auto ur = cross(up, ub).normalize();

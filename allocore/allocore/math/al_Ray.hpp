@@ -52,7 +52,7 @@ typedef Ray<double> Rayd;
 
 /// Ray for intersection tests
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 template <class T>
 class Ray {
 public:

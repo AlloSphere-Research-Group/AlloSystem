@@ -102,7 +102,7 @@ Vec<1+sizeof...(Vs),V> toVec(const V& v, Vs... vs);
 /// by the compiler and to avoid an extra 'size' data member for small-sized
 /// arrays.
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 template <int N, class T>
 class Vec : public VecElems<N,T>{
 
@@ -118,46 +118,46 @@ public:
 	template <class U> using Type = Vec<N,U>;
 
 
-	/// @param[in] v		value to initialize all elements to
+	/// \param[in] v		value to initialize all elements to
 	Vec(const T& v=T()){ *this = v; }
 
-	/// @param[in] v1		value to initialize first element
-	/// @param[in] v2		value to initialize second element
+	/// \param[in] v1		value to initialize first element
+	/// \param[in] v2		value to initialize second element
 	Vec(const T& v1, const T& v2){ set(v1, v2); }
 
-	/// @param[in] v1		value to initialize first element
-	/// @param[in] v2		value to initialize second element
-	/// @param[in] v3		value to initialize third element
+	/// \param[in] v1		value to initialize first element
+	/// \param[in] v2		value to initialize second element
+	/// \param[in] v3		value to initialize third element
 	Vec(const T& v1, const T& v2, const T& v3){ set(v1, v2, v3); }
 
-	/// @param[in] v1		value to initialize first element
-	/// @param[in] v2		value to initialize second element
-	/// @param[in] v3		value to initialize third element
-	/// @param[in] v4		value to initialize fourth element
+	/// \param[in] v1		value to initialize first element
+	/// \param[in] v2		value to initialize second element
+	/// \param[in] v3		value to initialize third element
+	/// \param[in] v4		value to initialize fourth element
 	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); }
 
-	/// @param[in] v		values to initialize elements to
+	/// \param[in] v		values to initialize elements to
 	/// If the initializer list has one element, then it is assigned to all
 	/// vector components. If the initializer list is empty, then no elements
 	/// are assigned to.
 	Vec(std::initializer_list<T> v){ set(v); }
 
-	/// @param[in] v		vector to initialize elements to
+	/// \param[in] v		vector to initialize elements to
 	template <int N2, class T2>
 	Vec(const Vec<N2, T2>& v){ *this = v; initTail<N2>(); }
 
-	/// @param[in] v		vector to initialize first N-1 elements to
-	/// @param[in] s		value of last element
+	/// \param[in] v		vector to initialize first N-1 elements to
+	/// \param[in] s		value of last element
 	template <class Tv, class Ts>
 	Vec(const Vec<N-1, Tv>& v, const Ts& s){ set(v,s); }
 
-	/// @param[in] s		value of first element
-	/// @param[in] v		vector to initialize last N-1 elements to
+	/// \param[in] s		value of first element
+	/// \param[in] v		vector to initialize last N-1 elements to
 	template <class Ts, class Tv>
 	Vec(const Ts& s, const Vec<N-1, Tv>& v){ set(s,v); }
 
-	/// @param[in] v		pointer to array to initialize elements to
-	/// @param[in] stride	stride factor through array
+	/// \param[in] v		pointer to array to initialize elements to
+	/// \param[in] stride	stride factor through array
 	template <class T2>
 	Vec(const T2 * v, int stride=1){ set(v,stride); }
 
@@ -183,8 +183,8 @@ public:
 
 	/// Get vector filled with linear sequence of values
 
-	/// @param[in] begin	start value
-	/// @param[in] inc		difference between successive elements (slope)
+	/// \param[in] begin	start value
+	/// \param[in] inc		difference between successive elements (slope)
 	static Vec iota(T begin = T(0), T inc = T(1)){
 		Vec r;
 		auto val = begin;
@@ -194,9 +194,9 @@ public:
 
 	/// Get vector filled with linear ramp
 
-	/// @param[in] begin	start value
-	/// @param[in] end		end value
-	/// @tparam endInc		whether end value is inclusive
+	/// \param[in] begin	start value
+	/// \param[in] end		end value
+	/// \tparam endInc		whether end value is inclusive
 	template <bool endInc = true>
 	static Vec line(T begin = T(0), T end = T(1)){
 		constexpr auto M = N - int(endInc);
@@ -306,7 +306,7 @@ public:
 
 	/// Get element using unit domain rather than index
 
-	/// @param[in] v	Location in [0,1).
+	/// \param[in] v	Location in [0,1).
 	///					The element index is computed from floor(v N).
 	///					For efficiency, no bounds checking is performed.
 	T& at01(float v){ return at(int(v*float(N))); }
@@ -721,8 +721,8 @@ public:
 
 	/// Map elements through function into new vector
 
-	/// @param[in] func		Function taking old value and returning new value
-	/// @param[in] args		Extra function arguments
+	/// \param[in] func		Function taking old value and returning new value
+	/// \param[in] args		Extra function arguments
 	template <class Func, class... Args>
 	Vec map(Func func, Args... args) const {
 		return map<T>(func, args...);
@@ -738,10 +738,10 @@ public:
 
 	/// Reduce elements into scalar
 
-	/// @param[in] prev		Initial previous value
-	/// @param[in] func		Function taking previous and current values as first 
+	/// \param[in] prev		Initial previous value
+	/// \param[in] func		Function taking previous and current values as first
 	///						two arguments and returning new value
-	/// @param[in] args		Extra function arguments
+	/// \param[in] args		Extra function arguments
 	template <class Func, class... Args>
 	T reduce(const T& prev, Func func, Args... args) const {
 		T r = prev;
@@ -766,8 +766,8 @@ public:
 
 	/// Returns a nearby vector along some dimension
 
-	/// @tparam 	Dimension	The dimension along which to get a nearby vector
-	/// @param[in]	shift		The amount to shift along specified dimension
+	/// \tparam 	Dimension	The dimension along which to get a nearby vector
+	/// \param[in]	shift		The amount to shift along specified dimension
 	template<int Dimension>
 	Vec by(T shift) const {
 		static_assert(Dimension<N, "Dimension out of bounds");
@@ -926,7 +926,7 @@ public:
 
 	/// Normalize magnitude (preserving direction)
 
-	/// @param[in] magVal	magnitude (1 is a standard normalization)
+	/// \param[in] magVal	magnitude (1 is a standard normalization)
 	///
 	Vec& normalize(T magVal=T(1)){
 		return mag(magVal);
@@ -934,7 +934,7 @@ public:
 
 	/// Return closest vector lying on a sphere
 
-	/// @param[in] magVal	magnitude (1 is a standard normalization)
+	/// \param[in] magVal	magnitude (1 is a standard normalization)
 	///
 	Vec normalized(T magVal=T(1)) const {
 		return dup().normalize(magVal);
@@ -972,16 +972,16 @@ public:
 
 	/// Returns whether this is inside sphere
 
-	/// @param[in] p		center of sphere
-	/// @param[in] radius	radius of sphere
+	/// \param[in] p		center of sphere
+	/// \param[in] radius	radius of sphere
 	bool insideSphere(const Vec& p, T radius) const {
 		return (*this-p).magSqr() < radius*radius;
 	}
 
 	/// Returns whether this is outside sphere
 
-	/// @param[in] p		center of sphere
-	/// @param[in] radius	radius of sphere
+	/// \param[in] p		center of sphere
+	/// \param[in] radius	radius of sphere
 	bool outsideSphere(const Vec& p, T radius) const {
 		return !insideSphere(p, radius);
 	}
@@ -1002,8 +1002,8 @@ public:
 	/// Get projection onto sphere
 
 	/// This function is useful for applying distance-based constraints.
-	/// @param[in] p		center of sphere
-	/// @param[in] radius	radius of sphere
+	/// \param[in] p		center of sphere
+	/// \param[in] radius	radius of sphere
 	Vec projSphere(const Vec& p, T radius) const {
 		return (*this-p).normalize(radius) + p;
 	}
@@ -1038,9 +1038,9 @@ public:
 
 	/// Rotate vector on a global plane
 
-	/// @param[in] angle	angle of right-handed rotation, in radians
-	/// @param[in] dim1		dimension to rotate from
-	/// @param[in] dim2		dimension to rotate towards
+	/// \param[in] angle	angle of right-handed rotation, in radians
+	/// \param[in] dim1		dimension to rotate from
+	/// \param[in] dim2		dimension to rotate towards
 	Vec& rotate(double angle, int dim1, int dim2){
 		return rotate(std::cos(angle),std::sin(angle), dim1,dim2);
 	}
@@ -1053,8 +1053,8 @@ public:
 
 	/// Rotate vector 45 degrees on a global plane
 
-	/// @param[in] dim1		dimension to rotate from
-	/// @param[in] dim2		dimension to rotate towards
+	/// \param[in] dim1		dimension to rotate from
+	/// \param[in] dim2		dimension to rotate towards
 	/// To rotate -45 degrees, swap the two dimensions.
 	Vec& rotate45(int dim1, int dim2){
 		/*	    | c -c |
@@ -1077,8 +1077,8 @@ public:
 
 	/// Rotate vector 90 degrees on a global plane
 
-	/// @param[in] dim1		dimension to rotate from
-	/// @param[in] dim2		dimension to rotate towards
+	/// \param[in] dim1		dimension to rotate from
+	/// \param[in] dim2		dimension to rotate towards
 	/// To rotate -90 degrees, swap the two dimensions.
 	Vec& rotate90(int dim1, int dim2){
 		at(dim2) = -at(dim2);
@@ -1093,8 +1093,8 @@ public:
 
 	/// Rotate vector 180 degrees on a global plane
 
-	/// @param[in] dim1		dimension to rotate from
-	/// @param[in] dim2		dimension to rotate towards
+	/// \param[in] dim1		dimension to rotate from
+	/// \param[in] dim2		dimension to rotate towards
 	Vec& rotate180(int dim1, int dim2){
 		at(dim1) = -at(dim1);
 		at(dim2) = -at(dim2);
@@ -1371,10 +1371,10 @@ inline T dot(const Vec<N,T>& a, const Vec<N,T>& b){
 
 /// Rotate a vector around a normal vector
 
-/// @param[in,out]	vec		Vector to rotate
-/// @param[in]		normal	Normal perpendicular to the plane of rotation
-/// @param[in]		cosAng	Cosine of the rotation angle
-/// @param[in]		sinAng	Sine of the rotation angle
+/// \param[in,out]	vec		Vector to rotate
+/// \param[in]		normal	Normal perpendicular to the plane of rotation
+/// \param[in]		cosAng	Cosine of the rotation angle
+/// \param[in]		sinAng	Sine of the rotation angle
 template <class T>
 void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng){
 	T c = cosAng;
@@ -1386,9 +1386,9 @@ void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng)
 
 /// Rotate a vector around a normal vector
 
-/// @param[in,out]	vec			Vector to rotate
-/// @param[in]		normal		Normal perpendicular to the plane of rotation
-/// @param[in]		angle		Rotation angle, in radians
+/// \param[in,out]	vec			Vector to rotate
+/// \param[in]		normal		Normal perpendicular to the plane of rotation
+/// \param[in]		angle		Rotation angle, in radians
 template <class T>
 void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
 	rotate(vec, normal, cos(angle), sin(angle));
@@ -1406,8 +1406,8 @@ Vec<3,T> rotated(const Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
 
 /// Rotate a vector 90 degrees around a normal vector
 
-/// @param[in,out]	vec		Vector to rotate
-/// @param[in]		normal	Normal perpendicular to the plane of rotation
+/// \param[in,out]	vec		Vector to rotate
+/// \param[in]		normal	Normal perpendicular to the plane of rotation
 template <class T>
 void rotate90(Vec<3,T>& vec, const Vec<3,T>& normal){
 	// Simplified Rodrigues' rotation formula with c=0,s=1:
@@ -1431,9 +1431,9 @@ inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
 }
 
 /*! Compute centroid of points
-	@param[ in] p1	Point 1
-	@param[ in] p2	Point 2
-	@param[ in] p3	Point 3
+	\param[ in] p1	Point 1
+	\param[ in] p2	Point 2
+	\param[ in] p3	Point 3
 	\returns centroid of points
 */
 template <int N, class T>
@@ -1471,11 +1471,11 @@ Vec<N,T> closestPointOnLineSegment(const Vec<N,T>& a, const Vec<N,T>& b, const V
 
 /// Line-plane intersection test
 
-/// @param[out] d	scalar indicating intersection on line d*l + l0
-/// @param[in] l	direction of line d*l + l0
-/// @param[in] l0	point on line d*l + l0
-/// @param[in] n	normal of plane
-/// @param[in] p0	point on plane
+/// \param[out] d	scalar indicating intersection on line d*l + l0
+/// \param[in] l	direction of line d*l + l0
+/// \param[in] l0	point on line d*l + l0
+/// \param[in] n	normal of plane
+/// \param[in] p0	point on plane
 /// \returns 1 if single intersection, 0 if no intersection or 2 if line on plane
 template <int N, class T, class D>
 int linePlaneIntersection(

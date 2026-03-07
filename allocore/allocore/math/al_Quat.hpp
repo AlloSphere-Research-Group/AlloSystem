@@ -63,7 +63,7 @@ typedef Quat<double>	Quatd;	///< Double-precision quaternion
 
 /// Conversions to and from matrices assume a right-handed coordinate system.
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 template<typename T=double>
 class Quat {
 public:
@@ -83,14 +83,14 @@ public:
 	Quat(const T& w = T(1), const T& x = T(0), const T& y = T(0), const T& z = T(0))
 	:	w(w), x(x), y(y), z(z){}
 
-	/// @param[in] v		quaternion to set values from
+	/// \param[in] v		quaternion to set values from
 	template <class U>
 	Quat(const Quat<U>& v)
 	:	w(v.w), x(v.x), y(v.y), z(v.z){}
 
 	/// Construct 'pure imaginary' quaternion
 
-	/// @param[in] xyz		vector to set x,y,z components from; w is set to 0
+	/// \param[in] xyz		vector to set x,y,z components from; w is set to 0
 	///
 	template <class U>
 	Quat(const Vec<3,U>& xyz)
@@ -99,8 +99,8 @@ public:
 
 	/// Construct quaternion from real and imaginary parts
 
-	/// @param[in] w		real part (w)
-	/// @param[in] xyz		vector to set imaginary (x,y,z) components from
+	/// \param[in] w		real part (w)
+	/// \param[in] xyz		vector to set imaginary (x,y,z) components from
 	template <class U>
 	Quat(const T& w, const Vec<3,U>& xyz)
 	:	w(w), x(xyz[0]), y(xyz[1]), z(xyz[2]){}
@@ -116,12 +116,12 @@ public:
 	/// if the Y axis isn't suitable, the Z axis is used instead
 	///
 	/// a typical use case: rotate object A to face object B:
-	/// @code
+	/// \code
 	/// Vec3d src = Vec3d(A.quat().toVectorZ()).normalize();
 	/// Vec3d dst = Vec3d(B.pos() - A.pos()).normalize();
 	/// Quatd rot = Quatd::getRotationTo(src, dst);
 	/// A.quat() = rot * A.quat();
-	/// @endcode
+	/// \endcode
 	static Quat getRotationTo(const Vec<3,T>& usrc, const Vec<3,T>& udst);
 
 
@@ -129,11 +129,11 @@ public:
 	/// Intended for billboarding in omni
 	///
 	/// Typical use case for omni billboarding:
-	/// @code
+	/// \code
 	/// Vec3d forward = Vec3d(pose.pos() - src.pos()).normalize();
 	/// Quatd rot = Quatd::getBillboardRotation(forward, pose.uu());
 	/// g.rotate(rot);
-	/// @endcode
+	/// \endcode
 	// Code sourced from Unity forum post about this functionality:
 	// http://answers.unity3d.com/questions/467614/what-is-the-source-code-of-quaternionlookrotation.html
 	static Quat getBillboardRotation(const Vec<3,T>& forward, const Vec<3,T>& up);
@@ -149,9 +149,9 @@ public:
 
 	///	Spherical linear interpolation of a quaternion
 
-	/// @param[in] from		The quaternion to interpolate from
-	///	@param[in] to		The quaternion to interpolate to
-	///	@param[in] amt		The amount to interpolate, range [0, 1]
+	/// \param[in] from		The quaternion to interpolate from
+	///	\param[in] to		The quaternion to interpolate to
+	///	\param[in] amt		The amount to interpolate, range [0, 1]
 	///	\returns resulting interpolated quaternion
 	static Quat slerp(const Quat& from, const Quat& to, T amt);
 

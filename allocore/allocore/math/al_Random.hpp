@@ -49,7 +49,7 @@
 
 namespace al {
 
-/// @addtogroup allocore
+/// \addtogroup allocore
 /// @{
 
 /// Random number generation utilities
@@ -80,7 +80,7 @@ public:
 	/// Default constructor uses a randomly generated seed
 	Random(){}
 
-	/// @param[in] seed		Initial seed value
+	/// \param[in] seed		Initial seed value
 	Random(uint32_t seed): mRNG(seed){}
 
 
@@ -120,7 +120,7 @@ public:
 
 	/// To get a random point on a sphere, simply normalize the result.
 	/// \tparam		N		dimensions of ball
-	/// @param[in]	point	an array of size N
+	/// \param[in]	point	an array of size N
 	template <int N, class T>
 	void ball(T * point);
 
@@ -139,7 +139,7 @@ public:
 	/// Returns point within a unit n-cube
 
 	/// \tparam		N		dimensions of cube
-	/// @param[in]	point	an array of size N
+	/// \param[in]	point	an array of size N
 	template <int N, class T>
 	void cube(T * point);
 
@@ -300,7 +300,7 @@ public:
 
 	/// Get a weighted die with specified weights
 
-	/// @param[in] ws	List of weights for each side; must be positive 
+	/// \param[in] ws	List of weights for each side; must be positive
 	/// 				with at least one non-zero weight
 	template <class... Weights>
 	Die<sizeof...(Weights)> die(const Weights... ws){
@@ -352,7 +352,7 @@ public:
 		type(0);
 	}
 
-	/// @param[in] seed		Initial seed value
+	/// \param[in] seed		Initial seed value
 	LinCon(uint32_t seed)
 	:	mVal(seed)
 	{	type(0); }
@@ -397,7 +397,7 @@ public:
 		type(0);
 	}
 
-	/// @param[in] seed		Initial seed value
+	/// \param[in] seed		Initial seed value
 	MulCon(uint32_t seed)
 	:	mVal(seed)
 	{	type(0); }
@@ -447,7 +447,7 @@ public:
 	/// Default constructor uses a randomly generated seed
 	Xoshiro(): Xoshiro(al::rnd::seed()){}
 
-	/// @param[in] seed		Initial seed value
+	/// \param[in] seed		Initial seed value
 	Xoshiro(uint64_t seed){ this->seed(seed); }
 
 	/// Generate next uniform random integer in [0, 2^32)
@@ -498,7 +498,7 @@ public:
 	/// Default constructor uses a randomly generated seed
 	Tausworthe(){ seed(al::rnd::seed()); }
 
-	/// @param[in] seed		Initial seed value
+	/// \param[in] seed		Initial seed value
 	Tausworthe(uint32_t seed){ this->seed(seed); }
 
 	/// Generate next uniform random integer in [0, 2^32)
@@ -538,7 +538,7 @@ inline Random<>& global(){ static Random<> r; return r; }
 
 /// To get a random point on a sphere, simply normalize the result.
 /// \tparam		N		dimensions of ball
-/// @param[in]	point	an array of size N
+/// \param[in]	point	an array of size N
 template <int N, class T>
 inline void ball(T * point){ global().ball<N>(point); }
 
@@ -553,7 +553,7 @@ inline Vec ball(){ return global().ball<Vec>(); }
 /// Returns point within a unit n-cube
 
 /// \tparam		N		dimensions of cube
-/// @param[in]	point	an array of size N
+/// \param[in]	point	an array of size N
 template <int N, class T>
 inline void cube(T * point){ global().cube<N>(point); }
 
