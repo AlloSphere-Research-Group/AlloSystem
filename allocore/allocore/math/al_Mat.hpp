@@ -449,29 +449,41 @@ public:
 		return const_cast<Mat*>(this)->at<Row,Col>();
 	}
 
-	/// Return column i as vector
+	/// Get column as vector
 	const Vec<N,T>& col(int i) const { return Vec<N,T>::pun(elems() + i*N); }
 	Vec<N,T>& col(int i){ return Vec<N,T>::pun(elems() + i*N); }
 
-	template <unsigned Index>
-	Vec<N,T>& col(){
-		static_assert(Index < N, "Column index out of bounds");
-		constexpr auto j = Index*N;
-		return Vec<N,T>::pun(elems() + j);
+	template <int Index>
+	static constexpr int toSafeIndex(){
+		constexpr int i = Index>=0 ? Index : N+Index;
+		static_assert(0 <= i && i < N, "Index out of bounds");
+		return i;
 	}
 
-	template <unsigned Index>
+	/// Get column as vector
+
+	/// \tparam Index	Column index. If negative, uses N+Index.
+	///
+	template <int Index>
+	Vec<N,T>& col(){
+		constexpr auto j = toSafeIndex<Index>()*N;
+		return Vec<N,T>::pun(elems() + j);
+	}
+	template <int Index>
 	const Vec<N,T>& col() const {
 		return const_cast<Mat*>(this)->col<Index>();
 	}
 
-	/// Return row i as vector
+	/// Get row as vector
 	Vec<N,T> row(int i) const { return Vec<N,T>(elems()+i, N); }
 
-	template <unsigned Index>
+	/// Get row as vector
+
+	/// \tparam Index	Row index. If negative, uses N+Index.
+	///
+	template <int Index>
 	Vec<N,T> row() const {
-		static_assert(Index < N, "Row index out of bounds");
-		return row(Index);
+		return row(toSafeIndex<Index>());
 	}
 
 	/// Set row values
@@ -481,10 +493,13 @@ public:
 		return *this;
 	}
 
-	template <unsigned Index, class V>
+	/// Set row values
+
+	/// \tparam Index	Row index. If negative, uses N+Index.
+	/// \tparam V		Type of source values
+	template <int Index, class V>
 	Mat& row(const Vec<N,V>& v){
-		static_assert(Index < N, "Row index out of bounds");
-		return row(Index, v);
+		return row(toSafeIndex<Index>(), v);
 	}
 
 	/// Return diagonal

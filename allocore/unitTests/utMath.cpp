@@ -305,7 +305,11 @@ int utMath(){
 			assert(c.row(2) == Vec3d(7,8,9));
 
 			assert(c.col<0>() == c.col(0));
+			assert(c.col<1>() == c.col(1));
+			assert(c.col<-1>() == c.col(c.order()-1));
 			assert(c.row<0>() == c.row(0));
+			assert(c.row<1>() == c.row(1));
+			assert(c.row<-1>() == c.row(c.order()-1));
 
 			assert(c.diagonal() == Vec3d(1,5,9));
 
