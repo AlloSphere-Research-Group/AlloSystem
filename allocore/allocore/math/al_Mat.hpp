@@ -900,9 +900,10 @@ public:
 
 	/// Rotate (submatrix) on a global plane
 
-	/// This efficiently applies A' = R*A with only 2N complex muls
-	/// (or about 4N madds). The translation part is affected.
+	/// This efficiently applies A' = R*A with only 2M complex muls (~4M madds).
+	/// The translation part is affected unless applied to a submatrix.
 	///
+	/// \tparam M			size of submatrix
 	/// \param[in] r		rotation (or angle in radians)
 	/// \param[in] dim1		global axis to rotate away from
 	/// \param[in] dim2		global axis to rotate towards
