@@ -61,8 +61,7 @@ public:
 		LUMINANCE,		//!< Luminance (1-plane)
 		LUMALPHA,		//!< Luminance/alpha (2-plane)
 		RGB,			//!< RGB (3-plane)
-		RGBA,			//!< RGBA (4-plane)
-
+		RGBA			//!< RGBA (4-plane)
 	};
 
 	enum FileType {
