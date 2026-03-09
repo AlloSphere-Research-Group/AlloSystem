@@ -50,7 +50,7 @@ namespace al{
 
 /// Loads and saves images.
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 class Image {
 public:
 	/*!
@@ -84,7 +84,7 @@ public:
 
 	Image();
 
-	/// @param[in] filePath		Image file to load
+	/// \param[in] filePath		Image file to load
 	Image(const std::string& filePath);
 
 	~Image();
@@ -92,15 +92,15 @@ public:
 
 	/// Load image from disk
 
-	/// @param[in] filePath		File to load. Image type determined by file 
+	/// \param[in] filePath		File to load. Image type determined by file 
 	///							extension.
     /// \returns detected file type
 	FileType load(const std::string& filePath);
 
 	/// Load image from memory source
 
-	/// @param[in] src		Source array
-	/// @param[in] len		Number of bytes
+	/// \param[in] src		Source array
+	/// \param[in] len		Number of bytes
     /// \returns detected file type
 	FileType load(const unsigned char * src, int len);
 	FileType load(const ByteArray& src){ return load(&src[0], src.size()); }
@@ -108,7 +108,7 @@ public:
 
 	/// Save image to disk
 
-	/// @param[in] filePath		File to save. Image type determined by file 
+	/// \param[in] filePath		File to save. Image type determined by file 
 	///							extension.
     /// \returns true for success or print error message and return false
 	bool save(const std::string& filePath);
@@ -118,11 +118,11 @@ public:
 
 	/// Save pixel data to disk
 
-	/// @param[in] filePath		File to save. Image type determined by file 
+	/// \param[in] filePath		File to save. Image type determined by file 
 	///							extension.
-	/// @param[in] src			source array containing pixel data
-	/// @param[in] compressFlags level of compression in [0,100] and other flags
-	/// @param[in] paletteSize	number of colors in palette, in [2,256]
+	/// \param[in] src			source array containing pixel data
+	/// \param[in] compressFlags level of compression in [0,100] and other flags
+	/// \param[in] paletteSize	number of colors in palette, in [2,256]
 	static bool save(const std::string& filePath, const Array& src, int compressFlags=50, int paletteSize=-1);
 
 	/// Save pixel data to memory
@@ -130,14 +130,14 @@ public:
 
 	/// Save pixel data to disk
 
-	/// @param[in] filePath		File to save. Image type determined by file 
+	/// \param[in] filePath		File to save. Image type determined by file 
 	///							extension.
-	/// @param[in] pixels		pixel data
-	/// @param[in] nx			number of pixels along the x dimension
-	/// @param[in] ny			number of pixels along the y dimension
-	/// @param[in] nc			number of components
-	/// @param[in] compressFlags level of compression in [0,100] and other flags
-	/// @param[in] paletteSize	number of colors in palette, in [2,256]
+	/// \param[in] pixels		pixel data
+	/// \param[in] nx			number of pixels along the x dimension
+	/// \param[in] ny			number of pixels along the y dimension
+	/// \param[in] nc			number of components
+	/// \param[in] compressFlags level of compression in [0,100] and other flags
+	/// \param[in] paletteSize	number of colors in palette, in [2,256]
 	template <class T>
 	static bool save(const std::string& filePath, const T * pixels, int nx, int ny, int nc, int compressFlags=50, int paletteSize=-1);
 
@@ -198,7 +198,7 @@ public:
 
 	/// Set color palette size
 
-	/// @param[in] numColors	number of colors in palette, in [2,256]
+	/// \param[in] numColors	number of colors in palette, in [2,256]
 	///
 	Image& paletteSize(int numColors){ mPaletteSize=numColors; return *this; }
 
@@ -240,9 +240,10 @@ public:
 
 	/// Resize internal pixel buffer. Erases any existing data.
 
-	/// @param[in] dimX		number of pixels in x direction
-	/// @param[in] dimY		number of pixels in y direction
-	/// @param[in] format	pixel color format
+	/// \tparam T			component type
+	/// \param[in] dimX		number of pixels in x direction
+	/// \param[in] dimY		number of pixels in y direction
+	/// \param[in] format	pixel color format
 	/// \returns True on success; false otherwise.
 	template <typename T>
 	bool resize(int dimX, int dimY, Format format){
