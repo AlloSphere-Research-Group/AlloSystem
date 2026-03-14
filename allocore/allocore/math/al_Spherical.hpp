@@ -58,41 +58,31 @@ typedef SphereCoord<float> SphereCoordf;	///< float SphereCoord
 typedef SphereCoord<double> SphereCoordd;	///< double SphereCoord
 
 
+/// Convert spherical to Cartesian coordinate
 
-/// Convert spherical to Cartesian coordinates in-place
-
-/// \param[in,out] r2x		radius to x coordinate
-/// \param[in,out] t2y		theta (angle on xy plane), in [-pi, pi], to z coordinate
-/// \param[in,out] p2z		phi (angle from z axis), in [0, pi], to y coordinate
-template<class T> void sphericalToCart(T& r2x, T& t2y, T& p2z){
-	T rsinp = r * std::sin(p);
-	T rcosp = r * std::cos(p);
-	r = rsinp * std::cos(t);
-	t = rsinp * std::sin(t);
-	p = rcosp;
+/// \param[in] s	Spherical coordinate (radius, theta, phi) where
+/// 				theta is the angle on the xy plane in [-pi, pi] and
+/// 				phi is the angle from the z axis in [0, pi].
+/// \returns Cartesian coordinate (x,y,z)
+template<class T>
+Vec<3,T> sphereToCart(const Vec<3,T>& s){
+	T rcosp = std::cos(s.z) * s.x;
+	T rsinp = std::sin(s.z) * s.x;
+	T  cost = std::cos(s.y);
+	T  sint = std::sin(s.y);
+	return{ rsinp * cost, rsinp * sint, rcosp };
 }
 
-/// Convert spherical to Cartesian coordinates in-place
-template<class T> void sphericalToCart(T * vec3){
-	sphericalToCart(vec3[0], vec3[1], vec3[2]);
-}
+/// Convert Cartesian to spherical coordinate
 
-/// Convert Cartesian to spherical coordinates in-place
-
-/// \param[in,out] x2r		x coordinate to radius
-/// \param[in,out] y2t		y coordinate to theta (angle on xy plane), in [-pi, pi]
-/// \param[in,out] z2p		z coordinate to phi (angle from z axis), in [0, pi]
-template<class T> void cartToSpherical(T& x2r, T& y2t, T& z2p){
-	T r = std::sqrt(x*x + y*y + z*z);
-	T t = std::atan2(y, x);
-	z = std::acos(z/r);
-	y = t;
-	x = r;
-}
-
-/// Convert Cartesian to spherical coordinates in-place
-template<class T> void cartToSpherical(T * vec3){
-	cartToSpherical(vec3[0], vec3[1], vec3[2]);
+/// \param[in] p	Cartesian coordinate (x,y,z)
+/// \returns Spherical coordinate (radius, theta, phi) where
+/// 	theta is the angle on the xy plane in [-pi, pi] and
+/// 	phi is the angle from the z axis in [0, pi].
+template<class T>
+Vec<3,T> cartToSphere(const Vec<3,T>& p){
+	auto r = p.mag();
+	return { r, std::atan2(p.y, p.x), std::acos(p.z/r) };
 }
 
 /// Stereographic projection from an n-sphere to an n-1 dimensional hyperplane

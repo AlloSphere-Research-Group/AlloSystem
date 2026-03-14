@@ -9,6 +9,32 @@ int utMathSpherical(){
 	constexpr double pi = 3.1415926535897932;
 	constexpr double twoPi = 2.*pi;
 
+	auto eq = [](Vec3f a, Vec3f b, float eps=0.000001){
+		return ::eq(&a[0], &b[0], a.size(), eps);
+	};
+
+	{
+		assert(eq(sphereToCart(Vec3f( 1,0,0)), Vec3f(0,0, 1)));
+		assert(eq(sphereToCart(Vec3f( 2,0,0)), Vec3f(0,0, 2)));
+		assert(eq(sphereToCart(Vec3f(-2,0,0)), Vec3f(0,0,-2)));
+		assert(eq(sphereToCart(Vec3f(1,0,pi)), Vec3f(0,0,-1)));
+		assert(eq(sphereToCart(Vec3f(1,0,pi/2)), Vec3f(1,0,0)));
+		assert(eq(sphereToCart(Vec3f(1,0,-pi/2)), Vec3f(-1,0,0)));
+		assert(eq(sphereToCart(Vec3f(1,pi/2,pi/2)), Vec3f(0,1,0)));
+		assert(eq(sphereToCart(Vec3f(1,pi/2,-pi/2)), Vec3f(0,-1,0)));
+
+		int N = 32;
+		for(int j=0; j<N; ++j){
+		for(int i=0; i<N; ++i){
+			// Try to avoid points on xyz axes as they have ambiguous angles
+			Vec3f a(1, (float(i+1)/(N+1) - 0.5f) * twoPi, float(j+1)/(N+1) * pi);
+			auto p = sphereToCart(a);
+			auto b = cartToSphere(p);
+			//a.print(); p.print(); b.println();
+			assert(eq(a, b));
+		}}
+	}
+
 	{
 		auto spharmGround = [](int l, int m, Complexd th, Complexd ph) -> Complexd{
 			switch(l){
