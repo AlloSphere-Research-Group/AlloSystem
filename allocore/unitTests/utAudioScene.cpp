@@ -21,20 +21,20 @@ void testBasicStereo() {
 	Pose listeningPose(Vec3d(0, 0, 4)); // Default Pose facing forward
 	panner.renderSample(io, listeningPose, 0.5, 0);
 
-	assert(almostEqual(AIO_OUT(0, 0), 0.5 * sin(M_PI/4.0)));
-	assert(almostEqual(AIO_OUT(0, 1), 0.5 * sin(M_PI/4.0)));
+	assert(eq(AIO_OUT(0, 0), 0.5 * sin(M_PI/4.0)));
+	assert(eq(AIO_OUT(0, 1), 0.5 * sin(M_PI/4.0)));
 
 	listeningPose = Pose(Vec3d(1, 0, 0)); // Full pan right
 	panner.renderSample(io, listeningPose, 0.5, 1);
 
-	assert(almostEqual(AIO_OUT(1, 0), 0.0));
-	assert(almostEqual(AIO_OUT(1, 1), 0.5));
+	assert(eq(AIO_OUT(1, 0), 0.0));
+	assert(eq(AIO_OUT(1, 1), 0.5));
 
 	listeningPose = Pose(Vec3d(-1, 0, 0)); // Full pan left
 	panner.renderSample(io, listeningPose, 0.5, 2);
 
-	assert(almostEqual(AIO_OUT(2, 0), 0.5));
-	assert(almostEqual(AIO_OUT(2, 1), 0.0));
+	assert(eq(AIO_OUT(2, 0), 0.5));
+	assert(eq(AIO_OUT(2, 1), 0.0));
 
 	// Test buffer rendering
 	io.bufferOut().zero();
@@ -43,8 +43,8 @@ void testBasicStereo() {
 	panner.renderBuffer(io, listeningPose, input, 8);
 
 	for (int i = 0; i < 8; i++) {
-		assert(almostEqual(AIO_OUT(i, 0), input[i] * sin(M_PI/4.0)));
-		assert(almostEqual(AIO_OUT(i, 1), input[i] * sin(M_PI/4.0)));
+		assert(eq(AIO_OUT(i, 0), input[i] * sin(M_PI/4.0)));
+		assert(eq(AIO_OUT(i, 1), input[i] * sin(M_PI/4.0)));
 	}
 
 	io.bufferOut().zero();
@@ -52,8 +52,8 @@ void testBasicStereo() {
 	panner.renderBuffer(io, listeningPose, input, 8);
 
 	for (int i = 0; i < 8; i++) {
-		assert(almostEqual(AIO_OUT(i, 0), 0.0));
-		assert(almostEqual(AIO_OUT(i, 1), input[i]));
+		assert(eq(AIO_OUT(i, 0), 0.0));
+		assert(eq(AIO_OUT(i, 1), input[i]));
 	}
 
 }
@@ -80,8 +80,8 @@ void testStereoAudioScene(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, 0.0));
-		assert(almostEqual(right, 0.5));
+		assert(eq(left, 0.0));
+		assert(eq(right, 0.5));
 	}
 
 	 // Render another buffer without changing position
@@ -94,8 +94,8 @@ void testStereoAudioScene(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, 0.0));
-		assert(almostEqual(right, 0.6));
+		assert(eq(left, 0.0));
+		assert(eq(right, 0.6));
 	}
 
 	//
@@ -111,8 +111,8 @@ void testStereoAudioScene(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, sin(M_PI/4)));
-		assert(almostEqual(right, sin(M_PI/4)));
+		assert(eq(left, sin(M_PI/4)));
+		assert(eq(right, sin(M_PI/4)));
 	}
 
 	for (int i = 0; i < bufferSize; i++) {
@@ -126,8 +126,8 @@ void testStereoAudioScene(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, 0.75));
-		assert(almostEqual(right, 0.0));
+		assert(eq(left, 0.75));
+		assert(eq(right, 0.0));
 	}
 
 	delete panner;
@@ -172,8 +172,8 @@ void testMultipleSourcesStereo(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, 0.05));
-		assert(almostEqual(right, 0.5));
+		assert(eq(left, 0.05));
+		assert(eq(right, 0.5));
 	}
 }
 
@@ -211,8 +211,8 @@ void testMultipleSourcesMovingStereo() {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, 0.35));
-		assert(almostEqual(right, 0.492));
+		assert(eq(left, 0.35));
+		assert(eq(right, 0.492));
 	}
 
 	src1.pos(-1, 0, 0);
@@ -223,8 +223,8 @@ void testMultipleSourcesMovingStereo() {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, 0.492));
-		assert(almostEqual(right, 0.35));
+		assert(eq(left, 0.492));
+		assert(eq(right, 0.35));
 	}
 }
 
@@ -277,30 +277,30 @@ void testVbapGains() {
 	Pose listeningPose(Vec3d(0, 0, 4)); // Default Pose facing forward
 	panner.renderSample(io, listeningPose, 0.5, 0);
 
-	assert(almostEqual(AIO_OUT(0, 0), 0.5));
-	assert(almostEqual(AIO_OUT(1, 0), 0.0));
-	assert(almostEqual(AIO_OUT(2, 0), 0.0));
+	assert(eq(AIO_OUT(0, 0), 0.5));
+	assert(eq(AIO_OUT(1, 0), 0.0));
+	assert(eq(AIO_OUT(2, 0), 0.0));
 
 	listeningPose = Pose(Vec3d(0, 0, -4)); // Default Pose facing back
 	panner.renderSample(io, listeningPose, 0.5, 1);
 
-	assert(almostEqual(AIO_OUT(0, 1), 0));
-	assert(almostEqual(AIO_OUT(1, 1), 0.5 * cos(M_PI/4.0)));
-	assert(almostEqual(AIO_OUT(2, 1), 0.5 * cos(M_PI/4.0)));
+	assert(eq(AIO_OUT(0, 1), 0));
+	assert(eq(AIO_OUT(1, 1), 0.5 * cos(M_PI/4.0)));
+	assert(eq(AIO_OUT(2, 1), 0.5 * cos(M_PI/4.0)));
 
 	listeningPose = Pose(Vec3d(0, 0, -4)); // Back
 	panner.renderSample(io, listeningPose, 0.25, 2);
 
-	assert(almostEqual(AIO_OUT(0, 2), 0));
-	assert(almostEqual(AIO_OUT(1, 2), 0.25 * cos(M_PI/4.0)));
-	assert(almostEqual(AIO_OUT(2, 2), 0.25 * cos(M_PI/4.0)));
+	assert(eq(AIO_OUT(0, 2), 0));
+	assert(eq(AIO_OUT(1, 2), 0.25 * cos(M_PI/4.0)));
+	assert(eq(AIO_OUT(2, 2), 0.25 * cos(M_PI/4.0)));
 
 	listeningPose = Pose(Vec3d(3.4641016151377535, 0, 2)); // Right
 	panner.renderSample(io, listeningPose, 0.25, 3);
 
-	assert(almostEqual(AIO_OUT(0, 3), 0.25 * cos(M_PI/4.0)));
-	assert(almostEqual(AIO_OUT(1, 3), 0));
-	assert(almostEqual(AIO_OUT(2, 3), 0.25 * cos(M_PI/4.0)));
+	assert(eq(AIO_OUT(0, 3), 0.25 * cos(M_PI/4.0)));
+	assert(eq(AIO_OUT(1, 3), 0));
+	assert(eq(AIO_OUT(2, 3), 0.25 * cos(M_PI/4.0)));
 
 	// 3D Octahedron
 
@@ -317,22 +317,22 @@ void testVbapGains() {
 
 	listeningPose = Pose(Vec3d(0, 0, 4)); // Default Pose facing forward
 	panner3D.renderSample(io, listeningPose, 0.2, 0);
-	assert(almostEqual(AIO_OUT(0, 0), 0.2));
-	assert(almostEqual(AIO_OUT(1, 0), 0.0));
-	assert(almostEqual(AIO_OUT(2, 0), 0.0));
-	assert(almostEqual(AIO_OUT(3, 0), 0.0));
-	assert(almostEqual(AIO_OUT(4, 0), 0.0));
-	assert(almostEqual(AIO_OUT(5, 0), 0.0));
+	assert(eq(AIO_OUT(0, 0), 0.2));
+	assert(eq(AIO_OUT(1, 0), 0.0));
+	assert(eq(AIO_OUT(2, 0), 0.0));
+	assert(eq(AIO_OUT(3, 0), 0.0));
+	assert(eq(AIO_OUT(4, 0), 0.0));
+	assert(eq(AIO_OUT(5, 0), 0.0));
 
 	listeningPose = Pose(Vec3d(1, 1, 1)); // Elevated Right
 	panner3D.renderSample(io, listeningPose, 0.25, 4);
 
-	assert(almostEqual(AIO_OUT(0, 4), 0.25 * sqrt(1.0/3.0)));
-	assert(almostEqual(AIO_OUT(1, 4), 0));
-	assert(almostEqual(AIO_OUT(2, 4), 0.25 * sqrt(1.0/3.0)));
-	assert(almostEqual(AIO_OUT(3, 4), 0.0));
-	assert(almostEqual(AIO_OUT(4, 4), 0.25 * sqrt(1.0/3.0)));
-	assert(almostEqual(AIO_OUT(5, 4), 0.0));
+	assert(eq(AIO_OUT(0, 4), 0.25 * sqrt(1.0/3.0)));
+	assert(eq(AIO_OUT(1, 4), 0));
+	assert(eq(AIO_OUT(2, 4), 0.25 * sqrt(1.0/3.0)));
+	assert(eq(AIO_OUT(3, 4), 0.0));
+	assert(eq(AIO_OUT(4, 4), 0.25 * sqrt(1.0/3.0)));
+	assert(eq(AIO_OUT(5, 4), 0.0));
 
 	float input[8] = {0.5f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, -0.3f, -0.4f};
 	io.bufferOut().zero();
@@ -340,12 +340,12 @@ void testVbapGains() {
 	panner3D.renderBuffer(io, listeningPose, input, 8);
 
 	for (int i = 0; i < 8; i++) {
-		assert(almostEqual(AIO_OUT(0, i), input[i] * sqrt(1.0/3.0)));
-		assert(almostEqual(AIO_OUT(1, i), 0));
-		assert(almostEqual(AIO_OUT(2, i), input[i]  * sqrt(1.0/3.0)));
-		assert(almostEqual(AIO_OUT(3, i), 0.0));
-		assert(almostEqual(AIO_OUT(4, i), input[i]  * sqrt(1.0/3.0)));
-		assert(almostEqual(AIO_OUT(5, i), 0.0));
+		assert(eq(AIO_OUT(0, i), input[i] * sqrt(1.0/3.0)));
+		assert(eq(AIO_OUT(1, i), 0));
+		assert(eq(AIO_OUT(2, i), input[i]  * sqrt(1.0/3.0)));
+		assert(eq(AIO_OUT(3, i), 0.0));
+		assert(eq(AIO_OUT(4, i), input[i]  * sqrt(1.0/3.0)));
+		assert(eq(AIO_OUT(5, i), 0.0));
 	}
 }
 
@@ -360,50 +360,50 @@ void testVbapRing() {
 	Pose listeningPose(Vec3d(0, 0, 4)); // Default Pose facing forward
 	panner.renderSample(io, listeningPose, 0.5, 0);
 
-	assert(almostEqual(AIO_OUT(0, 0), 0.5));
-	assert(almostEqual(AIO_OUT(1, 0), 0.0));
-	assert(almostEqual(AIO_OUT(2, 0), 0.0));
-	assert(almostEqual(AIO_OUT(3, 0), 0.0));
-	assert(almostEqual(AIO_OUT(4, 0), 0.0));
-	assert(almostEqual(AIO_OUT(5, 0), 0.0));
-	assert(almostEqual(AIO_OUT(6, 0), 0.0));
-	assert(almostEqual(AIO_OUT(7, 0), 0.0));
+	assert(eq(AIO_OUT(0, 0), 0.5));
+	assert(eq(AIO_OUT(1, 0), 0.0));
+	assert(eq(AIO_OUT(2, 0), 0.0));
+	assert(eq(AIO_OUT(3, 0), 0.0));
+	assert(eq(AIO_OUT(4, 0), 0.0));
+	assert(eq(AIO_OUT(5, 0), 0.0));
+	assert(eq(AIO_OUT(6, 0), 0.0));
+	assert(eq(AIO_OUT(7, 0), 0.0));
 
 	listeningPose = Pose(Vec3d(1, 0, 0)); // Full pan right
 	panner.renderSample(io, listeningPose, 0.5, 1);
 
-	assert(almostEqual(AIO_OUT(0, 1), 0.0));
-	assert(almostEqual(AIO_OUT(1, 1), 0.0));
-	assert(almostEqual(AIO_OUT(2, 1), 0.5));
-	assert(almostEqual(AIO_OUT(3, 1), 0.0));
-	assert(almostEqual(AIO_OUT(4, 1), 0.0));
-	assert(almostEqual(AIO_OUT(5, 1), 0.0));
-	assert(almostEqual(AIO_OUT(6, 1), 0.0));
-	assert(almostEqual(AIO_OUT(7, 1), 0.0));
+	assert(eq(AIO_OUT(0, 1), 0.0));
+	assert(eq(AIO_OUT(1, 1), 0.0));
+	assert(eq(AIO_OUT(2, 1), 0.5));
+	assert(eq(AIO_OUT(3, 1), 0.0));
+	assert(eq(AIO_OUT(4, 1), 0.0));
+	assert(eq(AIO_OUT(5, 1), 0.0));
+	assert(eq(AIO_OUT(6, 1), 0.0));
+	assert(eq(AIO_OUT(7, 1), 0.0));
 
 	listeningPose = Pose(Vec3d(-2, 0, 0)); // Full pan left
 	panner.renderSample(io, listeningPose, 0.5, 2);
 
-	assert(almostEqual(AIO_OUT(1, 2), 0.0));
-	assert(almostEqual(AIO_OUT(0, 2), 0.0));
-	assert(almostEqual(AIO_OUT(2, 2), 0.0));
-	assert(almostEqual(AIO_OUT(3, 2), 0.0));
-	assert(almostEqual(AIO_OUT(4, 2), 0.0));
-	assert(almostEqual(AIO_OUT(5, 2), 0.0));
-	assert(almostEqual(AIO_OUT(6, 2), 0.5));
-	assert(almostEqual(AIO_OUT(7, 2), 0.0));
+	assert(eq(AIO_OUT(1, 2), 0.0));
+	assert(eq(AIO_OUT(0, 2), 0.0));
+	assert(eq(AIO_OUT(2, 2), 0.0));
+	assert(eq(AIO_OUT(3, 2), 0.0));
+	assert(eq(AIO_OUT(4, 2), 0.0));
+	assert(eq(AIO_OUT(5, 2), 0.0));
+	assert(eq(AIO_OUT(6, 2), 0.5));
+	assert(eq(AIO_OUT(7, 2), 0.0));
 
 	listeningPose = Pose(Vec3d(0.3826834323650899, 0.0, -0.9238795325112867) ); // SSE
 	panner.renderSample(io, listeningPose, 0.5, 3);
 
-	assert(almostEqual(AIO_OUT(0, 3), 0.0));
-	assert(almostEqual(AIO_OUT(1, 3), 0.0));
-	assert(almostEqual(AIO_OUT(2, 3), 0.0));
-	assert(almostEqual(AIO_OUT(3, 3), 0.5 * cos(M_PI/4.0)));
-	assert(almostEqual(AIO_OUT(4, 3), 0.5 * cos(M_PI/4.0)));
-	assert(almostEqual(AIO_OUT(5, 3), 0.0));
-	assert(almostEqual(AIO_OUT(6, 3), 0.0));
-	assert(almostEqual(AIO_OUT(7, 3), 0.0));
+	assert(eq(AIO_OUT(0, 3), 0.0));
+	assert(eq(AIO_OUT(1, 3), 0.0));
+	assert(eq(AIO_OUT(2, 3), 0.0));
+	assert(eq(AIO_OUT(3, 3), 0.5 * cos(M_PI/4.0)));
+	assert(eq(AIO_OUT(4, 3), 0.5 * cos(M_PI/4.0)));
+	assert(eq(AIO_OUT(5, 3), 0.0));
+	assert(eq(AIO_OUT(6, 3), 0.0));
+	assert(eq(AIO_OUT(7, 3), 0.0));
 
 	// Test buffer rendering
 	io.bufferOut().zero();
@@ -412,14 +412,14 @@ void testVbapRing() {
 	panner.renderBuffer(io, listeningPose, input, 8);
 
 	for (int i = 0; i < 8; i++) {
-		assert(almostEqual(AIO_OUT(0, i), 0.0));
-		assert(almostEqual(AIO_OUT(1, i), 0.0));
-		assert(almostEqual(AIO_OUT(2, i), 0.0));
-		assert(almostEqual(AIO_OUT(3, i), 0.0));
-		assert(almostEqual(AIO_OUT(4, i), 0.0));
-		assert(almostEqual(AIO_OUT(5, i), input[i] * sin(M_PI/4.0)));
-		assert(almostEqual(AIO_OUT(6, i), input[i] * sin(M_PI/4.0)));
-		assert(almostEqual(AIO_OUT(7, i), 0.0));
+		assert(eq(AIO_OUT(0, i), 0.0));
+		assert(eq(AIO_OUT(1, i), 0.0));
+		assert(eq(AIO_OUT(2, i), 0.0));
+		assert(eq(AIO_OUT(3, i), 0.0));
+		assert(eq(AIO_OUT(4, i), 0.0));
+		assert(eq(AIO_OUT(5, i), input[i] * sin(M_PI/4.0)));
+		assert(eq(AIO_OUT(6, i), input[i] * sin(M_PI/4.0)));
+		assert(eq(AIO_OUT(7, i), 0.0));
 	}
 }
 
@@ -465,8 +465,8 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, right));
-		assert(almostEqual(right, sin(M_PI/4)));
+		assert(eq(left, right));
+		assert(eq(right, sin(M_PI/4)));
 	}
 
 	for (int i = 0; i < bufferSize; i++) {
@@ -480,8 +480,8 @@ void testAmbisonicsFirstOrder2D(int bufferSize) {
 	for (int i = 0; i < bufferSize; i++) {
 		float left = AIO_OUT(0, i);
 		float right = AIO_OUT(1, i);
-		assert(almostEqual(left, 0.75));
-		assert(almostEqual(right, 0.0));
+		assert(eq(left, 0.75));
+		assert(eq(right, 0.0));
 	}
 
 	delete panner;

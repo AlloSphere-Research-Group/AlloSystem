@@ -1,9 +1,6 @@
 #include "utAllocore.h"
 #include "allocore/system/al_Time.hpp"
 
-template <class T>
-bool aboutEqual(T v, T to, T r){ return v<(to+r) && v>(to-r); }
-
 int utSystem(){
 	using namespace al;
 
@@ -20,14 +17,14 @@ int utSystem(){
 			auto t = al_steady_time_nsec();
 			al_sleep_nsec(sleepns);
 			auto dt = al_steady_time_nsec() - t;
-			assert(aboutEqual(dt, sleepns, slop));
+			assert(eq(dt, sleepns, slop));
 		}
 
 		{
 			auto t = al_steady_time_nsec();
 			al_sleep(al_time_ns2s * sleepns);
 			auto dt = al_steady_time_nsec() - t;
-			assert(aboutEqual(dt, sleepns, slop));
+			assert(eq(dt, sleepns, slop));
 		}
 
 		{
@@ -37,7 +34,7 @@ int utSystem(){
 			auto t = al_system_time();
 			al_sleep_until(t + sleeps);
 			auto dt = al_system_time() - t;
-			assert(aboutEqual(dt, sleeps, 15./1000.));
+			assert(eq(dt, sleeps, 15./1000.));
 		}
 
 		{
@@ -46,7 +43,7 @@ int utSystem(){
 			al_sleep_nsec(sleepns);
 			tm.stop();
 			auto dt = tm.elapsed();
-			assert(aboutEqual(dt, sleepns, slop));
+			assert(eq(dt, sleepns, slop));
 			assert(al_time_ns2s * tm.elapsed() == tm.elapsedSec());
 		}
 	}
