@@ -85,15 +85,19 @@ Vec<3,T> cartToSphere(const Vec<3,T>& p){
 	return { r, std::atan2(p.y, p.x), std::acos(p.z/r) };
 }
 
-/// Stereographic projection from an n-sphere to an n-1 dimensional hyperplane
+/// Stereographic projection
 
 /// \tparam N		dimensions of sphere
 /// \tparam T		element type
 /// \param[in] v	unit n-vector describing point on n-sphere
 /// \returns		vector describing projected coordinate on n-1 hyperplane
+///
+/// The function projects a point on a unit n-sphere to an n-1 dimensional 
+/// hyperplane. The n-sphere is assumed to be centered at the origin.
+/// This function will produce infinity for the point at the north pole.
 template <int N, class T>
 Vec<N-1,T> sterProj(const Vec<N,T>& v){
-	return sub<N-1>(v) * (T(1)/v[N-1]);
+	return sub<N-1>(v) * (T(1)/(T(1) - v.back()));
 }
 
 
