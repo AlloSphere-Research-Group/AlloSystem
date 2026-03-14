@@ -89,17 +89,31 @@ Vec<3,T> cartToSphere(const Vec<3,T>& p){
 
 /// \tparam N		dimensions of sphere
 /// \tparam T		element type
-/// \param[in] v	unit n-vector describing point on n-sphere
-/// \returns		vector describing projected coordinate on n-1 hyperplane
+/// \param[in] v	unit vector on n-sphere
+/// \returns		projected coordinate on n-1 hyperplane
 ///
-/// The function projects a point on a unit n-sphere to an n-1 dimensional 
-/// hyperplane. The n-sphere is assumed to be centered at the origin.
-/// This function will produce infinity for the point at the north pole.
+/// This function projects a point on a unit n-sphere centered at the origin to
+/// an (n-1)-dimensional hyperplane. This function will produce infinity for the 
+/// point at the north pole.
 template <int N, class T>
 Vec<N-1,T> sterProj(const Vec<N,T>& v){
 	return sub<N-1>(v) * (T(1)/(T(1) - v.back()));
 }
 
+/// Inverse stereographic projection
+
+/// \tparam N		dimensions of hyperplane
+/// \tparam T		element type
+/// \param[in] v	point on hyperplane
+/// \returns		unit vector on (n+1)-sphere
+///
+/// This function projects a point on a n-dimensional hyperplane to a unit 
+/// (n+1)-sphere centered at the origin.
+template <int N, class T>
+Vec<N+1,T> sterProjInv(const Vec<N,T>& v){
+	auto den = v.magSqr() + T(1);
+	return (v*(T(2)/den)).concat((den-T(2))/den);
+}
 
 
 /// Spherical coordinate in terms of two complex numbers
