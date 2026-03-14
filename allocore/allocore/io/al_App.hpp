@@ -401,8 +401,13 @@ public:
 
 
 	// Utility functions
+
 	/// Get value of trigonometric pi constant
-	static constexpr double pi(){ return 3.14159265358979; }
+	template <int Num=1, int Den=1>
+	static constexpr double pi(){
+		static_assert(Den != 0, "Division by zero");
+		return (3.14159265358979323846 * Num)/Den;
+	}
 
 	/// Convert degrees to radians
 	static constexpr double deg2rad(double v){
