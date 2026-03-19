@@ -157,11 +157,8 @@ struct Color{
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
 
-	value_type * begin(){ return components; }
-	const value_type * begin() const { return components; }
-	value_type * end(){ return components + size(); }
-	const value_type * end() const { return components + size(); }
 
+	/// Get reference to RGB components
 	RGB& rgb(){ return *(RGB*)(components); }
 	const RGB& rgb() const { return *(const RGB*)(components); }
 
@@ -261,6 +258,11 @@ struct Color{
 	Color mix(const Color& c, float amt=0.5f) const {
 		return (c-*this)*amt + *this;
 	}
+
+	value_type * begin(){ return components; }
+	const value_type * begin() const { return components; }
+	value_type * end(){ return components + size(); }
+	const value_type * end() const { return components + size(); }
 
 private:
 	float tof(uint8_t v){ return float(v)*(1.f/255.f); }
@@ -367,14 +369,21 @@ struct Colori {
 	}
 
 	template <class T>
-	const T& as() const {
-		return const_cast<Colori*>(this)->as<T>();
-	}
+	const T& as() const { return const_cast<Colori*>(this)->as<T>(); }
 
-	value_type * begin(){ return components; }
-	const value_type * begin() const { return components; }
-	value_type * end(){ return components + size(); }
-	const value_type * end() const { return components + size(); }
+	/// Set RGB components
+	Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
+		r=re; g=gr; b=bl; return *this; }
+
+	/// Set RGBA components
+	Colori& set(uint8_t re, uint8_t gr, uint8_t bl, uint8_t al){
+		a=al; return set(re,gr,bl); }
+
+	/// Set from gray value
+	Colori& set(uint8_t v){ return set(v,v,v); }
+
+	/// Set from gray value and alpha
+	Colori& set(uint8_t v, uint8_t al){ return set(v,v,v,al); }
 
 	/// Set from floating-point color
 	Colori& operator= (const Color& v){
@@ -407,19 +416,19 @@ struct Colori {
 	/// Return true if components are not equal, false otherwise
 	bool operator !=(const Colori& v) const { return !(*this == v); }
 
-	/// Set RGB components
-	Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
-		r=re; g=gr; b=bl; return *this; }
+	/// Multiply components by value
 
-	/// Set RGBA components
-	Colori& set(uint8_t re, uint8_t gr, uint8_t bl, uint8_t al){
-		a=al; return set(re,gr,bl); }
+	/// \param[in] v	 Multiplier in [0,255] corresponding to [0,1]
+	///
+	Colori& operator*= (uint32_t v){
+		++v;
+		rgba =	(((((rgba >> 8) & 0x00ff00ff) * v) & 0xff00ff00) + 
+				((((rgba & 0x00ff00ff) * v) >> 8 ) & 0x00ff00ff));
+		return *this;
+	}
 
-	/// Set from gray value
-	Colori& set(uint8_t v){ return set(v,v,v); }
+	Colori operator* (uint8_t v) const { return Colori(*this)*=v; }
 
-	/// Set from gray value and alpha
-	Colori& set(uint8_t v, uint8_t al){ return set(v,v,v,al); }
 
 	template <unsigned HexValue>
 	constexpr Colori& fromHexRGB(){
@@ -490,6 +499,11 @@ struct Colori {
 	/// Map RGB components through function into new color
 	template <class Trgb, class Func, class... Args>
 	Colori mapRGB(Func f, Args... args) const { return mapN<3,Trgb>(f, args...); }
+
+	value_type * begin(){ return components; }
+	const value_type * begin() const { return components; }
+	value_type * end(){ return components + size(); }
+	const value_type * end() const { return components + size(); }
 
 private:
 	static uint8_t toi(float v);
@@ -664,10 +678,16 @@ struct RGB{
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
 
-	value_type * begin(){ return components; }
-	const value_type * begin() const { return components; }
-	value_type * end(){ return components + size(); }
-	const value_type * end() const { return components + size(); }
+
+	/// Get reference to self as another type
+	template <class T>
+	T& as(){
+		static_assert(sizeof(T) <= sizeof(*this), "Attempt to pun to object of larger size");
+		return *(T *)(this);
+	}
+
+	template <class T>
+	const T& as() const { return const_cast<RGB*>(this)->as<T>(); }
 
 
 	/// Set from RGB components
@@ -679,20 +699,6 @@ struct RGB{
 	/// Set from an array of RGB components
 	template <class T>
 	RGB& set(const T* rgb){ return set(rgb[0],rgb[1],rgb[2]); }
-
-	template <class V>
-	V& as(){
-		static_assert(sizeof(V)==sizeof(components), "Size mismatch");
-		return *(V*)(components);
-	}
-
-
-	template <unsigned HexValue>
-	constexpr RGB& fromHex(){
-		auto ci = Colori().fromHexRGB<HexValue>();
-		r = ci.r/255.; g = ci.g/255.; b = ci.b/255.;
-		return *this;
-	}
 
 	/// Set components from tightly packed RGB array
 	template <class Array3>
@@ -751,6 +757,12 @@ struct RGB{
 	RGB operator* (float v) const { return RGB(*this)*=v; }
 	RGB operator/ (float v) const { return RGB(*this)/=v; }
 
+	template <unsigned HexValue>
+	constexpr RGB& fromHex(){
+		auto ci = Colori().fromHexRGB<HexValue>();
+		r = ci.r/255.; g = ci.g/255.; b = ci.b/255.;
+		return *this;
+	}
 
 	/// Clamp all components into [0,max] range
 	RGB& clamp(float max=1.f){
@@ -807,6 +819,11 @@ struct RGB{
 
 	/// Get color with specified saturation
 	RGB tint(float v) const { return RGB(*this).saturation(v); }
+
+	value_type * begin(){ return components; }
+	const value_type * begin() const { return components; }
+	value_type * end(){ return components + size(); }
+	const value_type * end() const { return components + size(); }
 };
 
 
