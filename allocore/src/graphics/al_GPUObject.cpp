@@ -5,51 +5,43 @@
 
 using namespace al;
 
-typedef std::set<al::GPUObject *>		ResourceSet;	// resource list
-typedef std::map<int, ResourceSet>		ContextMap;		// context ID to resource list
-typedef std::map<al::GPUObject *, int>	ResourceMap;	//
+typedef std::set<al::GPUObject *>		ResourceSet;	// set of resources
+typedef std::map<int, ResourceSet>		ContextMap;		// context ID to resource set
+typedef std::map<al::GPUObject *, int>	ResourceMap;	// resource to context ID
 typedef std::map<int, al::GPUContext *>	Contexts;		// context ID to context object
 
-ContextMap& getContextMap() {
-	static ContextMap * instance = new ContextMap;
-	return *instance;
-}
+template<class T>
+T& singleton(){ static T t; return t; }
 
-ResourceMap& getResourceMap() {
-	static ResourceMap * instance = new ResourceMap;
-	return *instance;
-}
+ContextMap& getContextMap(){ return singleton<ContextMap>(); }
+ResourceMap& getResourceMap(){ return singleton<ResourceMap>(); }
+Contexts& getContexts(){ return singleton<Contexts>(); }
 
-Contexts& getContexts(){
-	static Contexts * r = new Contexts;
-	return *r;
-}
-
-int getNextContextID() {
-	static int g_next_context_id = GPUContext::defaultContextID();
-	int result = g_next_context_id;
-	++g_next_context_id;
+int getNextContextID(){
+	static int nextID = GPUContext::defaultContextID();
+	int result = nextID++;
 	//printf("GPUContext: created new context id %d\n", result);
 	return result;
 }
 
 
-GPUContext :: GPUContext() {
-	mContextID = getNextContextID();
-	getContexts()[contextID()] = this;
+GPUContext::GPUContext()
+:	mContextID(getNextContextID())
+{
+	getContexts()[mContextID] = this;
 }
 
-GPUContext :: ~GPUContext(){
+GPUContext::~GPUContext(){
 	// call destroy on all registered GPUObjects
 	contextDestroy();
 
 	// remove self from global list of contexts
-	Contexts& C = getContexts();
-	Contexts::iterator it = C.find(contextID());
+	auto& C = getContexts();
+	auto it = C.find(mContextID);
 	if(it != C.end()) C.erase(it);
 }
 
-int GPUContext::defaultContextID(){
+/*static*/ int GPUContext::defaultContextID(){
 	// Note: we reserve 0 for an invalid context
 	return 1;
 }
@@ -80,7 +72,7 @@ void GPUContext::makeDefaultContext(){
 
 	if(myID != dfID){
 		Contexts& C = getContexts();
-		Contexts::iterator it = C.find(dfID);
+		auto it = C.find(dfID);
 
 		// If someone else is already default, then swap IDs with them
 		if(it != C.end()){
@@ -117,42 +109,37 @@ void GPUContext::makeDefaultContext(){
 	}
 }
 
-void GPUContext :: contextCreate() {
+template <class Func>
+void forEachResourceInContext(int contextID, Func f){
 	ContextMap& contexts = getContextMap();
-	ContextMap::iterator cit = contexts.find(mContextID);
+	ContextMap::iterator cit = contexts.find(contextID);
 	if(cit != contexts.end()) {
-		ResourceSet &ctx_set = cit->second;
-		ResourceSet::iterator it = ctx_set.begin();
-		ResourceSet::iterator end = ctx_set.end();
-		for(; it != end; ++it) {
-			(*it)->create();
-		}
+		ResourceSet& resources = cit->second;
+		for(auto * r : resources) f(*r);
 	}
 }
 
-void GPUContext :: contextDestroy() { //printf("GPUContext::contextDestroy %d\n", mContextID);
-	ContextMap& contexts = getContextMap();
-	ContextMap::iterator cit = contexts.find(mContextID);
-	if(cit != contexts.end()) {
-		ResourceSet &ctx_set = cit->second;
-		ResourceSet::iterator it = ctx_set.begin();
-		ResourceSet::iterator end = ctx_set.end();
-		for(; it != end; ++it) {
-			(*it)->destroy();
-		}
-	}
+void GPUContext::contextCreate(){
+	forEachResourceInContext(mContextID, [](auto& r){
+		r.create();
+	});
+}
+
+void GPUContext::contextDestroy(){ //printf("GPUContext::contextDestroy %d\n", mContextID);
+	forEachResourceInContext(mContextID, [](auto& r){
+		r.destroy();
+	});
 }
 
 
 
 
 GPUObject::GPUObject(int ctx)
-:	mID(0), mResubmit(false)
 {	contextRegister(ctx); }
 
 GPUObject::GPUObject(GPUContext& ctx)
-:	mID(0), mResubmit(false)
-{	contextRegister(ctx.contextID()); }
+:	GPUObject(ctx.contextID())
+{}
 
 GPUObject::~GPUObject(){
 	contextUnregister();
@@ -184,23 +171,21 @@ void GPUObject::destroy(){
 	mID=0;
 }
 
-void GPUObject :: contextRegister(int ctx) {
+void GPUObject::contextRegister(int ctx) {
 	contextUnregister();
-	ContextMap& contexts = getContextMap();
-	ResourceMap& resources = getResourceMap();
-	contexts[ctx].insert(this);
-	resources[this] = ctx;
+	getContextMap()[ctx].insert(this);
+	getResourceMap()[this] = ctx;
 }
 
-void GPUObject :: contextUnregister() {
-	ContextMap& contexts = getContextMap();
-	ResourceMap& resources = getResourceMap();
+void GPUObject::contextUnregister() {
+	auto& contexts = getContextMap();
+	auto& resources = getResourceMap();
 
 	ResourceMap::iterator rit = resources.find(this);
 	if(rit != resources.end()) {
 		ContextMap::iterator it = contexts.find( rit->second );
 		if(it != contexts.end()) {
-			ResourceSet &ctx_set = it->second;
+			ResourceSet& ctx_set = it->second;
 			ResourceSet::iterator sit = ctx_set.find(this);
 			if(sit != ctx_set.end()) {
 				ctx_set.erase(sit);

@@ -49,7 +49,7 @@
 	rebuilt.
 
 	GPUContext represents an object with a corollary rendering context on a GPU.
-	GPUObject is a shared base class for all objects that have a corrollary
+	GPUObject is a shared base class for all objects that have a corollary
 	object on the GPU, and which must be re-submitted when the rendering context
 	is rebuilt.
 	An object that inherits GPUContext must call contextDestroy() when the
@@ -62,15 +62,14 @@
 
 	GPUContexts are identified by an integer ID, which increments for each
 	context created.
-	The first created context has ID=0. GPUObjects will register with this
-	context by default.
+	GPUObjects will register with the first created context by default.
 */
 
 namespace al{
 
 /// Context for signaling resource changes to GPU objects
 ///
-/// @ingroup allocore
+/// \ingroup allocore
 class GPUContext {
 public:
 	GPUContext();
@@ -99,10 +98,10 @@ protected:
 class GPUObject{
 public:
 
-	/// @param[in] ctx	a GPU context ID to attach to
+	/// \param[in] ctx	a GPU context ID to attach to
 	GPUObject(int ctx = GPUContext::defaultContextID());
 
-	/// @param[in] ctx	a GPU context to attach to
+	/// \param[in] ctx	a GPU context to attach to
 	GPUObject(GPUContext& ctx);
 
 	virtual ~GPUObject();
@@ -117,7 +116,7 @@ public:
 	/// Destroys object on GPU
 	void destroy();
 
-	/// Returns the assigned object id
+	/// Returns the assigned object ID
 	unsigned long id() const { return mID; }
 
 	void id(unsigned long v){ mID = v; }
@@ -141,8 +140,8 @@ public:
 	void invalidate();
 
 protected:
-	unsigned long mID;
-	bool mResubmit;
+	unsigned long mID = 0;
+	bool mResubmit = false;
 
 	/// Called when currently assigned context is created
 	virtual void onCreate() = 0;
