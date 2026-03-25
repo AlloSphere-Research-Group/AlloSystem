@@ -285,12 +285,12 @@ public:
 	void unbind();
 
 	/// Render the texture onto a quad on the XY plane
-	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0, double z=0);
+	void quad(Graphics& gl, float w=2, float h=2, float x=-1, float y=-1, float z=0);
 
 	/// Render the texture onto a quad filling current viewport
 	void quadViewport(
 		Graphics& g, const Color& color = Color(1),
-		double w=2, double h=2, double x=-1, double y=-1, double z=0);
+		float w=2, float h=2, float x=-1, float y=-1, float z=0);
 
 	/// Get immutable reference to self (use to ensure getting read-only data)
 	const Texture& constant() const { return *this; }
