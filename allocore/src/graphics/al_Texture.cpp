@@ -722,12 +722,8 @@ Texture& Texture::submit(){
 Texture& Texture::copyFrameBuffer(
 	int w, int h, int fbx, int fby, int texx, int texy, int texz
 ){
-	if(w < 0){
-		w += 1 + width();
-	}
-	if(h < 0){
-		h += 1 + height();
-	}
+	if(w < 0) w += 1 + width();
+	if(h < 0) h += 1 + height();
 
 	bind();
 	switch(target()){
@@ -754,30 +750,24 @@ Texture& Texture::copyFrameBuffer(
 	return *this;
 }
 
-void Texture::quad(Graphics& gl, double w, double h, double x, double y, double z){
-	//Graphics::error(id(), "prebind quad texture");
+void Texture::quad(Graphics& g, float w, float h, float x, float y, float z){
 	bind();
-	Mesh& m = gl.mesh();
-	m.reset();
-	//Graphics::error(id(), "reset mesh quad texture");
-	m.primitive(gl.TRIANGLE_STRIP);
-		m.texCoord	(0, 0);
-		m.vertex	(x, y, z);
-		m.texCoord	(1, 0);
-		m.vertex	(x+w, y, z);
-		m.texCoord	(0, 1);
-		m.vertex	(x, y+h, z);
-		m.texCoord	(1, 1);
-		m.vertex	(x+w, y+h, z);
-	//Graphics::error(id(), "set mesh quad texture");
-	gl.draw(m);
-	//Graphics::error(id(), "draw mesh quad texture");
+	auto& m = g.mesh();
+	m.reset()
+		.triangleStrip()
+		.vertex(x  , y  , z)
+		.vertex(x+w, y  , z)
+		.vertex(x  , y+h, z)
+		.vertex(x+w, y+h, z)
+		.texCoord2(0,0, 1,0, 0,1, 1,1)
+	;
+	g.draw(m);
 	unbind();
 }
 
 void Texture::quadViewport(
 	Graphics& g, const Color& color,
-	double w, double h, double x, double y, double z
+	float w, float h, float x, float y, float z
 ){
 	g.pushMatrix(g.PROJECTION);
 	g.loadIdentity();
