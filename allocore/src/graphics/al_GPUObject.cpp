@@ -1,5 +1,4 @@
 #include "allocore/graphics/al_GPUObject.hpp"
-
 #include <map>
 #include <set>
 
@@ -112,16 +111,17 @@ void GPUContext::makeDefaultContext(){
 template <class Func>
 void forEachResourceInContext(int contextID, Func f){
 	ContextMap& contexts = getContextMap();
-	ContextMap::iterator cit = contexts.find(contextID);
-	if(cit != contexts.end()) {
-		ResourceSet& resources = cit->second;
+	auto it = contexts.find(contextID);
+	if(it != contexts.end()) {
+		ResourceSet& resources = it->second;
 		for(auto * r : resources) f(*r);
 	}
 }
 
-void GPUContext::contextCreate(){
+void GPUContext::contextCreate(){ //printf("GPUContext::contextCreate %d\n", mContextID);
 	forEachResourceInContext(mContextID, [](auto& r){
 		r.create();
+		//printf("object %s %lu %p\n", typeid(r).name(), r.id(), &r); fflush(stdout);
 	});
 }
 
