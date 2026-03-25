@@ -549,6 +549,7 @@ bool Window::implCreate(){
 		printf("SDL ERROR: Could not create GL context.\n");
 	}
 	mImpl->mGLContext = glContext;
+	mContextHandle = glContext; // GPUContext
 
 	AL_GRAPHICS_INIT_CONTEXT;
 	vsync(mVSync);
