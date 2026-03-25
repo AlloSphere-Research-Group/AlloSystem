@@ -84,11 +84,19 @@ public:
 	/// Get context ID
 	int contextID() const { return mContextID; }
 
+	/// Get implementation defined handle to context
+
+	/// The value stored in the handle will depend on the underlying windowing
+	/// implementation that creates the GPU context. For example, for SDL, the
+	/// handle is an SDL_GLContext.
+	void * contextHandle() const { return mContextHandle; }
+
 	void makeDefaultContext();
 	static int defaultContextID();
 
 protected:
 	int mContextID;
+	void * mContextHandle = nullptr;
 };
 
 
