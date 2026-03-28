@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_STEREO_PANNER_HPP
-#define INCLUDE_AL_STEREO_PANNER_HPP
+#ifndef INC_AL_STEREO_PANNER_HPP
+#define INC_AL_STEREO_PANNER_HPP
 
 #include <vector>
 #include "allocore/sound/al_AudioScene.hpp"
@@ -33,5 +33,4 @@ private:
 };
 
 } // al::
-
 #endif

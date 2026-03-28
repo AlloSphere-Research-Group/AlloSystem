@@ -1,12 +1,16 @@
-//  Created by Ryan McGee on 5/8/15.
-//
-//
+#ifndef INC_AL_BIQUAD_HPP
+#define INC_AL_BIQUAD_HPP
 
-#ifndef __AL_BIQUAD__
-#define __AL_BIQUAD__
+/*	Allocore -- Multimedia / virtual environment application class library
 
-namespace al
-{
+	Description:
+	A cross-over shelf filter that sums to an allpass
+
+	Author(s):
+	Ryan McGee, 2015
+*/
+
+namespace al{
     
 /* this holds the data required to update samples thru a filter */
 typedef struct {
@@ -73,6 +77,5 @@ private:
     BiQuad *mFilters;
 };
 
-}
-
-#endif /* defined(__AL_BIQUAD__) */
+} // al::
+#endif

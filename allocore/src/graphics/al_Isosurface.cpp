@@ -1,3 +1,28 @@
+/*
+This file incorporates work covered by the following copyright(s) and
+permission notice(s):
+
+	Author: Raghavendra Chandrashekara
+	Email: rc99@doc.ic.ac.uk, rchandrashekara@hotmail.com
+	Last Modified: 5/8/2000
+
+	This work incorporates work covered by the following copyright and
+	permission notice:
+
+		Marching Cubes Example Program
+		by Cory Bloyd (corysama@yahoo.com)
+
+		A simple, portable and complete implementation of the Marching Cubes
+		and Marching Tetrahedrons algorithms in a single source file.
+		There are many ways that this code could be made faster, but the
+		intent is for the code to be easy to understand.
+
+		For a description of the algorithm go to
+		http://astronomy.swin.edu.au/pbourke/modelling/polygonise/
+
+		This code is public domain.
+*/
+
 #include <cmath>
 #include "allocore/types/al_Voxels.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"

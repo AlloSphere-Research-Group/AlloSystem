@@ -1,53 +1,20 @@
-/*	Allocore --
-	Multimedia / virtual environment application class library
+#ifndef INC_AL_ARRAY_H
+#define INC_AL_ARRAY_H
 
-	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
-	Copyright (C) 2012. The Regents of the University of California.
-	All rights reserved.
+/*	Allocore -- Multimedia / virtual environment application class library
 
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
+	Description:
+	Multidimensional array represented as a data pointer and metadata to
+	describe its type and layout
 
-		Redistributions of source code must retain the above copyright notice,
-		this list of conditions and the following disclaimer.
-
-		Redistributions in binary form must reproduce the above copyright
-		notice, this list of conditions and the following disclaimer in the
-		documentation and/or other materials provided with the distribution.
-
-		Neither the name of the University of California nor the names of its
-		contributors may be used to endorse or promote products derived from
-		this software without specific prior written permission.
-
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-
-
-	File description:
-	AlloArray is a multidimensional array.
-	It is a pointer to data followed by meta-data to describe its type and layout.
-
-	File author(s):
+	Author(s):
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#ifndef INCLUDE_ALLO_ARRAY_H
-#define INCLUDE_ALLO_ARRAY_H 1
-
 #include "allocore/system/al_Config.h"
 #include <limits.h> /* ULONG_MAX */
-
 
 /*
  Maximum number of dimensions a array may represent
@@ -59,12 +26,10 @@
 extern "C" {
 #endif
 
-
-#pragma mark AlloTy
 /**
-	Unique identifiers for principal types
-		(inspired by SDIF; higher bits represent semantics, lower bits represent size)
-		(unlike SDIF, assumption is little-endian; and 'byte' is represented as AlloUInt8Ty)
+Unique identifiers for principal types
+	(inspired by SDIF; higher bits represent semantics, lower bits represent size)
+	(unlike SDIF, assumption is little-endian; and 'byte' is represented as AlloUInt8Ty)
 */
 enum {
 	/* type with no size */
@@ -293,7 +258,6 @@ void allo_array_wrapper_release(AlloArrayWrapper *wrap);
  ********* INLINE IMPLEMENTATION BELOW ***********
  *
  */
-#pragma mark -------------------------------------
 
 static inline size_t allo_type_size(AlloTy ty) {
 	switch(ty) {
@@ -366,13 +330,11 @@ static inline size_t allo_array_size(const AlloArray * arr) {
 	return allo_array_size_from_header(&arr->header);
 }
 
-
 /* Multidimensional terminology:
 	# Dimensions	0			1			2			3			4
 	----------------------------------------------------------------------------
 	Index						row			column		pillar		file
 	Tensor						scalar		vector		matrix
-	Sound						sample		time		channel		pattern
 	Polytope		point		line		polygon		polyhedron	polychoron
 	n-cube			point		line		square		cube		tesseract
 	n-sphere					interval	circle		sphere		hypersphere
@@ -380,9 +342,8 @@ static inline size_t allo_array_size(const AlloArray * arr) {
 	Movement		position	velocity	accel.		jerk		snap
 */
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* INCLUDE_ALLO_H */
+#endif
