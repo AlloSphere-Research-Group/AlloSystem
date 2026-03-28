@@ -42,14 +42,23 @@ public:
 	vec ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr; ///< Corners
 	Plane<T> pl[6]; ///< Face planes (normals point inward)
 
-
+	/// Get corner
 	const vec& corner(int i) const { return (&ntl)[i]; }
 	vec& corner(int i){ return (&ntl)[i]; }
-
-	const vec& corner(int i0, int i1, int i2) const {
-		return corner(i2<<2 | i1<<1 | i0);
+	template <int i>
+	const vec& corner() const {
+		static_assert(0<=i && i<8, "Index out of bounds");
+		return corner(i);
 	}
 
+	/// Get corner
+	const vec& corner(int i0, int i1, int i2) const {
+		return corner(toIndex(i0,i1,i2));
+	}
+	template <int i0, int i1, int i2>
+	const vec& corner() const {
+		return corner<toIndex(i0,i1,i2)>();
+	}
 
 	/// Set from eight corners
 	template <class Vec>
@@ -80,15 +89,16 @@ public:
 	/// Get point in frustum corresponding to fraction along edges
 	template <class Vec3>
 	vec getPoint(const Vec3& frac) const {
+		static_assert(sizeof(Vec3)/sizeof(typename Vec3::value_type) >= 3, "Vec must have at least 3 elements");
 		return
 		lerp(frac[2],
 			lerp(frac[1],
-				lerp(frac[0], corner(0,0,0), corner(1,0,0)),
-				lerp(frac[0], corner(0,1,0), corner(1,1,0))
+				lerp(frac[0], corner<0,0,0>(), corner<1,0,0>()),
+				lerp(frac[0], corner<0,1,0>(), corner<1,1,0>())
 			),
 			lerp(frac[1],
-				lerp(frac[0], corner(0,0,1), corner(1,0,1)),
-				lerp(frac[0], corner(0,1,1), corner(1,1,1))
+				lerp(frac[0], corner<0,0,1>(), corner<1,0,1>()),
+				lerp(frac[0], corner<0,1,1>(), corner<1,1,1>())
 			)
 		);
 	}
@@ -176,7 +186,7 @@ public:
 	/// Get axis-aligned bounding box
 	template <class Vec3>
 	void boundingBox(Vec3& xyz, Vec3& dim) const {
-		auto vmin = corner(0);
+		auto vmin = corner<0>();
 		auto vmax = vmin;
 
 		for(int i=1; i<8; ++i){
@@ -205,6 +215,10 @@ public:
 	}
 
 private:
+	static constexpr int toIndex(int i0, int i1, int i2){
+		return i2<<2 | i1<<1 | i0;
+	}
+
 	template <class Tf, class Tv>
 	static Tv lerp(Tf f, const Tv& x, const Tv& y){
 		return (y - x) * f + x;
