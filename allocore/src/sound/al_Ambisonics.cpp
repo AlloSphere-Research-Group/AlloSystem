@@ -49,6 +49,31 @@ AmbiBase::~AmbiBase(){
 	delete[] mWeights;
 }
 
+int AmbiBase::orderToChannels(int dim, int order){
+	int chans = orderToChannelsH(order);
+	return dim == 2 ? chans : chans + orderToChannelsV(order);
+}
+
+int AmbiBase::orderToChannelsH(int orderH){ return (orderH << 1) + 1; }
+int AmbiBase::orderToChannelsV(int orderV){ return orderV * orderV; }
+
+int AmbiBase::channelsToOrder(int channels){
+	switch(channels){
+	case 3: case 4:	return 1;
+	case 9:			return 2;
+	case 16:		return 3;
+	default:		return -1;
+	}
+}
+
+inline int AmbiBase::channelsToDimensions(int channels){
+	switch(channels){
+	case 3:						return 2;
+	case 4: case 9: case 16:	return 3;
+	default:					return -1;
+	}
+}
+
 void AmbiBase::order(int o){
 	if(o != mOrder){
 		mOrder = o;
@@ -160,9 +185,6 @@ void AmbiBase::encodeWeightsFuMa16(float * ws, float az, float el){
 
 
 
-
-// AmbiDecode
-
 float AmbiDecode::flavorWeights[4][5][5] = {
 	{	// none:
 		{1,		1,		1,		1,		1    }, // n = 0, M = 0, 1, 2, 3, 4
@@ -250,6 +272,21 @@ void AmbiDecode::decode(float *dec, const float * ambi, int numDecFrames, int ti
 	}
 }
 
+float AmbiDecode::decode(float * encFrame, int encNumChannels, int speakerNum){
+	float smp = 0;
+	float * dec = mDecodeMatrix + speakerNum * channels();
+	float * wc = mWeights;
+	for(int i=0; i<encNumChannels; ++i) smp += *dec++ * *wc++ * *encFrame++;
+	return smp;
+}
+
+//inline float AmbiDecode::decode(int speakerNum){
+//	return decode(mFrame, channels(), speakerNum);
+//}
+
+//inline float * AmbiDecode::azimuths(){ return mPositions; }
+//inline float * AmbiDecode::elevations(){ return mPositions + mNumSpeakers; }
+//inline float * AmbiDecode::frame() const { return mFrame; }
 
 void AmbiDecode::flavor(int type){
 	if(type < 4){
@@ -366,6 +403,50 @@ void AmbiDecode::print(FILE * fp, const char * append) const {
 }
 
 
+
+void AmbiEncode::direction(float az, float el){
+	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, az, el);
+}
+
+void AmbiEncode::direction(float x, float y, float z){
+	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, x,y,z);
+}
+
+//inline void AmbiEncode::encode(const AmbiDecode &dec, float input){
+//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] = weights()[c] * input;
+//}
+//
+//inline void AmbiEncode::encodeAdd(const AmbiDecode &dec, float input){
+//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] += weights()[c] * input;
+//}
+
+void AmbiEncode::encode(float * ambiChans, int numFrames, int timeIndex, float timeSample) const {
+	// "Iterate" through spherical harmonics using Duff's device.
+	// This requires only a simple jump per time sample.
+	#define CS(chanindex) case chanindex: ambiChans[chanindex*numFrames+timeIndex] += weights()[chanindex] * timeSample;
+	int ch = channels()-1;
+	switch(ch){
+		CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)
+		CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
+		default:;
+	}
+	#undef CS
+}
+
+void AmbiEncode::encode(float * ambiChans, const float * input, int numFrames){
+	float * pAmbi = ambiChans; // non-interleaved ambi buffers, we can use fast pointer arithmetic
+
+	for(int c=0; c<channels(); ++c){
+		const float * pInput = input;
+		float weight = weights()[c];
+		for(int i=0; i<numFrames; ++i){
+			*pAmbi++ += weight * *pInput++;
+		}
+	}
+}
+
+
+
 AmbisonicsSpatializer::AmbisonicsSpatializer(
 	SpeakerLayout &sl, int dim, int order, int flavor
 )
@@ -393,6 +474,10 @@ void AmbisonicsSpatializer::numFrames(int v){
 
 void AmbisonicsSpatializer::numSpeakers(int num){
     mDecoder.numSpeakers(num);
+}
+
+float * AmbisonicsSpatializer::ambiChans(unsigned channel){
+	return &mAmbiDomainChannels[channel * mNumFrames];
 }
 
 void AmbisonicsSpatializer::setSpeakerLayout(SpeakerLayout& sl){

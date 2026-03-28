@@ -124,7 +124,11 @@ protected:
 	float * mWeights;	// weights for each ambi channel
 
 	template<typename T>
-	static void resize(T *& a, int n);
+	static void resize(T *& a, int n){
+		if(a) delete[] a;
+		a = new T[n];
+		memset((void *)a, 0, n*sizeof(T));
+	}
 };
 
 
@@ -318,126 +322,6 @@ private:
 
 // Implementation ______________________________________________________________
 
-
-// AmbiBase
-inline int AmbiBase::orderToChannels(int dim, int order){
-	int chans = orderToChannelsH(order);
-	return dim == 2 ? chans : chans + orderToChannelsV(order);
-}
-
-inline int AmbiBase::orderToChannelsH(int orderH){ return (orderH << 1) + 1; }
-inline int AmbiBase::orderToChannelsV(int orderV){ return orderV * orderV; }
-
-inline int AmbiBase::channelsToOrder(int channels)
-{
-	int order = -1;
-	switch(channels) {
-	case 3:
-	case 4:
-		order = 1;
-		break;
-	case 9:
-		order = 2;
-		break;
-	case 16:
-		order = 3;
-		break;
-	default:
-		order = -1;
-	}
-	return order;
-}
-
-inline int AmbiBase::channelsToDimensions(int channels)
-{
-	int dim = 3;
-	switch(channels) {
-	case 3:
-		dim = 2;
-		break;
-	case 4:
-	case 9:
-	case 16:
-		dim = 3;
-		break;
-	default:
-		dim = -1;
-	}
-	return dim;
-}
-
-template<typename T>
-void AmbiBase::resize(T *& a, int n){
-	delete[] a;
-	a = new T[n];
-	memset((void *)a, 0, n*sizeof(T));
-}
-
-
-// AmbiDecode
-
-inline float AmbiDecode::decode(float * encFrame, int encNumChannels, int speakerNum){
-	float smp = 0;
-	float * dec = mDecodeMatrix + speakerNum * channels();
-	float * wc = mWeights;
-	for(int i=0; i<encNumChannels; ++i) smp += *dec++ * *wc++ * *encFrame++;
-	return smp;
-}
-
-//inline float AmbiDecode::decode(int speakerNum){
-//	return decode(mFrame, channels(), speakerNum);
-//}
-
-//inline float * AmbiDecode::azimuths(){ return mPositions; }
-//inline float * AmbiDecode::elevations(){ return mPositions + mNumSpeakers; }
-//inline float * AmbiDecode::frame() const { return mFrame; }
-
-
-
-// AmbiEncode
-//inline void AmbiEncode::encode(const AmbiDecode &dec, float input){
-//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] = weights()[c] * input;
-//}
-//
-//inline void AmbiEncode::encodeAdd(const AmbiDecode &dec, float input){
-//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] += weights()[c] * input;
-//}
-
-inline void AmbiEncode::direction(float az, float el){
-	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, az, el);
-}
-
-inline void AmbiEncode::direction(float x, float y, float z){
-	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, x,y,z);
-}
-
-inline void AmbiEncode::encode(float * ambiChans, int numFrames, int timeIndex, float timeSample) const {
-
-	// "Iterate" through spherical harmonics using Duff's device.
-	// This requires only a simple jump per time sample.
-	#define CS(chanindex) case chanindex: ambiChans[chanindex*numFrames+timeIndex] += weights()[chanindex] * timeSample;
-	int ch = channels()-1;
-	switch(ch){
-		CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)
-		CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
-		default:;
-	}
-	#undef CS
-}
-
-inline void AmbiEncode::encode(float * ambiChans, const float * input, int numFrames)
-{
-	float * pAmbi = ambiChans; // non-interleaved ambi buffers, we can use fast pointer arithmetic
-
-	for(int c=0; c<channels(); ++c){
-		const float * pInput = input;
-		float weight = weights()[c];
-		for(int i=0; i<numFrames; ++i){
-			*pAmbi++ += weight * *pInput++;
-		}
-	}
-}
-
 template <class XYZ>
 void AmbiEncode::encode(float * ambiChans, const XYZ * dir, const float * input, int numFrames){
 
@@ -467,11 +351,6 @@ void AmbiEncode::encode(float * ambiChans, const XYZ * dir, const float * input,
 			ambiChans[c][i] += weights()[c] * input[i];
 		}*/
 	}
-}
-
-
-inline float * AmbisonicsSpatializer::ambiChans(unsigned channel) {
-	return &mAmbiDomainChannels[channel * mNumFrames];
 }
 
 } // al::
