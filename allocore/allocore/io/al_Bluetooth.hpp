@@ -17,7 +17,7 @@
 
 namespace al{
 
-/// @addtogroup allocore
+/// \addtogroup allocore
 /// @{
 
 /// Bluetooth connection
@@ -64,7 +64,7 @@ public:
 
 
 	/// Get channel
-	int channel() const;
+	int channel() const { return mChannel; }
 
 	/// Returns whether a connection is open
 	bool opened() const;
@@ -118,9 +118,6 @@ private:
 	bool open(const std::string& addr);
 	void print(FILE * fp=stdout);
 };
-
-
-inline int Bluetooth::channel() const { return mChannel; }
 
 /// @} // end allocore group
 
