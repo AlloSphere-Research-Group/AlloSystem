@@ -53,11 +53,28 @@ public:
 
 	/// Set from eight corners
 	template <class Vec>
-	Frustum& fromCorners(const Vec * corners);
+	Frustum& fromCorners(const Vec * corners){
+		for(unsigned i=0; i<8; ++i){
+			for(unsigned k=0; k<3; ++k){
+				corner(i)[k] = corners[i][k];
+			}
+		}
+		return computePlanes();
+	}
 
 	/// Set from inverse model-view-projection matrix
 	template <class Mat4>
-	Frustum& fromInverseMVP(const Mat4& invMVP);
+	Frustum& fromInverseMVP(const Mat4& invMVP){
+		static const Vec3f bb[8] = {
+			{-1.f, 1.f,-1.f}, { 1.f, 1.f,-1.f}, {-1.f,-1.f,-1.f}, { 1.f,-1.f,-1.f},
+			{-1.f, 1.f, 1.f}, { 1.f, 1.f, 1.f}, {-1.f,-1.f, 1.f}, { 1.f,-1.f, 1.f}
+		};
+		for(unsigned i=0; i<8; ++i){
+			auto c = invMVP * Vec4f(bb[i],1.f);
+			corner(i) = c.xyz() / c.w;
+		}
+		return computePlanes();
+	}
 
 
 	/// Get point in frustum corresponding to fraction along edges
@@ -95,13 +112,26 @@ public:
 	
 	/// \returns OUTSIDE, INTERSECT or INSIDE
 	///
-	int testPoint(const vec& p) const;
+	int testPoint(const vec& p) const {
+		for(const auto& plane : pl){
+			if(plane.inNegativeSpace(p)) return OUTSIDE;
+		}
+		return INSIDE;
+	}
 
 	/// Test whether sphere is in frustum
 
 	/// \returns OUTSIDE, INTERSECT or INSIDE
 	///
-	int testSphere(const vec& center, float radius) const;
+	int testSphere(const vec& center, float radius) const {
+		int result = INSIDE;
+		for(const auto& plane : pl){
+			auto distance = plane.distance(center);
+			if(distance < -radius)		return OUTSIDE;
+			else if(distance < radius)	result = INTERSECT;
+		}
+		return result;
+	}
 
 	/// Test whether axis-aligned box is in frustum
 
@@ -112,19 +142,67 @@ public:
 	/// \param[in] min	minimum corner of box
 	/// \param[in] ext	extents (diameters) of box
 	/// \returns OUTSIDE, INTERSECT or INSIDE
-	int testBox(const vec& min, const vec& ext) const;
-	int testBoxMinMax(const vec& min, const vec& max) const;
+	int testBox(const vec& min, const vec& ext) const {
+		return testBoxMinMax(min, min+ext);
+	}
+
+	int testBoxMinMax(const vec& min, const vec& max) const {
+		int result = INSIDE;
+		for(const auto& plane : pl){
+			const auto plNrm = plane.normal();
+			/*
+			The positive vertex is the vertex from the box that is further along
+			the normal's direction. The negative vertex is the opposite vertex.
+
+			If the p-vertex is on the wrong side of the plane, the box can be
+			immediately rejected, as it falls completely outside the frustum. On the
+			other hand, if the p-vertex is on the right side of the plane, then
+			testing the whereabouts of the n-vertex tells if the box is totally on
+			the right side of the plane, or if the box intersects the plane.
+			*/
+			// Is positive vertex outside?
+			vec vp;
+			for(int i=0; i<3; ++i) vp[i] = plNrm[i]>T(0) ? max[i] : min[i];
+			if(plane.inNegativeSpace(vp)) return OUTSIDE;
+
+			// Is negative vertex outside?
+			vec vn;
+			for(int i=0; i<3; ++i) vn[i] = plNrm[i]<T(0) ? max[i] : min[i];
+			if(plane.inNegativeSpace(vn)) result = INTERSECT;
+		}
+		return result;
+	}
 
 	/// Get axis-aligned bounding box
 	template <class Vec3>
-	void boundingBox(Vec3& xyz, Vec3& dim) const;
+	void boundingBox(Vec3& xyz, Vec3& dim) const {
+		auto vmin = corner(0);
+		auto vmax = vmin;
+
+		for(int i=1; i<8; ++i){
+			auto v = corner(i);
+			vmin = min(vmin, v);
+			vmax = max(vmax, v);
+		}
+
+		xyz = vmin;
+		dim = vmax - vmin;
+	}
 
 
 	/// Compute planes based on frustum corners (planes face to inside)
 
 	/// This must be called if any of the corners change value.
 	///
-	Frustum& computePlanes();
+	Frustum& computePlanes(){
+		pl[TOP   ].from3Points(ntr,ntl,ftl);
+		pl[BOTTOM].from3Points(nbl,nbr,fbr);
+		pl[LEFT  ].from3Points(ntl,nbl,fbl);
+		pl[RIGHT ].from3Points(nbr,ntr,fbr);
+		pl[NEARP ].from3Points(ntl,ntr,nbr);
+		pl[FARP  ].from3Points(ftr,ftl,fbl);
+		return *this;
+	}
 
 private:
 	template <class Tf, class Tv>
@@ -132,112 +210,6 @@ private:
 		return (y - x) * f + x;
 	}
 };
-
-
-
-template <class T>
-template <class Vec>
-Frustum<T>& Frustum<T>::fromCorners(const Vec * corners){
-	for(unsigned i=0; i<8; ++i){
-		for(unsigned k=0; k<3; ++k){
-			corner(i)[k] = corners[i][k];
-		}
-	}
-	return computePlanes();
-}
-
-template <class T>
-template <class Mat4>
-Frustum<T>& Frustum<T>::fromInverseMVP(const Mat4& invMVP){
-	static const Vec3f bb[8] = {
-		{-1.f, 1.f,-1.f}, { 1.f, 1.f,-1.f}, {-1.f,-1.f,-1.f}, { 1.f,-1.f,-1.f},
-		{-1.f, 1.f, 1.f}, { 1.f, 1.f, 1.f}, {-1.f,-1.f, 1.f}, { 1.f,-1.f, 1.f}
-	};
-	for(unsigned i=0; i<8; ++i){
-		auto c = invMVP * Vec4f(bb[i],1.f);
-		corner(i) = c.xyz() / c.w;
-	}
-	return computePlanes();
-}
-
-template <class T>
-template <class Vec3>
-void Frustum<T>::boundingBox(Vec3& xyz, Vec3& dim) const {
-	auto vmin = corner(0);
-	auto vmax = vmin;
-
-	for(int i=1; i<8; ++i){
-		auto v = corner(i);
-		vmin = min(vmin, v);
-		vmax = max(vmax, v);
-	}
-
-	xyz = vmin;
-	dim = vmax - vmin;
-}
-
-template <class T>
-Frustum<T>& Frustum<T>::computePlanes(){
-	pl[TOP   ].from3Points(ntr,ntl,ftl);
-	pl[BOTTOM].from3Points(nbl,nbr,fbr);
-	pl[LEFT  ].from3Points(ntl,nbl,fbl);
-	pl[RIGHT ].from3Points(nbr,ntr,fbr);
-	pl[NEARP ].from3Points(ntl,ntr,nbr);
-	pl[FARP  ].from3Points(ftr,ftl,fbl);
-	return *this;
-}
-
-template <class T>
-int Frustum<T>::testPoint(const vec& p) const {
-	for(const auto& plane : pl){
-		if(plane.inNegativeSpace(p)) return OUTSIDE;
-	}
-	return INSIDE;
-}
-
-template <class T>
-int Frustum<T>::testSphere(const vec& c, float r) const {
-	int result = INSIDE;
-	for(const auto& plane : pl){
-		auto distance = plane.distance(c);
-		if(distance < -r)		return OUTSIDE;
-		else if(distance < r)	result = INTERSECT;
-	}
-	return result;
-}
-
-template <class T>
-int Frustum<T>::testBoxMinMax(const vec& min, const vec& max) const {
-	int result = INSIDE;
-	for(const auto& plane : pl){
-		const auto plNrm = plane.normal();
-/*
-		The positive vertex is the vertex from the box that is further along
-		the normal's direction. The negative vertex is the opposite vertex.
-
-		If the p-vertex is on the wrong side of the plane, the box can be
-		immediately rejected, as it falls completely outside the frustum. On the
-		other hand, if the p-vertex is on the right side of the plane, then
-		testing the whereabouts of the n-vertex tells if the box is totally on
-		the right side of the plane, or if the box intersects the plane.
-*/
-		// Is positive vertex outside?
-		vec vp;
-		for(int i=0; i<3; ++i) vp[i] = plNrm[i]>T(0) ? max[i] : min[i];
-		if(plane.inNegativeSpace(vp)) return OUTSIDE;
-
-		// Is negative vertex outside?
-		vec vn;
-		for(int i=0; i<3; ++i) vn[i] = plNrm[i]<T(0) ? max[i] : min[i];
-		if(plane.inNegativeSpace(vn)) result = INTERSECT;
-	}
-	return result;
-}
-
-template <class T>
-int Frustum<T>::testBox(const vec& min, const vec& ext) const {
-	return testBoxMinMax(min, min+ext);
-}
 
 } // al::
 #endif
