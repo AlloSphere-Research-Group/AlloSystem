@@ -28,10 +28,20 @@ public:
 	
 	Crossover(T f=(T)600, T fs=(T)44100.) { freq(f, fs); clear(); }
 
-	/// set the cross-over middle frequency
-	void freq(T f, T fs);
+	/// Set cross-over middle frequency
+	void freq(T f, T fs){
+		auto rad = twoPi * f / fs;
+		auto cosine = std::cos(rad);
+		auto sine = std::sin(rad);
+		if (std::abs(cosine) > (T)0.0001) {
+			mC0 = (sine - (T)1.)/cosine;
+		} else {
+			mC0 = cosine * (T)0.5;
+		}
+		mC1 = ((T)1. + mC0) * (T)0.5;
+	}
 
-	/// process one sample and return hi/lo shelf
+	/// Process one sample and return hi/lo shelf
 	void next(const T in, T * lo, T * hi);
 
 	void clear() { mZ0=(T)0; mZ1=(T)0; mZ2=(T)0; }
@@ -44,27 +54,14 @@ protected:
 };
 
 
-template <typename T>
-void Crossover<T> :: freq(T f, T fs) {
-	auto rad = twoPi * f / fs;
-	auto cosine = std::cos(rad);
-	auto sine = std::sin(rad);
-	if (std::abs(cosine) > (T)0.0001) {
-		mC0 = (sine - (T)1.)/cosine;
-	} else {
-		mC0 = cosine * (T)0.5;
-	}
-	mC1 = ((T)1. + mC0) * (T)0.5;
-}
-
-namespace{
+namespace detail{
 	template <typename T> constexpr T denorm_offset();
 	template<> constexpr float denorm_offset<float>(){ return FLT_EPSILON*2.; }
 	template<> constexpr double denorm_offset<double>(){ return DBL_EPSILON*2.; }
 }
 
 template <typename T>
-inline void Crossover<T> :: next(const T in, T * lo, T * hi) {
+inline void Crossover<T>::next(const T in, T * lo, T * hi){
 
 	const auto v0 = in - mC0 * mZ0;
 	const auto x0 = mZ0 + mC0 * v0;
@@ -75,9 +72,11 @@ inline void Crossover<T> :: next(const T in, T * lo, T * hi) {
 	const auto v2 = mC1 * (x1 - mZ2);
 	const auto x2 = v2 + mZ2;
 
-	mZ0 = v0 + denorm_offset<T>();
-	mZ1 = v1 + x1 + denorm_offset<T>();
-	mZ2 = v2 + x2 + denorm_offset<T>();
+	auto eps = detail::denorm_offset<T>();
+
+	mZ0 = v0 + eps;
+	mZ1 = v1 + x1 + eps;
+	mZ2 = v2 + x2 + eps;
 
 	*lo = x2;
 	*hi = x0 - x2;
