@@ -86,5 +86,3 @@ void MsgTube::writeData(char * data, size_t size) {
 		cache(cpy, size);
 	}
 }
-
-
