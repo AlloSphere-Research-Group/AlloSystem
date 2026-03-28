@@ -6,14 +6,14 @@ namespace al{
 bool SpeakerTriple::loadVectors(const std::vector<Speaker>& spkrs){
 	bool hasInverse;
 
-	s1Vec = spkrs[s1].vec();
-	s2Vec = spkrs[s2].vec();
+	s1Vec = spkrs[s1].pos();
+	s2Vec = spkrs[s2].pos();
 
 	s1Chan = spkrs[s1].deviceChannel;
 	s2Chan = spkrs[s2].deviceChannel;
 
 	if(s3!=-1){ // 3d Speaker layout
-		s3Vec = spkrs[s3].vec();
+		s3Vec = spkrs[s3].pos();
 		s3Chan = spkrs[s3].deviceChannel;
 		mat.set(s1Vec[0],s1Vec[1],s1Vec[2],
 		        s2Vec[0],s2Vec[1],s2Vec[2],
@@ -217,11 +217,11 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 			}
 
 			//Set z to 0
-			Vec3d vec1(trip.vec[spkIdx1].x,trip.vec[spkIdx1].y,0.f);
-			Vec3d vec2(trip.vec[spkIdx2].x,trip.vec[spkIdx2].y,0.f);
+			Vec3f vec1(trip.vec[spkIdx1].x,trip.vec[spkIdx1].y,0.f);
+			Vec3f vec2(trip.vec[spkIdx2].x,trip.vec[spkIdx2].y,0.f);
 
-			for(Speaker s: spkrs){
-				if(s.vec().z != trip.vec[spkIdx1].z){
+			for(const auto& s: spkrs){
+				if(s.pos().z != trip.vec[spkIdx1].z){
 					continue;
 				}
 
@@ -229,7 +229,8 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 					continue;
 				}
 
-				Vec3d spkVec(s.vec().x,s.vec().y,0.f);
+				//Vec3d spkVec(s.pos().x,s.pos().y,0.f);
+				auto spkVec = s.pos().with<2>(0.f);
 
 				if( angle(vec1,vec2) > angle(vec1,spkVec) &&  angle(vec1,vec2) > angle(vec2,spkVec)){
 					itA = triplets.erase(itA);
@@ -359,8 +360,8 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 	double thresh = 0.f;
 	int spkInTri = 0;
 	for(int i = 0; i < numSpeakersSigned; ++i){
-		Speaker s = spkrs[i];
-		Vec3d vec =s.vec().normalized();
+		const auto& s = spkrs[i];
+		auto vec = s.pos().dir();
 		int devChan = s.deviceChannel;
 
 		std::list<SpeakerTriple>::iterator itg = triplets.begin();

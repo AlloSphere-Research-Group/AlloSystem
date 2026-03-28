@@ -12,9 +12,8 @@ void Dbap::compile(Listener& listener){
 	mNumSpeakers = mSpeakers.size();
 	printf("DBAP Compiled with %d speakers\n", mNumSpeakers);
 
-	for(int i = 0; i < mNumSpeakers; i++)
-	{
-		mSpeakerVecs[i] = mSpeakers[i].vec();
+	for(int i = 0; i < mNumSpeakers; i++){
+		mSpeakerVecs[i] = mSpeakers[i].pos();
 		mDeviceChannels[i] = mSpeakers[i].deviceChannel;
 	}
 }
