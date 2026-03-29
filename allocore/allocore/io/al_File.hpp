@@ -121,13 +121,27 @@ public:
 	File& path(const std::string& v){ mPath=v; return *this; }
 
 	/// Write string to file
+	/// \returns number of characters written.
 	int write(const std::string& v);
 
 	/// Write memory elements to file
+	/// \returns number of elements written.
 	int write(const void * v, int itemSizeInBytes, int items=1);
 
+	/// Write single POD element to file
+	template <class POD>
+	int write(const POD& pod){
+		return write(&pod, sizeof(POD), 1);
+	}
+
 	/// Read memory elements from file
-	int read(void * v, int size, int items=1){ return fread(v, size, items, mFP); }
+	int read(void * v, int size, int items=1);
+
+	/// Read single POD element from file
+	template <class POD>
+	int read(POD& pod){
+		return read(&pod, sizeof(POD), 1);
+	}
 
 	/// Returns character string of file contents (read mode only)
 	const char * readAll();
