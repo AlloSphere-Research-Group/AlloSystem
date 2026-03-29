@@ -121,14 +121,10 @@ public:
 	File& path(const std::string& v){ mPath=v; return *this; }
 
 	/// Write string to file
-	int write(const std::string& v){ return write(v.data(), 1, v.length()); }
+	int write(const std::string& v);
 
 	/// Write memory elements to file
-	int write(const void * v, int itemSizeInBytes, int items=1){
-		int itemsWritten = fwrite(v, itemSizeInBytes, items, mFP);
-		mSizeBytes += itemsWritten * itemSizeInBytes;
-		return itemsWritten;
-	}
+	int write(const void * v, int itemSizeInBytes, int items=1);
 
 	/// Read memory elements from file
 	int read(void * v, int size, int items=1){ return fread(v, size, items, mFP); }
@@ -299,7 +295,6 @@ protected:
 
 	friend class Dir;
 };
-
 
 
 

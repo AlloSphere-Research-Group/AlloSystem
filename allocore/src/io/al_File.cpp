@@ -533,6 +533,14 @@ void File::close(){
 	mSizeBytes=0;
 }
 
+int File::write(const std::string& v){ return write(v.data(), 1, v.length()); }
+
+int File::write(const void * v, int itemSizeInBytes, int items){
+	int itemsWritten = fwrite(v, itemSizeInBytes, items, mFP);
+	mSizeBytes += itemsWritten * itemSizeInBytes;
+	return itemsWritten;
+}
+
 const char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
 		int n = size();
