@@ -316,43 +316,4 @@ void Timer::print() const {
 	printf("%g sec (%g ms) elapsed\n", dtSec, dtSec*1000.);
 }
 
-
-void DelayLockedLoop :: setBandwidth(double bandwidth) {
-	double F = 1./tperiod;		// step rate
-	double omega = M_PI * 2.8 * bandwidth/F;
-	mB = omega * sqrt(2.);	// 1st-order weight
-	mC = omega * omega;		// 2nd-order weight
-}
-
-void DelayLockedLoop :: step(al_sec realtime) {
-	if (mReset) {
-		// The first iteration sets initial conditions.
-
-		// init loop
-		t2 = tperiod;
-		t0 = realtime;
-		t1 = t0 + t2;	// t1 is ideally the timestamp of the next block start
-
-		// subsequent iterations use the other branch:
-		mReset = false;
-	} else {
-		// read timer and calculate loop error
-		// e.g. if t1 underestimated, terr will be
-		al_sec terr = realtime - t1;
-		// update loop
-		t0 = t1;				// 0th-order (distance)
-		t1 += mB * terr + t2;	// integration of 1st-order (velocity)
-		t2 += mC * terr;		// integration of 2nd-order (acceleration)
-	}
-
-//		// now t0 is the current system time, and t1 is the estimated system time at the next step
-//		//
-//		al_sec tper_estimate = t1-t0;	// estimated real duration between this step & the next one
-//		double factor = tperiod/tper_estimate;	// <1 if we are too slow, >1 if we are too fast
-//		double real_rate = 1./tper_estimate;
-//		al_sec tper_estimate2 = t2;	// estimated real duration between this step & the next one
-//		double factor2 = 1./t2;	// <1 if we are too slow, >1 if we are too fast
-//		printf("factor %f %f rate %f\n", factor, factor2, real_rate);
-}
-
 } // al::
