@@ -11,13 +11,12 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#include <cmath>
 #include <string>
 #include "allocore/system/al_Time.h"
 
 namespace al{
 
-/// @addtogroup allocore
+/// \addtogroup allocore
 /// @{
 
 /// Sleep for an interval of seconds
@@ -30,8 +29,8 @@ inline al_sec walltime(){ return timeNow(); }
 
 /// Convert nanoseconds to timecode string
 
-/// @param[in] t		nanosecond time to convert
-/// @param[in] format	String describing output format.
+/// \param[in] t		nanosecond time to convert
+/// \param[in] format	String describing output format.
 /// The following special characters output the following values:
 ///		D	date, as yyyynndd
 ///		y	year
@@ -102,9 +101,9 @@ public:
 
 	/// Time a function
 
-	/// @param[in] blockSize	number of function calls within one timing block
-	/// @param[in] trials		number of blocks to trial to get lowest time
-	/// @param[in] func			function to time, takes call count as input
+	/// \param[in] blockSize	number of function calls within one timing block
+	/// \param[in] trials		number of blocks to trial to get lowest time
+	/// \param[in] func			function to time, takes call count as input
 	///							(to vary function arguments)
 	///
 	/// \returns the lowest time in nanoseconds to execute one block
@@ -134,12 +133,12 @@ private:
 
 /// Helper macro to print timing of an expression
 
-/// @param[in] blockSize	size of test block
-/// @param[in] trials		number of blocks to measure for lowest time
-/// @param[in] unit			'n' for nanoseconds,
+/// \param[in] blockSize	size of test block
+/// \param[in] trials		number of blocks to measure for lowest time
+/// \param[in] unit			'n' for nanoseconds,
 ///							'u' for microseconds,
 ///							'm' for milliseconds
-/// @param[in] ...			expression to time
+/// \param[in] ...			expression to time
 #define AL_PRINT_EXPR_TIME(blockSize, trials, unit, ...){\
 	unsigned long unitDiv = 1;\
 	const char * unitStr = "ns";\
@@ -158,9 +157,11 @@ private:
 /// periodic or one-shot.
 class ITimer{
 public:
-	ITimer(float interval=1, bool oneShot=false, bool active=true)
-	:	mInterval(interval), mActive(active), mPeriodic(!oneShot)
-	{}
+
+	/// \param[in] interval		Timer interval (in seconds)
+	/// \param[in] oneShot		Whether to stop after one interval
+	/// \param[in] active		Whether active
+	ITimer(float interval=1, bool oneShot=false, bool active=true);
 
 	
 	/// Get whether timer is active
@@ -195,17 +196,7 @@ public:
 	ITimer& reset(float start=0.){ return time(start); }
 
 	/// Increment time by dt and return whether interval passed on this update
-	bool operator()(float dt){
-		mTriggered = false;
-		if(mActive){
-			mTime += dt;
-			if(mTime >= mInterval){
-				if(mPeriodic) mTime = std::fmod(mTime, mInterval);
-				mTriggered = true;
-			}
-		}
-		return mTriggered;
-	}
+	bool operator()(float dt);
 
 private:
 	float mTime = 0;

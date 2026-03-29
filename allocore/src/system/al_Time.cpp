@@ -1,6 +1,7 @@
+#include <cmath> // fmod
 #include <sstream> // ostringstream
 #include <iomanip> // std::setw
-#include <stdio.h> // printf
+#include <cstdio> // printf
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/system/al_Time.hpp"
 
@@ -314,6 +315,23 @@ std::string timecodeNow(const std::string& format){
 void Timer::print() const {
 	auto dtSec = elapsedSec();
 	printf("%g sec (%g ms) elapsed\n", dtSec, dtSec*1000.);
+}
+
+
+ITimer::ITimer(float interval, bool oneShot, bool active)
+:	mInterval(interval), mActive(active), mPeriodic(!oneShot)
+{}
+
+bool ITimer::operator()(float dt){
+	mTriggered = false;
+	if(mActive){
+		mTime += dt;
+		if(mTime >= mInterval){
+			if(mPeriodic) mTime = std::fmod(mTime, mInterval);
+			mTriggered = true;
+		}
+	}
+	return mTriggered;
 }
 
 } // al::
