@@ -178,6 +178,7 @@ public:
 
 
 	/// Quick and dirty read of all bytes from file
+	static std::vector<char> read(const char * path);
 	static std::vector<char> read(const std::string& path);
 
 	/// Quick and dirty read of all bytes from text file

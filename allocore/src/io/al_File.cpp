@@ -560,14 +560,18 @@ const char * File::readAll(){
 	return mContent;
 }
 
-/*static*/ std::vector<char> File::read(const std::string& path){
+/*static*/ std::vector<char> File::read(const char * path){
 	File f(path, "rb");
 	if(f.open()){
 		std::vector<char> buf(f.size());
 		f.read(buf.data(), buf.size());
-		return buf;
+		return std::move(buf);
 	}
 	return {};
+}
+
+/*static*/ std::vector<char> File::read(const std::string& path){
+	return std::move(read(path.c_str()));
 }
 
 /*static*/ std::string File::toString(const std::string& path){
