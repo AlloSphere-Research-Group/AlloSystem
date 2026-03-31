@@ -1433,6 +1433,11 @@ inline Vec<N,T> centroid(const Vec<N,T>& p1, const Vec<N,T>& p2, const Vec<N,T>&
 }
 
 /// Get closest point on a line to a point p
+
+/// \param[in] linePnt	A point on the line
+/// \param[in] lineDir	Unit vector representing direction of line
+/// \param[in] p		Point to query against
+/// \returns Closest point on line to queried point
 template <int N, class T>
 Vec<N,T> closestPointOnLine(const Vec<N,T>& linePnt, const Vec<N,T>& lineDir, const Vec<N,T>& p){
 	return linePnt + (p-linePnt).proj(lineDir);
