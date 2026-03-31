@@ -910,6 +910,30 @@ public:
 	/// Get direction (unit) vector
 	Vec dir(T scale=T(1)) const { return normalized(scale); }
 
+	/// Invert vector
+
+	/// This applies a geometric inversion w.r.t. a unit sphere centered at the
+	/// origin. The result is the magnitude is reciprocated while the direction
+	/// is left unchanged.
+	Vec& invert(){
+		return *this /= magSqr(); // a/|a| x 1/|a| = a / |a|^2
+	}
+
+	/// Invert vector
+
+	/// This applies a geometric inversion w.r.t. a sphere with a given radius
+	/// and position. 
+	/// \param[in] r	Radius of sphere
+	/// \param[in] o	Center of sphere
+	Vec& invert(T r, Vec o = Vec(0)){
+		auto dv = *this - o;
+		return *this = o + (r*r / dv.magSqr()) * dv;
+	}
+
+	/// Get inverse vector
+	Vec inv() const { return dup().invert(); }
+	Vec inv(T r, Vec o = Vec(0)) const { return dup().invert(r,o); }
+
 	/// Get projection of vector onto another vector
 	Vec proj(const Vec& v) const {
 		static const T eps = T(1e-30);
