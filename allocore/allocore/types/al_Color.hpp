@@ -323,11 +323,20 @@ struct Colori {
 	{	*this = hcluv; }
 	
 
-	/// Set color component at index with no bounds checking
+	/// Set component at index with no bounds checking
 	uint8_t& operator[](int i){ return components[i]; }
 
-	/// Get color component at index with no bounds checking
+	/// Get component at index with no bounds checking
 	const uint8_t& operator[](int i) const { return components[i]; }
+
+	/// Get component at index with bounds checking
+	template <unsigned i>
+	uint8_t& at(){
+		static_assert(i<4, "Invalid index");
+		return components[i];
+	}
+	template <unsigned i>
+	uint8_t at() const{ return const_cast<Colori*>(this)->at<i>(); }
 
 	/// Get reference to self as another type
 	template <class T>
@@ -352,6 +361,10 @@ struct Colori {
 
 	/// Set from gray value and alpha
 	Colori& set(uint8_t v, uint8_t al){ return set(v,v,v,al); }
+
+	/// Set component at index
+	template <unsigned i>
+	Colori& set(uint8_t v){ at<i>() = v; return *this; }
 
 	/// Set from floating-point color
 	Colori& operator= (const Color& v){
@@ -396,7 +409,6 @@ struct Colori {
 	}
 
 	Colori operator* (uint8_t v) const { return Colori(*this)*=v; }
-
 
 	template <unsigned HexValue>
 	constexpr Colori& fromHexRGB(){
