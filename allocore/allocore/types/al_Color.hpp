@@ -410,6 +410,12 @@ struct Colori {
 
 	Colori operator* (uint8_t v) const { return Colori(*this)*=v; }
 
+	/// Multiply RGB components by A
+	Colori& preMul(){
+		auto alpha = a;
+		return set<3>(255) *= alpha;
+	}
+
 	template <unsigned HexValue>
 	constexpr Colori& fromHexRGB(){
 		static_assert(HexValue <= 0xFFFFFF, "Hex value is greater than 0xFFFFFF");
