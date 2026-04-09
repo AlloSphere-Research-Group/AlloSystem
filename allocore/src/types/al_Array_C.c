@@ -50,7 +50,7 @@ void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src){
 void allo_array_resetdims(AlloArrayHeader * h, unsigned startDim){
 	unsigned i;
 	for(i=startDim; i<ALLO_ARRAY_MAX_DIMS; i++)
-		h->dim[i] = 1;
+		h->dim[i] = i!=0;
 }
 
 void allo_array_setdim1d(AlloArrayHeader * h, uint32_t nx){
