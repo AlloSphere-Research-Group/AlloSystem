@@ -47,15 +47,39 @@ void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src){
 	memcpy(&dst->header, src, sizeof(AlloArrayHeader));
 }
 
+void allo_array_resetdims(AlloArrayHeader * h, unsigned startDim){
+	unsigned i;
+	for(i=startDim; i<ALLO_ARRAY_MAX_DIMS; i++)
+		h->dim[i] = 1;
+}
+
 void allo_array_setdim1d(AlloArrayHeader * h, uint32_t nx){
 	h->dimcount	= 1;
-	h->dim[0]	= nx;
+	h->dim[0] = nx;
+	allo_array_resetdims(h, 1);
 }
 
 void allo_array_setdim2d(AlloArrayHeader * h, uint32_t nx, uint32_t ny){
 	h->dimcount	= 2;
-	h->dim[0]	= nx;
-	h->dim[1]	= ny;
+	h->dim[0] = nx;
+	h->dim[1] = ny;
+	allo_array_resetdims(h, 2);
+}
+
+void allo_array_setdim3d(AlloArrayHeader * h, uint32_t nx, uint32_t ny, uint32_t nz){
+	h->dimcount	= 3;
+	h->dim[0] = nx;
+	h->dim[1] = ny;
+	h->dim[2] = nz;
+	allo_array_resetdims(h, 3);
+}
+
+void allo_array_setdimNd(AlloArrayHeader * h, uint32_t * n, uint8_t numDims){
+	if(numDims > ALLO_ARRAY_MAX_DIMS) numDims = ALLO_ARRAY_MAX_DIMS;
+	h->dimcount	= numDims;
+	uint8_t i;
+	for(i=0; i<numDims; i++) h->dim[i] = n[i];
+	allo_array_resetdims(h, numDims);
 }
 
 void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize){

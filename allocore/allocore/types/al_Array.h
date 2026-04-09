@@ -142,6 +142,7 @@ static size_t allo_array_size(const AlloArray *);
 */
 void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src);
 
+void allo_array_resetdims(AlloArrayHeader * h, unsigned startDim);
 
 /** Set dimension attributes without modifying memory
 */
@@ -151,10 +152,15 @@ void allo_array_setdim1d(AlloArrayHeader *, uint32_t nx);
 */
 void allo_array_setdim2d(AlloArrayHeader *, uint32_t nx, uint32_t ny);
 
+/** Set dimension attributes without modifying memory
+*/
+void allo_array_setdim3d(AlloArrayHeader * h, uint32_t nx, uint32_t ny, uint32_t nz);
+
+void allo_array_setdimNd(AlloArrayHeader * h, uint32_t * n, uint8_t numDims);
+
 /** Set stride factors based on a specific byte alignment
 */
 void allo_array_setstride(AlloArrayHeader *, unsigned alignSize);
-
 
 /** Checks if headers are equivalent.
 

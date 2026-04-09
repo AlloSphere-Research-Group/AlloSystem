@@ -122,11 +122,11 @@ Texture& Texture::type(DataType v){
 }
 
 Texture& Texture::resize(unsigned w){
-	return resize(w,0,0);
+	return resize(w,1,1);
 }
 
 Texture& Texture::resize(unsigned w, unsigned h){
-	return resize(w,h,0);
+	return resize(w,h,1);
 }
 
 Texture& Texture::resize(unsigned w, unsigned h, unsigned d){
@@ -138,15 +138,15 @@ Texture& Texture::resize(unsigned w, unsigned h, unsigned d){
 		if(mArray.hasData()) allocate(); // ensure local data matches new size
 
 		// derive the GL texture target
-		if(mDepth != 0){
+		if(mDepth > 1){
 			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 			mTarget = TEXTURE_3D;
 			#endif
 		}
-		else if(mHeight != 0){
+		else if(mHeight > 1){
 			mTarget = TEXTURE_2D;
 		}
-		else if(mWidth != 0){
+		else if(mWidth >= 1){
 			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 			mTarget = TEXTURE_1D;
 			#endif
@@ -209,7 +209,7 @@ unsigned Texture::numComponents() const {
 }
 
 unsigned Texture::numPixels() const {
-	return mWidth * (mHeight?mHeight:1) * (mDepth?mDepth:1);
+	return mWidth * mHeight * mDepth;
 }
 
 unsigned Texture::numElems() const {
@@ -356,26 +356,14 @@ void Texture::resetArray(unsigned align){
 
 	switch(mTarget){
 	case TEXTURE_2D:
-	default:
-		mArray.header.dimcount = 2;
-		mArray.header.dim[0] = mWidth;
-		mArray.header.dim[1] = mHeight;
-		break;
+	default: allo_array_setdim2d(&mArray.header, mWidth, mHeight); break;
 
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
-	case TEXTURE_1D:
-		mArray.header.dimcount = 1;
-		mArray.header.dim[0] = mWidth;
-		break;
+	case TEXTURE_1D: allo_array_setdim1d(&mArray.header, mWidth); break;
 	#endif
 
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-	case TEXTURE_3D:
-		mArray.header.dimcount = 3;
-		mArray.header.dim[0] = mWidth;
-		mArray.header.dim[1] = mHeight;
-		mArray.header.dim[2] = mDepth;
-		break;
+	case TEXTURE_3D: allo_array_setdim3d(&mArray.header, mWidth, mHeight, mDepth); break;
 	#endif
 	}
 
@@ -456,14 +444,14 @@ Texture& Texture::getRemoteData(){
 
 void Texture::sendParams(bool force){
 	if(mParamsUpdated || force){
-		glTexParameteri(target(), GL_TEXTURE_MAG_FILTER, filterMag());
-		glTexParameteri(target(), GL_TEXTURE_MIN_FILTER, filterMin());
-		switch(target()){
+		glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, mFilterMag);
+		glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, mFilterMin);
+		switch(mTarget){
 		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-		case TEXTURE_3D: glTexParameteri(target(), GL_TEXTURE_WRAP_R, mWrapR);
+		case TEXTURE_3D: glTexParameteri(mTarget, GL_TEXTURE_WRAP_R, mWrapR);
 		#endif
-		case TEXTURE_2D: glTexParameteri(target(), GL_TEXTURE_WRAP_T, mWrapT);
-		default:         glTexParameteri(target(), GL_TEXTURE_WRAP_S, mWrapS);
+		case TEXTURE_2D: glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, mWrapT);
+		default:         glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, mWrapS);
 		}
 			AL_GRAPHICS_ERROR("Texture::sendParams (glTexParameteri)", id());
 		mParamsUpdated = false;
@@ -497,8 +485,7 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 				#endif
 			};
 
-			switch(target()){
-
+			switch(mTarget){
 				/*void glTexSubImage3D(
 					GLenum target, GLint level,
 					GLint xoffset, GLint yoffset, GLint zoffset,
@@ -506,10 +493,9 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 					GLenum format, GLenum type,
 					const GLvoid *pixels
 				);*/
-
 				#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 				case TEXTURE_1D:
-					glTexSubImage1D(target(), 0, 0, width(), format(), type(), pixels);
+					glTexSubImage1D(mTarget, 0, 0, mWidth, mFormat, mType, pixels);
 						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
 					genMipmap();
 					break;
@@ -517,14 +503,14 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 
 				case TEXTURE_2D:{
 					const void * data = (const char *)(pixels) + mArray.stride(1)*r.offset;
-					glTexSubImage2D(target(), 0, 0,r.offset, width(),r.count, format(), type(), data);
+					glTexSubImage2D(mTarget, 0, 0,r.offset, mWidth,r.count, mFormat, mType, data);
 						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
 					genMipmap();
 					} break;
 
 				#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 				case TEXTURE_3D:
-					glTexSubImage3D(target(), 0, 0,0,0, width(),height(),depth(), format(), type(), pixels);
+					glTexSubImage3D(mTarget, 0, 0,0,0, mWidth,mHeight,mDepth, mFormat, mType, pixels);
 						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
 					genMipmap();
 					break;
@@ -539,7 +525,7 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 		};
 
 		if(mFirstBind || mUpdateRows.empty()){
-			Rows r = {0, (height()?height():1) * (depth()?depth():1)};
+			Rows r = {0, mHeight * mDepth};
 			sendSubImage(r);
 		} else {
 			while(mUpdateRows.size()){
@@ -568,32 +554,32 @@ void Texture::sendShape(bool force){
 
 		// Determine texel format (on GPU)
 		// Use specified texel format if defined, otherwise pixel (CPU) format
-		int intFmt = mTexelFormat ? mTexelFormat : format();
+		int intFmt = mTexelFormat ? mTexelFormat : mFormat;
 
-		if(!mTexelClamp && type() == Graphics::FLOAT && unclampedFloatFormat()){
+		if(!mTexelClamp && mType == Graphics::FLOAT && unclampedFloatFormat()){
 			intFmt = unclampedFloatFormat();
 		}
 
 		//printf("Texture::sendShape calling glTexImage\n");
-		switch(target()){
+		switch(mTarget){
 		/*void glTexImage3D(
 			GLenum target, GLint level, GLenum internalformat,
 			GLsizei width, GLsizei height, GLsizei depth,
 			GLint border, GLenum format, GLenum type, const GLvoid *pixels);*/
 		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		case TEXTURE_1D:
-			glTexImage1D(target(), 0, intFmt, width(), 0, format(), type(), NULL);
+			glTexImage1D(mTarget, 0, intFmt, mWidth, 0, mFormat, mType, NULL);
 			break;
 		#endif
 
 		case TEXTURE_2D:
-			glTexImage2D(target(), 0, intFmt, width(), height(), 0, format(), type(), NULL);
+			glTexImage2D(mTarget, 0, intFmt, mWidth,mHeight, 0, mFormat, mType, NULL);
 			//printf("glTexImage2D(%s, 0, %s, %u, %u, 0, %s, %s, NULL)\n", toString(target()), toString(Graphics::Format(intFmt)), width(), height(), toString(format()), toString(type()));
 			break;
 
 		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 		case TEXTURE_3D:
-			glTexImage3D(target(), 0, intFmt, width(), height(), depth(), 0, format(), type(), NULL);
+			glTexImage3D(mTarget, 0, intFmt, mWidth,mHeight,mDepth, 0, mFormat, mType, NULL);
 			break;
 		#endif
 
@@ -648,7 +634,7 @@ Texture& Texture::submit(const void * pixels, uint32_t align){
 
 Texture& Texture::submit(const Array& src, bool reconfigure){
 
-	// Here we basically do a deep copy of the passed in Array
+	// In this case, we do a deep copy of the passed in Array
 	if(reconfigure){
 		shapeFrom(src.header, true /*reallocate*/);
 		//printf("configured to target=%X(%dD), type=%X(%X), format=%X, align=(%d)\n", mTarget, src.dimcount(), type(), src.type(), mFormat, src.alignment());
@@ -661,11 +647,11 @@ Texture& Texture::submit(const Array& src, bool reconfigure){
 			AL_WARN("submit failed: source array width does not match");
 			goto end;
 		}
-		if(height() && src.height() != height()){
+		if(src.height() != height()){
 			AL_WARN("submit failed: source array height does not match");
 			goto end;
 		}
-		if(depth() && src.depth() != depth()){
+		if(src.depth() != depth()){
 			AL_WARN("submit failed: source array depth does not match");
 			goto end;
 		}
@@ -726,20 +712,20 @@ Texture& Texture::copyFrameBuffer(
 	if(h < 0) h += 1 + height();
 
 	bind();
-	switch(target()){
+	switch(mTarget){
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	case TEXTURE_1D:
-		glCopyTexSubImage1D(GL_TEXTURE_1D, 0, texx, fbx,fby, w);
+		glCopyTexSubImage1D(mTarget, 0, texx, fbx,fby, w);
 			AL_GRAPHICS_ERROR("Texture::copyFrameBuffer (glCopyTexSubImage1D)", id());
 		break;
 	#endif
 	case TEXTURE_2D:
-		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, texx,texy, fbx,fby, w, h);
+		glCopyTexSubImage2D(mTarget, 0, texx,texy, fbx,fby, w, h);
 			AL_GRAPHICS_ERROR("Texture::copyFrameBuffer (glCopyTexSubImage2D)", id());
 		break;
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 	case TEXTURE_3D:
-		glCopyTexSubImage3D(GL_TEXTURE_3D, 0, texx,texy,texz, fbx,fby, w, h);
+		glCopyTexSubImage3D(mTarget, 0, texx,texy,texz, fbx,fby, w, h);
 			AL_GRAPHICS_ERROR("Texture::copyFrameBuffer (glCopyTexSubImage3D)", id());
 		break;
 	#endif
@@ -782,10 +768,8 @@ void Texture::quadViewport(
 }
 
 void Texture::iterate(const std::function<void(int i, int j, int k)>& onPixel){
-	auto D =  depth() ?  depth() : 1;
-	auto H = height() ? height() : 1;
-	for(int k=0; k<D; ++k){
-	for(int j=0; j<H; ++j){
+	for(int k=0; k<depth(); ++k){
+	for(int j=0; j<height(); ++j){
 	for(int i=0; i<width(); ++i){
 		onPixel(i,j,k);
 	}}}
@@ -839,7 +823,7 @@ void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPi
 }
 
 void Texture::assign(const std::function<void(int i, int j, float * rgba)>& onPixel){
-	assign(onPixel, width(), height());
+	assign(onPixel, mWidth, mHeight);
 }
 
 void Texture::assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel, int w, int h, int xoffset, int yoffset){
@@ -852,7 +836,7 @@ void Texture::assignFromTexCoord(const std::function<void(float s, float t, floa
 }
 
 void Texture::assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel){
-	assignFromTexCoord(onPixel, width(), height());
+	assignFromTexCoord(onPixel, mWidth, mHeight);
 }
 
 void Texture::print(){
@@ -862,22 +846,22 @@ void Texture::print(){
 	switch(mTarget){
 		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 		case TEXTURE_1D:
-			printf("target=%s, %d(%d)", toString(mTarget), width(), mArray.width());
+			printf("target=%s, %d(%d)", toString(mTarget), mWidth, mArray.width());
 			break;
 		#endif
 
 		case TEXTURE_2D:
-			printf("target=%s, %dx%d(%dx%d)", toString(mTarget), width(), height(), mArray.width(), mArray.height());
+			printf("target=%s, %dx%d(%dx%d)", toString(mTarget), mWidth, mHeight, mArray.width(), mArray.height());
 			break;
 
 		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 		case TEXTURE_3D:
-			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), mWidth, mHeight, mDepth, mArray.width(), mArray.height(), mArray.depth());
 			break;
 		#endif
 
 		case NO_TARGET:
-			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), mWidth, mHeight, mDepth, mArray.width(), mArray.height(), mArray.depth());
 			break;
 
 		default:

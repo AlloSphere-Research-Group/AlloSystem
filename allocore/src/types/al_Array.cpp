@@ -5,10 +5,10 @@ namespace al{
 
 Array::Array(){
 	data.ptr = NULL;
-	header.type= 0;
+	header.type = AlloVoidTy;
 	header.components = 1;
 	header.dimcount = 0;
-	for(int i=0; i<ALLO_ARRAY_MAX_DIMS; ++i) header.dim[i]=0;
+	allo_array_resetdims(&header, 0);
 }
 
 Array::Array(const AlloArray& cpy){
@@ -44,9 +44,8 @@ Array::~Array(){ dataFree(); }
 Array& Array::operator= (const Array& cpy) {
 	if(&cpy != this){
 		format(cpy.header);
-		if (cpy.data.ptr) {
+		if(cpy.data.ptr)
 			memcpy(data.ptr, cpy.data.ptr, size());
-		}
 	}
 	return *this;
 }
@@ -54,9 +53,8 @@ Array& Array::operator= (const Array& cpy) {
 Array& Array::operator= (const AlloArray& cpy) {
 	if(&cpy != this){
 		format(cpy.header);
-		if (cpy.data.ptr) {
+		if(cpy.data.ptr)
 			memcpy(data.ptr, cpy.data.ptr, size());
-		}
 	}
 	return *this;
 }
@@ -141,10 +139,7 @@ AlloArrayHeader Array::getHeader(int comps, AlloTy ty, uint32_t * dims, int numD
 	AlloArrayHeader h;
 	h.type = ty;
 	h.components = comps;
-	h.dimcount = numDims;
-	int i=0;
-	for(; i<numDims; ++i)				h.dim[i] = dims[i];
-	for(; i<ALLO_ARRAY_MAX_DIMS; ++i)	h.dim[i] = 0;
+	allo_array_setdimNd(&h, dims, numDims);
 	deriveStride(h, align);
 	return h;
 }

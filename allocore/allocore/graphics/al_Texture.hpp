@@ -446,7 +446,7 @@ protected:
 	DataType mType;				// UBYTE, FLOAT, etc.
 	Wrap mWrapS, mWrapT, mWrapR;
 	Filter mFilterMin, mFilterMag;
-	unsigned mWidth=0, mHeight=0, mDepth=0;
+	unsigned mWidth=0, mHeight=1, mDepth=1;
 	Array mArray;				// Array representation of client-side pixel data
 	bool mFirstBind=true;
 	bool mParamsUpdated=true;	// Flags change in texture params (wrap, filter)
@@ -482,6 +482,10 @@ protected:
 	static bool update(const T& v, T& var, bool& flag){
 		if(v!=var){ var=v; flag=true; return true; }
 		return false;
+	}
+
+	unsigned index(unsigned i, unsigned j) const {
+		return j*width() + i;
 	}
 };
 
@@ -533,12 +537,12 @@ Texture& Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, un
 
 template <class T>
 Texture& Texture::ref(T * src, unsigned w, Graphics::Format fmt){
-	return ref(src, w,0,0, fmt);
+	return ref(src, w,1,1, fmt);
 }
 
 template <class T>
 Texture& Texture::ref(T * src, unsigned w, unsigned h, Graphics::Format fmt){
-	return ref(src, w,h,0, fmt);
+	return ref(src, w,h,1, fmt);
 }
 
 template <class T>
