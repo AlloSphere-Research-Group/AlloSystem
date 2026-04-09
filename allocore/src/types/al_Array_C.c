@@ -1,27 +1,27 @@
-#include <string.h>
-#include <stdlib.h>
+#include <string.h> // memcpy
+#include <stdlib.h> // malloc
 #include "allocore/types/al_Array.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-const char * allo_type_name(AlloTy ty){
-	switch(ty) {
-		case AlloUInt8Ty:		return "uint8_t";
-		case AlloUInt16Ty:		return "uint16_t";
-		case AlloUInt32Ty:		return "uint32_t";
-		case AlloUInt64Ty:		return "uint64_t";
-		case AlloSInt8Ty:		return "int8_t";
-		case AlloSInt16Ty:		return "int16_t";
-		case AlloSInt32Ty:		return "int32_t";
-		case AlloSInt64Ty:		return "int64_t";
-		case AlloFloat32Ty:		return "float";
-		case AlloFloat64Ty:		return "double";
-		case AlloArrayTy:		return "AlloArray";
-		case AlloPointer32Ty:	return "int32_t";
-		case AlloPointer64Ty:	return "int64_t";
-		default:				return "";
+const char * allo_type_name(AlloTy t){
+	switch(t){
+	case AlloUInt8Ty:		return "uint8_t";
+	case AlloUInt16Ty:		return "uint16_t";
+	case AlloUInt32Ty:		return "uint32_t";
+	case AlloUInt64Ty:		return "uint64_t";
+	case AlloSInt8Ty:		return "int8_t";
+	case AlloSInt16Ty:		return "int16_t";
+	case AlloSInt32Ty:		return "int32_t";
+	case AlloSInt64Ty:		return "int64_t";
+	case AlloFloat32Ty:		return "float";
+	case AlloFloat64Ty:		return "double";
+	case AlloArrayTy:		return "AlloArray";
+	case AlloPointer32Ty:	return "int32_t";
+	case AlloPointer64Ty:	return "int64_t";
+	default:				return "";
 	}
 }
 
@@ -43,7 +43,7 @@ int allo_array_equal_headers(const AlloArrayHeader * h1, const AlloArrayHeader *
 	}
 }
 
-void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src) {
+void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src){
 	memcpy(&dst->header, src, sizeof(AlloArrayHeader));
 }
 
@@ -77,35 +77,35 @@ void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize){
 	}
 }
 
-void allo_array_header_clear(AlloArrayHeader *h) {
+void allo_array_header_clear(AlloArrayHeader * h){
 	memset(h, 0, sizeof(AlloArrayHeader));
 }
 
-void allo_array_clear(AlloArray * arr) {
-	allo_array_header_clear( &(arr->header) );
-	arr->data.ptr = NULL;
+void allo_array_clear(AlloArray * a){
+	allo_array_header_clear(&a->header);
+	a->data.ptr = NULL;
 }
 
-void allo_array_free(AlloArray * arr) {
-	if (NULL != arr->data.ptr) free(arr->data.ptr);
-	arr->data.ptr = NULL;
+void allo_array_free(AlloArray * a){
+	if(NULL != a->data.ptr) free(a->data.ptr);
+	a->data.ptr = NULL;
 }
 
-void allo_array_destroy(AlloArray * arr) {
-	if (NULL != arr->data.ptr) {
-		allo_array_free(arr);
-		allo_array_clear(arr);
+void allo_array_destroy(AlloArray * a){
+	if(NULL != a->data.ptr){
+		allo_array_free(a);
+		allo_array_clear(a);
 	}
 }
 
-void allo_array_allocate(AlloArray * arr) {
-	arr->data.ptr = (char *)calloc(1, allo_array_size(arr));
+void allo_array_allocate(AlloArray * a){
+	a->data.ptr = (char *)calloc(1, allo_array_size(a));
 }
 
-void allo_array_create(AlloArray * arr, const AlloArrayHeader *h) {
-	allo_array_destroy(arr);
-	allo_array_setheader(arr, h);
-	allo_array_allocate(arr);
+void allo_array_create(AlloArray * a, const AlloArrayHeader * h){
+	allo_array_destroy(a);
+	allo_array_setheader(a, h);
+	allo_array_allocate(a);
 }
 
 void allo_array_create1d(
@@ -114,7 +114,7 @@ void allo_array_create1d(
 	AlloTy type,
 	uint32_t dimx,
 	size_t align
-) {
+){
 	AlloArrayHeader header;
 	header.type = type;
 	header.components = components;
@@ -130,7 +130,7 @@ void allo_array_create2d(
 	uint32_t dimx,
 	uint32_t dimy,
 	size_t align
-) {
+){
 	AlloArrayHeader header;
 	header.type = type;
 	header.components = components;
@@ -139,9 +139,9 @@ void allo_array_create2d(
 	allo_array_create(arr, &header);
 }
 
-void allo_array_adapt(AlloArray * arr, const AlloArrayHeader *h) {
-	if(! allo_array_equal_headers( &(arr->header), h)) {
-		allo_array_create(arr, h);
+void allo_array_adapt(AlloArray * a, const AlloArrayHeader * h){
+	if(!allo_array_equal_headers(&a->header, h)){
+		allo_array_create(a, h);
 	}
 }
 
@@ -152,7 +152,7 @@ void allo_array_adapt2d(
 	uint32_t dimx,
 	uint32_t dimy,
 	size_t align
-) {
+){
 	AlloArrayHeader header;
 	header.type = type;
 	header.components = components;
@@ -161,7 +161,7 @@ void allo_array_adapt2d(
 	allo_array_adapt(arr, &header);
 }
 
-void allo_array_copy(AlloArray *dst, AlloArray *src){
+void allo_array_copy(AlloArray * dst, AlloArray * src){
 	allo_array_adapt(dst, &(src->header));
 	memcpy(dst->data.ptr, src->data.ptr, allo_array_size(src));
 }
@@ -169,29 +169,29 @@ void allo_array_copy(AlloArray *dst, AlloArray *src){
 
 
 
-AlloArrayWrapper * allo_array_wrapper_new() {
+AlloArrayWrapper * allo_array_wrapper_new(){
 	return (AlloArrayWrapper *)malloc(sizeof(AlloArrayWrapper));
 }
 
-void allo_array_wrapper_free(AlloArrayWrapper *w) {
+void allo_array_wrapper_free(AlloArrayWrapper * w){
 	free(w);
 }
 
-void allo_array_wrapper_setup(AlloArrayWrapper *wrap) {
-	allo_array_clear( &(wrap->array) );
-	wrap->refs = 0;
+void allo_array_wrapper_setup(AlloArrayWrapper * w){
+	allo_array_clear(&w->array);
+	w->refs = 0;
 }
 
-void allo_array_wrapper_retain(AlloArrayWrapper *wrap) {
-	wrap->refs++;
+void allo_array_wrapper_retain(AlloArrayWrapper * w){
+	w->refs++;
 }
 
-void allo_array_wrapper_release(AlloArrayWrapper *wrap) {
-	wrap->refs--;
-	if(wrap->refs <= 0) {
-		allo_array_destroy(&(wrap->array));
-		wrap->refs = 0;
-		allo_array_wrapper_free(wrap);
+void allo_array_wrapper_release(AlloArrayWrapper * w){
+	w->refs--;
+	if(w->refs <= 0) {
+		allo_array_destroy(&w->array);
+		w->refs = 0;
+		allo_array_wrapper_free(w);
 	}
 }
 
