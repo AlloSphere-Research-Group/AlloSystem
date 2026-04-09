@@ -75,6 +75,34 @@ int utTypes(){
 		assert(hdr.stride[2] == 8*7);
 	}
 
+	{
+		const double u08max = 255.;
+		const double u16max = 65535.;
+		const double u32max = 4294967295.;
+		const double u64max = 18446744073709551616.;
+		{ uint8_t x=   90; assert(allo_type_tonumber( AlloUInt8Ty, &x) == x/u08max);}
+		{uint16_t x=  900; assert(allo_type_tonumber(AlloUInt16Ty, &x) == x/u16max);}
+		{uint32_t x=90000; assert(allo_type_tonumber(AlloUInt32Ty, &x) == x/u32max);}
+		{uint64_t x= 9e10; assert(allo_type_tonumber(AlloUInt64Ty, &x) == x/u64max);}
+		{  int8_t x=   90; assert(allo_type_tonumber( AlloSInt8Ty, &x) == x/u08max+0.5);}
+		{ int16_t x=  900; assert(allo_type_tonumber(AlloSInt16Ty, &x) == x/u16max+0.5);}
+		{ int32_t x=90000; assert(allo_type_tonumber(AlloSInt32Ty, &x) == x/u32max+0.5);}
+		{ int64_t x= 9e10; assert(allo_type_tonumber(AlloSInt64Ty, &x) == x/u64max+0.5);}
+		{ float x=1.3; assert(allo_type_tonumber(AlloFloat32Ty, &x) == x);}
+		{double x=1.3; assert(allo_type_tonumber(AlloFloat64Ty, &x) == x);}
+
+		{ uint8_t x=   90,y; allo_type_fromnumber( AlloUInt8Ty, x/u08max, &y); assert(y==x);}
+		{uint16_t x=  900,y; allo_type_fromnumber(AlloUInt16Ty, x/u16max, &y); assert(y==x);}
+		{uint32_t x=90000,y; allo_type_fromnumber(AlloUInt32Ty, x/u32max, &y); assert(y==x);}
+		{uint64_t x= 9e10,y; allo_type_fromnumber(AlloUInt64Ty, x/u64max, &y); assert(y==x);}
+		{  int8_t x=   90,y; allo_type_fromnumber( AlloSInt8Ty, x/u08max-0.5, &y); assert(y==x);}
+		{ int16_t x=  900,y; allo_type_fromnumber(AlloSInt16Ty, x/u16max-0.5, &y); assert(y==x);}
+		{ int32_t x=90000,y; allo_type_fromnumber(AlloSInt32Ty, x/u32max-0.5, &y); assert(y==x);}
+		{ int64_t x= 9e10,y; allo_type_fromnumber(AlloSInt64Ty, x/u64max-0.5, &y); assert(y==x);}
+		{  float x=1.3,y; allo_type_fromnumber(AlloFloat32Ty, x, &y); assert(y==x);}
+		{ double x=1.3,y; allo_type_fromnumber(AlloFloat64Ty, x, &y); assert(y==x);}
+	}
+
 	{	// Basic Array usage
 
 		// TODO: move this to an example

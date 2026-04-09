@@ -14,7 +14,6 @@
 */
 
 #include "allocore/system/al_Config.h"
-#include <limits.h> /* ULONG_MAX */
 
 /*
  Maximum number of dimensions a array may represent
@@ -71,15 +70,15 @@ static size_t allo_type_size(const AlloTy ty);
 */
 const char * allo_type_name(const AlloTy ty);
 
-/** Converts any format value into a double in [0, 1].
-	Useful for converting numeric formats.
+/** Converts any format value into a double.
+	Integer formats are converted to the range [0, 1].
+	Floating-point formats are simply type-casted.
 */
-static double allo_type_tonumber(AlloTy ty, const char * ptr);
+static double allo_type_tonumber(AlloTy ty, const void * ptr);
 
 /** Converts a double in [0, 1] to a specified AlloTy.
-	Useful for converting numeric formats.
 */
-static void allo_type_fromnumber(AlloTy ty, double number, char * dst);
+static void allo_type_fromnumber(AlloTy ty, double number, void * dst);
 
 
 /** Description a dynamically-typed, multidimensional array */
@@ -278,42 +277,50 @@ static inline size_t allo_type_size(AlloTy ty) {
 	}
 }
 
-static inline double allo_type_tonumber(AlloTy ty, const char * ptr) {
+inline  uint8_t _allo_ui08_max(){ return ~(( uint8_t)0); }
+inline uint16_t _allo_ui16_max(){ return ~((uint16_t)0); }
+inline uint32_t _allo_ui32_max(){ return ~((uint32_t)0); }
+inline uint64_t _allo_ui64_max(){ return ~((uint64_t)0); }
+inline double _allo_ui08f_max(){ return (double)_allo_ui08_max(); }
+inline double _allo_ui16f_max(){ return (double)_allo_ui16_max(); }
+inline double _allo_ui32f_max(){ return (double)_allo_ui32_max(); }
+inline double _allo_ui64f_max(){ return (double)_allo_ui64_max(); }
+
+static inline double allo_type_tonumber(AlloTy ty, const void * ptr) {
 	switch(ty) {
-		case AlloUInt8Ty:		return (double)(((uint8_t *)ptr)[0])/255.;	/* UCHAR_MAX */
-		case AlloUInt16Ty:		return (double)(((uint8_t *)ptr)[0])/65535.;
-		case AlloUInt32Ty:		return (double)(((uint8_t *)ptr)[0])/(double)0xffffffff;
-		case AlloUInt64Ty:		return (double)(((uint8_t *)ptr)[0])/(double)ULONG_MAX;
-		case AlloSInt8Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/255.;	/* UCHAR_MAX */
-		case AlloSInt16Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/65535.;
-		case AlloSInt32Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/(double)0xffffffff;
-		case AlloSInt64Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/(double)ULONG_MAX;
-		case AlloFloat32Ty:		return (double)(((float *)ptr)[0]);
-		case AlloFloat64Ty:		return ((double *)ptr)[0];
-		default:				return 0;
+	case AlloUInt8Ty:	return (double)*(( uint8_t *)ptr)/_allo_ui08f_max();
+	case AlloUInt16Ty:	return (double)*((uint16_t *)ptr)/_allo_ui16f_max();
+	case AlloUInt32Ty:	return (double)*((uint32_t *)ptr)/_allo_ui32f_max();
+	case AlloUInt64Ty:	return (double)*((uint64_t *)ptr)/_allo_ui64f_max();
+	case AlloSInt8Ty:	return (double)*((  int8_t *)ptr)/_allo_ui08f_max()+0.5;
+	case AlloSInt16Ty:	return (double)*(( int16_t *)ptr)/_allo_ui16f_max()+0.5;
+	case AlloSInt32Ty:	return (double)*(( int32_t *)ptr)/_allo_ui32f_max()+0.5;
+	case AlloSInt64Ty:	return (double)*(( int64_t *)ptr)/_allo_ui64f_max()+0.5;
+	case AlloFloat32Ty:	return (double)*((float *)ptr);
+	case AlloFloat64Ty:	return *(double *)ptr;
+	default:			return 0;
 	}
 }
 
-static inline void allo_type_fromnumber(AlloTy ty, double number, char * dst) {
+static inline void allo_type_fromnumber(AlloTy ty, double val, void * dst) {
 	switch(ty) {
-		case AlloUInt8Ty:		*((uint8_t *)dst) = (uint8_t)(number * 255.); break;
-		case AlloUInt16Ty:		*((uint16_t *)dst) = (uint16_t)(number * 65535.); break;
-		case AlloUInt32Ty:		*((uint32_t *)dst) = (uint32_t)(number * (double)(0xffffffff)); break;
-		case AlloUInt64Ty:		*((uint64_t *)dst) = (uint64_t)(number * (double)(ULONG_MAX)); break;
-
-		case AlloSInt8Ty:		*((int8_t *)dst) = (int8_t)((number-0.5) * 255.); break;
-		case AlloSInt16Ty:		*((int16_t *)dst) = (int16_t)((number-0.5) * 65535.); break;
-		case AlloSInt32Ty:		*((int32_t *)dst) = (int32_t)((number-0.5) * (double)(0xffffffff)); break;
-		case AlloSInt64Ty:		*((int64_t *)dst) = (int64_t)((number-0.5) * (double)(ULONG_MAX)); break;
-		case AlloFloat32Ty:		*((float *)dst) = (float)number; break;
-		case AlloFloat64Ty:		*((double *)dst) = number; break;
-		default:				*dst = 0;
+	case AlloUInt8Ty:	*( uint8_t *)dst = ( uint8_t)(val * _allo_ui08f_max()); break;
+	case AlloUInt16Ty:	*(uint16_t *)dst = (uint16_t)(val * _allo_ui16f_max()); break;
+	case AlloUInt32Ty:	*(uint32_t *)dst = (uint32_t)(val * _allo_ui32f_max()); break;
+	case AlloUInt64Ty:	*(uint64_t *)dst = (uint64_t)(val * _allo_ui64f_max()); break;
+	case AlloSInt8Ty:	*(  int8_t *)dst = (  int8_t)((val-0.5) * _allo_ui08f_max()); break;
+	case AlloSInt16Ty:	*( int16_t *)dst = ( int16_t)((val-0.5) * _allo_ui16f_max()); break;
+	case AlloSInt32Ty:	*( int32_t *)dst = ( int32_t)((val-0.5) * _allo_ui32f_max()); break;
+	case AlloSInt64Ty:	*( int64_t *)dst = ( int64_t)((val-0.5) * _allo_ui64f_max()); break;
+	case AlloFloat32Ty:	*(float *)dst = (float)val; break;
+	case AlloFloat64Ty:	*(double *)dst = val; break;
+	default:			;//*dst = 0;
 	}
 }
 
 static inline uint32_t allo_array_elements(const AlloArray * arr) {
 	uint32_t i, elements = 1;
-	for (i=0; i<arr->header.dimcount; i++)
+	for(i=0; i<arr->header.dimcount; i++)
 		elements *= arr->header.dim[i];
 	return elements;
 }
