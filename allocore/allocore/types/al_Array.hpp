@@ -61,10 +61,18 @@ public:
 	uint8_t components() const { return header.components; }	///< Get number of components
 	uint8_t dimcount() const { return header.dimcount; }		///< Get number of dimensions
 	uint32_t dim(int i=0) const { return header.dim[i]; }		///< Get size of dimension
-	unsigned width() const { return dim(0); }					///< Get size of first dimension
-	unsigned height() const { return dim(1); }					///< Get size of second dimension
-	unsigned depth() const { return dim(2); }					///< Get size of third dimension
+	template <unsigned i> uint32_t dim() const {
+		static_assert(i<=ALLO_ARRAY_MAX_DIMS, "Invalid index");
+		return dim(i);
+	}
+	unsigned width() const { return dim<0>(); }					///< Get size of first dimension
+	unsigned height() const { return dim<1>(); }					///< Get size of second dimension
+	unsigned depth() const { return dim<2>(); }					///< Get size of third dimension
 	uint32_t stride(int i=0) const { return header.stride[i]; }	///< Get stride of dimension, in bytes
+	template <unsigned i> uint32_t stride() const {
+		static_assert(i<=ALLO_ARRAY_MAX_DIMS, "Invalid index");
+		return stride(i);
+	}
 
 	/// Returns the maximum possible byte alignment of the rows (1, 2, 4 or 8 byte)
 	uint32_t alignment() const;
@@ -155,28 +163,28 @@ public:
 
 
 	/// Get mutable component using 1-D index
-	template <class T> T& elem(size_t ic, size_t ix){
-		return cell<T>(ix)[ic]; }
+	template <class T> T& elem(size_t ic, size_t ix)
+		{ return cell<T>(ix)[ic]; }
 
 	/// Get mutable component using 2-D index
-	template <class T> T& elem(size_t ic, size_t ix, size_t iy){
-		return cell<T>(ix,iy)[ic]; }
+	template <class T> T& elem(size_t ic, size_t ix, size_t iy)
+		{ return cell<T>(ix,iy)[ic]; }
 
 	/// Get mutable component using 3-D index
-	template <class T> T& elem(size_t ic, size_t ix, size_t iy, size_t iz){
-		return cell<T>(ix,iy,iz)[ic]; }
+	template <class T> T& elem(size_t ic, size_t ix, size_t iy, size_t iz)
+		{ return cell<T>(ix,iy,iz)[ic]; }
 
 	/// Get const component using 1-D index
-	template <class T> const T& elem(size_t ic, size_t ix) const{
-		return cell<T>(ix)[ic]; }
+	template <class T> const T& elem(size_t ic, size_t ix) const
+		{ return cell<T>(ix)[ic]; }
 
 	/// Get const component using 2-D index
-	template <class T> const T& elem(size_t ic, size_t ix, size_t iy) const{
-		return cell<T>(ix,iy)[ic]; }
+	template <class T> const T& elem(size_t ic, size_t ix, size_t iy) const
+		{ return cell<T>(ix,iy)[ic]; }
 
 	/// Get const component using 3-D index
-	template <class T> const T& elem(size_t ic, size_t ix, size_t iy, size_t iz) const{
-		return cell<T>(ix,iy,iz)[ic]; }
+	template <class T> const T& elem(size_t ic, size_t ix, size_t iy, size_t iz) const
+		{ return cell<T>(ix,iy,iz)[ic]; }
 
 
 	/// Fill with the same cell value throughout
@@ -308,40 +316,28 @@ template<> constexpr AlloTy Array::type<void *>(){ return ptrType<sizeof(void*)>
 }*/
 
 template<class T> inline T * Array::cell(size_t x) const {
-	size_t fieldstride_x = header.stride[0];
-	return (T *)(data.ptr + x*fieldstride_x);
+	return (T *)(data.ptr + x*stride<0>());
 }
 template<class T> inline T * Array::cell(size_t x, size_t y) const {
-	size_t fieldstride_x = header.stride[0];
-	size_t fieldstride_y = header.stride[1];
-	return (T *)(data.ptr + x*fieldstride_x + y*fieldstride_y);
+	return (T *)(data.ptr + x*stride<0>() + y*stride<1>());
 }
 template<class T> inline T * Array::cell(size_t x, size_t y, size_t z) const {
-	size_t fieldstride_x = header.stride[0];
-	size_t fieldstride_y = header.stride[1];
-	size_t fieldstride_z = header.stride[2];
-	return (T *)(data.ptr + x*fieldstride_x + y*fieldstride_y + z*fieldstride_z);
+	return (T *)(data.ptr + x*stride<0>() + y*stride<1>() + z*stride<2>());
 }
 
 
 // read the plane values from array into val array (no bounds checking)
-template<class T> inline void Array::read(T* val, int x) const {
-	T * paaa = cell<T>(x);
-	for (uint8_t p=0; p<header.components; p++) {
-		val[p] = paaa[p];
-	}
+template<class T> inline void Array::read(T * val, int x) const {
+	T * c = cell<T>(x);
+	for(uint8_t i=0; i<components(); i++) val[i] = c[i];
 }
-template<class T> inline void Array::read(T* val, int x, int y) const {
-	T * paaa = cell<T>(x, y);
-	for (uint8_t p=0; p<header.components; p++) {
-		val[p] = paaa[p];
-	}
+template<class T> inline void Array::read(T * val, int x, int y) const {
+	T * c = cell<T>(x, y);
+	for(uint8_t i=0; i<components(); i++) val[i] = c[i];
 }
-template<class T> inline void Array::read(T* val, int x, int y, int z) const {
-	T * paaa = cell<T>(x, y, z);
-	for (uint8_t p=0; p<header.components; p++) {
-		val[p] = paaa[p];
-	}
+template<class T> inline void Array::read(T * val, int x, int y, int z) const {
+	T * c = cell<T>(x, y, z);
+	for(uint8_t i=0; i<components(); i++) val[i] = c[i];
 }
 
 #define AL_ARRAY_FLOOR(v) ( (long)(v) - ((v)<0. && (v)!=(long)(v)) )
@@ -350,73 +346,61 @@ template<class T> inline void Array::read(T* val, int x, int y, int z) const {
 // linear interpolated lookup (virtual array index)
 // reads the linearly interpolated plane values into val array
 template<class T> inline void Array::read_interp(T * val, double x) const {
-	x = std::fmod<double>(x, header.dim[0]);
+	x = std::fmod<double>(x, width());
 	// convert 0..1 field indices to 0..(d-1) cell indices
-	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
-	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
+	unsigned xa = AL_ARRAY_FLOOR(x);
+	unsigned xb = xa+1;	if(xb == width()) xb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
 	double faaa = AL_ARRAY_FRAC(x);
-	double fbaa = 1.f - faaa;
+	double fbaa = 1. - faaa;
 	// get the cell addresses for each neighbor:
 	T * paaa = cell<T>(xa);
 	T * pbaa = cell<T>(xb);
 	// for each plane of the field, do the interp:
-	for (uint8_t p=0; p<header.components; p++) {
-		val[p] =	(paaa[p] * faaa) + (pbaa[p] * fbaa);
-	}
+	for(uint8_t i=0; i<components(); i++)
+		val[i] = paaa[i]*faaa + pbaa[i]*fbaa;
 }
 
 template<class T> inline void Array::read_interp(T * val, double x, double y) const {
-	x = std::fmod<double>(x, header.dim[0]);
-	y = std::fmod<double>(y, header.dim[1]);
-	// convert 0..1 field indices to 0..(d-1) cell indices
-	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
-	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
-	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
-	unsigned yb = ya+1;	if (yb == header.dim[1]) yb = 0;
-	// get the normalized 0..1 interp factors, of x,y,z:
+	x = std::fmod<double>(x, width());
+	y = std::fmod<double>(y, height());
+	unsigned xa = AL_ARRAY_FLOOR(x);
+	unsigned ya = AL_ARRAY_FLOOR(y);
+	unsigned xb = xa+1;	if(xb == width()) xb = 0;
+	unsigned yb = ya+1;	if(yb ==height()) yb = 0;
 	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1.f - xbf;
+	double xaf = 1. - xbf;
 	double ybf = AL_ARRAY_FRAC(y);
-	double yaf = 1.f - ybf;
-	// get the interpolation corner weights:
+	double yaf = 1. - ybf;
 	double faaa = xaf * yaf;
 	double faba = xaf * ybf;
 	double fbaa = xbf * yaf;
 	double fbba = xbf * ybf;
-	// get the cell addresses for each neighbor:
 	T * paaa = cell<T>(xa, ya);
 	T * paba = cell<T>(xa, yb);
 	T * pbaa = cell<T>(xb, ya);
 	T * pbba = cell<T>(xb, yb);
-	// for each plane of the field, do the interp:
-	for (uint8_t p=0; p<header.components; p++) {
-		val[p] =	(paaa[p] * faaa) +
-		(pbaa[p] * fbaa) +
-		(paba[p] * faba) +
-		(pbba[p] * fbba);
-	}
+	for(uint8_t i=0; i<components(); i++)
+		val[i] = 	paaa[i]*faaa + pbaa[i]*fbaa +
+					paba[i]*faba + pbba[i]*fbba;
 }
 
 template<class T> inline void Array::read_interp(T * val, double x, double y, double z) const {
-	x = std::fmod<double>(x, header.dim[0]);
-	y = std::fmod<double>(y, header.dim[1]);
-	z = std::fmod<double>(z, header.dim[2]);
-	// convert 0..1 field indices to 0..(d-1) cell indices
-	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
-	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
-	const unsigned za = (const unsigned)AL_ARRAY_FLOOR(z);
-	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
-	unsigned yb = ya+1;	if (yb == header.dim[1]) yb = 0;
-	unsigned zb = za+1;	if (zb == header.dim[2]) zb = 0;
-	// get the normalized 0..1 interp factors, of x,y,z:
+	x = std::fmod<double>(x, width());
+	y = std::fmod<double>(y, height());
+	z = std::fmod<double>(z, depth());
+	unsigned xa = AL_ARRAY_FLOOR(x);
+	unsigned ya = AL_ARRAY_FLOOR(y);
+	unsigned za = AL_ARRAY_FLOOR(z);
+	unsigned xb = xa+1;	if(xb == width()) xb = 0;
+	unsigned yb = ya+1;	if(yb ==height()) yb = 0;
+	unsigned zb = za+1;	if(zb == depth()) zb = 0;
 	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1.f - xbf;
+	double xaf = 1. - xbf;
 	double ybf = AL_ARRAY_FRAC(y);
-	double yaf = 1.f - ybf;
+	double yaf = 1. - ybf;
 	double zbf = AL_ARRAY_FRAC(z);
-	double zaf = 1.f - zbf;
-	// get the interpolation corner weights:
+	double zaf = 1. - zbf;
 	double faaa = xaf * yaf * zaf;
 	double faab = xaf * yaf * zbf;
 	double faba = xaf * ybf * zaf;
@@ -425,7 +409,6 @@ template<class T> inline void Array::read_interp(T * val, double x, double y, do
 	double fbab = xbf * yaf * zbf;
 	double fbba = xbf * ybf * zaf;
 	double fbbb = xbf * ybf * zbf;
-	// get the cell addresses for each neighbor:
 	T * paaa = cell<T>(xa, ya, za);
 	T * paab = cell<T>(xa, ya, zb);
 	T * paba = cell<T>(xa, yb, za);
@@ -434,73 +417,59 @@ template<class T> inline void Array::read_interp(T * val, double x, double y, do
 	T * pbab = cell<T>(xb, ya, zb);
 	T * pbba = cell<T>(xb, yb, za);
 	T * pbbb = cell<T>(xb, yb, zb);
-	// for each plane of the field, do the 3D interp:
-	for (size_t p=0; p<header.components; p++) {
-		val[p] =	(paaa[p] * faaa) +
-					(pbaa[p] * fbaa) +
-					(paba[p] * faba) +
-					(paab[p] * faab) +
-					(pbab[p] * fbab) +
-					(pabb[p] * fabb) +
-					(pbba[p] * fbba) +
-					(pbbb[p] * fbbb);
-	}
+	for (size_t i=0; i<components(); i++)
+		val[i] =	paaa[i] * faaa + pbaa[i] * fbaa +
+					paba[i] * faba + paab[i] * faab +
+					pbab[i] * fbab + pabb[i] * fabb +
+					pbba[i] * fbba + pbbb[i] * fbbb;
 }
 
 // write plane values from val array into array (no bounds checking)
-template<class T> inline void Array::write(const T* val, int x) {
-	T * paaa = cell<T>(x);
-	for (uint8_t p=0; p<header.components; ++p) {
-		paaa[p] = val[p];
-	}
+template<class T> inline void Array::write(const T * val, int x) {
+	T * c = cell<T>(x);
+	for(uint8_t i=0; i<components(); ++i) c[i] = val[i];
 }
-template<class T> inline void Array::write(const T* val, int x, int y) {
-	T * paaa = cell<T>(x, y);
-	for (uint8_t p=0; p<header.components; ++p) {
-		paaa[p] = val[p];
-	}
+template<class T> inline void Array::write(const T * val, int x, int y) {
+	T * c = cell<T>(x, y);
+	for(uint8_t i=0; i<components(); ++i) c[i] = val[i];
 }
-template<class T> inline void Array::write(const T* val, int x, int y, int z) {
-	T * paaa = cell<T>(x, y, z);
-	for (uint8_t p=0; p<header.components; ++p) {
-		paaa[p] = val[p];
-	}
+template<class T> inline void Array::write(const T * val, int x, int y, int z) {
+	T * c = cell<T>(x, y, z);
+	for(uint8_t i=0; i<components(); ++i) c[i] = val[i];
 }
 
 // linear interpolated write (virtual array index)
 // writes the linearly interpolated plane values from val array into array
 template<class T> inline void Array::write_interp(const T* val, double x) {
-	x = std::fmod<double>(x, header.dim[0]);
-	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
-	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
+	x = std::fmod<double>(x, width());
+	unsigned xa = AL_ARRAY_FLOOR(x);
+	unsigned xb = xa+1;	if(xb == width()) xb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
 	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1.f - xbf;
+	double xaf = 1. - xbf;
 	// get the interpolation corner weights:
 	double faaa = xaf;
 	double fbaa = xbf;
 	T * paaa = cell<T>(xa);
 	T * pbaa = cell<T>(xb);
 	// for each plane of the field, do the 3D interp:
-	for (uint8_t p=0; p<header.components; p++) {
-		T tmp = val[p];
-		paaa[p] += tmp * faaa;
-		pbaa[p] += tmp * fbaa;
+	for(uint8_t i=0; i<components(); i++){
+		T tmp = val[i];
+		paaa[i] += tmp * faaa;
+		pbaa[i] += tmp * fbaa;
 	}
 }
 template<class T> inline void Array::write_interp(const T* val, double x, double y) {
-	x = std::fmod<double>(x, header.dim[0]);
-	y = std::fmod<double>(y, header.dim[1]);
-	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
-	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
-	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
-	unsigned yb = ya+1;	if (yb == header.dim[1]) yb = 0;
-	// get the normalized 0..1 interp factors, of x,y,z:
+	x = std::fmod<double>(x, width());
+	y = std::fmod<double>(y, height());
+	unsigned xa = AL_ARRAY_FLOOR(x);
+	unsigned ya = AL_ARRAY_FLOOR(y);
+	unsigned xb = xa+1;	if(xb == width()) xb = 0;
+	unsigned yb = ya+1;	if(yb ==height()) yb = 0;
 	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1.f - xbf;
+	double xaf = 1. - xbf;
 	double ybf = AL_ARRAY_FRAC(y);
-	double yaf = 1.f - ybf;
-	// get the interpolation corner weights:
+	double yaf = 1. - ybf;
 	double faaa = xaf * yaf;
 	double faba = xaf * ybf;
 	double fbaa = xbf * yaf;
@@ -509,34 +478,31 @@ template<class T> inline void Array::write_interp(const T* val, double x, double
 	T * paba = cell<T>(xa, yb);
 	T * pbaa = cell<T>(xb, ya);
 	T * pbba = cell<T>(xb, yb);
-	// for each plane of the field, do the 3D interp:
-	for (uint8_t p=0; p<header.components; p++) {
-		T tmp = val[p];
-		paaa[p] += tmp * faaa;
-		paba[p] += tmp * faba;
-		pbaa[p] += tmp * fbaa;
-		pbba[p] += tmp * fbba;
+	for(uint8_t i=0; i<components(); i++){
+		T tmp = val[i];
+		paaa[i] += tmp * faaa;
+		paba[i] += tmp * faba;
+		pbaa[i] += tmp * fbaa;
+		pbba[i] += tmp * fbba;
 	}
 }
 
 template<class T> inline void Array::write_interp(const T* val, double x0, double y0, double z0) {
-	double x = std::fmod<double>(x0, header.dim[0]);
-	double y = std::fmod<double>(y0, header.dim[1]);
-	double z = std::fmod<double>(z0, header.dim[2]);
-	const unsigned xa = (const unsigned)AL_ARRAY_FLOOR(x);
-	const unsigned ya = (const unsigned)AL_ARRAY_FLOOR(y);
-	const unsigned za = (const unsigned)AL_ARRAY_FLOOR(z);
-	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
-	unsigned yb = ya+1;	if (yb == header.dim[1]) yb = 0;
-	unsigned zb = za+1;	if (zb == header.dim[2]) zb = 0;
-	// get the normalized 0..1 interp factors, of x,y,z:
+	double x = std::fmod<double>(x0, width());
+	double y = std::fmod<double>(y0, height());
+	double z = std::fmod<double>(z0, depth());
+	unsigned xa = AL_ARRAY_FLOOR(x);
+	unsigned ya = AL_ARRAY_FLOOR(y);
+	unsigned za = AL_ARRAY_FLOOR(z);
+	unsigned xb = xa+1;	if(xb == width()) xb = 0;
+	unsigned yb = ya+1;	if(yb ==height()) yb = 0;
+	unsigned zb = za+1;	if(zb == depth()) zb = 0;
 	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1.f - xbf;
+	double xaf = 1. - xbf;
 	double ybf = AL_ARRAY_FRAC(y);
-	double yaf = 1.f - ybf;
+	double yaf = 1. - ybf;
 	double zbf = AL_ARRAY_FRAC(z);
-	double zaf = 1.f - zbf;
-	// get the interpolation corner weights:
+	double zaf = 1. - zbf;
 	double faaa = xaf * yaf * zaf;
 	double faab = xaf * yaf * zbf;
 	double faba = xaf * ybf * zaf;
@@ -553,17 +519,16 @@ template<class T> inline void Array::write_interp(const T* val, double x0, doubl
 	T * pbab = cell<T>(xb, ya, zb);
 	T * pbba = cell<T>(xb, yb, za);
 	T * pbbb = cell<T>(xb, yb, zb);
-	// for each plane of the field, do the 3D interp:
-	for (uint8_t p=0; p<header.components; p++) {
-		T tmp = val[p];
-		paaa[p] += tmp * faaa;
-		paab[p] += tmp * faab;
-		paba[p] += tmp * faba;
-		pabb[p] += tmp * fabb;
-		pbaa[p] += tmp * fbaa;
-		pbab[p] += tmp * fbab;
-		pbba[p] += tmp * fbba;
-		pbbb[p] += tmp * fbbb;
+	for(uint8_t i=0; i<components(); i++){
+		T tmp = val[i];
+		paaa[i] += tmp * faaa;
+		paab[i] += tmp * faab;
+		paba[i] += tmp * faba;
+		pabb[i] += tmp * fabb;
+		pbaa[i] += tmp * fbaa;
+		pbab[i] += tmp * fbab;
+		pbba[i] += tmp * fbba;
+		pbbb[i] += tmp * fbbb;
 	}
 }
 
@@ -571,148 +536,135 @@ template<class T> inline void Array::write_interp(const T* val, double x0, doubl
 #undef AL_ARRAY_FRAC
 
 template<class T> void Array::fill(void (*func)(T * values, double normx)) {
-	int d0 = header.dim[0];
-	double inv_d0 = 1.0/(double)d0;
-	int components = header.components;
+	unsigned d0 = dim<0>();
+	double inv_d0 = 1./d0;
 
-	T *vals = (T *)(data.ptr);
-	for(int x=0; x < d0; x++) {
+	T * vals = (T *)(data.ptr);
+	for(unsigned x=0; x < d0; x++){
 		func(vals, inv_d0 * x);
-		vals += components;
+		vals += components();
 	}
 }
 
 template<class T> void Array::fill(void (*func)(T * values, double normx, double normy)) {
-	int d0 = header.dim[0];
-	int d1 = header.dim[1];
-	int s1 = header.stride[1];
-	double inv_d0 = 1.0/(double)d0;
-	double inv_d1 = 1.0/(double)d1;
-	int components = header.components;
+	unsigned d0 = dim<0>();
+	unsigned d1 = dim<1>();
+	unsigned s1 = stride<1>();
+	double inv_d0 = 1./d0;
+	double inv_d1 = 1./d1;
 
-	for(int y=0; y < d1; y++) {
-		T *vals = (T *)(data.ptr + s1*y);
-		for(int x=0; x < d0; x++) {
+	for(unsigned y=0; y < d1; y++){
+		T * vals = (T *)(data.ptr + s1*y);
+		for(unsigned x=0; x < d0; x++){
 			func(vals, inv_d0 * x, inv_d1 * y);
-			vals += components;
+			vals += components();
 		}
 	}
 }
 
 template<class T> void Array::fill(void (*func)(T * values, double normx, double normy, double normz)) {
-	int d0 = header.dim[0];
-	int d1 = header.dim[1];
-	int d2 = header.dim[2];
-	int s1 = header.stride[1];
-	int s2 = header.stride[2];
-	double inv_d0 = 1.0/(double)d0;
-	double inv_d1 = 1.0/(double)d1;
-	double inv_d2 = 1.0/(double)d2;
-	int components = header.components;
+	unsigned d0 = dim<0>();
+	unsigned d1 = dim<1>();
+	unsigned d2 = dim<2>();
+	unsigned s1 = stride<1>();
+	unsigned s2 = stride<2>();
+	double inv_d0 = 1./d0;
+	double inv_d1 = 1./d1;
+	double inv_d2 = 1./d2;
 
-	for(int z=0; z < d1; z++) {
-		for(int y=0; y < d1; y++) {
-			T *vals = (T *)(data.ptr + s1*y + s2*z);
-			for(int x=0; x < d0; x++) {
+	for(unsigned z=0; z < d2; z++){
+		for(unsigned y=0; y < d1; y++){
+			T * vals = (T *)(data.ptr + s1*y + s2*z);
+			for(unsigned x=0; x < d0; x++){
 				func(vals, inv_d0 * x, inv_d1 * y, inv_d2 * z);
-				vals += components;
+				vals += components();
 			}
 		}
 	}
 }
 
 template<class T> void Array::setall(T value) {
-	int d0 = header.dim[0];
-	int d1 = header.dim[1];
-	//int d2 = header.dim[2];
-	int s0 = header.stride[0];
-	int s1 = header.stride[1];
-	int s2 = header.stride[2];
-	int components = header.components;
-	T * vals;
-	switch (header.dimcount) {
-		case 3:
-			for(int z=0; z < d1; z++) {
-				for(int y=0; y < d1; y++) {
-					vals = (T *)(data.ptr + s1*y + s2*z);
-					for(int x=0; x < d0; x++) {
-						for (int i=0; i<components; i++) {
-							vals[i] = value;
-						}
-					}
-				}
-			}
-			break;
-		case 2:
-			for(int y=0; y < d1; y++) {
-				for(int x=0; x < d0; x++) {
-					vals = (T *)(data.ptr + s0*x + s1*y);
-					for (int i=0; i<components; i++) {
+	unsigned d0 = dim<0>();
+	unsigned d1 = dim<1>();
+	//unsigned d2 = dim<2>();
+	unsigned s0 = stride<0>();
+	unsigned s1 = stride<1>();
+	unsigned s2 = stride<2>();
+
+	switch(dimcount()){
+	case 3:
+		for(unsigned z=0; z < d1; z++){
+			for(unsigned y=0; y < d1; y++){
+				T * vals = (T *)(data.ptr + s1*y + s2*z);
+				for(unsigned x=0; x < d0; x++){
+					for(unsigned i=0; i<components(); i++)
 						vals[i] = value;
-					}
 				}
 			}
-			break;
-		case 1:
-			vals = (T *)(data.ptr);
-			for(int x=0; x < d0; x++) {
-				for (int i=0; i<components; i++) {
+		}
+		break;
+	case 2:
+		for(unsigned y=0; y < d1; y++) {
+			for(unsigned x=0; x < d0; x++) {
+				T * vals = (T *)(data.ptr + s0*x + s1*y);
+				for(unsigned i=0; i<components(); i++)
 					vals[i] = value;
-				}
 			}
-			break;
-		default:
-			break;
+		}
+		break;
+	case 1:{
+		T * vals = (T *)(data.ptr);
+		for(unsigned x=0; x < d0; x++){
+			for(unsigned i=0; i<components(); i++)
+				vals[i] = value;
+		}
+		} break;
+	default:
+		break;
 	}
 
 }
 
 template<class T> void Array::set1d(T * cell) {
-	int d0 = header.dim[0];
-	int s0 = header.stride[0];
-	int components = header.components;
+	unsigned d0 = dim<0>();
+	unsigned s0 = stride<0>();
 
-	for(int x=0; x < d0; x++) {
-		T *vals = (T *)(data.ptr + s0*x);
-		for (int i=0; i<components; i++) {
+	for(unsigned x=0; x < d0; x++){
+		T * vals = (T *)(data.ptr + s0*x);
+		for(unsigned i=0; i<components(); i++)
 			vals[i] = cell[i];
-		}
 	}
 }
 
 template<class T> void Array::set2d(T * cell) {
-	int d0 = header.dim[0];
-	int d1 = header.dim[1];
-	int s0 = header.stride[0];
-	int s1 = header.stride[1];
-	int components = header.components;
+	unsigned d0 = dim<0>();
+	unsigned d1 = dim<1>();
+	unsigned s0 = stride<0>();
+	unsigned s1 = stride<1>();
 
-	for(int y=0; y < d1; y++) {
-		for(int x=0; x < d0; x++) {
-			T *vals = (T *)(data.ptr + s0*x + s1*y);
-			for (int i=0; i<components; i++) {
+	for(unsigned y=0; y < d1; y++){
+		for(unsigned x=0; x < d0; x++){
+			T * vals = (T *)(data.ptr + s0*x + s1*y);
+			for(unsigned i=0; i<components(); i++)
 				vals[i] = cell[i];
-			}
 		}
 	}
 }
 
 template<class T> void Array::set3d(T * cell) {
-	int d0 = header.dim[0];
-	int d1 = header.dim[1];
-	int d2 = header.dim[2];
-	int s0 = header.stride[0];
-	int s1 = header.stride[1];
-	int s2 = header.stride[2];
-	int components = header.components;
+	unsigned d0 = dim<0>();
+	unsigned d1 = dim<1>();
+	unsigned d2 = dim<1>();
+	unsigned s0 = stride<0>();
+	unsigned s1 = stride<1>();
+	unsigned s2 = stride<2>();
 
-	for(int z=0; z < d2; z++) {
-		for(int y=0; y < d1; y++) {
-			for(int x=0; x < d0; x++) {
-				T *vals = (T *)(data.ptr + s0*x + s1*y + s2*z);
-				for (int i=0; i<components; i++) {
+	for(unsigned z=0; z < d2; z++){
+		for(unsigned y=0; y < d1; y++){
+			for(unsigned x=0; x < d0; x++){
+				T * vals = (T *)(data.ptr + s0*x + s1*y + s2*z);
+				for(unsigned i=0; i<components(); i++)
 					vals[i] = cell[i];
-				}
 			}
 		}
 	}
