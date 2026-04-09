@@ -11,7 +11,7 @@
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
-#include <cmath> // fmod
+#include <cmath> // floor
 #include <cstdio> // FILE
 #include "allocore/types/al_Array.h"
 #include "allocore/math/al_Vec.hpp"
@@ -187,10 +187,10 @@ public:
 		{ return cell<T>(ix,iy,iz)[ic]; }
 
 
-	/// Fill with the same cell value throughout
-	template<class T> void set1d(T * cell);
-	template<class T> void set2d(T * cell);
-	template<class T> void set3d(T * cell);
+	/// Fill with the same component values throughout
+	template<class T> void set1d(const T * comps);
+	template<class T> void set2d(const T * comps);
+	template<class T> void set3d(const T * comps);
 
 	template<class T> void setall(T value);
 
@@ -279,6 +279,21 @@ protected:
 
 	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
 
+	struct Lookup{
+		Lookup(double pos, unsigned len){
+			auto q = std::floor(pos);
+			i = (int(q)%len + len) % len; // % allowing left operand to be negative
+			j = i+1; if(j==len) j=0;
+			f = pos - q;
+		}
+		int i,j;
+		double f; // fraction in [0,1]
+		template <class T>
+		T get(T a, T b) const { return (b-a)*f + a; }
+		template <class T>
+		void set(T v, T& a, T& b) const { a=v*(1.-f); b=v*f; }
+	};
+
 public:	// temporarily made public, because protected broke some other project code -gw
 	Array(const Array&);
 	Array& operator= (const Array&);
@@ -340,200 +355,118 @@ template<class T> inline void Array::read(T * val, int x, int y, int z) const {
 	for(uint8_t i=0; i<components(); i++) val[i] = c[i];
 }
 
-#define AL_ARRAY_FLOOR(v) ( (long)(v) - ((v)<0. && (v)!=(long)(v)) )
-#define AL_ARRAY_FRAC(v) ( ((v)>=0.) ? (v)-(long)(v) : (-v)-(long)(v) )
-
 // linear interpolated lookup (virtual array index)
 // reads the linearly interpolated plane values into val array
 template<class T> inline void Array::read_interp(T * val, double x) const {
-	x = std::fmod<double>(x, width());
-	// convert 0..1 field indices to 0..(d-1) cell indices
-	unsigned xa = AL_ARRAY_FLOOR(x);
-	unsigned xb = xa+1;	if(xb == width()) xb = 0;
-	// get the normalized 0..1 interp factors, of x,y,z:
-	double faaa = AL_ARRAY_FRAC(x);
-	double fbaa = 1. - faaa;
-	// get the cell addresses for each neighbor:
-	T * paaa = cell<T>(xa);
-	T * pbaa = cell<T>(xb);
-	// for each plane of the field, do the interp:
+	Lookup lx(x, width());
+	const T * abc = cell<T>(lx.i);
+	const T * Abc = cell<T>(lx.j);
 	for(uint8_t i=0; i<components(); i++)
-		val[i] = paaa[i]*faaa + pbaa[i]*fbaa;
+		val[i] = lx.get(abc[i], Abc[i]);
 }
 
 template<class T> inline void Array::read_interp(T * val, double x, double y) const {
-	x = std::fmod<double>(x, width());
-	y = std::fmod<double>(y, height());
-	unsigned xa = AL_ARRAY_FLOOR(x);
-	unsigned ya = AL_ARRAY_FLOOR(y);
-	unsigned xb = xa+1;	if(xb == width()) xb = 0;
-	unsigned yb = ya+1;	if(yb ==height()) yb = 0;
-	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1. - xbf;
-	double ybf = AL_ARRAY_FRAC(y);
-	double yaf = 1. - ybf;
-	double faaa = xaf * yaf;
-	double faba = xaf * ybf;
-	double fbaa = xbf * yaf;
-	double fbba = xbf * ybf;
-	T * paaa = cell<T>(xa, ya);
-	T * paba = cell<T>(xa, yb);
-	T * pbaa = cell<T>(xb, ya);
-	T * pbba = cell<T>(xb, yb);
+	Lookup lx(x, width());
+	Lookup ly(y, height());
+	const T * abc = cell<T>(lx.i, ly.i);
+	const T * Abc = cell<T>(lx.j, ly.i);
+	const T * aBc = cell<T>(lx.i, ly.j);
+	const T * ABc = cell<T>(lx.j, ly.j);
 	for(uint8_t i=0; i<components(); i++)
-		val[i] = 	paaa[i]*faaa + pbaa[i]*fbaa +
-					paba[i]*faba + pbba[i]*fbba;
+		val[i] = ly.get(
+			lx.get(abc[i], Abc[i]),
+			lx.get(aBc[i], ABc[i])
+		);
 }
 
 template<class T> inline void Array::read_interp(T * val, double x, double y, double z) const {
-	x = std::fmod<double>(x, width());
-	y = std::fmod<double>(y, height());
-	z = std::fmod<double>(z, depth());
-	unsigned xa = AL_ARRAY_FLOOR(x);
-	unsigned ya = AL_ARRAY_FLOOR(y);
-	unsigned za = AL_ARRAY_FLOOR(z);
-	unsigned xb = xa+1;	if(xb == width()) xb = 0;
-	unsigned yb = ya+1;	if(yb ==height()) yb = 0;
-	unsigned zb = za+1;	if(zb == depth()) zb = 0;
-	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1. - xbf;
-	double ybf = AL_ARRAY_FRAC(y);
-	double yaf = 1. - ybf;
-	double zbf = AL_ARRAY_FRAC(z);
-	double zaf = 1. - zbf;
-	double faaa = xaf * yaf * zaf;
-	double faab = xaf * yaf * zbf;
-	double faba = xaf * ybf * zaf;
-	double fabb = xaf * ybf * zbf;
-	double fbaa = xbf * yaf * zaf;
-	double fbab = xbf * yaf * zbf;
-	double fbba = xbf * ybf * zaf;
-	double fbbb = xbf * ybf * zbf;
-	T * paaa = cell<T>(xa, ya, za);
-	T * paab = cell<T>(xa, ya, zb);
-	T * paba = cell<T>(xa, yb, za);
-	T * pabb = cell<T>(xa, yb, zb);
-	T * pbaa = cell<T>(xb, ya, za);
-	T * pbab = cell<T>(xb, ya, zb);
-	T * pbba = cell<T>(xb, yb, za);
-	T * pbbb = cell<T>(xb, yb, zb);
+	Lookup lx(x, width());
+	Lookup ly(y, height());
+	Lookup lz(z, depth());
+	const T * abc = cell<T>(lx.i, ly.i, lz.i);
+	const T * Abc = cell<T>(lx.j, ly.i, lz.i);
+	const T * aBc = cell<T>(lx.i, ly.j, lz.i);
+	const T * ABc = cell<T>(lx.j, ly.j, lz.i);
+	const T * abC = cell<T>(lx.i, ly.i, lz.j);
+	const T * AbC = cell<T>(lx.j, ly.i, lz.j);
+	const T * aBC = cell<T>(lx.i, ly.j, lz.j);
+	const T * ABC = cell<T>(lx.j, ly.j, lz.j);
 	for (size_t i=0; i<components(); i++)
-		val[i] =	paaa[i] * faaa + pbaa[i] * fbaa +
-					paba[i] * faba + paab[i] * faab +
-					pbab[i] * fbab + pabb[i] * fabb +
-					pbba[i] * fbba + pbbb[i] * fbbb;
+		val[i] = lz.get(
+			ly.get(
+				lx.get(abc[i], Abc[i]),
+				lx.get(aBc[i], ABc[i])
+			),
+			ly.get(
+				lx.get(abC[i], AbC[i]),
+				lx.get(aBC[i], ABC[i])
+			)
+		);
 }
 
 // write plane values from val array into array (no bounds checking)
-template<class T> inline void Array::write(const T * val, int x) {
+template<class T> inline void Array::write(const T * src, int x) {
 	T * c = cell<T>(x);
-	for(uint8_t i=0; i<components(); ++i) c[i] = val[i];
+	for(uint8_t i=0; i<components(); ++i) c[i] = src[i];
 }
-template<class T> inline void Array::write(const T * val, int x, int y) {
+template<class T> inline void Array::write(const T * src, int x, int y) {
 	T * c = cell<T>(x, y);
-	for(uint8_t i=0; i<components(); ++i) c[i] = val[i];
+	for(uint8_t i=0; i<components(); ++i) c[i] = src[i];
 }
-template<class T> inline void Array::write(const T * val, int x, int y, int z) {
+template<class T> inline void Array::write(const T * src, int x, int y, int z){
 	T * c = cell<T>(x, y, z);
-	for(uint8_t i=0; i<components(); ++i) c[i] = val[i];
+	for(uint8_t i=0; i<components(); ++i) c[i] = src[i];
 }
 
 // linear interpolated write (virtual array index)
 // writes the linearly interpolated plane values from val array into array
-template<class T> inline void Array::write_interp(const T* val, double x) {
-	x = std::fmod<double>(x, width());
-	unsigned xa = AL_ARRAY_FLOOR(x);
-	unsigned xb = xa+1;	if(xb == width()) xb = 0;
-	// get the normalized 0..1 interp factors, of x,y,z:
-	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1. - xbf;
-	// get the interpolation corner weights:
-	double faaa = xaf;
-	double fbaa = xbf;
-	T * paaa = cell<T>(xa);
-	T * pbaa = cell<T>(xb);
-	// for each plane of the field, do the 3D interp:
+template<class T> inline void Array::write_interp(const T * val, double x){
+	Lookup lx(x, width());
+	T * abc = cell<T>(lx.i);
+	T * Abc = cell<T>(lx.j);
 	for(uint8_t i=0; i<components(); i++){
-		T tmp = val[i];
-		paaa[i] += tmp * faaa;
-		pbaa[i] += tmp * fbaa;
+		lx.set(val[i], abc[i], Abc[i]);
 	}
 }
-template<class T> inline void Array::write_interp(const T* val, double x, double y) {
-	x = std::fmod<double>(x, width());
-	y = std::fmod<double>(y, height());
-	unsigned xa = AL_ARRAY_FLOOR(x);
-	unsigned ya = AL_ARRAY_FLOOR(y);
-	unsigned xb = xa+1;	if(xb == width()) xb = 0;
-	unsigned yb = ya+1;	if(yb ==height()) yb = 0;
-	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1. - xbf;
-	double ybf = AL_ARRAY_FRAC(y);
-	double yaf = 1. - ybf;
-	double faaa = xaf * yaf;
-	double faba = xaf * ybf;
-	double fbaa = xbf * yaf;
-	double fbba = xbf * ybf;
-	T * paaa = cell<T>(xa, ya);
-	T * paba = cell<T>(xa, yb);
-	T * pbaa = cell<T>(xb, ya);
-	T * pbba = cell<T>(xb, yb);
+template<class T> inline void Array::write_interp(const T * val, double x, double y){
+	Lookup lx(x, width());
+	Lookup ly(y, height());
+	T * abc = cell<T>(lx.i, ly.i);
+	T * Abc = cell<T>(lx.j, ly.i);
+	T * aBc = cell<T>(lx.i, ly.j);
+	T * ABc = cell<T>(lx.j, ly.j);
 	for(uint8_t i=0; i<components(); i++){
-		T tmp = val[i];
-		paaa[i] += tmp * faaa;
-		paba[i] += tmp * faba;
-		pbaa[i] += tmp * fbaa;
-		pbba[i] += tmp * fbba;
+		T b, B;
+		ly.set(val[i], b, B);
+		lx.set(b, abc[i], Abc[i]);
+		lx.set(B, aBc[i], ABc[i]);
 	}
 }
 
-template<class T> inline void Array::write_interp(const T* val, double x0, double y0, double z0) {
-	double x = std::fmod<double>(x0, width());
-	double y = std::fmod<double>(y0, height());
-	double z = std::fmod<double>(z0, depth());
-	unsigned xa = AL_ARRAY_FLOOR(x);
-	unsigned ya = AL_ARRAY_FLOOR(y);
-	unsigned za = AL_ARRAY_FLOOR(z);
-	unsigned xb = xa+1;	if(xb == width()) xb = 0;
-	unsigned yb = ya+1;	if(yb ==height()) yb = 0;
-	unsigned zb = za+1;	if(zb == depth()) zb = 0;
-	double xbf = AL_ARRAY_FRAC(x);
-	double xaf = 1. - xbf;
-	double ybf = AL_ARRAY_FRAC(y);
-	double yaf = 1. - ybf;
-	double zbf = AL_ARRAY_FRAC(z);
-	double zaf = 1. - zbf;
-	double faaa = xaf * yaf * zaf;
-	double faab = xaf * yaf * zbf;
-	double faba = xaf * ybf * zaf;
-	double fabb = xaf * ybf * zbf;
-	double fbaa = xbf * yaf * zaf;
-	double fbab = xbf * yaf * zbf;
-	double fbba = xbf * ybf * zaf;
-	double fbbb = xbf * ybf * zbf;
-	T * paaa = cell<T>(xa, ya, za);
-	T * paab = cell<T>(xa, ya, zb);
-	T * paba = cell<T>(xa, yb, za);
-	T * pabb = cell<T>(xa, yb, zb);
-	T * pbaa = cell<T>(xb, ya, za);
-	T * pbab = cell<T>(xb, ya, zb);
-	T * pbba = cell<T>(xb, yb, za);
-	T * pbbb = cell<T>(xb, yb, zb);
+template<class T> inline void Array::write_interp(const T * val, double x, double y, double z){
+	Lookup lx(x, width());
+	Lookup ly(y, height());
+	Lookup lz(z, depth());
+	T * abc = cell<T>(lx.i, ly.i, lz.i);
+	T * Abc = cell<T>(lx.j, ly.i, lz.i);
+	T * aBc = cell<T>(lx.i, ly.j, lz.i);
+	T * ABc = cell<T>(lx.j, ly.j, lz.i);
+	T * abC = cell<T>(lx.i, ly.i, lz.j);
+	T * AbC = cell<T>(lx.j, ly.i, lz.j);
+	T * aBC = cell<T>(lx.i, ly.j, lz.j);
+	T * ABC = cell<T>(lx.j, ly.j, lz.j);
 	for(uint8_t i=0; i<components(); i++){
-		T tmp = val[i];
-		paaa[i] += tmp * faaa;
-		paab[i] += tmp * faab;
-		paba[i] += tmp * faba;
-		pabb[i] += tmp * fabb;
-		pbaa[i] += tmp * fbaa;
-		pbab[i] += tmp * fbab;
-		pbba[i] += tmp * fbba;
-		pbbb[i] += tmp * fbbb;
+		T c, C;
+		lz.set(val[i], c, C);
+		T bc, Bc, bC, BC;
+		ly.set(c, bc, Bc);
+		ly.set(C, bC, BC);
+		lx.set(bc, abc[i], Abc[i]);
+		lx.set(Bc, aBc[i], ABc[i]);
+		lx.set(bC, abC[i], AbC[i]);
+		lx.set(BC, aBC[i], ABC[i]);
 	}
 }
-
-#undef AL_ARRAY_FLOOR
-#undef AL_ARRAY_FRAC
 
 template<class T> void Array::fill(void (*func)(T * values, double normx)) {
 	unsigned d0 = dim<0>();
@@ -583,20 +516,13 @@ template<class T> void Array::fill(void (*func)(T * values, double normx, double
 	}
 }
 
-template<class T> void Array::setall(T value) {
-	unsigned d0 = dim<0>();
-	unsigned d1 = dim<1>();
-	//unsigned d2 = dim<2>();
-	unsigned s0 = stride<0>();
-	unsigned s1 = stride<1>();
-	unsigned s2 = stride<2>();
-
+template<class T> void Array::setall(T value){
 	switch(dimcount()){
 	case 3:
-		for(unsigned z=0; z < d1; z++){
-			for(unsigned y=0; y < d1; y++){
-				T * vals = (T *)(data.ptr + s1*y + s2*z);
-				for(unsigned x=0; x < d0; x++){
+		for(unsigned z=0; z < dim<2>(); z++){
+			for(unsigned y=0; y < dim<1>(); y++){
+				for(unsigned x=0; x < dim<0>(); x++){
+					T * vals = cell<T>(x,y,z);
 					for(unsigned i=0; i<components(); i++)
 						vals[i] = value;
 				}
@@ -604,68 +530,44 @@ template<class T> void Array::setall(T value) {
 		}
 		break;
 	case 2:
-		for(unsigned y=0; y < d1; y++) {
-			for(unsigned x=0; x < d0; x++) {
-				T * vals = (T *)(data.ptr + s0*x + s1*y);
+		for(unsigned y=0; y < dim<1>(); y++) {
+			for(unsigned x=0; x < dim<0>(); x++) {
+				T * vals = cell<T>(x,y);
 				for(unsigned i=0; i<components(); i++)
 					vals[i] = value;
 			}
 		}
 		break;
-	case 1:{
-		T * vals = (T *)(data.ptr);
-		for(unsigned x=0; x < d0; x++){
+	case 1:
+		for(unsigned x=0; x < dim<0>(); x++){
+			T * vals = cell<T>(x);
 			for(unsigned i=0; i<components(); i++)
 				vals[i] = value;
 		}
-		} break;
+		break;
 	default:
 		break;
 	}
 
 }
 
-template<class T> void Array::set1d(T * cell) {
-	unsigned d0 = dim<0>();
-	unsigned s0 = stride<0>();
+template<class T> void Array::set1d(const T * src) {
+	for(unsigned x=0; x < dim<0>(); x++)
+		write(src, x);
+}
 
-	for(unsigned x=0; x < d0; x++){
-		T * vals = (T *)(data.ptr + s0*x);
-		for(unsigned i=0; i<components(); i++)
-			vals[i] = cell[i];
+template<class T> void Array::set2d(const T * src) {
+	for(unsigned y=0; y < dim<1>(); y++){
+		for(unsigned x=0; x < dim<0>(); x++)
+			write(src, x,y);
 	}
 }
 
-template<class T> void Array::set2d(T * cell) {
-	unsigned d0 = dim<0>();
-	unsigned d1 = dim<1>();
-	unsigned s0 = stride<0>();
-	unsigned s1 = stride<1>();
-
-	for(unsigned y=0; y < d1; y++){
-		for(unsigned x=0; x < d0; x++){
-			T * vals = (T *)(data.ptr + s0*x + s1*y);
-			for(unsigned i=0; i<components(); i++)
-				vals[i] = cell[i];
-		}
-	}
-}
-
-template<class T> void Array::set3d(T * cell) {
-	unsigned d0 = dim<0>();
-	unsigned d1 = dim<1>();
-	unsigned d2 = dim<1>();
-	unsigned s0 = stride<0>();
-	unsigned s1 = stride<1>();
-	unsigned s2 = stride<2>();
-
-	for(unsigned z=0; z < d2; z++){
-		for(unsigned y=0; y < d1; y++){
-			for(unsigned x=0; x < d0; x++){
-				T * vals = (T *)(data.ptr + s0*x + s1*y + s2*z);
-				for(unsigned i=0; i<components(); i++)
-					vals[i] = cell[i];
-			}
+template<class T> void Array::set3d(const T * src) {
+	for(unsigned z=0; z < dim<2>(); z++){
+		for(unsigned y=0; y < dim<1>(); y++){
+			for(unsigned x=0; x < dim<0>(); x++)
+				write(src, x,y,z);
 		}
 	}
 }
