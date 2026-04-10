@@ -264,7 +264,9 @@ public:
 	const Texture& constant() const { return *this; }
 
 	/// Get mutable reference to the internal pixel data
-	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
+
+	/// Calling this function will flag the local data as dirty.
+	/// The layout or dimensions of this array should not be modified.
 	Array& array(){ mArrayDirty=true; return mArray; }
 
 	/// Get read-only reference to internal pixel data
@@ -284,7 +286,21 @@ public:
 	/// Iterate through pixel indices
 	void iterate(const std::function<void(int i, int j, int k)>& onPixel);
 	void iterate(const std::function<void(int i, int j, int k)>& onPixel) const {
-		const_cast<Texture*>(this)->iterate(onPixel);
+		mut().iterate(onPixel);
+	}
+
+	/// Iterate through pixels
+	template <class T, class OnPixel>
+	void forEach(const OnPixel& onPixel){
+		auto& pix = array();
+		iterate([&](int i, int j, int k){
+			onPixel(pix.as<T>(i,j,k));
+		});
+	}
+	template <class T, class OnPixel>
+	void forEach(const OnPixel& onPixel) const {
+		mut().forEach<const T>(onPixel);
+		mut().mArrayDirty=false; // no mutation possible, so prevent sync
 	}
 
 	/// Assign pixel values using a visitor function
@@ -484,9 +500,9 @@ protected:
 		return false;
 	}
 
-	unsigned index(unsigned i, unsigned j) const {
-		return j*width() + i;
-	}
+	unsigned index(unsigned i, unsigned j) const { return j*width() + i; }
+
+	Texture& mut() const { return const_cast<Texture&>(*this); }
 };
 
 
