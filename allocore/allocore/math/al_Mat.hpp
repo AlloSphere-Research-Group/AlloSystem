@@ -310,6 +310,16 @@ public:
 		return m;
 	}
 
+	/// Get translation-scaling-translation (TST) transform matrix
+
+	/// This returns the transform matrix T2*S*T1 where the respective matrices
+	/// are a translation, scaling and translation. The lumped transform is
+	/// created with only N-1 madds.
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat TST(const Vec<N-1,T>& t1, const Vec<N-1,T>& s, const Vec<N-1,T>& t2){
+		return Mat::TS(t1,s).translateGlobal(t2);
+	}
+
 	/// Get scaling-rotation (SR) transform matrix
 
 	/// This returns the transform matrix R*S where the respective matrices are
