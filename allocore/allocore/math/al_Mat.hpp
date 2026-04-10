@@ -298,6 +298,18 @@ public:
 		return m;
 	}
 
+	/// Get translation-scaling (TS) transform matrix
+
+	/// This returns the transform matrix S*T where the respective matrices are
+	/// a scaling and translation. The lumped transform is created with only
+	/// N-1 multiplies.
+	template <unsigned Dim1=0, unsigned Dim2=1>
+	static Mat TS(const Vec<N-1,T>& t, const Vec<N-1,T>& s){
+		Mat m = Mat::scaling(s);
+		m.col<N-1>().template sub<N-1>() = t*s;
+		return m;
+	}
+
 	/// Get scaling-rotation (SR) transform matrix
 
 	/// This returns the transform matrix R*S where the respective matrices are
