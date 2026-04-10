@@ -28,7 +28,10 @@ namespace al {
 class Array : public AlloArray {
 public:
 
-	/// Empty constructor defines a 0-dimensional, 1-component array of void type; unallocated data
+	/// Default constructor
+
+	/// Defines a 0-dimensional, 1-component array of void type.
+	/// No memory is allocated.
 	Array();
 
 	/// Construct 1-dimensional array
@@ -41,14 +44,17 @@ public:
 	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
 
 	///	Copy constructor; copies both the layout and data from cpy
-	explicit Array(const AlloArray& cpy);
-	explicit Array(const AlloArrayHeader& h2);
+	Array(const Array&);
+	explicit Array(const AlloArray&);
+	explicit Array(const AlloArrayHeader&);
+
 
 	~Array();
 
 
 	/// Assignment operator copies format and data (allocates memory if necessary)
-	Array& operator= (const AlloArray& cpy);
+	Array& operator= (const Array&);
+	Array& operator= (const AlloArray&);
 
 
 	/// Get type of elements
@@ -90,7 +96,7 @@ public:
 	void format(const AlloArrayHeader& h);
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
-	void format(const AlloArray& array) { format(array.header); }
+	void format(const AlloArray& array){ format(array.header); }
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(int components, AlloTy ty, uint32_t dimx);
@@ -162,29 +168,37 @@ public:
 	void zero();
 
 
-	/// Get mutable component using 1-D index
-	template <class T> T& elem(size_t ic, size_t ix)
-		{ return cell<T>(ix)[ic]; }
+	/// Get the components at a given index in the array (no bounds checking)
+	template<class T> T * cell(int x) const;
+	template<class T> T * cell(int x, int y) const;
+	template<class T> T * cell(int x, int y, int z) const;
+	template<class T, class U> T * cell(T* val, Vec<2,U> p) const { return cell(val, p[0], p[1]); }
+	template<class T, class U> T * cell(T* val, Vec<3,U> p) const { return cell(val, p[0], p[1], p[2]); }
+
+	/// Return a particular cell casted to a typed reference (no bounds checking)
+	template<class T> T& as(int x) { return *cell<T>(x); }
+	template<class T> const T& as(int x) const { return mut().as<T>(x); }
+	template<class T> T& as(int x, int y) { return *cell<T>(x,y); }
+	template<class T> const T& as(int x, int y) const { return mut().as<T>(x,y); }
+	template<class T> T& as(int x, int y, int z) { return *cell<T>(x,y,z); }
+	template<class T> const T& as(int x, int y, int z) const { return mut().as<T>(x,y,z); }
+	/// Return casted cell indexed by a vector (no bounds checking)
+	template<class T, class U> T& as(Vec<2,U> p) { return as<T>(p.x,p.y); }
+	template<class T, class U> const T& as(Vec<2,U> p) const { return mut().as<T>(p); }
+	template<class T, class U> T& as(Vec<3,U> p) { return as(p.x,p.y,p.z); }
+	template<class T, class U> const T& as(Vec<3,U> p) const { return mut().as<T>(p); }
+
+	/// Get component using 1-D index
+	template<class T> T& elem(int c, int x){ return cell<T>(x)[c]; }
+	template<class T> const T& elem(int c, int x) const { return mut().elem<T>(c,x); }
 
 	/// Get mutable component using 2-D index
-	template <class T> T& elem(size_t ic, size_t ix, size_t iy)
-		{ return cell<T>(ix,iy)[ic]; }
+	template<class T> T& elem(int ic, int ix, int iy){ return cell<T>(ix,iy)[ic]; }
+	template<class T> const T& elem(int c, int x, int y) const { return mut().elem<T>(c,x,y); }
 
 	/// Get mutable component using 3-D index
-	template <class T> T& elem(size_t ic, size_t ix, size_t iy, size_t iz)
-		{ return cell<T>(ix,iy,iz)[ic]; }
-
-	/// Get const component using 1-D index
-	template <class T> const T& elem(size_t ic, size_t ix) const
-		{ return cell<T>(ix)[ic]; }
-
-	/// Get const component using 2-D index
-	template <class T> const T& elem(size_t ic, size_t ix, size_t iy) const
-		{ return cell<T>(ix,iy)[ic]; }
-
-	/// Get const component using 3-D index
-	template <class T> const T& elem(size_t ic, size_t ix, size_t iy, size_t iz) const
-		{ return cell<T>(ix,iy,iz)[ic]; }
+	template<class T> T& elem(int c, int x, int y, int z){ return cell<T>(x,y,z)[c]; }
+	template<class T> const T& elem(int c, int x, int y, int z) const { return mut().elem<T>(c,x,y,z); }
 
 
 	/// Fill with the same component values throughout
@@ -198,27 +212,6 @@ public:
 	template<class T> void fill(void (*func)(T * values, double normx));
 	template<class T> void fill(void (*func)(T * values, double normx, double normy));
 	template<class T> void fill(void (*func)(T * values, double normx, double normy, double normz));
-
-	/// Get the components at a given index in the array (no bounds checking)
-	template<class T> T * cell(size_t x) const;
-	template<class T> T * cell(size_t x, size_t y) const;
-	template<class T> T * cell(size_t x, size_t y, size_t z) const;
-
-	template<class T, class U> T * cell(T* val, Vec<2,U> p) const { return cell(val, p[0], p[1]); }
-	template<class T, class U> T * cell(T* val, Vec<3,U> p) const { return cell(val, p[0], p[1], p[2]); }
-
-	/// Return a particular cell casted to a typed reference (no bounds checking)
-	template<class T> T& as(int x) { return *cell<T>(x); }
-	template<class T> const T& as(int x) const { return *cell<T>(x); }
-	template<class T> T& as(int x, int y) { return *cell<T>(x,y); }
-	template<class T> const T& as(int x, int y) const { return *cell<T>(x,y); }
-	template<class T> T& as(int x, int y, int z) { return *cell<T>(x,y,z); }
-	template<class T> const T& as(int x, int y, int z) const { return *cell<T>(x,y,z); }
-	/// Return casted cell indexed by a vector (no bounds checking)
-	template<class T, class U> T& as(Vec<2,U> p) { return *cell<T>(p.x,p.y); }
-	template<class T, class U> const T& as(Vec<2,U> p) const { return *cell<T>(p.x,p.y); }
-	template<class T, class U> T& as(Vec<3,U> p) { return *cell<T>(p.x,p.y,p.z); }
-	template<class T, class U> const T& as(Vec<3,U> p) const { return *cell<T>(p.x,p.y,p.z); }
 
 	/// Read the component values from array into val array (no bounds checking)
 	template<class T> void read(T* val, int x) const;
@@ -275,6 +268,9 @@ public:
 protected:
 	bool mIsRef = false;
 
+	// Used internally for creating const functions
+	Array& mut() const { return const_cast<Array&>(*this); }
+
 	AlloArrayHeader getHeader(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
 
 	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
@@ -295,10 +291,6 @@ protected:
 		template <class T>
 		void add(T v, T& a, T& b) const { a+=v*(1.-f); b+=v*f; }
 	};
-
-public:	// temporarily made public, because protected broke some other project code -gw
-	Array(const Array&);
-	Array& operator= (const Array&);
 };
 
 
@@ -332,13 +324,13 @@ template<> constexpr AlloTy Array::type<void *>(){ return ptrType<sizeof(void*)>
 	return 0;
 }*/
 
-template<class T> inline T * Array::cell(size_t x) const {
+template<class T> inline T * Array::cell(int x) const {
 	return (T *)(data.ptr + x*stride<0>());
 }
-template<class T> inline T * Array::cell(size_t x, size_t y) const {
+template<class T> inline T * Array::cell(int x, int y) const {
 	return (T *)(data.ptr + x*stride<0>() + y*stride<1>());
 }
-template<class T> inline T * Array::cell(size_t x, size_t y, size_t z) const {
+template<class T> inline T * Array::cell(int x, int y, int z) const {
 	return (T *)(data.ptr + x*stride<0>() + y*stride<1>() + z*stride<2>());
 }
 

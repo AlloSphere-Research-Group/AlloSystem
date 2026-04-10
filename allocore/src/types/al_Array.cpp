@@ -11,14 +11,16 @@ Array::Array(){
 	allo_array_resetdims(&header, 0);
 }
 
+Array::Array(const Array& cpy){
+	data.ptr = NULL;
+    (*this) = cpy;
+}
+
 Array::Array(const AlloArray& cpy){
-	data.ptr = 0;
+	data.ptr = NULL;
     (*this) = cpy;
 }
-Array::Array(const Array& cpy) {
-	data.ptr = 0;
-    (*this) = cpy;
-}
+
 Array::Array(const AlloArrayHeader& h2){
 	allo_array_clear(this);
 	format(h2);
@@ -41,7 +43,7 @@ Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz){
 
 Array::~Array(){ dataFree(); }
 
-Array& Array::operator= (const Array& cpy) {
+Array& Array::operator= (const Array& cpy){
 	if(&cpy != this){
 		format(cpy.header);
 		if(cpy.data.ptr)
@@ -50,7 +52,7 @@ Array& Array::operator= (const Array& cpy) {
 	return *this;
 }
 
-Array& Array::operator= (const AlloArray& cpy) {
+Array& Array::operator= (const AlloArray& cpy){
 	if(&cpy != this){
 		format(cpy.header);
 		if(cpy.data.ptr)
@@ -86,7 +88,7 @@ void Array::dataFree() {
 	}
 }
 
-void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
+/*static*/ void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
 	allo_array_setstride(&h, alignSize);
 }
 
