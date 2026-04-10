@@ -291,7 +291,6 @@ public:
 	/// This returns the transform matrix T*S where the respective matrices are
 	/// a translation and scaling. The lumped transform is created with only
 	/// 2(N-1) assignments.
-	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat ST(const Vec<N-1,T>& s, const Vec<N-1,T>& t){
 		Mat m = Mat::scaling(s);
 		m.col<N-1>().template sub<N-1>() = t;
@@ -303,7 +302,6 @@ public:
 	/// This returns the transform matrix S*T where the respective matrices are
 	/// a scaling and translation. The lumped transform is created with only
 	/// N-1 multiplies.
-	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat TS(const Vec<N-1,T>& t, const Vec<N-1,T>& s){
 		Mat m = Mat::scaling(s);
 		m.col<N-1>().template sub<N-1>() = t*s;
@@ -315,7 +313,6 @@ public:
 	/// This returns the transform matrix T2*S*T1 where the respective matrices
 	/// are a translation, scaling and translation. The lumped transform is
 	/// created with only N-1 madds.
-	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat TST(const Vec<N-1,T>& t1, const Vec<N-1,T>& s, const Vec<N-1,T>& t2){
 		return Mat::TS(t1,s).translateGlobal(t2);
 	}
