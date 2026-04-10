@@ -292,6 +292,8 @@ protected:
 		T get(T a, T b) const { return (b-a)*f + a; }
 		template <class T>
 		void set(T v, T& a, T& b) const { a=v*(1.-f); b=v*f; }
+		template <class T>
+		void add(T v, T& a, T& b) const { a+=v*(1.-f); b+=v*f; }
 	};
 
 public:	// temporarily made public, because protected broke some other project code -gw
@@ -425,7 +427,7 @@ template<class T> inline void Array::write_interp(const T * val, double x){
 	T * abc = cell<T>(lx.i);
 	T * Abc = cell<T>(lx.j);
 	for(uint8_t i=0; i<components(); i++){
-		lx.set(val[i], abc[i], Abc[i]);
+		lx.add(val[i], abc[i], Abc[i]);
 	}
 }
 template<class T> inline void Array::write_interp(const T * val, double x, double y){
@@ -438,8 +440,8 @@ template<class T> inline void Array::write_interp(const T * val, double x, doubl
 	for(uint8_t i=0; i<components(); i++){
 		T b, B;
 		ly.set(val[i], b, B);
-		lx.set(b, abc[i], Abc[i]);
-		lx.set(B, aBc[i], ABc[i]);
+		lx.add(b, abc[i], Abc[i]);
+		lx.add(B, aBc[i], ABc[i]);
 	}
 }
 
@@ -461,10 +463,10 @@ template<class T> inline void Array::write_interp(const T * val, double x, doubl
 		T bc, Bc, bC, BC;
 		ly.set(c, bc, Bc);
 		ly.set(C, bC, BC);
-		lx.set(bc, abc[i], Abc[i]);
-		lx.set(Bc, aBc[i], ABc[i]);
-		lx.set(bC, abC[i], AbC[i]);
-		lx.set(BC, aBC[i], ABC[i]);
+		lx.add(bc, abc[i], Abc[i]);
+		lx.add(Bc, aBc[i], ABc[i]);
+		lx.add(bC, abC[i], AbC[i]);
+		lx.add(BC, aBC[i], ABC[i]);
 	}
 }
 
