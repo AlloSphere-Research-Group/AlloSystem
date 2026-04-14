@@ -317,6 +317,24 @@ public:
 		return Mat::TS(t1,s).translateGlobal(t2);
 	}
 
+	/// Get scaling-translation-scaling (STS) transform matrix
+
+	/// This returns the transform matrix S2*T*S1 where the respective matrices
+	/// are a scaling, translation and scaling. The lumped transform is created
+	/// with only 2(N-1) multiplies.
+	static Mat STS(const Vec<N-1,T>& s1, const Vec<N-1,T>& t, const Vec<N-1,T>& s2){
+		return Mat::ST(s1,t).scaleGlobal(s2);
+	}
+
+	/// Get scaling-translation-scaling-translation (STST) transform matrix
+
+	/// This returns the transform matrix T2*S2*T1*S1 where the respective 
+	/// matrices are a translation, scaling, translation and scaling. The lumped
+	/// transform is created with only N-1 multiplies and madds.
+	static Mat STST(const Vec<N-1,T>& s1, const Vec<N-1,T>& t1, const Vec<N-1,T>& s2, const Vec<N-1,T>& t2){
+		return Mat::STS(s1,t1,s2).translateGlobal(t2);
+	}
+
 	/// Get scaling-rotation (SR) transform matrix
 
 	/// This returns the transform matrix R*S where the respective matrices are
