@@ -786,6 +786,14 @@ public:
 		return a >= 0. ? a : a + 1.;
 	}
 
+	/// Returns angle, in interval [0, pi], between self and other vector
+	T angle(const Vec& v) const {
+		T cosAng = this->dot(v) / std::sqrt(magSqr()*v.magSqr());
+		if(cosAng >= T( 1)){ return T(0); }		else
+		if(cosAng <= T(-1)){ return T(3.141592653589793); }
+		return std::acos(cosAng);
+	}
+
 	/// Returns vector filled with absolute values of elements
 	Vec absVec() const {
 		using namespace std;
@@ -1388,7 +1396,6 @@ Vec<3,T> rotated(const Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
 	return rotated(vec, normal, cos(angle), sin(angle));
 }
 
-
 /// Rotate a vector 90 degrees around a normal vector
 
 /// \param[in,out]	vec		Vector to rotate
@@ -1403,16 +1410,6 @@ void rotate90(Vec<3,T>& vec, const Vec<3,T>& normal){
 template <class T>
 Vec<3,T> rotated90(const Vec<3,T>& vec, const Vec<3,T>& normal){
 	auto r = vec; rotate90(r, normal); return r;
-}
-
-
-/// Returns angle, in interval [0, pi], between two vectors
-template <int N, class T>
-inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
-	T cosAng = a.dot(b) / sqrt(a.magSqr()*b.magSqr());
-	if(cosAng >= T( 1)){ return T(0); }		else
-	if(cosAng <= T(-1)){ return T(3.141592653589793); }
-	return std::acos(cosAng);
 }
 
 /*! Compute centroid of points
