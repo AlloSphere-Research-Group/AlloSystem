@@ -1342,16 +1342,10 @@ inline Vec<N,T> fract(const Vec<N,T>& v){ return v - floor(v); }
 template <int N, class T>
 inline T sum(const Vec<N,T>& v){ return v.sum(); }
 
-/// Sets r to cross product, a x b
-template <class T>
-inline void cross(Vec<3,T>& r, const Vec<3,T>& a, const Vec<3,T>& b){
-	r = a.cross(b);
-}
-
 /// Returns cross product, a x b
 template <class T>
 inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
-	Vec<3,T> r;	cross(r,a,b); return r;
+	return a.cross(b);
 }
 
 /// Returns dot product
