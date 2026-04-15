@@ -40,11 +40,25 @@ struct VecElems{ T x,y,z,w; private: T data[N-4]; };
 
 template<class T> struct VecElems<0,T>{};
 template<class T> struct VecElems<1,T>{ T x; };
-template<class T> struct VecElems<2,T>{ T x,y; };
+template<class T> struct VecElems<2,T>{
+	T x,y;
+
+	/// Returns cross product, self x b
+
+	/// The product is the signed area of the parallelogram formed by the two 
+	/// vectors.
+	T cross(const Vec<2,T>& b) const {
+		return x*b.y - y*b.x;
+	}
+};
 template<class T> struct VecElems<3,T>{
 	T x,y,z;
 
-	/// Returns cross product of this x b
+	/// Returns cross product, self x b
+
+	/// The direction of the product is orthogonal to the two vectors.
+	/// The magnitude of the product is the signed area of the parallelogram
+	/// formed by the two vectors.
 	Vec<3,T> cross(const Vec<3,T>& b) const {
 		return { y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x };
 	}
@@ -1349,6 +1363,12 @@ inline Vec<N,T> fract(const Vec<N,T>& v){ return v - floor(v); }
 /// Returns sum of elements
 template <int N, class T>
 inline T sum(const Vec<N,T>& v){ return v.sum(); }
+
+/// Returns cross product, a x b
+template <class T>
+inline T cross(const Vec<2,T>& a, const Vec<2,T>& b){
+	return a.cross(b);
+}
 
 /// Returns cross product, a x b
 template <class T>

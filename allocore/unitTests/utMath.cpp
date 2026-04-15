@@ -230,9 +230,12 @@ int utMath(){
 		assert(max(a,b) == 1);
 	}
 
-
-	// Vec3
-	{
+	{ // Vec2 specials
+		assert(Vec2i(4,0).cross(Vec2i(0,4)) == 16);
+		assert(Vec2i(0,3).cross(Vec2i(5,0)) ==-15);
+	}
+	
+	{ // Vec3 specials
 		Vec3d a, b, c;
 
 		a.set(1,0,0);
