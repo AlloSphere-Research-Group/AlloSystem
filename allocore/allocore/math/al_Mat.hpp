@@ -303,9 +303,7 @@ public:
 	/// a scaling and translation. The lumped transform is created with only
 	/// N-1 multiplies.
 	static Mat TS(const Vec<N-1,T>& t, const Vec<N-1,T>& s){
-		Mat m = Mat::scaling(s);
-		m.col<N-1>().template sub<N-1>() = t*s;
-		return m;
+		return Mat::ST(s, s*t);
 	}
 
 	/// Get translation-scaling-translation (TST) transform matrix
