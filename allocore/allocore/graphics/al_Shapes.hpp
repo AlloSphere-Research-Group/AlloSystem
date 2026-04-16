@@ -179,6 +179,7 @@ int addCircle(Mesh& m, float radius=1., int N=60);
 /// @param[in] height		Total height (along y)
 /// @param[in] x			Position of center along x
 /// @param[in] y			Position of center along y
+/// @param[in] z			Position along z
 ///
 /// Vertex order is counter-clockwise from the bottom-left corner.
 ///
