@@ -471,7 +471,7 @@ public:
 
 	/// Get a subvector
 
-	/// \tparam M		Size of subvector; if M<0, the size is M+N.
+	/// \tparam M		Size of subvector; if M<0, the size is N+M
 	/// \tparam Begin	Starting element of subvector
 	template <int M, int Begin=0>
 	const auto& sub() const {
@@ -911,6 +911,18 @@ public:
 	Vec& negate(){
 		at<i>() = -at<i>();
 		return *this;
+	}
+
+	/// Scale to fit within a cube
+
+	/// This divides all elements by the element with maximum absolute value
+	/// and then scales the result. The direction is not changed.
+	/// \param[in] r	Radius of cube
+	Vec& fitToCube(T r = T(1)){
+		using namespace std;
+		auto mx = abs(max());
+		if(mx > T(0)) r/=mx;
+		return *this *= r;
 	}
 
 	/// Normalize magnitude (preserving direction)
