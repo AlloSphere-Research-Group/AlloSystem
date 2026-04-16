@@ -150,10 +150,10 @@ void Vbap::findSpeakerPairs(const std::vector<Speaker>& spkrs){
 
 bool Vbap::isCrossing(Vec3d c, Vec3d li, Vec3d lj, Vec3d ln, Vec3d lm){
 	double thresh = 0.0001;
-	double a1 = angle(c,li)+angle(c,lj);
-	double a2 = angle(li,lj);
-	double a3 = angle(c,ln)+angle(c,lm);
-	double a4 = angle(ln,lm);
+	double a1 = c.angle(li)+c.angle(lj);
+	double a2 = li.angle(lj);
+	double a3 = c.angle(ln)+c.angle(lm);
+	double a4 = ln.angle(lm);
 	return (fabs(a1-a2)< thresh) && (fabs(a3-a4)< thresh);
 }
 
@@ -232,7 +232,7 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 				//Vec3d spkVec(s.pos().x,s.pos().y,0.f);
 				auto spkVec = s.pos().with<2>(0.f);
 
-				if( angle(vec1,vec2) > angle(vec1,spkVec) &&  angle(vec1,vec2) > angle(vec2,spkVec)){
+				if( vec1.angle(vec2) > vec1.angle(spkVec) && vec1.angle(vec2) > vec2.angle(spkVec)){
 					itA = triplets.erase(itA);
 					breakOuter = true;
 					equalElevBtwCounter++;
@@ -262,7 +262,7 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 
 		float volume = fabs(xprod.dot(c));
 
-		float length = fabs(angle(a , b) ) + fabs(angle(a , c) ) + fabs(angle(b , c) );
+		float length = fabs(a.angle(b)) + fabs(a.angle(c)) + fabs(b.angle(c));
 		float ratio;
 
 		if (length > MIN_LENGTH){

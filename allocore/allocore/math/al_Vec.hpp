@@ -40,11 +40,25 @@ struct VecElems{ T x,y,z,w; private: T data[N-4]; };
 
 template<class T> struct VecElems<0,T>{};
 template<class T> struct VecElems<1,T>{ T x; };
-template<class T> struct VecElems<2,T>{ T x,y; };
+template<class T> struct VecElems<2,T>{
+	T x,y;
+
+	/// Returns cross product, self x b
+
+	/// The product is the signed area of the parallelogram formed by the two 
+	/// vectors.
+	T cross(const Vec<2,T>& b) const {
+		return x*b.y - y*b.x;
+	}
+};
 template<class T> struct VecElems<3,T>{
 	T x,y,z;
 
-	/// Returns cross product of this x b
+	/// Returns cross product, self x b
+
+	/// The direction of the product is orthogonal to the two vectors.
+	/// The magnitude of the product is the signed area of the parallelogram
+	/// formed by the two vectors.
 	Vec<3,T> cross(const Vec<3,T>& b) const {
 		return { y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x };
 	}
@@ -786,6 +800,14 @@ public:
 		return a >= 0. ? a : a + 1.;
 	}
 
+	/// Returns angle, in interval [0, pi], between self and other vector
+	T angle(const Vec& v) const {
+		T cosAng = this->dot(v) / std::sqrt(magSqr()*v.magSqr());
+		if(cosAng >= T( 1)){ return T(0); }		else
+		if(cosAng <= T(-1)){ return T(3.141592653589793); }
+		return std::acos(cosAng);
+	}
+
 	/// Returns vector filled with absolute values of elements
 	Vec absVec() const {
 		using namespace std;
@@ -1342,16 +1364,16 @@ inline Vec<N,T> fract(const Vec<N,T>& v){ return v - floor(v); }
 template <int N, class T>
 inline T sum(const Vec<N,T>& v){ return v.sum(); }
 
-/// Sets r to cross product, a x b
+/// Returns cross product, a x b
 template <class T>
-inline void cross(Vec<3,T>& r, const Vec<3,T>& a, const Vec<3,T>& b){
-	r = a.cross(b);
+inline T cross(const Vec<2,T>& a, const Vec<2,T>& b){
+	return a.cross(b);
 }
 
 /// Returns cross product, a x b
 template <class T>
 inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
-	Vec<3,T> r;	cross(r,a,b); return r;
+	return a.cross(b);
 }
 
 /// Returns dot product
@@ -1394,7 +1416,6 @@ Vec<3,T> rotated(const Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
 	return rotated(vec, normal, cos(angle), sin(angle));
 }
 
-
 /// Rotate a vector 90 degrees around a normal vector
 
 /// \param[in,out]	vec		Vector to rotate
@@ -1409,16 +1430,6 @@ void rotate90(Vec<3,T>& vec, const Vec<3,T>& normal){
 template <class T>
 Vec<3,T> rotated90(const Vec<3,T>& vec, const Vec<3,T>& normal){
 	auto r = vec; rotate90(r, normal); return r;
-}
-
-
-/// Returns angle, in interval [0, pi], between two vectors
-template <int N, class T>
-inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
-	T cosAng = a.dot(b) / sqrt(a.magSqr()*b.magSqr());
-	if(cosAng >= T( 1)){ return T(0); }		else
-	if(cosAng <= T(-1)){ return T(3.141592653589793); }
-	return std::acos(cosAng);
 }
 
 /*! Compute centroid of points

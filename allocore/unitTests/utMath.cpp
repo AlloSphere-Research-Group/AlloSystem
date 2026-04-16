@@ -199,9 +199,9 @@ int utMath(){
 		}
 
 		// geometry and other math ops
-		assert(eq(angle(Vec3d(1,0,0), Vec3d(1, 0, 0)), 0.));
-		assert(eq(angle(Vec3d(1,0,0), Vec3d(0, 1, 0)), M_PI_2));
-		assert(eq(angle(Vec3d(1,0,0), Vec3d(0,-1, 0)), M_PI_2));
+		assert(eq(Vec3d(1,0,0).angle(Vec3d(1, 0, 0)), 0.));
+		assert(eq(Vec3d(1,0,0).angle(Vec3d(0, 1, 0)), M_PI_2));
+		assert(eq(Vec3d(1,0,0).angle(Vec3d(0,-1, 0)), M_PI_2));
 
 		assert(eq(abs(Vec3d(-1,2,-3)), Vec3d(1,2,3)));
 
@@ -230,9 +230,12 @@ int utMath(){
 		assert(max(a,b) == 1);
 	}
 
-
-	// Vec3
-	{
+	{ // Vec2 specials
+		assert(Vec2i(4,0).cross(Vec2i(0,4)) == 16);
+		assert(Vec2i(0,3).cross(Vec2i(5,0)) ==-15);
+	}
+	
+	{ // Vec3 specials
 		Vec3d a, b, c;
 
 		a.set(1,0,0);
