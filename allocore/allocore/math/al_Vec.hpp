@@ -151,7 +151,7 @@ public:
 
 
 	//--------------------------------------------------------------------------
-	// Factory Methods
+	// Named Constructors
 
 	/// Get axis aligned vector
 	static Vec aa(int axis, T val = T(1)){
