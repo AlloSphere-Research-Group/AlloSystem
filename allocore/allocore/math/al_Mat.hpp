@@ -191,7 +191,7 @@ public:
 
 
 	//--------------------------------------------------------------------------
-	// Factory Methods
+	// Named Constructors
 
 	/// Get identity matrix
 	static Mat identity(){
@@ -292,9 +292,7 @@ public:
 	/// a translation and scaling. The lumped transform is created with only
 	/// 2(N-1) assignments.
 	static Mat ST(const Vec<N-1,T>& s, const Vec<N-1,T>& t){
-		Mat m = Mat::scaling(s);
-		m.col<N-1>().template sub<N-1>() = t;
-		return m;
+		return scaling(s).setTranslation(t);
 	}
 
 	/// Get translation-scaling (TS) transform matrix
@@ -303,7 +301,7 @@ public:
 	/// a scaling and translation. The lumped transform is created with only
 	/// N-1 multiplies.
 	static Mat TS(const Vec<N-1,T>& t, const Vec<N-1,T>& s){
-		return Mat::ST(s, s*t);
+		return ST(s, s*t);
 	}
 
 	/// Get translation-scaling-translation (TST) transform matrix
@@ -312,7 +310,7 @@ public:
 	/// are a translation, scaling and translation. The lumped transform is
 	/// created with only N-1 madds.
 	static Mat TST(const Vec<N-1,T>& t1, const Vec<N-1,T>& s, const Vec<N-1,T>& t2){
-		return Mat::TS(t1,s).translateGlobal(t2);
+		return TS(t1,s).translateGlobal(t2);
 	}
 
 	/// Get scaling-translation-scaling (STS) transform matrix
@@ -321,7 +319,7 @@ public:
 	/// are a scaling, translation and scaling. The lumped transform is created
 	/// with only 2(N-1) multiplies.
 	static Mat STS(const Vec<N-1,T>& s1, const Vec<N-1,T>& t, const Vec<N-1,T>& s2){
-		return Mat::ST(s1,t).scaleGlobal(s2);
+		return ST(s1,t).scaleGlobal(s2);
 	}
 
 	/// Get scaling-translation-scaling-translation (STST) transform matrix
@@ -330,7 +328,7 @@ public:
 	/// matrices are a translation, scaling, translation and scaling. The lumped
 	/// transform is created with only N-1 multiplies and madds.
 	static Mat STST(const Vec<N-1,T>& s1, const Vec<N-1,T>& t1, const Vec<N-1,T>& s2, const Vec<N-1,T>& t2){
-		return Mat::STS(s1,t1,s2).translateGlobal(t2);
+		return STS(s1,t1,s2).translateGlobal(t2);
 	}
 
 	/// Get scaling-rotation (SR) transform matrix
@@ -340,7 +338,7 @@ public:
 	/// multiplies versus N^3 if using matrix multiplication.
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat SR(const Vec<N-1,T>& s, const Rotoscale<T>& r){
-		Mat m = Mat::scaling(s);
+		Mat m = scaling(s);
 		m.at<Dim1,Dim1>() = r.r * s.template at<Dim1>(); // SR
 		m.at<Dim2,Dim1>() = r.i * s.template at<Dim1>();
 		m.at<Dim1,Dim2>() =-r.i * s.template at<Dim2>();
@@ -357,9 +355,7 @@ public:
 	/// it may be multiplied on the right by additional rotation matrices.
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat SRT(const Vec<N-1,T>& s, const Rotoscale<T>& r, const Vec<N-1,T>& t = T(0)){
-		Mat m = SR<Dim1,Dim2>(s, r); // SR
-		m.col<N-1>().template sub<-1>() = t; // SRT
-		return m;
+		return SR<Dim1,Dim2>(s,r).setTranslation(t);
 	}
 
 	/// Get translation-scaling-rotation (TSR) transform matrix
@@ -371,7 +367,7 @@ public:
 	static Mat<N,T> TSR(const Vec<N-1,T>& t, const Vec<N-1,T>& s, const Rotoscale<T>& r){
 		Mat m = SR<Dim1,Dim2>(s, r);
 		// We have SR and need to compute TSR
-		auto& c = m.col<N-1>().template sub<-1>();
+		auto& c = m.translation();
 		// Compute contribution of diagonal components
 		for(int i=0; i<N-1; ++i) c[i] = m(i,i) * t[i];
 		// Compute contribution of off-diagonal components
@@ -388,9 +384,7 @@ public:
 	/// matrix multiplication.
 	template <unsigned Dim1=0, unsigned Dim2=1>
 	static Mat<N,T> TSRT(const Vec<N-1,T>& t1, const Vec<N-1,T>& s, const Rotoscale<T>& r, const Vec<N-1,T>& t2){
-		Mat m = TSR<Dim1,Dim2>(t1, s, r);
-		m.col<N-1>().template sub<-1>() += t2;
-		return m;
+		return TSR<Dim1,Dim2>(t1, s, r).translateGlobal(t2);
 	}
 
 	//--------------------------------------------------------------------------
@@ -993,6 +987,14 @@ public:
 
 	template<typename... Vals>
 	Mat& translateGlobal(Vals... vals){ return translateGlobal(Vec<(sizeof...(Vals)),T>(vals...)); }
+
+	/// Get translation part
+	Vec<N-1,T>& translation(){ return col<-1>().template sub<-1>(); }
+	const Vec<N-1,T>& translation() const { return const_cast<Mat*>(this)->translation(); }
+
+	/// Set translation part
+	Mat& setTranslation(const Vec<N-1,T>& t){ translation() = t; return *this; }
+	// Note: using set to disambiguate with static function of same name
 
 	/// Print to file (stream)
 	void print(FILE * file = stdout) const;
