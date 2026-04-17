@@ -378,6 +378,22 @@ int utMath(){
 		assert(eq(Mat3d::translation(7,8).transformPoint(Vec2d(1,2)), Vec2d(8,10)));
 		assert(eq(Mat3d::translation(7,8).transformVector(Vec2d(1,2)), Vec2d(1,2)));
 
+		
+		{ // transform lumps
+			Vec3d t1( 8.8,-7.7,-8.0), t2( 4.9, 1.2, 7.4);
+			Vec3d s1(-5.1, 9.9,-1.4), s2(-7.1, 5.0,-9.7);
+			double r = 2.;
+			assert(eq(Mat4d::TS(t1,s1), Mat4d::scaling(s1)*Mat4d::translation(t1)));
+			assert(eq(Mat4d::ST(s1,t1), Mat4d::translation(t1)*Mat4d::scaling(s1)));
+			assert(eq(Mat4d::TST(t1,s1,t2), Mat4d::translation(t2)*Mat4d::scaling(s1)*Mat4d::translation(t1)));
+			assert(eq(Mat4d::STS(s1,t1,s2), Mat4d::scaling(s2)*Mat4d::translation(t1)*Mat4d::scaling(s1)));
+			assert(eq(Mat4d::STST(s1,t1,s2,t2), Mat4d::translation(t2)*Mat4d::scaling(s2)*Mat4d::translation(t1)*Mat4d::scaling(s1)));
+			assert(eq(Mat4d::SR(s1,r), Mat4d::rotation(r)*Mat4d::scaling(s1)));
+			assert(eq(Mat4d::SRT(s1,r,t1), Mat4d::translation(t1)*Mat4d::rotation(r)*Mat4d::scaling(s1)));
+			assert(eq(Mat4d::TSR(t1,s1,r), Mat4d::rotation(r)*Mat4d::scaling(s1)*Mat4d::translation(t1)));
+			assert(eq(Mat4d::TSRT(t1,s1,r,t2), Mat4d::translation(t2)*Mat4d::rotation(r)*Mat4d::scaling(s1)*Mat4d::translation(t1)));
+		}
+
 		{ // in-place transforms
 			// non-trivial rigid transform
 			auto A = Mat4d::translation(1,2,3) * Mat4d::rotation<1,2>(1) * Mat4d::rotation<0,1>(2);
