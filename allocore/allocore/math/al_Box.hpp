@@ -48,6 +48,7 @@ public:
 
 	Box(){ reset(); }
 	Box(const Box& b){ *this = b; }
+	Box(vec min, vec max){ set(min,max); }
 
 
 	/// Return a copy
