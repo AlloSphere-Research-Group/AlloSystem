@@ -565,7 +565,9 @@ Texture& Texture::ref(T * src, unsigned w, unsigned h, Graphics::Format fmt){
 
 template <class T>
 Texture& Texture::ref(T * src, unsigned w, unsigned h, unsigned d, Graphics::Format fmt){
-	mArray.ref(src, Graphics::numComponents(fmt), w, h);
+	     if(d>1) mArray.ref(src, Graphics::numComponents(fmt), w,h,d);
+	else if(h>1) mArray.ref(src, Graphics::numComponents(fmt), w,h);
+	else         mArray.ref(src, Graphics::numComponents(fmt), w);
 	type(Graphics::toDataType<T>());
 	format(fmt);
 	resize(w, h, d); // will derive target (1D, 2D or 3D)
