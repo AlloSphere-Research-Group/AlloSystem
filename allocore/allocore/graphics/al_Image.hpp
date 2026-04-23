@@ -137,19 +137,22 @@ public:
 
 
 	/// Get number of bytes per pixel
-	unsigned bytesPerPixel() const { return allo_type_size(array().type()) * array().components(); }
+	unsigned bytesPerPixel() const { return allo_type_size(mArray.type()) * mArray.components(); }
 
 	/// Get pixel format
 	Format format() const;
 
 	/// Get width, in pixels
-	unsigned width() const { return array().width(); }
+	unsigned width() const { return mArray.width(); }
 
 	/// Get height, in pixels
-	unsigned height() const { return array().height(); }
+	unsigned height() const { return mArray.height(); }
 
 	/// Get number of pixel color components
-	unsigned components() const { return array().components(); }
+	unsigned components() const { return mArray.components(); }
+
+	/// Returns whether the internal pixel buffer is empty
+	bool empty() const { return mArray.empty(); }
 
 
 	/// Get compression flags for saving
@@ -176,7 +179,7 @@ public:
 	/// Warning: no bounds checking performed on x and y.
 	template<typename Pix>
 	const Pix& at(unsigned x, unsigned y) const {
-		return *array().cell<Pix>(x, y);
+		return *mArray.cell<Pix>(x, y);
 	}
 
 	/// Get mutable reference to a pixel
@@ -185,7 +188,7 @@ public:
 	/// Warning: no bounds checking performed on x and y.
 	template<typename Pix>
 	Pix& at(unsigned x, unsigned y){
-		return *array().cell<Pix>(x, y);
+		return *mArray.cell<Pix>(x, y);
 	}
 
 	/// Write a pixel to an Image
@@ -194,7 +197,7 @@ public:
 	/// Warning: no bounds checking performed on x and y
 	template<typename Pix>
 	void write(const Pix& pix, unsigned x, unsigned y) {
-		array().write(&pix.r, x, y);
+		mArray.write(&pix.r, x, y);
 	}
 
 	/// Read a pixel from an Image
@@ -203,7 +206,7 @@ public:
 	/// Warning: no bounds checking performed on x and y
 	template<typename Pix>
 	void read(Pix& pix, unsigned x, unsigned y) const {
-		array().read(&pix.r, x, y);
+		mArray.read(&pix.r, x, y);
 	}
 
 	/// Resize internal pixel buffer. Erases any existing data.
@@ -218,6 +221,9 @@ public:
 		mArray.formatAligned(components(format), Array::type<T>(), dimX, dimY, 1);
 		return true;
 	}
+
+	/// Clear internal pixel buffer
+	Image& clear(){ mArray.dataFree(); return *this; }
 
 
 	/// Get number of components per pixel element

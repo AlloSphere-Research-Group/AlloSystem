@@ -731,7 +731,7 @@ bool saveFromArray(const Array& src, int compress, int paletteSize, const OnSave
 
 
 Image::Format Image::format() const {
-	return getFormat(array().components());
+	return getFormat(mArray.components());
 }
 
 /*static*/ Image::Format Image::getFormat(int planes){
