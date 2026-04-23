@@ -73,27 +73,32 @@ bool Array::isFormat(const AlloArrayHeader& h) const {
 	return allo_array_equal_headers(&header, &h);
 }
 
-void Array::configure(const AlloArrayHeader& h) {
+void Array::configure(const AlloArrayHeader& h){
 	allo_array_setheader(this, &h);
 }
 
-void Array::dataCalloc() {
+void Array::dataCalloc(){
 	allo_array_allocate(this);
 	mIsRef = false;
 }
 
-void Array::dataFree() {
+void Array::dataFree(){
 	if(!mIsRef){
 		allo_array_free(this);
 	}
 }
 
-/*static*/ void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
+void Array::zero(){
+	if(hasData())
+		memset(data.ptr, 0, size());
+}
+
+/*static*/ void Array::deriveStride(AlloArrayHeader& h, size_t alignSize){
 	allo_array_setstride(&h, alignSize);
 }
 
-void Array::format(const AlloArrayHeader& h) {
-	if(!isFormat(h)) {
+void Array::format(const AlloArrayHeader& h){
+	if(!isFormat(h)){
 		if(mIsRef){
 			configure(h); // just set header, don't mess with memory
 		}
@@ -109,29 +114,29 @@ void Array::format(const AlloArrayHeader& h) {
 	}
 }
 
-void Array::format(int comps, AlloTy ty, uint32_t dimx) {
+void Array::format(int comps, AlloTy ty, uint32_t dimx){
 	formatAligned(comps, ty, dimx, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
 
-void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy) {
+void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy){
 	formatAligned(comps, ty, dimx, dimy, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
 
-void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) {
+void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz){
 	formatAligned(comps, ty, dimx, dimy, dimz, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
 
-void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, size_t align) {
+void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, size_t align){
 	uint32_t dims[] = {dimx};
 	formatAlignedGeneral(comps, ty, dims,1, align);
 }
 
-void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align) {
+void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align){
 	uint32_t dims[] = {dimx,dimy};
 	formatAlignedGeneral(comps, ty, dims,2, align);
 }
 
-void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
+void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align){
 	uint32_t dims[] = {dimx,dimy,dimz};
 	formatAlignedGeneral(comps, ty, dims,3, align);
 }
@@ -146,13 +151,8 @@ AlloArrayHeader Array::getHeader(int comps, AlloTy ty, uint32_t * dims, int numD
 	return h;
 }
 
-void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align) {
+void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align){
 	format(getHeader(comps, ty, dims,numDims, align));
-}
-
-void Array::zero(){
-	if(hasData())
-		memset(data.ptr, 0, size());
 }
 
 void Array::print(FILE * fp) const {
