@@ -173,40 +173,16 @@ public:
 	///
 	Image& paletteSize(int numColors){ mPaletteSize=numColors; return *this; }
 
-	/// Get read-only reference to a pixel
-
-	/// Warning: doesn't check that Pix has matching type/component count.
-	/// Warning: no bounds checking performed on x and y.
-	template<typename Pix>
-	const Pix& at(unsigned x, unsigned y) const {
-		return *mArray.cell<Pix>(x, y);
-	}
-
 	/// Get mutable reference to a pixel
-
-	/// Warning: doesn't check that Pix has matching type/component count.
-	/// Warning: no bounds checking performed on x and y.
 	template<typename Pix>
 	Pix& at(unsigned x, unsigned y){
 		return *mArray.cell<Pix>(x, y);
 	}
 
-	/// Write a pixel to an Image
-
-	/// Warning: doesn't check that Pix has matching type/component count
-	/// Warning: no bounds checking performed on x and y
+	/// Get read-only reference to a pixel
 	template<typename Pix>
-	void write(const Pix& pix, unsigned x, unsigned y) {
-		mArray.write(&pix.r, x, y);
-	}
-
-	/// Read a pixel from an Image
-
-	/// Warning: doesn't check that Pix has matching type/component count
-	/// Warning: no bounds checking performed on x and y
-	template<typename Pix>
-	void read(Pix& pix, unsigned x, unsigned y) const {
-		mArray.read(&pix.r, x, y);
+	const Pix& at(unsigned x, unsigned y) const {
+		return const_cast<Image*>(this)->at<Pix>(x,y);
 	}
 
 	/// Resize internal pixel buffer. Erases any existing data.
