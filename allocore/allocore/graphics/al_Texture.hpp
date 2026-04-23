@@ -438,6 +438,8 @@ public:
 	template <class T>
 	Texture& ref(T * src, unsigned w, unsigned h, Graphics::Format fmt);
 
+	Texture& ref(Array& a);
+
 	/// Copy pixels from server into client-side memory (calling allocate() if necessary)
 	Texture& getRemoteData();
 

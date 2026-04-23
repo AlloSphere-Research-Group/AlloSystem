@@ -105,7 +105,7 @@ void Texture::onDestroy(){
 
 
 Texture& Texture::format(Format v){
-	if(update(v, mFormat, mShapeUpdated) && mArray.hasData())
+	if(update(v, mFormat, mShapeUpdated) && mArray.ownsData())
 		allocate();
 	return *this;
 }
@@ -116,7 +116,7 @@ template<> Texture& Texture::components<3>(){ return format(Graphics::RGB); }
 template<> Texture& Texture::components<4>(){ return format(Graphics::RGBA); }
 
 Texture& Texture::type(DataType v){
-	if(update(v, mType, mShapeUpdated) && mArray.hasData())
+	if(update(v, mType, mShapeUpdated) && mArray.ownsData())
 		allocate();
 	return *this;
 }
@@ -135,7 +135,7 @@ Texture& Texture::resize(unsigned w, unsigned h, unsigned d){
 		update(h, mHeight, mShapeUpdated) |
 		update(d, mDepth , mShapeUpdated)
 	){
-		if(mArray.hasData()) allocate(); // ensure local data matches new size
+		if(mArray.ownsData()) allocate(); // ensure local data matches new size
 
 		// derive the GL texture target
 		if(mDepth > 1){
@@ -409,6 +409,12 @@ Texture& Texture::allocate(const Array& src, bool reconfigure){
 
 Texture& Texture::deallocate(){
 	mArray.dataFree();
+	return *this;
+}
+
+Texture& Texture::ref(Array& a){
+	array().ref(a); // use mutable getter so shapeFromArray fires
+	shapeFromArray();
 	return *this;
 }
 
