@@ -155,6 +155,13 @@ void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numD
 	format(getHeader(comps, ty, dims,numDims, align));
 }
 
+void Array::ref(void * src, const AlloArrayHeader& h){
+	dataFree();
+	data.ptr = decltype(data.ptr)(src);
+	mIsRef = true;
+	configure(h);
+}
+
 void Array::print(FILE * fp) const {
 	/*printf("Array %p type %s components %d %d-D: ( ", this, allo_type_name(type()), components(), dimcount());
 	for (int i=0; i<dimcount(); i++) printf("%d(stride %d) ", dim(i), stride(i));

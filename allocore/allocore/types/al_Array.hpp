@@ -116,6 +116,12 @@ public:
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align);
 
+	void ref(void * src, const AlloArrayHeader& h);
+
+	void ref(Array& a){
+		ref(a.data.ptr, a.header);
+	}
+
 	/// Set 1D source array to reference
 	template <class T>
 	void ref(T * src, int comps, uint32_t dimx){
@@ -139,10 +145,7 @@ public:
 
 	template <class T>
 	void ref(T * src, int comps, uint32_t * dims, int numDims){
-		dataFree();
-		data.ptr = decltype(data.ptr)(src);
-		mIsRef = true;
-		configure(getHeader(comps, type<T>(), dims,numDims, 1));
+		ref(src, getHeader(comps, type<T>(), dims,numDims, 1));
 	}
 
 	/// Check if this Array conforms to an ArrayHeader format
@@ -154,6 +157,8 @@ public:
 
 	/// Returns true if there is data
 	bool hasData() const { return !empty(); }
+	bool isRef() const { return mIsRef; }
+	bool ownsData() const { return !(empty() || isRef()); }
 
 	/// Allocate memory for the given header.
 
