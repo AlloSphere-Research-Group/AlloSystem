@@ -542,8 +542,12 @@ int utTypes(){
 			});
 		}
 	}
-
 	{
+
+		auto eq = [](RGB a, RGB b, float eps=0.0000001){
+			return ::eq(a.components, b.components, a.size(), eps);
+		};
+
 		assert(RGB(0.1) == RGB(0.1,0.1,0.1));
 		assert(RGB(0.1) != RGB(0.2));
 		{ auto c = RGB(0.1); assert(c == RGB(0.1)); }
@@ -561,6 +565,7 @@ int utTypes(){
 		assert(RGB(-0.5,0.2,1.2).clamp() == RGB(0,0.2,1));
 		assert(RGB(-0.5,0.2,0.3).max() ==  0.3f);
 		assert(RGB(-0.5,0.2,0.3).min() == -0.5f);
+		{RGB c(0.0, 0.002, 0.7); assert(eq(c.dup().toSRGB().fromSRGB(), c)); }
 
 		assert(Colori(10,20,30) == Colori(10,20,30,255));
 		assert(Colori(10,128) == Colori(10,10,10,128));

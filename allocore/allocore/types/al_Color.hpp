@@ -664,6 +664,8 @@ struct RGB{
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
 
+	/// Get duplicate
+	RGB dup() const { return *this; }
 
 	/// Get reference to self as another type
 	template <class T>
@@ -734,14 +736,14 @@ struct RGB{
 	RGB& operator/= (float v){ return set(r/v, g/v, b/v); }
 
 	RGB operator- () const { return RGB(-r,-g,-b); }
-	RGB operator+ (const RGB& v) const { return RGB(*this)+=v; }
-	RGB operator- (const RGB& v) const { return RGB(*this)-=v; }
-	RGB operator* (const RGB& v) const { return RGB(*this)*=v; }
-	RGB operator/ (const RGB& v) const { return RGB(*this)/=v; }
-	RGB operator+ (float v) const { return RGB(*this)+=v; }
-	RGB operator- (float v) const { return RGB(*this)-=v; }
-	RGB operator* (float v) const { return RGB(*this)*=v; }
-	RGB operator/ (float v) const { return RGB(*this)/=v; }
+	RGB operator+ (const RGB& v) const { return dup()+=v; }
+	RGB operator- (const RGB& v) const { return dup()-=v; }
+	RGB operator* (const RGB& v) const { return dup()*=v; }
+	RGB operator/ (const RGB& v) const { return dup()/=v; }
+	RGB operator+ (float v) const { return dup()+=v; }
+	RGB operator- (float v) const { return dup()-=v; }
+	RGB operator* (float v) const { return dup()*=v; }
+	RGB operator/ (float v) const { return dup()/=v; }
 
 	template <unsigned HexValue>
 	constexpr RGB& fromHex(){
@@ -757,13 +759,13 @@ struct RGB{
 	}
 
 	/// Returns inverted color
-	RGB inverse() const { return RGB(*this).invert(); }
+	RGB inverse() const { return dup().invert(); }
 
 	/// Invert RGB components
 	RGB& invert(){ return set(1.f-r, 1.f-g, 1.f-b); }
 
 	/// Returns complementary color
-	RGB complementary() const { return RGB(*this).complement(); }
+	RGB complementary() const { return dup().complement(); }
 
 	/// Rotate hue halfway around color wheel
 	RGB& complement();
@@ -795,7 +797,7 @@ struct RGB{
 	RGB& value(float v);
 
 	/// Get color with specified brightness (value in HSV space)
-	RGB shade(float v) const { return RGB(*this).value(v); }
+	RGB shade(float v) const { return dup().value(v); }
 
 	/// Get saturation of color in HSV space
 	float saturation() const;
@@ -804,7 +806,13 @@ struct RGB{
 	RGB& saturation(float s);
 
 	/// Get color with specified saturation
-	RGB tint(float v) const { return RGB(*this).saturation(v); }
+	RGB tint(float v) const { return dup().saturation(v); }
+
+	/// Convert from linear to sRGB space in-place
+	RGB& toSRGB();
+
+	/// Convert from sRGB to linear space in-place
+	RGB& fromSRGB();
 
 	value_type * begin(){ return components; }
 	const value_type * begin() const { return components; }

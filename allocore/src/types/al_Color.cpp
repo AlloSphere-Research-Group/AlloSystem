@@ -1,6 +1,6 @@
 #include "allocore/types/al_Color.hpp"
 #include <algorithm> // min,max
-#include <cmath>
+#include <cmath> // pow
 
 namespace al{
 
@@ -124,6 +124,21 @@ RGB& RGB::saturation(float s){
 	return *this = RGB(max()).mix(*this, s);
 }
 
+RGB& RGB::toSRGB(){
+	auto g = [](float x){
+		return x>0.0031308f ? 1.055f*std::pow(x,1.f/2.4f)-0.055f : x*12.92f;
+	};
+	for(auto& c : *this) c = g(c);
+	return *this;
+}
+
+RGB& RGB::fromSRGB(){
+	auto g = [](float x){
+		return x>0.04045f ? std::pow((x+0.055f)/1.055f,2.4f) : x/12.92f;
+	};
+	for(auto& c : *this) c = g(c);
+	return *this;
+}
 
 RGB& RGB::operator= (const HSV& hsv){
 
