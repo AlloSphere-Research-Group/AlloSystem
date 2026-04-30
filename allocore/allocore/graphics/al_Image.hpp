@@ -127,13 +127,13 @@ public:
 	/// Get pixels as an Array (read-only)
 	const Array& array() const { return mArray; }
 
-	/// Get pointer to pixels
-	template <typename T>
-	T * pixels(){ return (T*)(mArray.data.ptr); }
+	/// Get pointer to pixel data
+	template <typename T = void>
+	T * data(){ return (T*)(mArray.data.ptr); }
 
-	/// Get pointer to pixels (read-only)
-	template <typename T>
-	const T * pixels() const { return (const T*)(mArray.data.ptr); }
+	/// Get pointer to pixel data (read-only)
+	template <typename T = void>
+	const T * data() const { return const_cast<Image*>(this)->data<T>(); }
 
 
 	/// Get number of bytes per pixel
@@ -150,6 +150,9 @@ public:
 
 	/// Get number of pixel color components
 	unsigned components() const { return mArray.components(); }
+
+	/// Get total size of pixel data, in bytes
+	unsigned sizeBytes() const { return mArray.size(); }
 
 	/// Returns whether the internal pixel buffer is empty
 	bool empty() const { return mArray.empty(); }

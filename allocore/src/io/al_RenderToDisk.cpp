@@ -634,7 +634,7 @@ bool RenderToDisk::ImageWriter::run(
 
 	// Create local copy of pixels
 	mImage.resize<unsigned char>(w,h, format);
-	std::memcpy(mImage.pixels<void>(), &pixels[0], pixels.size());
+	std::memcpy(mImage.data(), &pixels[0], pixels.size());
 
 	mImage.compression(compress);
 	mImage.paletteSize(paletteSize);
