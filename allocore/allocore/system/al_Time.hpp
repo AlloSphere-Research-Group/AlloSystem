@@ -123,7 +123,7 @@ public:
 	}
 
 	/// Print current elapsed time
-	void print() const;
+	void print(const char * pre = nullptr) const;
 
 private:
 	al_nsec mStart=0, mStop=0;	// start and stop times
@@ -149,6 +149,15 @@ private:
 	}\
 	std::cout << #__VA_ARGS__ ": " << al::Timer().timeFunc(blockSize,trials, [&](int i){ return __VA_ARGS__; })/unitDiv << " " << unitStr << "\n";\
 }
+
+
+/// Reports timing upon destruction
+class ScopeTimer : public Timer {
+public:
+	const char * pre;
+	ScopeTimer(const char * prefix = nullptr): Timer(true), pre(prefix){}
+	~ScopeTimer(){ stop(); print(pre); }
+};
 
 
 /// Interval timer

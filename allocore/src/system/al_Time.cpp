@@ -312,9 +312,10 @@ std::string timecodeNow(const std::string& format){
 }
 
 
-void Timer::print() const {
+void Timer::print(const char * pre) const {
 	auto dtSec = elapsedSec();
-	printf("%g sec (%g ms) elapsed\n", dtSec, dtSec*1000.);
+	if(pre && pre[0]) printf("%s ", pre);
+	printf("%g sec (%g ms)\n", dtSec, dtSec*1000.);
 }
 
 
