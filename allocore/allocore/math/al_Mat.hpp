@@ -952,6 +952,10 @@ public:
 		return *this;
 	}
 
+	/// Scale transformation matrix by uniform amount
+	template<class V>
+	Mat& scaleGlobal(const V& amount){ return scaleGlobal(Vec<N-1,V>(amount)); }
+
 	template<typename... Vals>
 	Mat& scaleGlobal(Vals... vals){ return scaleGlobal(Vec<(sizeof...(Vals)),T>(vals...)); }
 
