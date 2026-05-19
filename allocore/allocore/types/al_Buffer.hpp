@@ -190,10 +190,19 @@ public:
 
 	/// Append elements of an array
 	void append(const T * src, size_t len){
+		/*
 		size_t newSize = size() + len;
-		reserve(newSize);
+		if(newSize > capacity()){
+			size_t newCap = capacity() > 0 ? capacity() * 2 : 2;
+			while(newCap < newSize) newCap *= 2;
+			reserve(newCap);
+		}
 		std::copy(src, src + len, end());
 		mEnd += len;
+		//*/
+
+		// This is faster, according to some informal benchmarks
+		for(size_t i=0; i<len; ++i) append(src[i]);
 	}
 
 	/// Repeat last element
