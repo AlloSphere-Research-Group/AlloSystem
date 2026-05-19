@@ -310,7 +310,7 @@ void main(){
 	vcol = singleColor.a==8192. ? colIn : singleColor;
 	vnrm = hasNormals ? normalMatrix * nrmIn : vec3(1.,0.,0.);
 	vtan = hasTangents ? al_transform(MV, tanIn,0.) : vec3(0.,1.,0.);
-	if(doTex2) vtc2 = tcIn;
+	vtc2 = doTex2 ? tcIn : vec2(0.,0.);
 	gl_PointSize = pointSize;
 )" +
 	mOnVert +
