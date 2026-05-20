@@ -123,9 +123,24 @@ public:
 	/// Set buffer data store without copying client data
 	BufferObject& data(Graphics::DataType dataType, int numElems, int numComps=1);
 
-	/// Set subregion of buffer store
+	/// Map subregion of buffer store
+
+	/// \tparam T Data type
+	/// \param[in] src			Pointer to client data
+	/// \param[in] numElems		Number of data elements (size of array)
+	/// \param[in] byteOffset	Byte offset into data store
+	/// \returns byte offset of one past end of subregion
+	///
+	/// Subregions will become invalid if the source pointer changes (for
+	/// example due to resizing) or the main data store is resized. In either
+	/// case, the subregions should be cleared and added again. The only "safe"
+	/// scenario is when all memory layout remains persistent and we are only 
+	/// updating values in memory.
 	template <class T>
 	int subData(const T * src, int numElems, int byteOffset=0);
+
+	/// Clear all data subregions
+	BufferObject& subDataClear();
 
 	/// Trigger update of remote data buffer store
 	BufferObject& update();

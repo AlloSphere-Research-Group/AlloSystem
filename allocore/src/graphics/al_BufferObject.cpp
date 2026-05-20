@@ -66,6 +66,11 @@ BufferObject& BufferObject::data(Graphics::DataType dataType, int numElems, int 
 	return data(0, dataType, numElems, numComps);
 }
 
+BufferObject& BufferObject::subDataClear(){
+	mSubData.clear();
+	return *this;
+}
+
 void BufferObject::onCreate(){
 	glGenBuffers(1, (GLuint*)&mID);
 	if(size() > 0) update(); // handle potential GL context change
