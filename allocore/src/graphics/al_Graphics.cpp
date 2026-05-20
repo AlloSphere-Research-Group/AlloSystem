@@ -116,6 +116,7 @@ public:
 		count = Ni ? Ni : Nv;
 
 		mVBO.usage(BufferObject::STATIC_DRAW);
+		mVBO.subDataClear();
 		int b = 0; // current byte offset into VBO
 		b = mVBO.subData(&m.vertices()[0], Nv);
 
