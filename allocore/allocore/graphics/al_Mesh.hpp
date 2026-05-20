@@ -679,6 +679,14 @@ public:
 		return g;
 	}
 
+	/// Flag mesh data as changed
+
+	/// Note that for performance reasons, there is no attempt to set this flag
+	/// automatically---it must be managed by the user.
+	Mesh& dirty(bool v){ mDirty=v; return *this; }
+	bool dirty() const { return mDirty; }
+	bool handleDirty(){ auto t=mDirty; mDirty=false; return t; }
+
 	/// Print information about Mesh
 	void print(FILE * dst = stdout) const;
 
@@ -706,6 +714,7 @@ protected:
 	Attrib mAttribHint = Attrib(0);
 	float mStroke = -1.f;
 	bool mVisible = true;
+	bool mDirty = false;
 };
 
 inline Mesh::Attrib operator& (Mesh::Attrib a, Mesh::Attrib b){ return Mesh::Attrib(+a & +b); }
