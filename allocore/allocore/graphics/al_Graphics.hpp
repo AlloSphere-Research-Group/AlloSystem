@@ -371,6 +371,7 @@ public:
 		FrameBuffer& operator=(FrameBuffer&& other) noexcept;
 		bool empty() const;
 		void clear();
+		unsigned numComponents() const { return Graphics::numComponents(format); }
 		unsigned char * data = nullptr;
 		unsigned width = 0;
 		unsigned height = 0;
