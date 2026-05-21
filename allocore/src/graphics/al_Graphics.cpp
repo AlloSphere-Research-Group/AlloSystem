@@ -150,7 +150,8 @@ public:
 		}
 
 		// Here, b should be the total number of bytes in the buffer
-		mVBO.resize(b);
+		//if(b > mVBO.size())
+			mVBO.resize(b);
 
 		if(Ni){
 			mEBO.usage(BufferObject::STATIC_DRAW);
@@ -165,9 +166,17 @@ private:
 };
 
 
-std::map<const Mesh *, std::unique_ptr<GPUMesh>> gpuMeshes;
-//std::map<const MeshNew *, GPUMesh *> gpuMeshes;
-GPUMesh * currentGPUMesh = NULL;
+using GPUMeshMap = std::map<const Mesh *, std::unique_ptr<GPUMesh>>;
+GPUMeshMap& gpuMeshMap(){
+	static GPUMeshMap m;
+	return m;
+}
+
+GPUMesh *& currentGPUMesh(){
+	static GPUMesh * m = nullptr;
+	return m;
+}
+
 
 void Graphics::Backend::draw(const Mesh& m, int count, int begin){
 	if(m.visible())
@@ -753,7 +762,7 @@ R"(
 				mColorArray.clear();
 				for(int i=0; i<m.Nv; ++i) mColorArray.push_back(col);
 			}
-			if(currentGPUMesh && currentGPUMesh->bound()){
+			if(currentGPUMesh() && currentGPUMesh()->bound()){
 				// TODO: if VBO bound, must bind a separate color VBO
 			} else if((hasCol = mAttribLocs.col)){
 				bindAttribArray(mAttribLocs.col(), 4, GL_UNSIGNED_BYTE, &mColorArray[0], GL_TRUE);
@@ -1301,22 +1310,22 @@ Graphics& Graphics::shaderAutoBind(bool v){
 }
 
 void Graphics::setVertexBuffer(const Mesh& m, bool updateBuffer){
-	auto it = gpuMeshes.find(&m);
-	if(it != gpuMeshes.end()){ // found existing VBO for passed in mesh
-		currentGPUMesh = it->second.get();
+	auto it = gpuMeshMap().find(&m);
+	if(it != gpuMeshMap().end()){ // found existing VBO for passed in mesh
+		currentGPUMesh() = it->second.get();
 	} else { // create new buffer and update
-		currentGPUMesh = new GPUMesh;
-		gpuMeshes[&m] = std::unique_ptr<GPUMesh>(currentGPUMesh);
+		currentGPUMesh() = new GPUMesh;
+		gpuMeshMap()[&m] = std::unique_ptr<GPUMesh>(currentGPUMesh());
 		updateBuffer = true;
 	}
 	
-	if(updateBuffer) currentGPUMesh->update(m);
+	if(updateBuffer) currentGPUMesh()->update(m);
 }
 
 void Graphics::drawVertexBuffer(){
-	currentGPUMesh->bind();
-	mBackend->draw(*currentGPUMesh);
-	currentGPUMesh->unbind();
+	currentGPUMesh()->bind();
+	mBackend->draw(*currentGPUMesh());
+	currentGPUMesh()->unbind();
 }
 
 #define CS(t) case Graphics::t: return #t;
