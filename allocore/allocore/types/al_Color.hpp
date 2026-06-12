@@ -893,6 +893,11 @@ struct CIEXYZ{
 
 
 /// Color represented by L* (lightness), a*, b*
+
+/// CIELAB or simply L*a*b* is a chromance space designed to be perceptually 
+/// uniform. The lightness value closely matches human vision whereas the 
+/// chromance is less precise. The color space is useful for measuring color 
+/// differences.
 struct Lab{
 	
 	typedef float value_type;
@@ -941,8 +946,6 @@ struct Lab{
 	Lab(const HCLab& v){ *this = v; }
 
 
-
-
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
 
@@ -976,7 +979,12 @@ struct Lab{
 
 
 
-/// Color represented by hue, chroma, luminance(ab)
+/// Cylindrical model of CIELAB
+
+/// This is a cylindrical model of CIELAB that maps ab to hue/chroma and 
+/// leaves lightness/luminance unchanged. It falls under the general class of 
+/// LCh/HCL color spaces and is also known as LCh(ab) or HCL(ab).
+/// HCL can be viewed as a perceptually uniform version of HSV.
 struct HCLab{
 	
 	typedef float value_type;
@@ -1068,6 +1076,10 @@ struct HCLab{
 
 
 /// Color represented by L* (lightness), u*, v*
+
+/// CIELUV is a chromance space designed to be perceptually uniform. Compared to
+/// CIELAB, the lightness is the same whereas chromance is encoded differently.
+/// The color space is useful for measuring color differences.
 struct Luv{
 	
 	typedef float value_type;
@@ -1150,7 +1162,12 @@ struct Luv{
 
 
 
-/// Color represented by hue, chroma, luminance(uv)
+/// Cylindrical model of CIELUV
+
+/// This is a cylindrical model of CIELAB that maps uv to hue/chroma and 
+/// leaves lightness/luminance unchanged. It falls under the general class of 
+/// LCh/HCL color spaces and is also known as LCh(uv) or HCL(uv).
+/// HCL can be viewed as a perceptually uniform version of HSV.
 struct HCLuv{
 
 	typedef float value_type;
