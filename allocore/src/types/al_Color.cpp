@@ -1,10 +1,15 @@
 #include "allocore/types/al_Color.hpp"
 #include <algorithm> // min,max
-#include <cmath> // pow
+#include <cmath> // sin, cos, cbrt, sqrt, pow
 
 namespace al{
 
 constexpr auto twoPi = 6.28318530717958647692;
+
+void wrapHue(float& h){
+	if(h>1.f){ h -= int(h); }
+	else if(h<0.f){ h -= int(h)-1; }
+}
 
 // Returns vector v transformed by matrix m (via m * v)
 template <class T, class Vec>
@@ -98,8 +103,7 @@ Colori Colori::mix(const Colori& v, float amt) const {
 
 
 HSV& HSV::wrapHue(){
-	if(h>1.f){ h -= int(h); }
-	else if(h<0.f){ h -= int(h)-1; }
+	al::wrapHue(h);
 	return *this;
 }
 
@@ -140,6 +144,22 @@ RGB& RGB::fromSRGB(){
 	return *this;
 }
 
+
+HCLab& HCLab::wrapHue(){
+	al::wrapHue(h);
+	return *this;
+}
+
+
+HCLuv& HCLuv::wrapHue(){
+	al::wrapHue(h);
+	return *this;
+}
+
+
+// From here, we define color space conversions. These are paired up for
+// convenience.
+
 RGB& RGB::operator= (const HSV& hsv){
 
 	auto s=hsv.s, v=hsv.v;
@@ -165,7 +185,6 @@ RGB& RGB::operator= (const HSV& hsv){
 		case 5: {auto w=v-vs*f; return set(v,p,w);}
 	}
 }
-
 
 HSV& HSV::operator= (const RGB& c){
 
@@ -211,10 +230,8 @@ RGB& RGB::operator= (const CIEXYZ& v){
 
 	clamp(); //clamp RGB values to [0, 1]
 
-	//cout << "RGB from CIEXYZ: {" << r << ", " << g << ", " << b << "}" << endl;
 	return *this;
 }
-
 
 CIEXYZ& CIEXYZ::operator= (const RGB& v){
 	auto rgbLin = v;
@@ -232,144 +249,125 @@ CIEXYZ& CIEXYZ::operator= (const RGB& v){
 		CIEXYZ(rgbLin.components)
 	);
 
-	//cout << "CIEXYZ from RGB: {" << x << ", " << y << ", " << z << "}" << endl;
 	return *this;
 };
 
 
+const float cieEps = 216.f / 24389.f;
+const float cieKap = 24389.f / 27.f;
+float cube(float x){ return x*x*x; }
+
 CIEXYZ& CIEXYZ::operator=(const Lab& v){
-	float l, a, b, fx, fy, fz, xr, yr, zr;
-	float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
-	// using reference white D65
-	float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
+	float Xn = 0.95047f, Yn = 1.f, Zn = 1.08883f; // reference white D65
 
-	l = v.l; a = v.a; b = v.b;
+	float l = v.l, a = v.a, b = v.b;
 
-	fy = (l + 16) / 116;
-	fx = (a / 500) + fy;
-	fz = fy - (b / 200);
+	float fy = (l + 16.f) / 116.f;
+	float fx = (a / 500.f) + fy;
+	float fz = fy - (b / 200.f);
 
-	xr = (float)(pow(fx, 3.0) > epsilon)?pow(fx, 3.0):((116.0f * fx - 16.0f) / kappa);
-	yr = (float)(l > epsilon * kappa)?pow((l + 16.0f) / 116.0f, 3.0):l / kappa;
-	zr = (float)(pow(fz, 3.0) > epsilon)?pow(fz, 3.0):((116.0f * fz - 16.0f) / kappa);
+	float xr = cube(fx) > cieEps ? cube(fx) : (116.f * fx - 16.f) / cieKap;
+	float yr = l > cieEps*cieKap ? cube((l + 16.f) / 116.f) : l / cieKap;
+	float zr = cube(fz) > cieEps ? cube(fz) : (116.f * fz - 16.f) / cieKap;
 
 	x = xr * Xn;
 	y = yr * Yn;
 	z = zr * Zn;
 
-	//cout << "CIEXYZ from Lab: {" << x << ", " << y << ", " << z << "}" << endl;
 	return *this;
 }
-
-CIEXYZ& CIEXYZ::operator=(const Luv& w){
-	float l, u, v, a, b, c, d, ur, vr;
-	float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
-	// using reference white D65
-	float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
-	l = w.l; u = w.u; v = w.v;
-
-	ur = (4 * Xn) / (Xn + 15 * Yn + 3 * Zn);
-	vr = (9 * Yn) / (Xn + 15 * Yn + 3 * Zn);
-
-	c = (-1.0f / 3.0f);
-	a = -c * (((52.0f * l) / (u + 13.0f * l * ur)) - 1.0f);
-
-	y =  (float)(l > epsilon * kappa)?pow((l + 16.0) / 116.0, 3.0):l / kappa;
-
-	b = -5.0f * y;
-	d = y * (((39.0f * l) / (v + 13.0f * l * vr)) - 5.0f);
-
-	x = (d - b) / (a - c);
-	z = x * a + b;
-
-	//cout << "CIEXYZ from Luv: {" << x << ", " << y << ", " << z << "}" << endl;
-	return *this;
-}
-
 
 Lab& Lab::operator= (const CIEXYZ& v){
-	float fx, fy, fz, xr, yr, zr;
-	float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
-	// using reference white D65
-	float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
+	float Xn = 0.95047f, Yn = 1.f, Zn = 1.08883f; // reference white D65
 
-	// convert CIEXYZ to Lab
-	xr = v.x / Xn; yr = v.y / Yn; zr = v.z / Zn;
-	fx = (float)(xr > epsilon)?pow(xr, 1.0/3.0):((kappa * xr + 16.0) / 116.0);
-	fy = (float)(yr > epsilon)?pow(yr, 1.0/3.0):((kappa * yr + 16.0) / 116.0);
-	fz = (float)(zr > epsilon)?pow(zr, 1.0/3.0):((kappa * zr + 16.0) / 116.0);
+	float xr = v.x / Xn, yr = v.y / Yn, zr = v.z / Zn;
+	float fx = xr > cieEps ? std::cbrt(xr) : (cieKap * xr + 16.f) / 116.f;
+	float fy = yr > cieEps ? std::cbrt(yr) : (cieKap * yr + 16.f) / 116.f;
+	float fz = zr > cieEps ? std::cbrt(zr) : (cieKap * zr + 16.f) / 116.f;
 
-	l = 116.0f * fy - 16.0f;
-	a = 500.0f * (fx - fy);
-	b = 200.0f * (fy - fz);
-	//cout << "Lab: {" << l << ", " << a << ", " << b << "}" << endl;
+	l = 116.f * fy - 16.f;
+	a = 500.f * (fx - fy);
+	b = 200.f * (fy - fz);
+
 	return *this;
+}
+
+
+CIEXYZ& CIEXYZ::operator=(const Luv& w){
+	float Xn = 0.95047f, Yn = 1.f, Zn = 1.08883f; // reference white D65
+
+	float l = w.l, u = w.u, v = w.v;
+
+	float ur = (4.f * Xn) / (Xn + 15.f * Yn + 3.f * Zn);
+	float vr = (9.f * Yn) / (Xn + 15.f * Yn + 3.f * Zn);
+
+	const float _1_3 = 1.f/3.f;
+	float a = _1_3 * (((52.f * l) / (u + 13.f * l * ur)) - 1.f);
+
+	y = l > cieEps * cieKap ? cube((l + 16.f) / 116.f) : l / cieKap;
+
+	float d = y * (((39.f * l) / (v + 13.f * l * vr)) - 5.f);
+	float b = -5.f * y;
+
+	x = (d - b) / (a + _1_3);
+	z = x * a + b;
+
+	return *this;
+}
+
+Luv& Luv::operator= (const CIEXYZ& w){
+	float Xn = 0.95047f, Yn = 1.f, Zn = 1.08883f; // reference white D65
+
+	float x = w.x, y = w.y, z = w.z;
+
+	float ur = (4.f * Xn) / (Xn + 15.f * Yn + 3.f * Zn);
+	float yr = y / Yn;
+	float vr = (9.f * Yn) / (Xn + 15.f * Yn + 3.f * Zn);
+
+	float up = (4.f * x) / (x + 15.f * y + 3.f * z);
+	float vp = (9.f * y) / (x + 15.f * y + 3.f * z);
+
+	l = yr > cieEps ? 116.f * std::cbrt(yr) - 16.f : cieKap * yr;
+	u = 13.f * l * (up - ur);
+	v = 13.f * l * (vp - vr);
+
+	return *this;
+}
+
+
+void lch2LXY(float& L, float& X, float& Y, float l, float c, float h){
+	L = l * 100.f;
+	X = c * std::cos(h * twoPi);
+	Y = c * std::sin(h * twoPi);
+}
+
+void LXY2lch(float& l, float& c, float& h, float L, float X, float Y){
+	l = L * 0.01f;
+	c = std::sqrt(X*X + Y*Y);			// this will be scaled according to color space
+	h = std::atan2(Y,X) * (1.f/twoPi);	// hue in [-0.5, 0.5]
+	if(h < 0.f) h += 1.f;				// wrap hue angle into [0, 1)
 }
 
 Lab& Lab::operator=(const HCLab& v){
-	l = v.l * 100.0f;
-	a = (v.c * 133.419f) * cos(v.h * twoPi);
-	b = (v.c * 133.419f) * sin(v.h * twoPi);
-	//cout << "Lab from HCLab: {" << l << ", " << a << ", " << b << "}" << endl;
+	lch2LXY(l,a,b, v.l,v.c*133.419f,v.h);
 	return *this;
 }
-
 
 HCLab& HCLab::operator= (const Lab& v){
-	float L = v.l, a = v.a, b = v.b;
-	//calculate hue angle from 0 to 1
-	h = atan2(b, a) * (1.f / twoPi);	// hue in [-0.5, 0.5]
-	if(h < 0.f) h += 1.f;					// wrap hue angle into [0, 1]
-
-	c = sqrt(a * a + b * b) / 133.419f; //range determined empirically using
-										//16million RGB color image from http://brucelindbloom.com
-	l = L / 100.0f;
-	//cout << "HCLab: {" << h << ", " << c << ", " << l << "}" << endl;
+	LXY2lch(l,c,h, v.l,v.a,v.b);
+	c /= 133.419f; // scaling factor from http://brucelindbloom.com
 	return *this;
 }
 
-
-Luv& Luv::operator= (const CIEXYZ& w){
-	float up, vp, ur, yr, vr, x, y, z;
-	float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
-	// using reference white D65
-	float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
-	x = w.x; y = w.y; z = w.z;
-
-	// convert CIEXYZ to Luv
-	ur = (4 * Xn) / (Xn + 15 * Yn + 3 * Zn);
-	yr = w.y / Yn;
-	vr = (9 * Yn) / (Xn + 15 * Yn + 3 * Zn);
-
-	up = (4 * x) / (x + 15 * y + 3 * z);
-	vp = (9 * y) / (x + 15 * y + 3 * z);
-
-	l = (float)(yr > epsilon)?116.0f * pow(yr, 1.0/3.0) - 16.0f:kappa * yr;
-	u = 13.0f * l * (up - ur);
-	v = 13.0f * l * (vp - vr);
-	//cout << "Luv: {" << l << ", " << u << ", " << v << "}" << endl;
-	return *this;
-}
 
 Luv& Luv::operator=(const HCLuv& w){
-	l = w.l * 100.0f;
-	u = (w.c * 178.387f) * cos(w.h * twoPi);
-	v = (w.c * 178.387f) * sin(w.h * twoPi);
-	//cout << "Luv from HCLuv: {" << l << ", " << u << ", " << v << "}" << endl;
+	lch2LXY(l,u,v, w.l,w.c*178.387f,w.h);
 	return *this;
 }
 
-
 HCLuv& HCLuv::operator= (const Luv& w){
-	float L = w.l, u = w.u, v = w.v;
-	//calculate hue angle from 0 to 1
-	h = atan2(v, u) * (1.f / twoPi);	// hue in [-0.5, 0.5]
-	if(h < 0.f) h += 1.f;					// wrap hue angle into [0, 1]
-
-	c = sqrt(u * u + v * v) / 178.387f; //range determined empirically using
-										//16million RGB color image from http://brucelindbloom.com
-	l = L / 100.0f;
-	//cout << "HCLuv: {" << h << ", " << c << ", " << l << "}" << endl;
+	LXY2lch(l,c,h, w.l,w.u,w.v);
+	c /= 178.387f; // scaling factor from http://brucelindbloom.com
 	return *this;
 }
 

@@ -1066,11 +1066,7 @@ struct HCLab{
 	HCLab& rotateHue(float dh){ h += dh; return wrapHue(); }
 
 	/// Wrap hue value into valid interval [0, 1)
-	HCLab& wrapHue(){
-		if(h>1){ h -= int(h); }
-		else if(h<0){ h -= int(h)-1; }
-		return *this;
-	}
+	HCLab& wrapHue();
 };
 
 
@@ -1249,11 +1245,7 @@ struct HCLuv{
 	HCLuv& rotateHue(float dh){ h += dh; return wrapHue(); }
 
 	/// Wrap hue value into valid interval [0, 1)
-	HCLuv& wrapHue(){
-		if(h>1){ h -= int(h); }
-		else if(h<0){ h -= int(h)-1; }
-		return *this;
-	}
+	HCLuv& wrapHue();
 };
 
 /// @} // end allocore group
