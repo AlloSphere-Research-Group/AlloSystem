@@ -583,21 +583,15 @@ const char * File::readAll(){
 
 /*static*/ int File::write(const std::string& path, const void * v, int size, int items){
 	File f(path, "w");
-	int r = 0;
-	if(f.open()){
-		r = f.write(v, size, items);
-		f.close();
-	}
-	return r;
+	return f.open() ? f.write(v, size, items) : 0;
 }
 
 /*static*/ int File::write(const std::string& path, const std::string& data){
 	return File::write(path, &data[0], data.size());
 }
 
-/*static*/ bool File::remove(const std::string &path)
-{
-	if (!File::isDirectory(path)) {
+/*static*/ bool File::remove(const std::string &path){
+	if(!File::isDirectory(path)){
 		return ::remove(path.c_str()) == 0;
 	}
 	return false;
