@@ -582,7 +582,7 @@ const char * File::readAll(){
 }
 
 /*static*/ int File::write(const std::string& path, const void * v, int size, int items){
-	File f(path, "w");
+	File f(path, "wb");
 	return f.open() ? f.write(v, size, items) : 0;
 }
 
