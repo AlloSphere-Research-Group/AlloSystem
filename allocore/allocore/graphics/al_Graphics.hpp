@@ -372,6 +372,8 @@ public:
 		bool empty() const;
 		void clear();
 		unsigned numComponents() const { return Graphics::numComponents(format); }
+		unsigned char * dataRow(unsigned row){ return data + width*numComponents()*row; }
+		const unsigned char * dataRow(unsigned row) const { return const_cast<FrameBuffer*>(this)->dataRow(row); }
 		unsigned char * data = nullptr;
 		unsigned width = 0;
 		unsigned height = 0;
