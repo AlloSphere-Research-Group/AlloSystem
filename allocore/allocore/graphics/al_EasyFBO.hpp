@@ -25,12 +25,12 @@ struct EasyFBO {
 
 	EasyFBO(){}
 
-	/// @param[in] w		Width of buffer
-	/// @param[in] h		Height of buffer
-	/// @param[in] format	Texel format of color buffer
-	/// @param[in] type		Texel data type of color buffer
+	/// \param[in] w		Width of buffer
+	/// \param[in] h		Height of buffer
+	/// \param[in] format	Texel format of color buffer
+	/// \param[in] type		Texel data type of color buffer
 	EasyFBO(
-		int w, int h,
+		unsigned w, unsigned h,
 		Graphics::Format format = Graphics::RGBA,
 		Graphics::DataType type = Graphics::UBYTE
 	):	EasyFBO()
@@ -39,7 +39,7 @@ struct EasyFBO {
 	}
 
 	EasyFBO(
-		int wh,
+		unsigned wh,
 		Graphics::Format format = Graphics::RGBA,
 		Graphics::DataType type = Graphics::UBYTE	
 	)
@@ -48,13 +48,14 @@ struct EasyFBO {
 
 
 	/// Get height
-	int width() const { return mTexture.width(); }
+	unsigned width() const { return mTexture.width(); }
 	/// Get width
-	int height() const { return mTexture.height(); }
+	unsigned height() const { return mTexture.height(); }
+
 
 	/// Resize and configure color buffer
 	EasyFBO& resize(
-		int w, int h,
+		unsigned w, unsigned h,
 		Graphics::Format format,
 		Graphics::DataType type = Graphics::UBYTE
 	){
@@ -63,7 +64,7 @@ struct EasyFBO {
 	}
 
 	/// Resize
-	EasyFBO& resize(int w, int h){
+	EasyFBO& resize(unsigned w, unsigned h){
 		mTexture.resize(w,h);
 		mNeedsSync = true;
 		return *this;
@@ -165,7 +166,7 @@ private:
 	RBO mColorRBO_MS;
 	Matrix4d mMV{1};
 	Matrix4d mProj = Matrix4d::ortho(-1,1, -1,1, -1,1);
-	Color mClearColor = Color(0,0,0,1);
+	Color mClearColor{0};
 	bool mUseDepth = true;
 	bool mDoClear = true;
 	bool mNeedsSync = false;
