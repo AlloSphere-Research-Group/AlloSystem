@@ -363,11 +363,11 @@ public:
 	/// Set read buffer
 	void readBuffer(Direction d);
 
-	/// Get best supported read format
+	/// Get read format of currently bound framebuffer
 	static Format readFormat(Format v);
-	/// Get best supported read color components
+	/// Get read color components of currently bound framebuffer
 	static int readComponents(Format v);
-	/// Get best supported read type
+	/// Get read data type of currently bound framebuffer
 	static DataType readType(DataType v);
 
 	/// Minimal framebuffer for storing temporary results
