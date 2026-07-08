@@ -52,6 +52,12 @@ struct EasyFBO {
 	/// Get width
 	unsigned height() const { return mTexture.height(); }
 
+	/// Get number of color components
+	unsigned numComponents() const { return mTexture.numComponents(); }
+	/// Get color format
+	Graphics::Format format() const { return mTexture.format(); }
+	/// Get color type
+	Graphics::DataType type() const { return mTexture.type(); }
 
 	/// Resize and configure color buffer
 	EasyFBO& resize(
