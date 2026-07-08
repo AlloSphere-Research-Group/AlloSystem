@@ -363,6 +363,13 @@ public:
 	/// Set read buffer
 	void readBuffer(Direction d);
 
+	/// Get best supported read format
+	static Format readFormat(Format v);
+	/// Get best supported read color components
+	static int readComponents(Format v);
+	/// Get best supported read type
+	static DataType readType(DataType v);
+
 	/// Minimal framebuffer for storing temporary results
 	struct FrameBuffer{
 		FrameBuffer(){}

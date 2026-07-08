@@ -1129,6 +1129,28 @@ Graphics::~Graphics(){
 	}
 }
 
+// Check support for requested format/type
+// ES2 has very specific rules: "... format GL_RGBA in conjunction with type GL_UNSIGNED_BYTE is always allowed..." (see https://registry.khronos.org/OpenGL-Refpages/es2.0/ and https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glGet.xml)
+// Using glGet gives us the best supported values for all GL implementations with minimal fuss.
+// Note that GL_IMPLEMENTATION_COLOR_READ_* req's gl3 or es2
+/*static*/ Graphics::Format Graphics::readFormat(Format v){
+	#ifdef GL_IMPLEMENTATION_COLOR_READ_FORMAT
+	return decltype(v)(paramInt(GL_IMPLEMENTATION_COLOR_READ_FORMAT));
+	#else
+	return v;
+	#endif
+}
+/*static*/ Graphics::DataType Graphics::readType(DataType v){
+	#ifdef GL_IMPLEMENTATION_COLOR_READ_TYPE
+	return decltype(v)(paramInt(GL_IMPLEMENTATION_COLOR_READ_TYPE));
+	#else
+	return v;
+	#endif
+}
+/*static*/ int Graphics::readComponents(Format v){
+	return numComponents(readFormat(v));
+}
+
 Graphics::FrameBuffer::FrameBuffer(FrameBuffer&& other){
 	*this = std::move(other);
 }
@@ -1158,17 +1180,10 @@ void Graphics::FrameBuffer::clear(){
 }
 
 /*static*/ Graphics::FrameBuffer Graphics::getFrameBuffer(unsigned x, unsigned y, unsigned w, unsigned h, Format format, DataType type){
-	// Check support for requested format/type
-	// ES2 has very specific rules: "... format GL_RGBA in conjunction with type GL_UNSIGNED_BYTE is always allowed..." (see https://registry.khronos.org/OpenGL-Refpages/es2.0/ and https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glGet.xml)
-	// Using glGet gives us the best supported values for all GL implementations with minimal fuss.
-	#ifdef GL_IMPLEMENTATION_COLOR_READ_FORMAT /* req's gl3 or es2 */
-	{	auto f = decltype(format)(paramInt(GL_IMPLEMENTATION_COLOR_READ_FORMAT));
-		auto t = decltype(type  )(paramInt(GL_IMPLEMENTATION_COLOR_READ_TYPE));
-		//printf("frmt:%s type:%s\n", toString(f), toString(t));
-		format = f;
-		type = t;
-	}
-	#endif
+
+	format = readFormat(format);
+	type = readType(type);
+	//printf("fmt:%s type:%s\n", toString(format), toString(type));
 
 	auto rowBytes = w*numBytes(format, type);
 	unsigned nBytes = h*rowBytes;
