@@ -120,10 +120,19 @@ struct Color{
 
 
 	/// Set color component at index with no bounds checking
-	float& operator[](int i){ return components[i]; }
+	value_type& operator[](int i){ return components[i]; }
 
 	/// Get color component at index with no bounds checking
-	const float& operator[](int i) const { return components[i]; }
+	const value_type& operator[](int i) const { return components[i]; }
+
+	/// Get component at index with bounds checking
+	template <unsigned i>
+	value_type& at(){
+		static_assert(i<4, "Invalid index");
+		return components[i];
+	}
+	template <unsigned i>
+	value_type at() const { return const_cast<Color*>(this)->at<i>(); }
 
 
 	/// Get reference to RGB components
@@ -145,6 +154,10 @@ struct Color{
 
 	/// Set from gray value and alpha
 	Color& set(float v, float al){ return set(v,v,v,al); }
+
+	/// Set component at index
+	template <unsigned i>
+	Color& set(float v){ at<i>() = v; return *this; }
 
 	/// Set from an array of RGBA components
 	template <class T>
@@ -206,6 +219,12 @@ struct Color{
 	Color operator- (float v) const { return Color(*this)-=v; }
 	Color operator* (float v) const { return Color(*this)*=v; }
 	Color operator/ (float v) const { return Color(*this)/=v; }
+
+	/// Multiply RGB components by A
+	Color& preMul(){
+		auto alpha = a;
+		return set<3>(1.f) *= alpha;
+	}
 
 	/// Clamp all components into [0,max] range
 	Color& clamp(float max=1.f){
@@ -324,19 +343,19 @@ struct Colori {
 	
 
 	/// Set component at index with no bounds checking
-	uint8_t& operator[](int i){ return components[i]; }
+	value_type& operator[](int i){ return components[i]; }
 
 	/// Get component at index with no bounds checking
-	const uint8_t& operator[](int i) const { return components[i]; }
+	const value_type& operator[](int i) const { return components[i]; }
 
 	/// Get component at index with bounds checking
 	template <unsigned i>
-	uint8_t& at(){
+	value_type& at(){
 		static_assert(i<4, "Invalid index");
 		return components[i];
 	}
 	template <unsigned i>
-	uint8_t at() const{ return const_cast<Colori*>(this)->at<i>(); }
+	value_type at() const { return const_cast<Colori*>(this)->at<i>(); }
 
 	/// Get reference to self as another type
 	template <class T>
