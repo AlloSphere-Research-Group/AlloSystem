@@ -543,10 +543,30 @@ int utTypes(){
 		}
 	}
 	{
-
 		auto eq = [](RGB a, RGB b, float eps=0.0000001){
 			return ::eq(a.components, b.components, a.size(), eps);
 		};
+
+		assert(Color(0.1) == Color(0.1,0.1,0.1, 1.));
+		assert(Color(0.1, 0.5) == Color(0.1,0.1,0.1, 0.5));
+		assert(Color(0.1, 0.5) != Color(0.1, 1.0));
+
+		assert(Color(0,0.1,0.2, 0.5).at<0>() == 0.0f);
+		assert(Color(0,0.1,0.2, 0.5).at<1>() == 0.1f);
+		assert(Color(0,0.1,0.2, 0.5).at<3>() == 0.5f);
+
+		assert((Color(0.25,0.5,0.75, 0.) + Color(0.75,0.5,0.25, 1.)) == Color(1.));
+		assert((Color(1.75,1.5,1.25, 1.) - Color(0.75,0.5,0.25, 0.)) == Color(1.));
+		assert((Color(0.5,0.25) + 0.5) == Color(1.,0.75));
+		assert((Color(0.5,0.75) - 0.5) == Color(0.,0.25));
+		assert((Color(0.5,1.) * 0.5) == Color(0.25,0.5));
+		assert((Color(0.5,1.) / 2.0) == Color(0.25,0.5));
+
+		assert(Color(0.1,0.2,0.3, 0.5).preMul() == Color(0.05,0.1,0.15, 0.5));
+		assert(Color(0.1,0.2,0.3, 0.0).preMul() == Color(0.,0.,0., 0.));
+
+		assert(Color(0.5,1.2,-0.1, 3.4).clamp() == Color(0.5,1.,0., 1.));
+		assert(Color(1.,1.).mix(Color(0.,0.), 0.75) == Color(0.25, 0.25));
 
 		assert(RGB(0.1) == RGB(0.1,0.1,0.1));
 		assert(RGB(0.1) != RGB(0.2));
@@ -566,6 +586,7 @@ int utTypes(){
 		assert(RGB(-0.5,0.2,0.3).max() ==  0.3f);
 		assert(RGB(-0.5,0.2,0.3).min() == -0.5f);
 		{RGB c(0.0, 0.002, 0.7); assert(eq(c.dup().toSRGB().fromSRGB(), c)); }
+
 
 		assert(Colori(10,20,30) == Colori(10,20,30,255));
 		assert(Colori(10,128) == Colori(10,10,10,128));
