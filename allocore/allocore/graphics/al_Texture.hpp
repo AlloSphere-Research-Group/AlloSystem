@@ -475,7 +475,7 @@ public:
 	Texture& updateRows(unsigned offset, unsigned count=1);
 
 	/// Print information about texture
-	void print();
+	void print() const;
 
 protected:
 

@@ -898,7 +898,7 @@ void Texture::clearMipmaps(){
 	if(mMipData) delete[] mMipData;
 }
 
-void Texture::print(){
+void Texture::print() const {
 
 	printf("Texture ");
 
