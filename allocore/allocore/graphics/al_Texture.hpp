@@ -23,7 +23,7 @@
 namespace al{
 
 /// A simple wrapper around an OpenGL Texture
-/// @ingroup allocore
+/// \ingroup allocore
 class Texture : public GPUObject {
 public:
 
@@ -79,10 +79,10 @@ public:
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 	/// Construct a 1D Texture object
 
-	/// @param[in] width		width, in pixels
-	/// @param[in] format		format of pixel data
-	/// @param[in] type			data type of pixel data
-	/// @param[in] clientAlloc	allocate data on the client
+	/// \param[in] width		width, in pixels
+	/// \param[in] format		format of pixel data
+	/// \param[in] type			data type of pixel data
+	/// \param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width,
 		Graphics::Format format=Graphics::RGBA,
@@ -93,11 +93,11 @@ public:
 
 	/// Construct a 2D Texture object
 
-	/// @param[in] width		width, in pixels
-	/// @param[in] height		height, in pixels
-	/// @param[in] format		format of pixel data
-	/// @param[in] type			data type of pixel data
-	/// @param[in] clientAlloc	allocate data on the client
+	/// \param[in] width		width, in pixels
+	/// \param[in] height		height, in pixels
+	/// \param[in] format		format of pixel data
+	/// \param[in] type			data type of pixel data
+	/// \param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width, unsigned height,
 		Graphics::Format format=Graphics::RGBA,
@@ -108,12 +108,12 @@ public:
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 	/// Construct a 3D Texture object
 
-	/// @param[in] width		width, in pixels
-	/// @param[in] height		height, in pixels
-	/// @param[in] depth		depth, in pixels
-	/// @param[in] format		format of pixel data
-	/// @param[in] type			data type of pixel data
-	/// @param[in] clientAlloc	allocate data on the client
+	/// \param[in] width		width, in pixels
+	/// \param[in] height		height, in pixels
+	/// \param[in] depth		depth, in pixels
+	/// \param[in] format		format of pixel data
+	/// \param[in] type			data type of pixel data
+	/// \param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width, unsigned height, unsigned depth,
 		Graphics::Format format=Graphics::RGBA,
@@ -130,8 +130,8 @@ public:
 
 	/// Set shape (size, format, type, etc.) from array header
 
-	/// @param[in] hdr		Array header from which to match shape
-	/// @param[in] realloc	If true, then the texture's internal memory will
+	/// \param[in] hdr		Array header from which to match shape
+	/// \param[in] realloc	If true, then the texture's internal memory will
 	///						be reallocated as necessary.
 	void shapeFrom(const AlloArrayHeader& hdr, bool realloc=false);
 
@@ -397,13 +397,13 @@ public:
 
 	/// Copy pixels from current frame buffer to texture texels
 
-	/// @param[in] w		width of region to copy; w<0 uses w + 1 + texture.width
-	/// @param[in] h		height of region to copy; h<0 uses h + 1 + texture.height
-	/// @param[in] fbx		pixel offset from left edge of frame buffer
-	/// @param[in] fby		pixel offset from bottom edge of frame buffer
-	/// @param[in] texx		texel offset in x direction
-	/// @param[in] texy		texel offset in y direction (2D/3D only)
-	/// @param[in] texz		texel offset in z direction (3D only)
+	/// \param[in] w		width of region to copy; w<0 uses w + 1 + texture.width
+	/// \param[in] h		height of region to copy; h<0 uses h + 1 + texture.height
+	/// \param[in] fbx		pixel offset from left edge of frame buffer
+	/// \param[in] fby		pixel offset from bottom edge of frame buffer
+	/// \param[in] texx		texel offset in x direction
+	/// \param[in] texy		texel offset in y direction (2D/3D only)
+	/// \param[in] texz		texel offset in z direction (3D only)
 	Texture& copyFrameBuffer(
 		int w=-1, int h=-1,
 		int fbx=0, int fby=0,
