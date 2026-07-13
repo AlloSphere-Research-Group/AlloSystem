@@ -58,7 +58,7 @@ public:
 		return *this;
 	}
 
-	~Buffer(){ 
+	~Buffer(){
 		delete[] mData;
 		mData = nullptr;
 		mEnd = nullptr;
@@ -178,7 +178,7 @@ public:
 		emplace_back(v);
 	}
 	/// synonym for append():
-	void push_back(const T& v) { append(v); }
+	void push_back(const T& v){ append(v); }
 
 	/// Append elements of another Buffer
 
@@ -193,8 +193,8 @@ public:
 		/*
 		size_t newSize = size() + len;
 		if(newSize > capacity()){
-			size_t newCap = capacity() > 0 ? capacity() * 2 : 2;
-			while(newCap < newSize) newCap *= 2;
+			auto newCap = grow(capacity());
+			while(newCap < newSize) newCap = grow(newCap);
 			reserve(newCap);
 		}
 		std::copy(src, src + len, end());
@@ -213,8 +213,7 @@ public:
 	template <class... Args>
 	void emplace_back(Args&&... args){
         if(mEnd == mCapEnd){ // Grow if out of memory
-			size_t newCap = capacity() > 0 ? capacity() * 2 : 2;
-			reserve(newCap);
+			reserve(grow(capacity()));
 		}
         new(mEnd++) T(std::forward<Args>(args)...);
 	}
@@ -257,6 +256,8 @@ private:
 	T* mData = nullptr;
 	T* mEnd = nullptr;
 	T* mCapEnd = nullptr;
+
+	static size_t grow(size_t n){ return n>1 ? n*2 : 2; }
 
 	void alloc(size_t newCap){
 		if(newCap<=0){ newCap = 2; }
