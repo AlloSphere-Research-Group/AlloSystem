@@ -157,7 +157,7 @@ public:
 
 	/// Returns true if there is data
 	bool hasData() const { return !empty(); }
-	bool isRef() const { return mIsRef; }
+	bool isRef() const { return header.ref; }
 	bool ownsData() const { return !(empty() || isRef()); }
 
 	/// Allocate memory for the given header.
@@ -271,8 +271,6 @@ public:
 	static void deriveStride(AlloArrayHeader& h, size_t rowAlignSize);
 
 protected:
-	bool mIsRef = false;
-
 	// Used internally for creating const functions
 	Array& mut() const { return const_cast<Array&>(*this); }
 

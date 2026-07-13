@@ -44,7 +44,13 @@ int allo_array_equal_headers(const AlloArrayHeader * h1, const AlloArrayHeader *
 }
 
 void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src){
+	uint8_t ref = dst->header.ref; // do not change ref status
 	memcpy(&dst->header, src, sizeof(AlloArrayHeader));
+	dst->header.ref = ref;
+}
+
+void allo_array_header_clear(AlloArrayHeader * h){
+	memset(h, 0, sizeof(AlloArrayHeader));
 }
 
 void allo_array_resetdims(AlloArrayHeader * h, unsigned startDim){
@@ -101,29 +107,26 @@ void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize){
 	}
 }
 
-void allo_array_header_clear(AlloArrayHeader * h){
-	memset(h, 0, sizeof(AlloArrayHeader));
-}
-
 void allo_array_clear(AlloArray * a){
 	allo_array_header_clear(&a->header);
 	a->data.ptr = NULL;
 }
 
 void allo_array_free(AlloArray * a){
-	if(NULL != a->data.ptr) free(a->data.ptr);
+	// only free if has data and owns data
+	if(NULL != a->data.ptr && 0 == a->header.ref) free(a->data.ptr);
+	a->header.ref = 0;
 	a->data.ptr = NULL;
 }
 
 void allo_array_destroy(AlloArray * a){
-	if(NULL != a->data.ptr){
-		allo_array_free(a);
-		allo_array_clear(a);
-	}
+	allo_array_free(a);
+	allo_array_clear(a);
 }
 
 void allo_array_allocate(AlloArray * a){
 	a->data.ptr = (char *)calloc(1, allo_array_size(a));
+	a->header.ref = 0;
 }
 
 void allo_array_create(AlloArray * a, const AlloArrayHeader * h){

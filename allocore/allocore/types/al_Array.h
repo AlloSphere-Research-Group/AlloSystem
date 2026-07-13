@@ -94,7 +94,10 @@ typedef struct AlloArrayHeader {
 	uint8_t components;
 
 	/** The number of dimensions (actually should not be > ALLO_ARRAY_MAX_DIMS!) */
-	uint8_t dimcount;
+	uint8_t dimcount : 7;
+
+	/** Whether references rather than owns data */
+	uint8_t ref : 1;
 
 	/** The size of each dimension */
 	uint32_t dim[ALLO_ARRAY_MAX_DIMS];

@@ -79,13 +79,10 @@ void Array::configure(const AlloArrayHeader& h){
 
 void Array::dataCalloc(){
 	allo_array_allocate(this);
-	mIsRef = false;
 }
 
 void Array::dataFree(){
-	if(!mIsRef){
-		allo_array_free(this);
-	}
+	allo_array_free(this);
 }
 
 void Array::zero(){
@@ -99,7 +96,7 @@ void Array::zero(){
 
 void Array::format(const AlloArrayHeader& h){
 	if(!isFormat(h)){
-		if(mIsRef){
+		if(isRef()){
 			configure(h); // just set header, don't mess with memory
 		}
 		else if(size() != allo_array_size_from_header(&h)){
@@ -158,7 +155,7 @@ void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numD
 void Array::ref(void * src, const AlloArrayHeader& h){
 	dataFree();
 	data.ptr = decltype(data.ptr)(src);
-	mIsRef = true;
+	header.ref = 1;
 	configure(h);
 }
 
