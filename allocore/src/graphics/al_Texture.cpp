@@ -472,7 +472,7 @@ void Texture::sendParams(bool force){
 }
 
 Texture& Texture::updateRows(unsigned offset, unsigned count){
-	mUpdateRows.push({offset, count});
+	mUpdateRows.push_back({offset, count});
 	mPixelsUpdated = true;
 	return *this;
 }
@@ -540,12 +540,11 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 		if(mFirstBind || mUpdateRows.empty() || mTarget!=TEXTURE_2D){
 			uploadOkay = uploadPixels(0, 0,0,0, mWidth,mHeight,mDepth, pixels);
 		} else {
-			while(mUpdateRows.size()){
-				auto r = mUpdateRows.top();
+			for(auto r : mUpdateRows){
 				const auto * data = (const char *)(pixels) + mArray.stride(1)*r.offset;
 				uploadOkay |= uploadPixels(0, 0,r.offset,0, mWidth,r.count,mDepth, data);
-				mUpdateRows.pop();
 			}
+			mUpdateRows.clear();
 		}
 		if(uploadOkay) genMipmap();
 

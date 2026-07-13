@@ -14,7 +14,7 @@
 
 #include <cstring> // memcpy
 #include <functional>
-#include <stack>
+#include <vector>
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
@@ -492,7 +492,7 @@ protected:
 	Filter mFilterMin, mFilterMag;
 	unsigned mWidth=0, mHeight=1, mDepth=1;
 	Array mArray;				// Array representation of client-side pixel data
-	std::stack<Rows> mUpdateRows;
+	std::vector<Rows> mUpdateRows;
 	std::vector<MipMap> mMipmaps;
 	unsigned char * mMipData = nullptr;
 	bool mFirstBind=true;
