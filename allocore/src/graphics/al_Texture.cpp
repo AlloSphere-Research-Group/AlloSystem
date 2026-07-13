@@ -83,6 +83,7 @@ Texture::Texture(AlloArrayHeader& header)
 }
 
 Texture::~Texture(){
+	clearMipmaps();
 }
 
 void Texture::onCreate(){
@@ -94,7 +95,7 @@ void Texture::onCreate(){
 		sendShape();
 		sendParams();
 		sendPixels();
-		glBindTexture(target(), 0);
+		glBindTexture(mTarget, 0);
 	});
 	AL_GRAPHICS_ERROR("creating texture", id());
 }
@@ -212,6 +213,10 @@ unsigned Texture::numPixels() const {
 	return mWidth * mHeight * mDepth;
 }
 
+unsigned Texture::bytesPerPixel() const {
+	return numComponents() * Graphics::numBytes(mType);
+}
+
 unsigned Texture::numElems() const {
 	return numPixels() * numComponents();
 }
@@ -296,7 +301,7 @@ void Texture::tryBind(const std::function<void(void)>& onPostBind){
 	shapeFromArray();
 
 	if(valid()){
-		glBindTexture(target(), id());
+		glBindTexture(mTarget, id());
 		onPostBind();
 		mFirstBind = false;
 	}
@@ -318,7 +323,7 @@ void Texture::bind(){
 		AL_GRAPHICS_ERROR("binding texture", id());
 
 		#ifdef AL_GRAPHICS_TEXTURE_NEEDS_ENABLE
-		glEnable(target());
+		glEnable(mTarget);
 			AL_GRAPHICS_ERROR("enable target binding texture", id());
 		#endif
 
@@ -340,9 +345,9 @@ void Texture::bind(int texUnit){
 void Texture::unbind(){
 	// multitexturing:
 	glActiveTexture(GL_TEXTURE0 + mTexUnit);
-	glBindTexture(target(), 0);
+	glBindTexture(mTarget, 0);
 	#ifdef AL_GRAPHICS_TEXTURE_NEEDS_ENABLE
-	glDisable(target());
+	glDisable(mTarget);
 	#endif
 }
 
@@ -376,6 +381,7 @@ Texture& Texture::allocate(unsigned align){
 	resetArray(align);
 	mArray.dataCalloc();
 	//printf("alloc 2:\n"); mArray.print();
+	clearMipmaps();
 	mPixelsUpdated = true;
 	return *this;
 }
@@ -409,6 +415,7 @@ Texture& Texture::allocate(const Array& src, bool reconfigure){
 
 Texture& Texture::deallocate(){
 	mArray.dataFree();
+	clearMipmaps();
 	return *this;
 }
 
@@ -480,17 +487,7 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 		Graphics::pixelAlignUpload(align);
 			AL_GRAPHICS_ERROR("Texture::sendPixels (pixelAlignUpload set)", id());
 
-		auto sendSubImage = [&](const Rows& r){
-
-			auto genMipmap = [this](){
-				#ifdef AL_GRAPHICS_SUPPORTS_MIPMAP
-				if(mMipmap){
-					glGenerateMipmap(target());
-						AL_GRAPHICS_ERROR("Texture::sendPixels (glGenerateMipmap)", id());
-				}
-				#endif
-			};
-
+		auto uploadPixels = [this](unsigned level, unsigned x, unsigned y, unsigned z, unsigned w, unsigned h, unsigned d, const void * data){
 			switch(mTarget){
 				/*void glTexSubImage3D(
 					GLenum target, GLint level,
@@ -501,44 +498,56 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 				);*/
 				#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
 				case TEXTURE_1D:
-					glTexSubImage1D(mTarget, 0, 0, mWidth, mFormat, mType, pixels);
-						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
-					genMipmap();
-					break;
+					glTexSubImage1D(mTarget, level, x, w, mFormat, mType, data);
+						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage1D)", id());
+					return true;
 				#endif
 
-				case TEXTURE_2D:{
-					const void * data = (const char *)(pixels) + mArray.stride(1)*r.offset;
-					glTexSubImage2D(mTarget, 0, 0,r.offset, mWidth,r.count, mFormat, mType, data);
-						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
-					genMipmap();
-					} break;
+				case TEXTURE_2D:
+					glTexSubImage2D(mTarget, level, x,y, w,h, mFormat, mType, data);
+						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage2D)", id());
+					return true;
 
 				#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
 				case TEXTURE_3D:
-					glTexSubImage3D(mTarget, 0, 0,0,0, mWidth,mHeight,mDepth, mFormat, mType, pixels);
-						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
-					genMipmap();
-					break;
+					glTexSubImage3D(mTarget, level, x,y,z, w,h,d, mFormat, mType, data);
+						AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage3D)", id());
+					return true;
 				#endif
 
-				case NO_TARGET:;
-					// Unconfigured
+				case NO_TARGET: // Unconfigured
 				default:
-					AL_WARN("invalid texture target %d", target());
+					AL_WARN("invalid texture target %d", mTarget);
 			}
-
+			return false;
 		};
 
-		if(mFirstBind || mUpdateRows.empty()){
-			Rows r = {0, mHeight * mDepth};
-			sendSubImage(r);
+		auto genMipmap = [&](){
+			#ifdef AL_GRAPHICS_SUPPORTS_MIPMAP
+			if(mMipmap){
+				if(mMipmaps.empty()){
+					glGenerateMipmap(mTarget); // auto generate
+						AL_GRAPHICS_ERROR("Texture::sendPixels (glGenerateMipmap)", id());
+				} else {
+					for(auto& mip : mMipmaps)
+						uploadPixels(mip.level, 0,0,0, mip.w,mip.h,mip.d, mip.data);
+				}
+			}
+			#endif
+		};
+
+		bool uploadOkay = false;
+		if(mFirstBind || mUpdateRows.empty() || mTarget!=TEXTURE_2D){
+			uploadOkay = uploadPixels(0, 0,0,0, mWidth,mHeight,mDepth, pixels);
 		} else {
 			while(mUpdateRows.size()){
-				sendSubImage(mUpdateRows.top());
+				auto r = mUpdateRows.top();
+				const auto * data = (const char *)(pixels) + mArray.stride(1)*r.offset;
+				uploadOkay |= uploadPixels(0, 0,r.offset,0, mWidth,r.count,mDepth, data);
 				mUpdateRows.pop();
 			}
 		}
+		if(uploadOkay) genMipmap();
 
 		// Set alignment back to original
 		Graphics::pixelAlignUpload(origAlign);
@@ -566,33 +575,43 @@ void Texture::sendShape(bool force){
 			intFmt = unclampedFloatFormat();
 		}
 
-		//printf("Texture::sendShape calling glTexImage\n");
-		switch(mTarget){
-		/*void glTexImage3D(
-			GLenum target, GLint level, GLenum internalformat,
-			GLsizei width, GLsizei height, GLsizei depth,
-			GLint border, GLenum format, GLenum type, const GLvoid *pixels);*/
-		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
-		case TEXTURE_1D:
-			glTexImage1D(mTarget, 0, intFmt, mWidth, 0, mFormat, mType, NULL);
-			break;
-		#endif
+		auto uploadShape = [&](unsigned level, unsigned w, unsigned h, unsigned d){
+			//printf("Texture::sendShape calling glTexImage\n");
+			switch(mTarget){
+			/*void glTexImage3D(
+				GLenum target, GLint level, GLenum internalformat,
+				GLsizei width, GLsizei height, GLsizei depth,
+				GLint border, GLenum format, GLenum type, const GLvoid *pixels);*/
+			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
+			case TEXTURE_1D:
+				glTexImage1D(mTarget, level, intFmt, w, 0, mFormat, mType, NULL);
+				return true;
+			#endif
 
-		case TEXTURE_2D:
-			glTexImage2D(mTarget, 0, intFmt, mWidth,mHeight, 0, mFormat, mType, NULL);
-			//printf("glTexImage2D(%s, 0, %s, %u, %u, 0, %s, %s, NULL)\n", toString(target()), toString(Graphics::Format(intFmt)), width(), height(), toString(format()), toString(type()));
-			break;
+			case TEXTURE_2D:
+				glTexImage2D(mTarget, level, intFmt, w,h, 0, mFormat, mType, NULL);
+				//printf("glTexImage2D(%s, 0, %s, %u, %u, 0, %s, %s, NULL)\n", toString(mTarget), toString(Graphics::Format(intFmt)), width(), height(), toString(format()), toString(type()));
+				return true;
 
-		#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-		case TEXTURE_3D:
-			glTexImage3D(mTarget, 0, intFmt, mWidth,mHeight,mDepth, 0, mFormat, mType, NULL);
-			break;
-		#endif
+			#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
+			case TEXTURE_3D:
+				glTexImage3D(mTarget, level, intFmt, w,h,d, 0, mFormat, mType, NULL);
+				return true;
+			#endif
 
-		case NO_TARGET:;
-			// Unconfigured
-		default:;
+			case NO_TARGET: // Unconfigured
+			default:;
+			}
+
+			return false;
+		};
+
+		if(uploadShape(0, mWidth,mHeight,mDepth)){
+			// Send mipmap shapes
+			for(auto& mip : mMipmaps)
+				uploadShape(mip.level, mip.w,mip.h,mip.d);
 		}
+
 		AL_GRAPHICS_ERROR("Texture::sendShape (glTexImage)", id());
 		mShapeUpdated = false;
 	}
@@ -630,7 +649,7 @@ Texture& Texture::submit(const void * pixels, uint32_t align){
 		//printf("submitted texture data %p\n", pixels);
 
 		// Unbind texture
-		glBindTexture(target(), 0);
+		glBindTexture(mTarget, 0);
 			AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
 	});
 
@@ -843,6 +862,40 @@ void Texture::assignFromTexCoord(const std::function<void(float s, float t, floa
 
 void Texture::assignFromTexCoord(const std::function<void(float s, float t, float * rgba)>& onPixel){
 	assignFromTexCoord(onPixel, mWidth, mHeight);
+}
+
+Texture& Texture::createMipmaps(const std::function<void(const MipMap&)>& onMipmap){
+
+	clearMipmaps();
+
+	auto w=width(), h=height(), d=depth();
+
+	unsigned count = 0; // total pixel count
+
+	while(w>1 || h>1 || d>1){
+		w>>=int(w>1);
+		h>>=int(h>1);
+		d>>=int(d>1);
+		mMipmaps.push_back({nullptr, w,h,d, unsigned(mMipmaps.size()+1)});
+		count += w*h*d;
+	}
+
+	auto bpp = bytesPerPixel();
+	mMipData = new unsigned char[count * bpp];
+	auto * ptr = mMipData;
+
+	for(auto& mip : mMipmaps){
+		mip.data = ptr;
+		ptr += mip.size() * bpp;
+		onMipmap(mip);
+	}
+
+	return *this;
+}
+
+void Texture::clearMipmaps(){
+	mMipmaps.clear();
+	if(mMipData) delete[] mMipData;
 }
 
 void Texture::print(){

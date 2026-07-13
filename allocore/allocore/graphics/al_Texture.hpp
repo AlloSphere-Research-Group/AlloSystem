@@ -64,6 +64,14 @@ public:
 		LINEAR_MIPMAP_LINEAR	= GL_LINEAR_MIPMAP_LINEAR,
 	};
 
+	/// Single mipmap level
+	struct MipMap{
+		void * data;	///< Pointer to pixel data
+		unsigned w,h,d;	///< Dimensions
+		unsigned level;	///< Reduction level (scaling approximately 2^-level)
+		unsigned size() const { return w*h*d; }
+	};
+
 
 	/// Construct an unsized Texture
 	Texture();
@@ -175,6 +183,9 @@ public:
 
 	/// Get total number of pixels
 	unsigned numPixels() const;
+
+	/// Get number of bytes per pixel
+	unsigned bytesPerPixel() const;
 
 	/// Get total number of elements (components x width x height x depth)
 	unsigned numElems() const;
@@ -440,22 +451,37 @@ public:
 
 	Texture& ref(Array& a);
 
+	/// Create custom mipmaps
+
+	/// This creates an internal store for mipmap data and provides a callback
+	/// to set the data in each level. The number of mipmaps is based on the
+	/// current size of the texture. The highest level is a single pixel.
+	/// Calling this function will override automatically generated mipmaps
+	/// (e.g., from glGenerateMipmap).
+	///
+	/// \param[in] onMipmap	Called for each mipmap starting at level 1.
+	///						The number of bytes allocated to the mipmap data is
+	///						equal to the product of the mipmap dimensions and
+	///						the bytes per pixel of the texture.
+	Texture& createMipmaps(const std::function<void(const MipMap&)>& onMipmap);
+
+	/// Clear custom mipmaps
+	void clearMipmaps();
+
 	/// Copy pixels from server into client-side memory (calling allocate() if necessary)
 	Texture& getRemoteData();
 
-	/// Print information about texture
-	void print();
-
 	/// Mark a contiguous set of rows to be updated from source array (2D only)
 	Texture& updateRows(unsigned offset, unsigned count=1);
+
+	/// Print information about texture
+	void print();
 
 protected:
 
 	struct Rows{
 		unsigned offset=0, count=1;
 	};
-
-	std::stack<Rows> mUpdateRows;
 
 	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc.
 	int mTexUnit = 0;			// Texture unit
@@ -466,6 +492,9 @@ protected:
 	Filter mFilterMin, mFilterMag;
 	unsigned mWidth=0, mHeight=1, mDepth=1;
 	Array mArray;				// Array representation of client-side pixel data
+	std::stack<Rows> mUpdateRows;
+	std::vector<MipMap> mMipmaps;
+	unsigned char * mMipData = nullptr;
 	bool mFirstBind=true;
 	bool mParamsUpdated=true;	// Flags change in texture params (wrap, filter)
 	bool mPixelsUpdated=true;	// Flags change in pixel data
