@@ -251,6 +251,10 @@ Window& Window::cursorHide(bool v){
 	return *this;
 }
 
+bool Window::keyRepeat() const {
+	return mKeyRepeat;
+}
+
 Window& Window::keyRepeat(bool v){
 	mKeyRepeat = v;
 	if(created()) implSetKeyRepeat();

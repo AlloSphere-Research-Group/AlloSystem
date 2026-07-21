@@ -363,6 +363,7 @@ public:
 	bool created() const;				///< Whether window has been created providing a valid graphics context
 	Cursor cursor() const;				///< Get current cursor type
 	bool cursorHide() const;			///< Whether the cursor is hidden
+	bool keyRepeat() const;
 	Dim dimensions() const;				///< Get current dimensions of window
 	DisplayMode displayMode() const;	///< Get current display mode
 	bool enabled(DisplayMode v) const;	///< Get whether display mode flag is set
