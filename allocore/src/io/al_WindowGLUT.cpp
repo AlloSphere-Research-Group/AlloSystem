@@ -650,9 +650,9 @@ bool Window::implCreate(){
 	//printf("GLUT created window %d\n",mImpl->mID);
 
 	glutSetWindow(mImpl->mID);
-	glutIgnoreKeyRepeat(1);
 	WindowImpl::registerCBs();
 	WindowImpl::windows()[mImpl->mID] = mImpl;
+	keyRepeat(mKeyRepeat);
 
 	AL_GRAPHICS_INIT_CONTEXT;
 	vsync(mVSync);
@@ -719,6 +719,11 @@ void Window::implSetCursorHide(){
 	mImpl->makeMainWindow();
 	if(mCursorHide)	glutSetCursor(GLUT_CURSOR_NONE);
 	else			cursor(mCursor);
+}
+
+void Window::implSetKeyRepeat(){
+	mImpl->makeMainWindow();
+	glutIgnoreKeyRepeat(mKeyRepeat ? 0:1);
 }
 
 void Window::implSetFPS(){

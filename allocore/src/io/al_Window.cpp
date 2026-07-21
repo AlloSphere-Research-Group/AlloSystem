@@ -171,12 +171,7 @@ void Window::Dim::print() const {
 }
 
 
-Window::Window()
-:	mDim(0,0,0,0), mDisplayMode(DEFAULT_BUF), mCursor(POINTER),
-	mFPS(0), mFPSAvg(0), mFrameTime(0), mDeltaTime(0),
-	mASAP(false), mCursorHide(false), mFullScreen(false),
-	mVisible(false), mVSync(true)
-{
+Window::Window(){
 	implCtor(); // must call first!
 	dimensions(Dim(800,600));
 	fps(40);
@@ -253,6 +248,12 @@ bool Window::cursorHide() const {
 Window& Window::cursorHide(bool v){
 	mCursorHide = v;
 	if(created()) implSetCursorHide();
+	return *this;
+}
+
+Window& Window::keyRepeat(bool v){
+	mKeyRepeat = v;
+	if(created()) implSetKeyRepeat();
 	return *this;
 }
 

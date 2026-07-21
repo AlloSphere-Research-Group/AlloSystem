@@ -242,7 +242,7 @@ private:
 
 			case EV_KEY_DOWN:
 			case EV_KEY_UP:
-			if(ev.key.repeat == 0){ //&& !SDL_IsTextInputActive()
+			if(ev.key.repeat == 0 || win.mKeyRepeat){ //&& !SDL_IsTextInputActive()
 				bool keyDown = EV_KEY_DOWN == ev.type;
 				auto& kb = win.mKeyboard;
 
@@ -536,8 +536,8 @@ bool Window::implCreate(){
 		mDim.t += top;
 	}
 
-	// Needed to get shifted keys in SDL2, although never got working...
 	#ifdef USING_SDL2
+		// Needed to get shifted keys in SDL2, although never got working...
 		//SDL_StartTextInput();
 	#endif
 
@@ -615,9 +615,12 @@ void Window::implSetCursor(){
 }
 
 void Window::implSetCursorHide(){
-	/*mImpl->makeMainWindow();
-	if(mCursorHide)	glutSetCursor(GLUT_CURSOR_NONE);
-	else			cursor(mCursor);*/
+}
+
+void Window::implSetKeyRepeat(){
+	#ifdef USING_SDL1
+	SDL_EnableKeyRepeat(mKeyRepeat ? SDL_DEFAULT_REPEAT_DELAY : 0, SDL_DEFAULT_REPEAT_INTERVAL);
+	#endif
 }
 
 void Window::implSetFPS(){

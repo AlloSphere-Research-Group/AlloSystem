@@ -383,6 +383,7 @@ public:
 	Window& cursor(Cursor v);			///< Set cursor type
 	Window& cursorHide(bool v);			///< Set cursor hiding
 	Window& cursorHideToggle();			///< Toggle cursor hiding
+	Window& keyRepeat(bool v);			///< Set whether held keyboard keys repeat events
 	Window& dimensions(const Dim& v);	///< Set dimensions
 	Window& displayMode(DisplayMode v);	///< Set display mode; will recreate window if different from current
 	Window& fps(double v);				///< Set frames/second
@@ -459,18 +460,19 @@ protected:
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
 	Dim mDim;
-	DisplayMode mDisplayMode;
+	DisplayMode mDisplayMode = DEFAULT_BUF;
 	std::string mTitle;
-	Cursor mCursor;
-	double mFPS; // requested FPS
-	double mFPSAvg; // average of actual FPS
-	double mFrameTime;
-	double mDeltaTime;
-	bool mASAP;
-	bool mCursorHide;
-	bool mFullScreen;
-	bool mVisible;
-	bool mVSync;
+	Cursor mCursor = POINTER;
+	double mFPS = 0.; // requested FPS
+	double mFPSAvg = 0.; // average of actual FPS
+	double mFrameTime = 0.;
+	double mDeltaTime = 0.;
+	bool mASAP = false;
+	bool mCursorHide = false;
+	bool mKeyRepeat = false;
+	bool mFullScreen = false;
+	bool mVisible = false;
+	bool mVSync = true;
 
 	// Must be defined in pimpl-specific file
 	void implCtor();
@@ -484,6 +486,7 @@ protected:
 	void implSetFullScreen();
 	void implSetTitle();
 	void implSetVSync();
+	void implSetKeyRepeat();
 
 	template <class TEventHandler>
 	EventHandlers<TEventHandler>& eventHandlers();
