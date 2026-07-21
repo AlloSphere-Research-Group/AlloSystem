@@ -46,16 +46,17 @@ public:
 		resize(size);
 	}
 
+	/// Copy constructor
 	Buffer(const Buffer& other){
-		*this = other;
-	}
-
-	Buffer& operator= (const Buffer& other){
 		if(this != &other){
-			resize(0);
+			reset();
 			append(other);
 		}
-		return *this;
+	}
+
+	/// Move constructor
+	Buffer(Buffer&& other){
+		swap(other);
 	}
 
 	~Buffer(){
@@ -64,6 +65,7 @@ public:
 		mEnd = nullptr;
 		mCapEnd = nullptr;
 	}
+
 
 	size_t capacity() const { return mCapEnd-mData; }	///< Get total capacity
 	size_t size() const { return mEnd-mData; }			///< Get size
@@ -105,7 +107,7 @@ public:
 	const T& back() const { return last(); }
 	T& back(){ return last(); }
 
-	/// Resets size to zero without deallocating allocated memory
+	/// Resets size to zero while retaining capacity
 	void reset(){ resize(0); }
 
 	/// Ensure the buffer capacity is at least n
@@ -250,6 +252,20 @@ public:
 			}
 			mEnd = mData+newSize;
 		}
+	}
+
+	/// Swap data with other object
+	void swap(Buffer& other){
+		std::swap(mData,   other.mData);
+		std::swap(mEnd,    other.mEnd);
+		std::swap(mCapEnd, other.mCapEnd);
+	}
+
+	friend void swap(Buffer& a, Buffer& b){ a.swap(b); }
+
+	Buffer& operator= (Buffer other){
+		swap(other);
+		return *this;
 	}
 
 private:

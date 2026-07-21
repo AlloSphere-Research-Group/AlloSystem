@@ -250,6 +250,30 @@ int utTypes(){
 			assert(a.capacity() > 0);
 		}
 
+		{ // moving / copying
+			Buffer<int> a, b;
+			b.resize(4);
+			for(int i=0; i<b.size(); ++i) b[i] = i;
+			assert(a.empty() && b.data());
+			auto * ptr = b.data();
+			int size = b.size();
+			int cap = b.capacity();
+			swap(a,b);
+			assert(a.data() == ptr && b.empty());
+			assert(a.size() == size && b.size() == 0);
+			assert(a.capacity() == cap && b.capacity() == 0);
+
+			{
+				auto c = a;
+				assert(c.size() == a.size());
+				assert(c.data() != a.data());
+				for(int i=0; i<b.size(); ++i) assert(c[i] == a[i]);
+
+				auto d = std::move(c);
+				assert(!d.empty() && c.empty());
+			}
+		}
+
 		{ // resize
 			Buffer<int> a;
 			a.resize(4);
