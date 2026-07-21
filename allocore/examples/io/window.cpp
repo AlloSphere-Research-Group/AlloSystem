@@ -68,6 +68,10 @@ int main(){
 		Window::DEFAULT_BUF				// display mode
 	);
 
+	// Other options (can be set before or after creation):
+	//win.keyRepeat(true);	// send repeated key events when key held down
+	//win.asap(true);		// render frames as soon as possible
+	//win.vsync(false);		// vertical sync: disable for better FPS, but possible tearing
+
 	MainLoop::start();
-	return 0;
 }
