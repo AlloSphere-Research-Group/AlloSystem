@@ -453,8 +453,9 @@ struct Colori {
 	Colori& fromHex(const char * s);
 
 	struct HexString{
-		char data[9];
-		HexString(){ data[8]='\0'; }
+		char data[10];
+		HexString(){ data[capacity()]='\0'; }
+		static constexpr unsigned capacity(){ return sizeof(data)-1; }
 		const char * c_str() const { return data; }
 		operator const char *() const { return data; }
 	};
@@ -463,7 +464,8 @@ struct Colori {
 
 	/// \param[in] len	Length of returned string. Options are
 	///					3 for RGB, 4 for RGBA, 6 for RRGGBB and 8 for RRGGBBAA.
-	HexString toHex(unsigned len=8) const;
+	/// \param[in] pre	Character to insert at start of returned string
+	HexString toHex(unsigned len=8, char pre=0) const;
 
 	/// Returns inverted color
 	Colori inverse() const { return Colori(*this).invert(); }

@@ -62,31 +62,33 @@ Colori& Colori::fromHex(const char * s){
 	}
 }
 
-Colori::HexString Colori::toHex(unsigned len) const {
-	HexString s;
+Colori::HexString Colori::toHex(unsigned len, char pre) const {
 	const char * d2h = "0123456789abcdef";
 	auto d2hh = [&](unsigned char d, char * hh){
 		hh[0] = d2h[(d>>4)&0xf];
 		hh[1] = d2h[(d   )&0xf];
 	};
+	HexString s;
+	auto * ptr = s.data;
+	if(pre) *ptr++ = pre;
 	switch(len){
 	default:
 		len=8;
-		d2hh(a, s.data+6);
+		d2hh(a, ptr+6);
 	case 6:
-		d2hh(r, s.data);
-		d2hh(g, s.data+2);
-		d2hh(b, s.data+4);
+		d2hh(r, ptr);
+		d2hh(g, ptr+2);
+		d2hh(b, ptr+4);
 		break;
 	case 4:
-		s.data[3] = d2h[a>>4];
+		ptr[3] = d2h[a>>4];
 	case 3:
-		s.data[0] = d2h[r>>4];
-		s.data[1] = d2h[g>>4];
-		s.data[2] = d2h[b>>4];
+		ptr[0] = d2h[r>>4];
+		ptr[1] = d2h[g>>4];
+		ptr[2] = d2h[b>>4];
 		break;
 	}
-	s.data[len] = '\0';
+	ptr[len] = '\0';
 	return s;
 }
 
