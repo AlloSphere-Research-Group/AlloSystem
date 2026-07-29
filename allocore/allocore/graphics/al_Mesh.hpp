@@ -88,6 +88,9 @@ public:
 		/// \returns true if there are no vertices
 		bool empty() const { return begin==end; }
 
+		/// \returns true if there are vertices
+		operator bool() const { return !empty(); }
+
 		/// Convert mesh (parent) index to local index
 		int local(int i) const { return i - begin; }
 
