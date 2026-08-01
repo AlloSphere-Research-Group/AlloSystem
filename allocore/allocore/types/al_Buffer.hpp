@@ -458,27 +458,21 @@ public:
 	ShiftBuffer(const T& v=T()){ assign(v); }
 
 	/// Get number of elements
-	static int size(){ return N; }
-
-	/// Get pointer to data (read-only)
-	const T * data() const { return mData; }
+	static constexpr int size(){ return N; }
 
 	/// Get pointer to data
+	const T * data() const { return mData; }
 	T * data(){ return mData; }
 
 	/// Get reference to element at index
-	T& operator[](int i){ return mData[i];}
-
-	/// Get reference to element at index (read-only)
 	const T& operator[](int i) const { return mData[i]; }
-
+	T& operator[](int i){ return mData[i];}
 
 	/// Push new element onto buffer. Newest element is at index 0.
 	void operator()(const T& v){
 		for(int i=N-1; i>0; --i) mData[i] = mData[i-1];
 		mData[0]=v;
 	}
-
 
 	/// Set all elements to argument
 	void assign(const T& v){ for(int i=0;i<N;++i) mData[i]=v; }
