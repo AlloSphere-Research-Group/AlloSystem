@@ -858,6 +858,12 @@ public:
 		return r;
 	}
 
+	/// Returns quotient of two elements
+	template <int i=0, int j=1>
+	T quotient() const {
+		return at<i>() / at<j>();
+	}
+
 	/// Returns sum of elements
 	T sum() const {
 		T r = front();
