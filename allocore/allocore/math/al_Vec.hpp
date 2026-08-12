@@ -915,8 +915,9 @@ public:
 
 	/// Scale to fit within a cube
 
-	/// This divides all elements by the element with maximum absolute value
-	/// and then scales the result. The direction is not changed.
+	/// This scales all elements so the vector position lies within a cube.
+	/// All elements are divided by the element with maximum absolute value
+	/// and then scaled the desired radius. The direction is not changed.
 	/// \param[in] r	Radius of cube
 	Vec& fitToCube(T r = T(1)){
 		using namespace std;
