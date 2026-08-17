@@ -166,6 +166,9 @@ public:
 	/// Get depth, in pixels
 	unsigned depth() const { return mDepth; }
 
+	/// Get quotient width/height
+	float aspect() const { return float(width())/height(); }
+
 	/// Get aspect correct height from a given width
 	float heightFromWidth(float w) const { return height() * w/width(); }
 
