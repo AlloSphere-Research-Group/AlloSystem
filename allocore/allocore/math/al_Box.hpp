@@ -86,6 +86,9 @@ public:
 	vec center() const { return (mMax+mMin)*T(0.5); }
 	/// Get volume of box
 	T volume() const { return extent().product(); }
+	/// Get aspect ratio
+	template <int Dim1=0, int Dim2=1>
+	T aspect() const { return extent().template quotient<Dim1,Dim2>(); }
 
 	/// Fit bounds to a set of points
 	template <class GetPointAtIndex>
