@@ -595,6 +595,9 @@ public:
 	}
 
 	/// Get vector as vector of vectors
+
+	/// \tparam M	Size of subvectors; must be positive integer factor of
+	///				original vector size
 	template <int M>
 	const Vec<N/M, Vec<M,T>>& nest() const {
 		return const_cast<Vec*>(this)->nest<M>();  
@@ -647,6 +650,8 @@ public:
 
 	/// Swap elements with another vector
 	Vec& swap(Vec& v){ IT(N) std::swap(at(i), v[i]); return *this; }
+
+	friend void swap(Vec& a, Vec& b){ a.swap(b); }
 
 
 	//--------------------------------------------------------------------------
@@ -1557,10 +1562,6 @@ inline Vec<3,T> gradToNormal(const Vec<2,T>& g){
 	// result is normalized (-g.x, -g.y, 1)
 	return g.template take<3>(T(-1)).normalized(T(-1));
 }
-
-/// Swap elements between vectors
-template <int N, class T>
-inline void swap(Vec<N,T>& a, Vec<N,T>& b){ a.swap(b); }
 
 /// Pun uniform POD into vector
 template <class T, class UniformPOD>
