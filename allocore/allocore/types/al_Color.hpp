@@ -560,6 +560,8 @@ struct HSV{
 	HSV(const HCLuv& hcluv){ *this = hcluv; }
 
 
+	HSV dup() const { return *this; }
+
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
 
@@ -591,11 +593,20 @@ struct HSV{
 	/// Set from HCLuv color
 	HSV& operator= (const HCLuv& v);
 
-	/// Get new HSV with value component multiplied by a scalar
-	HSV  operator* (float a) const { return HSV(*this)*=a; }
+
+	#define DEF_OP(op)\
+	HSV& operator op##= (const HSV& o){ h op##= o.h; s op##= o.s; v op##= o.v; return *this; }\
+	HSV  operator op  (const HSV& o) const { return dup() op##= o;  }
+
+	DEF_OP(+) DEF_OP(-)
+
+	#undef DEF_OP
 
 	/// Multiply value component by a scalar
 	HSV& operator*=(float a){ v*=a; return *this; }
+
+	/// Get new HSV with value component multiplied by a scalar
+	HSV  operator* (float a) const { return dup()*=a; }
 
 
 	/// Rotate hue in interval [0, 1)
