@@ -205,16 +205,14 @@ public:
 	}
 
 	template <class V>
-	const V& as() const {
-		return const_cast<Vec*>(this)->as<V>();
-	}
+	const V& as() const { return mut().template as<V>(); }
 
 	/// Get vector with elements casted to new type
 	template <class V>
 	Vec<N,V> to() const { return Vec<N,V>(*this); }
 
 	/// Get read-only pointer to elements
-	const T * elems() const { return const_cast<Vec*>(this)->elems(); }
+	const T * elems() const { return mut().elems(); }
 
 	/// Get read-write pointer to elements
 	T * elems(){ return (T*)(this); }
@@ -235,9 +233,7 @@ public:
 	}
 
 	template <class Func>
-	const Vec& forEach(const Func& f) const {
-		return const_cast<Vec*>(this)->forEach(f);
-	}
+	const Vec& forEach(const Func& f) const { return mut().forEach(f); }
 
 	/// Iterate over range of elements
 
@@ -260,8 +256,11 @@ public:
 
 	template <int Beg, int End, class Func>
 	const Vec& forEach(const Func& f) const {
-		return const_cast<Vec*>(this)->forEach<Beg,End>(f);
+		return mut().template forEach<Beg,End>(f);
 	}
+
+	/// Whether index can safely access an element
+	static constexpr bool indexValid(int i){ return 0<=i && i<size(); }
 
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems()[i];}
@@ -281,9 +280,14 @@ public:
 
 	/// Get element at index with compile-time bounds checking
 	template <int i>
-	const T& at() const {
-		return const_cast<Vec*>(this)->at<i>();
-	}
+	const T& at() const { return mut().template at<i>(); }
+
+	/// Access element if index valid
+	template <class F>
+	Vec& at(int i, const F& f){ if(indexValid(i)) f(at(i),i); return *this; }
+	template <class F>
+	const Vec& at(int i, const F& f) const { return mut().at(i,f); }
+
 
 	/// Get element using unit domain rather than index
 
@@ -291,17 +295,17 @@ public:
 	///					The element index is computed from floor(v N).
 	///					For efficiency, no bounds checking is performed.
 	T& at01(float v){ return at(int(v*float(N))); }
-	const T& at01(float v) const { return const_cast<Vec*>(this)->at01(v); }
+	const T& at01(float v) const { return mut().at01(v); }
 
 	/// Access first element
 	T& front(){ return at<0>(); }
-	const T& front() const { return const_cast<Vec*>(this)->front(); }
+	const T& front() const { return mut().front(); }
 
 	/// Access last element
 	template <int I=0>
 	T& back(){ return at<N-1-I>(); }
 	template <int I=0>
-	const T& back() const { return const_cast<Vec*>(this)->back<I>(); }
+	const T& back() const { return mut().template back<I>(); }
 
 	Vec& operator = (const T& v){ return fill(v); }
 
@@ -475,7 +479,7 @@ public:
 	/// \tparam Begin	Starting element of subvector
 	template <int M, int Begin=0>
 	const auto& sub() const {
-		return const_cast<Vec*>(this)->sub<M,Begin>();
+		return mut().template sub<M,Begin>();
 	}
 	template <int M, int Begin=0>
 	auto& sub(){
@@ -600,7 +604,7 @@ public:
 	///				original vector size
 	template <int M>
 	const Vec<N/M, Vec<M,T>>& nest() const {
-		return const_cast<Vec*>(this)->nest<M>();  
+		return mut().template nest<M>();  
 	}
 
 	template <int M>
@@ -1183,11 +1187,11 @@ public:
 	}
 
 	/// Get minimum value
-	const T& min() const { return const_cast<Vec*>(this)->min(); }
+	const T& min() const { return mut().min(); }
 	T& min(){ return at(indexOfMin()); }
 
 	/// Get maximum value
-	const T& max() const { return const_cast<Vec*>(this)->max(); }
+	const T& max() const { return mut().max(); }
 	T& max(){ return at(indexOfMax()); }
 
 	/// Get minimum and maximum values
@@ -1228,6 +1232,9 @@ public:
 	void println(FILE * out=stdout) const;
 
 private:
+	// Get non-const reference (for creating const overload from non-const)
+	Vec& mut() const { return const_cast<Vec&>(*this); }
+
 	// set last N-M elements to default value
 	template <int M>
 	void initTail(){
