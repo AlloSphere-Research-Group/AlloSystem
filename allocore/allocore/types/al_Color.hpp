@@ -32,13 +32,6 @@ struct Luv;
 struct HCLuv;
 
 
-namespace{
-	template <class T> T clampValue(const T& v, const T& max){
-		return v<T(0) ? T(0) : (v>max ? max : v);
-	}
-}
-
-
 /// Color represented by red, green, blue, and alpha components
 struct Color{
 
@@ -227,10 +220,7 @@ struct Color{
 	}
 
 	/// Clamp all components into [0,max] range
-	Color& clamp(float max=1.f){
-		for(auto& c : components) c = clampValue(c,max);
-		return *this;
-	}
+	Color& clamp(float max=1.f);
 
 	/// Returns inverted color
 	Color inverse() const { return Color(*this).invert(); }
@@ -613,6 +603,9 @@ struct HSV{
 
 	/// Wrap hue value into valid interval [0, 1)
 	HSV& wrapHue();
+
+	/// Clamp saturation and value to [0,1] and wrap hue
+	HSV& clamp();
 };
 
 
@@ -774,10 +767,7 @@ struct RGB{
 	}
 
 	/// Clamp all components into [0,max] range
-	RGB& clamp(float max=1.f){
-		for(auto& c : components) c = clampValue(c,max);
-		return *this;
-	}
+	RGB& clamp(float max=1.f);
 
 	/// Returns inverted color
 	RGB inverse() const { return dup().invert(); }

@@ -6,6 +6,11 @@ namespace al{
 
 constexpr auto twoPi = 6.28318530717958647692;
 
+template <class T>
+T clampValue(T v, T max = T(1)){
+	return v<T(0) ? T(0) : (v>max ? max : v);
+}
+
 void wrapHue(float& h){
 	if(h>1.f){ h -= int(h); }
 	else if(h<0.f){ h -= int(h)-1; }
@@ -25,6 +30,12 @@ Vec transform(
 		m21*v[0] + m22*v[1] + m23*v[2],
 		m31*v[0] + m32*v[1] + m33*v[2]
 	);
+}
+
+
+Color& Color::clamp(float max){
+	for(auto& c : components) c = clampValue(c,max);
+	return *this;
 }
 
 
@@ -109,10 +120,21 @@ HSV& HSV::wrapHue(){
 	return *this;
 }
 
+HSV& HSV::clamp(){
+	s = clampValue(s);
+	v = clampValue(v);
+	return wrapHue();
+}
+
 
 RGB& RGB::complement(){
 	// max(c) - min(c) - (c - min(c)) + min(c)
 	return *this = (max() + min()) - *this;
+}
+
+RGB& RGB::clamp(float max){
+	for(auto& c : components) c = clampValue(c,max);
+	return *this;
 }
 
 RGB& RGB::value(float v){
