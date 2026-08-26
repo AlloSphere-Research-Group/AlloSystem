@@ -1154,8 +1154,13 @@ public:
 
 	/// Returns index of first occurrence of value or -1 if no match
 	int find(const T& v) const {
-		for(int i=0; i<N; ++i){ if(v == at(i)) return i; }
+		IT(N){ if(v == at(i)) return i; }
 		return -1;
+	}
+
+	/// Returns whether vector contains a value
+	bool contains(const T& v) const {
+		return find(v) >= 0;
 	}
 
 	/// Get index of minimum value
