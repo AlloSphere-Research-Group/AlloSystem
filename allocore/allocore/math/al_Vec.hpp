@@ -153,6 +153,12 @@ public:
 	//--------------------------------------------------------------------------
 	// Named Constructors
 
+	/// Construct with same size, but different type
+	template <class U, class... Args>
+	static Vec<N,U> type(Args&&... args){
+		return {std::forward<Args>(args)...};
+	}
+
 	/// Get axis aligned vector
 	static Vec aa(int axis, T val = T(1)){
 		return Vec().setAA(axis, val);
