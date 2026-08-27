@@ -62,6 +62,7 @@ int utMath(){
 		}
 
 		// named constructors
+		assert(Vec3f().type<int>(1,2,3) == Vec3i(1,2,3));
 		assert(Vec3f::aa(0, 1.f) == Vec3f(1,0,0));
 		assert(Vec4i::iota(0  ) == Vec4i(0,1,2,3));
 		assert(Vec4i::iota(1  ) == Vec4i(1,2,3,4));
