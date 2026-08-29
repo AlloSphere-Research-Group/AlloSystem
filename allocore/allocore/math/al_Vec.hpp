@@ -1164,6 +1164,13 @@ public:
 		return -1;
 	}
 
+	/// Returns index of first element for which the predicate returns true
+	template <class Pred>
+	int findIf(const Pred& p) const {
+		IT(N){ if(p(at(i))) return i; }
+		return -1;
+	}
+
 	/// Returns whether vector contains a value
 	bool contains(const T& v) const {
 		return find(v) >= 0;
