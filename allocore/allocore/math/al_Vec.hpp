@@ -1409,6 +1409,10 @@ inline Vec<N,int> roundi(const Vec<N,T>& v){ return v + v.sgn(T(0.5)); }
 template <int N, class T>
 inline Vec<N,T> fract(const Vec<N,T>& v){ return v - floor(v); }
 
+/// Get values modulo some amount
+template <int N, class T>
+inline Vec<N,T> mod(const Vec<N,T>& v, T div = T(1)){ return fract(v/div)*div; }
+
 /// Returns sum of elements
 template <int N, class T>
 inline T sum(const Vec<N,T>& v){ return v.sum(); }
