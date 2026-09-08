@@ -219,13 +219,31 @@ public:
 	template<class T> void fill(void (*func)(T * values, double normx, double normy, double normz));
 
 	/// Copy component values to destination array (no bounds checking)
-	/// The type must match what is in the array.
+	/// The destination type must match what is in the array, otherwise results
+	/// are undefined.
 	template<class T> void read(T* val, int x) const;
 	template<class T> void read(T* val, int x, int y) const;
 	template<class T> void read(T* val, int x, int y, int z) const;
 
 	template<class T, class U> void read(T* val, Vec<2,U> p) const { read(val, p[0], p[1]); }
 	template<class T, class U> void read(T* val, Vec<3,U> p) const { read(val, p[0], p[1], p[2]); }
+
+	/// Copy component values to destination array applying type conversion
+	/// The destination type does NOT have to match the array type.
+	template<class T> void readConvert(T* val, int x, int y, int z) const;
+
+	/// Forward iterator with automatic type conversion
+
+	/// This iterates forward through all elements and applies a conversion
+	/// operation from the internal (dynamic) type to the destination static
+	/// type. Due to the automatic conversion, the iterator can be considered
+	/// "safe" in terms of memory access and numerical values.
+	/// \tparam N		Maximum number of components to read
+	/// \tparam T		Type to convert components into
+	/// \tparam Func	Called per component cell
+	/// \param[in] f	Take arguments (T[N], i,j,k)
+	template <unsigned N, class T, class Func>
+	void forEach(const Func& f);
 
 	/// Linear interpolated lookup (virtual array index)
 
@@ -295,6 +313,14 @@ protected:
 		template <class T>
 		void add(T v, T& a, T& b) const { a+=v*(1.-f); b+=v*f; }
 	};
+
+	template <class D, class S>
+	static D convert(const S& src){ return src; }
+
+	template <class D, class S>
+	static void copy(D * dst, const S * src, int len){
+		for(int i=0; i<len; ++i) dst[i] = convert<D>(src[i]);
+	}
 };
 
 
@@ -318,8 +344,6 @@ template<> constexpr AlloTy ptrType<4>(){ return AlloPointer32Ty; }
 template<> constexpr AlloTy ptrType<8>(){ return AlloPointer64Ty; }
 }
 template<> constexpr AlloTy Array::type<void *>(){ return ptrType<sizeof(void*)>(); }
-
-
 /*template<> constexpr AlloTy Array::type<void *>(){
 	switch(sizeof(void *)) {
 		case 4: return AlloPointer32Ty;
@@ -327,6 +351,36 @@ template<> constexpr AlloTy Array::type<void *>(){ return ptrType<sizeof(void*)>
 	}
 	return 0;
 }*/
+
+#define ARRAY_CONVI(D,S,op)\
+template<> inline D Array::convert<D,S>(const S& v){ return v op; }
+#define ARRAY_CONVE(D,S,op)\
+template<> inline D Array::convert<D,S>(const S& v){ return D(v) op; }
+ARRAY_CONVI( float,  uint8_t, /_allo_ui08f_max())
+ARRAY_CONVI( float, uint16_t, /_allo_ui16f_max())
+ARRAY_CONVI( float, uint32_t, /_allo_ui32f_max())
+ARRAY_CONVI( float, uint64_t, /_allo_ui64f_max())
+ARRAY_CONVI(double,  uint8_t, /_allo_ui08f_max())
+ARRAY_CONVI(double, uint16_t, /_allo_ui16f_max())
+ARRAY_CONVI(double, uint32_t, /_allo_ui32f_max())
+ARRAY_CONVI(double, uint64_t, /_allo_ui64f_max())
+ARRAY_CONVI( uint8_t,  float, *_allo_ui08f_max())
+ARRAY_CONVI(uint16_t,  float, *_allo_ui16f_max())
+ARRAY_CONVI(uint32_t,  float, *_allo_ui32f_max())
+ARRAY_CONVI(uint64_t,  float, *_allo_ui64f_max())
+ARRAY_CONVI( uint8_t, double, *_allo_ui08f_max())
+ARRAY_CONVI(uint16_t, double, *_allo_ui16f_max())
+ARRAY_CONVI(uint32_t, double, *_allo_ui32f_max())
+ARRAY_CONVI(uint64_t, double, *_allo_ui64f_max())
+ARRAY_CONVE(uint16_t, uint8_t, << 8)
+ARRAY_CONVE(uint32_t, uint8_t, <<24)
+ARRAY_CONVE(uint64_t, uint8_t, <<56)
+// TODO
+ARRAY_CONVI(uint8_t, uint16_t, >> 8)
+ARRAY_CONVI(uint8_t, uint32_t, >>24)
+ARRAY_CONVI(uint8_t, uint64_t, >>56)
+// TODO
+#undef ARRAY_CONV
 
 template<class T> inline T * Array::cell(int x) const {
 	return (T *)(data.ptr + x*stride<0>());
@@ -351,6 +405,37 @@ template<class T> inline void Array::read(T * val, int x, int y) const {
 template<class T> inline void Array::read(T * val, int x, int y, int z) const {
 	const T * c = cell<T>(x, y, z);
 	for(uint8_t i=0; i<components(); i++) val[i] = c[i];
+}
+
+template<class T> void Array::readConvert(T* val, int x, int y, int z) const {
+	#define CS(Type, type)\
+	case Type: copy(val, cell<type>(x,y,z), components()); break;
+	switch(type()){
+	CS(AlloFloat32Ty,float)
+	CS(AlloFloat64Ty,double)
+	CS(AlloUInt8Ty, uint8_t)
+	CS(AlloUInt16Ty,uint16_t)
+	CS(AlloUInt32Ty,uint32_t)
+	CS(AlloUInt64Ty,uint64_t)
+	CS(AlloSInt8Ty,  int8_t)
+	CS(AlloSInt16Ty, int16_t)
+	CS(AlloSInt32Ty, int32_t)
+	CS(AlloSInt64Ty, int64_t)
+	default:;
+	}
+	#undef CS
+}
+
+template <unsigned N, class T, class Func>
+void Array::forEach(const Func& f){
+	if(N < components()) return;
+	for(unsigned k=0; k< depth(); ++k){
+	for(unsigned j=0; j<height(); ++j){
+	for(unsigned i=0; i< width(); ++i){
+		T data[N];
+		readConvert(data, i,j,k);
+		f(data, i,j,k);
+	}}}
 }
 
 // linear interpolated lookup (virtual array index)
