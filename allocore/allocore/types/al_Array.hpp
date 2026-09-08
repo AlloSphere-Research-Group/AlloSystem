@@ -218,7 +218,8 @@ public:
 	template<class T> void fill(void (*func)(T * values, double normx, double normy));
 	template<class T> void fill(void (*func)(T * values, double normx, double normy, double normz));
 
-	/// Read the component values from array into val array (no bounds checking)
+	/// Copy component values to destination array (no bounds checking)
+	/// The type must match what is in the array.
 	template<class T> void read(T* val, int x) const;
 	template<class T> void read(T* val, int x, int y) const;
 	template<class T> void read(T* val, int x, int y, int z) const;
@@ -340,15 +341,15 @@ template<class T> inline T * Array::cell(int x, int y, int z) const {
 
 // read the plane values from array into val array (no bounds checking)
 template<class T> inline void Array::read(T * val, int x) const {
-	T * c = cell<T>(x);
+	const T * c = cell<T>(x);
 	for(uint8_t i=0; i<components(); i++) val[i] = c[i];
 }
 template<class T> inline void Array::read(T * val, int x, int y) const {
-	T * c = cell<T>(x, y);
+	const T * c = cell<T>(x, y);
 	for(uint8_t i=0; i<components(); i++) val[i] = c[i];
 }
 template<class T> inline void Array::read(T * val, int x, int y, int z) const {
-	T * c = cell<T>(x, y, z);
+	const T * c = cell<T>(x, y, z);
 	for(uint8_t i=0; i<components(); i++) val[i] = c[i];
 }
 
