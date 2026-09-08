@@ -15,7 +15,7 @@
 #include <cstdio>
 #include <initializer_list>
 #include <ostream>
-#include <type_traits> //remove_reference, is_polymorphic
+#include <type_traits> //remove_reference, integral_constant, is_polymorphic
 
 namespace al {
 
@@ -228,18 +228,21 @@ public:
 	T * end(){ return elems() + N; }
 	const T * end() const { return elems() + N; }
 
-	/// Iterate through all elements
+	/// Forward iterate through all elements
 
 	/// \param[in] f	Function called for each element with first arg the
-	///					value and second arg the index.
+	///					value and second arg the index. To ensure the second
+	///					(index) arg maintains constexpr, declare it \c auto.
 	template <class Func>
-	Vec& forEach(const Func& f){
-		for(int i=0; i<size(); ++i) f(at(i), i);
+	constexpr Vec& forEach(const Func& f){
+		static_for<0,N>::apply([&](auto i){
+			f(at<i>(), i);
+		});
 		return *this;
 	}
 
 	template <class Func>
-	const Vec& forEach(const Func& f) const { return mut().forEach(f); }
+	constexpr const Vec& forEach(const Func& f) const { return mut().forEach(f); }
 
 	/// Iterate over range of elements
 
@@ -1264,6 +1267,25 @@ private:
 		static_assert(Dim1<N && Dim2<N && Dim1!=Dim2, "Invalid dimension(s)");
 		return 0;
 	}
+
+	/// \tparam Beg		Begin index (inclusive)
+	/// \tparam End		End index (exclusive)
+	template <int Beg, int End>
+	struct static_for{
+		template <class F>
+		static constexpr void apply(const F& f){
+			if(Beg < End){
+				f(std::integral_constant<int, Beg>{});
+				static_for<Beg + 1, End>::apply(f);
+			}
+		}
+	};
+	// terminal case
+	template <int I>
+	struct static_for<I,I>{
+		template <class F>
+		static constexpr void apply(const F& f){}
+	};
 };
 
 
