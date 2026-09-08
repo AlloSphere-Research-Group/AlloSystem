@@ -219,6 +219,7 @@ protected:
 	int mPaletteSize = -1;	// number of colors in palette
 	bool mLoaded = false;	// true after image data is loaded
 
+	// Wrap raw pixel data with Array object if valid
 	template <class T, class OnArray>
 	static bool arrayScope(const T * pixels, int nx, int ny, int nc, const OnArray& onArray){
 		if(!pixels) return false;
