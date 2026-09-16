@@ -259,6 +259,14 @@ public:
 		return m;
 	}
 
+	/// Get a scaling transform matrix about a point
+	static Mat scaling(const Vec<N-1,T>& s, const Vec<N-1,T>& p){
+		return TST(-p,s,p);
+	}
+	static Mat scaling(T s, const Vec<N-1,T>& p){
+		return scaling(Vec<N-1,T>(s), p);
+	}
+
 	/// Get a scaling transform matrix
 	template <class V>
 	static Mat scaling(V v){
