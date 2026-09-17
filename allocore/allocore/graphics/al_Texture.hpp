@@ -266,10 +266,16 @@ public:
 	/// Unbind the texture
 	void unbind();
 
-	/// Render the texture onto a quad on the XY plane
-	void quad(Graphics& gl, float w=2, float h=2, float x=-1, float y=-1, float z=0);
+	/// Render texture onto quad on XY plane
+	void quad(Graphics& g, float w=2, float h=2, float x=-1, float y=-1, float z=0);
 
-	/// Render the texture onto a quad filling current viewport
+	/// Render texture to aspect-correct rectangle on XY plane
+
+	/// The rectangle aspect matches the texture and is fit to a square in
+	/// [-rmax, rmax] centered at the origin.
+	void quadFit(Graphics& g, float rmax=1, float x=0, float y=0, float z=0);
+
+	/// Render texture onto quad filling current viewport
 	void quadViewport(
 		Graphics& g, const Color& color = Color(1),
 		float w=2, float h=2, float x=-1, float y=-1, float z=0);

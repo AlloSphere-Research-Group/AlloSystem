@@ -762,8 +762,7 @@ Texture& Texture::copyFrameBuffer(
 
 void Texture::quad(Graphics& g, float w, float h, float x, float y, float z){
 	bind();
-	auto& m = g.mesh();
-	m.reset()
+	g.mesh().reset()
 		.triangleStrip()
 		.vertex(x  , y  , z)
 		.vertex(x+w, y  , z)
@@ -771,8 +770,15 @@ void Texture::quad(Graphics& g, float w, float h, float x, float y, float z){
 		.vertex(x+w, y+h, z)
 		.texCoord2(0,0, 1,0, 0,1, 1,1)
 	;
-	g.draw(m);
+	g.draw();
 	unbind();
+}
+
+void Texture::quadFit(Graphics& g, float rmax, float x, float y, float z){
+	float w,h;
+	if(width() > height()) w=rmax, h=rmax*float(height())/width();
+	else w=rmax*float(width())/height(), h=rmax;
+	quad(g, w,h, x-w*0.5f,y-h*0.5f,z);
 }
 
 void Texture::quadViewport(
