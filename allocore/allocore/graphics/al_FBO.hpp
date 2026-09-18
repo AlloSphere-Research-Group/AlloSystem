@@ -70,7 +70,13 @@ public:
 
 
 	/// Get maximum buffer size
-	static unsigned maxSize();
+	static unsigned sizeMax();
+
+	/// Get maximum multisample size
+	static unsigned samplesMax();
+	/// Get supported multisample sizes
+	/// \returns number of sizes written to array.
+	static unsigned samplesSizes(unsigned * sizes, unsigned len);
 
 	static void bind(unsigned id);
 	static bool resize(Graphics::Format format, unsigned width, unsigned height, unsigned samples=0);

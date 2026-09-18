@@ -46,8 +46,30 @@ void RBO::onSync(){
 	}
 }
 
-/*static*/ unsigned RBO::maxSize(){
+/*static*/ unsigned RBO::sizeMax(){
 	return Graphics::paramInt(GL_MAX_RENDERBUFFER_SIZE);
+}
+
+/*static*/ unsigned RBO::samplesMax(){
+	unsigned s;
+	samplesSizes(&s, 1);
+	return s;
+}
+
+/*static*/ unsigned RBO::samplesSizes(unsigned * sizes, unsigned len){
+	if(0 == len) return 0;
+	#if defined(GL_ARB_internalformat_query) || defined(AL_GRAPHICS_USE_OPENGLES3_X)
+		static constexpr unsigned N = 8;
+		if(len>N) len=N;
+		GLint glsamps[N];
+		// Req's GL4.2 / ES3.0 and later (not supported on macOS desktop)
+		glGetInternalformativ(GL_RENDERBUFFER, GL_RGB, GL_SAMPLES, N,glsamps);
+		for(int i=0; i<len; ++i) sizes[i] = glsamps[i];
+		return len;
+	#else
+		sizes[0] = graphics().paramInt(GL_MAX_SAMPLES);
+		return 1;
+	#endif
 }
 
 /*static*/ void RBO::bind(unsigned id){
@@ -56,7 +78,7 @@ void RBO::onSync(){
 }
 
 /*static*/ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h, unsigned samples){
-	unsigned mx = maxSize();
+	unsigned mx = sizeMax();
 	if(w > mx || h > mx) return false;
 	AL_GRAPHICS_ERROR("before RBO::resize", -1);
 
