@@ -308,12 +308,12 @@ public:
 
 
 	/// Window pixel dimensions
-	struct Dim{
+	struct Rect{
 		int l,t,w,h;
 
-		Dim(int v=0);
-		Dim(int w, int h);
-		Dim(int l, int t, int w, int h);
+		Rect(int v=0);
+		Rect(int w, int h);
+		Rect(int l, int t, int w, int h);
 
 		void set(int l, int t, int w, int h);
 
@@ -348,7 +348,7 @@ public:
 	/// been created.
 	/// \returns whether a valid window is created
 	bool create(){
-		return create(dimensions(), title(), fps(), displayMode());
+		return create(rect(), title(), fps(), displayMode());
 	}
 
 	/// Create window and its associated graphics context
@@ -356,12 +356,12 @@ public:
 	/// This will create a new window only if the the window has not already
 	/// been created.
 	/// \returns whether a valid window is created
-	/// @param[in] dim		Window dimensions in pixels
+	/// @param[in] rect		Window rectangle in pixels
 	/// @param[in] title	Title of window
 	/// @param[in] fps		Desired frames/second
 	/// @param[in] mode		Display mode bit flags
 	bool create(
-		const Dim& dim,
+		const Rect& rect,
 		const std::string& title="",
 		double fps=40,
 		DisplayMode mode = DEFAULT_BUF
@@ -373,12 +373,15 @@ public:
 	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
 	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
 
+	int height() const{return mRect.h;}	///< Get window height, in pixels
+	int width() const{return mRect.w;}	///< Get window width, in pixels
+	Rect rect() const;					///< Get current rectangle of window
 	double aspect() const;				///< Get aspect ratio (width divided by height)
+
 	bool created() const;				///< Whether window has been created providing a valid graphics context
 	Cursor cursor() const;				///< Get current cursor type
 	bool cursorHide() const;			///< Whether the cursor is hidden
 	bool keyRepeat() const;
-	Dim dimensions() const;				///< Get current dimensions of window
 	DisplayMode displayMode() const;	///< Get current display mode
 	bool enabled(DisplayMode v) const;	///< Get whether display mode flag is set
 	bool fullScreen() const;			///< Get whether window is in fullscreen
@@ -392,14 +395,11 @@ public:
 	bool vsync() const;					///< Get whether v-sync is enabled
 	bool asap() const;					///< Get whether window is rendering as fast as possible
 
-	int height() const { return mDim.h; } ///< Get window height, in pixels
-	int width() const { return mDim.w; } ///< Get window width, in pixels
-
+	Window& rect(const Rect& v);		///< Set rectangle
 	Window& cursor(Cursor v);			///< Set cursor type
 	Window& cursorHide(bool v);			///< Set cursor hiding
 	Window& cursorHideToggle();			///< Toggle cursor hiding
 	Window& keyRepeat(bool v);			///< Set whether held keyboard keys repeat events
-	Window& dimensions(const Dim& v);	///< Set dimensions
 	Window& displayMode(DisplayMode v);	///< Set display mode; will recreate window if different from current
 	Window& fps(double v);				///< Set frames/second
 
@@ -474,7 +474,7 @@ protected:
 	Mouse mMouse;
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
-	Dim mDim;
+	Rect mRect;
 	DisplayMode mDisplayMode = DEFAULT_BUF;
 	std::string mTitle;
 	Cursor mCursor = POINTER;
@@ -496,7 +496,7 @@ protected:
 	void implDestroy();
 	void implSetCursor();
 	void implSetCursorHide();
-	void implSetDimensions();
+	void implSetRect();
 	void implSetFPS();
 	void implSetFullScreen();
 	void implSetTitle();

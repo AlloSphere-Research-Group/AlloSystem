@@ -46,14 +46,14 @@ ViewpointWindow::ViewpointWindow(){
 }
 
 ViewpointWindow::ViewpointWindow(
-	const Dim& dims,
+	const Rect& rect,
 	const std::string title,
 	double fps,
 	DisplayMode mode
 )
 :	ViewpointWindow()
 {
-	create(dims, title, fps, mode);
+	create(rect, title, fps, mode);
 }
 
 bool ViewpointWindow::onResize(int w, int h){
@@ -286,14 +286,14 @@ void App::initAudio(
 
 
 ViewpointWindow * App::initWindow(
-	const Window::Dim& dims,
+	const Window::Rect& rect,
 	const std::string title,
 	double fps,
 	Window::DisplayMode mode,
 	int flags
 ){
 	auto& win = *new ViewpointWindow;
-	win.dimensions(dims);
+	win.rect(rect);
 	if(title.empty()){ // if no title, use app name, if any
 		if(!name().empty()) win.title(name());
 	} else {
@@ -423,7 +423,7 @@ int mousePos(const App * app, int window, bool clip){
 	int res = 0;
 	app->forValidWindow(window, [&](auto& win){
 		res = win.mouse().template pos<Vec2i>().template at<Axis>();
-		if(clip) res = clamp(res, win.dimensions().template ext<Vec2i>().template at<Axis>());
+		if(clip) res = clamp(res, win.rect().template ext<Vec2i>().template at<Axis>());
 	});
 	return res;
 }

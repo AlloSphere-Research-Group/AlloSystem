@@ -70,7 +70,7 @@ static bool toIdentifier(std::string& v){
 }
 
 void ProtoApp::init(
-	const Window::Dim& dim,
+	const Window::Rect& rect,
 	const std::string& title,
 	double fps,
 	Window::DisplayMode mode,
@@ -87,7 +87,7 @@ void ProtoApp::init(
 		//gam::Sync::master().spu(audioIO().fps());
 	}
 
-	auto * win = initWindow(dim, title, fps, mode);
+	auto * win = initWindow(rect, title, fps, mode);
 	mGUI.parentWindow(*win);
 
 	win->drawCalls().push_back(

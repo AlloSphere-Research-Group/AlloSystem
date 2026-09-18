@@ -154,26 +154,26 @@ void WindowEventHandler::onRemoveFromWindow(){
 
 
 
-Window::Dim::Dim(int v):Window::Dim(v,v){}
-Window::Dim::Dim(int w, int h): Window::Dim(0,0,w,h){}
-Window::Dim::Dim(int l_, int t_, int w_, int h_): l(l_), t(t_), w(w_), h(h_){}
+Window::Rect::Rect(int v): Window::Rect(v,v){}
+Window::Rect::Rect(int w, int h): Window::Rect(0,0,w,h){}
+Window::Rect::Rect(int l_, int t_, int w_, int h_): l(l_), t(t_), w(w_), h(h_){}
 
-void Window::Dim::set(int l_, int t_, int w_, int h_){
+void Window::Rect::set(int l_, int t_, int w_, int h_){
 	l=l_; t=t_; w=w_; h=h_;
 }
 
-float Window::Dim::aspect() const {
+float Window::Rect::aspect() const {
 	return (w!=0 && h!=0) ? double(w)/h : 1;
 }
 
-void Window::Dim::print() const {
-	printf("Dim: %4d x %4d @ (%4d, %4d)\n", w,h, l,t);
+void Window::Rect::print() const {
+	printf("Rect: %4d x %4d @ (%4d, %4d)\n", w,h, l,t);
 }
 
 
 Window::Window(){
 	implCtor(); // must call first!
-	dimensions(Dim(800,600));
+	rect(Rect(800,600));
 	fps(40);
 	append(inputEventHandler());
 	append(windowEventHandler());
@@ -189,10 +189,10 @@ double Window::timeInSec(){
 }
 
 bool Window::create(
-	const Dim& dim, const std::string& title, double fps, DisplayMode mode
+	const Rect& rect, const std::string& title, double fps, DisplayMode mode
 ){
 	if(!created()){
-		mDim = dim;
+		mRect = rect;
 		mTitle = title;
 		mFPS = fps;
 		mDisplayMode = mode;
@@ -223,7 +223,7 @@ Window& Window::asap(bool v){
 }
 
 double Window::aspect() const {
-	return dimensions().aspect();
+	return mRect.aspect();
 }
 
 Window& Window::cursorHideToggle(){
@@ -261,13 +261,13 @@ Window& Window::keyRepeat(bool v){
 	return *this;
 }
 
-Window::Dim Window::dimensions() const {
-	return mDim;
+Window::Rect Window::rect() const {
+	return mRect;
 }
 
-Window& Window::dimensions(const Dim& v){
-	mDim = v;
-	if(created()) implSetDimensions();
+Window& Window::rect(const Rect& v){
+	mRect = v;
+	if(created()) implSetRect();
 	return *this;
 }
 
@@ -280,13 +280,13 @@ Window& Window::displayMode(DisplayMode v){
 		if(created()){
 			const auto cursor_ = cursor();
 			const auto cursorHide_ = cursorHide();
-			const auto dim_ = dimensions();
+			const auto rect_ = rect();
 			const auto fullScreen_ = fullScreen();
 			const auto fps_ = fps();
 			const auto& title_ = title();
 
 			destroy();
-			create(dim_, title_, fps_, v);
+			create(rect_, title_, fps_, v);
 			cursor(cursor_);
 			cursorHide(cursorHide_);
 			fullScreen(fullScreen_);

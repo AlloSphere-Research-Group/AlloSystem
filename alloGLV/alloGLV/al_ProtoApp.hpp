@@ -31,7 +31,7 @@ public:
 
 	/// This should be called after configuring everything else with the app
 	void init(
-		const Window::Dim& dim = Window::Dim(800,600),
+		const Window::Rect& rect = Window::Rect(800,600),
 		const std::string& title="",
 		double fps=40,
 		Window::DisplayMode mode = Window::DEFAULT_BUF,

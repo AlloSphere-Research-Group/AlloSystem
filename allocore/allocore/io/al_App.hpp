@@ -118,12 +118,12 @@ public:
 	///
 	ViewpointWindow();
 
-	/// @param[in] dims		window dimensions
-	/// @param[in] title	window title
-	/// @param[in] fps		frames/second
-	/// @param[in] mode		window display mode
+	/// @param[in] rect		Window rectangle
+	/// @param[in] title	Window title
+	/// @param[in] fps		Frames/second
+	/// @param[in] mode		Window display mode
 	ViewpointWindow(
-		const Dim& dims,
+		const Rect& rect,
 		const std::string title="",
 		double fps=40,
 		DisplayMode mode = DEFAULT_BUF
@@ -176,13 +176,13 @@ public:
 
 	/// Initialize a new window
 
-	/// @param[in] dims				Window dimensions
+	/// @param[in] rect				Window rectangle
 	/// @param[in] title			Window title
 	/// @param[in] fps				Frames/second
 	/// @param[in] mode				Window display mode
 	/// @param[in] flags			Additional flags (unused)
 	ViewpointWindow * initWindow(
-		const Window::Dim& dims = Window::Dim(800,600),
+		const Window::Rect& rect = Window::Rect(800,600),
 		const std::string title="",
 		double fps=40,
 		Window::DisplayMode mode = Window::DEFAULT_BUF,

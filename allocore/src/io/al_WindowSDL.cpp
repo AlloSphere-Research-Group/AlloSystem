@@ -208,7 +208,7 @@ private:
 						//printf("Window %d shown\n", ID());
 						win.mVisible = true;
 						win.callHandlersOnVisibility(win.mVisible);
-						win.dimensions(win.dimensions());
+						win.rect(win.rect());
 						break;
 					case EV_WIN_HIDE:
 						//printf("Window %d hidden\n", ID());
@@ -220,17 +220,17 @@ private:
 						break;
 					case EV_WIN_MOVE:
 						//printf("Window %d moved to %d,%d\n", ID(), ev.window.data1, ev.window.data2);
-						win.mDim.l = ev.window.data1;
-						win.mDim.t = ev.window.data2;
+						win.mRect.l = ev.window.data1;
+						win.mRect.t = ev.window.data2;
 						break;
 					case EV_WIN_RESIZE:
 				#ifdef USING_SDL2 // does not appear necessary with SDL3
 					case EV_WIN_SIZE_CHANGE:
 				#endif
 						//printf("Window %d resized to %dx%d (ev:%d)\n", ID(), ev.window.data1, ev.window.data2, ev.type);
-						win.mDim.w = ev.window.data1;
-						win.mDim.h = ev.window.data2;
-						win.callHandlersOnResize(win.mDim.w, win.mDim.h);
+						win.mRect.w = ev.window.data1;
+						win.mRect.h = ev.window.data2;
+						win.callHandlersOnResize(win.mRect.w, win.mRect.h);
 						break;
 			#ifdef USING_SDL2
 					}
@@ -519,10 +519,10 @@ bool Window::implCreate(){
 	auto sdlWinFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
 	#ifdef USING_SDL3
-		auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.w,mDim.h, sdlWinFlags);
-		if(sdlWin) SDL_SetWindowPosition(sdlWin, mDim.l,mDim.t);
+		auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mRect.w,mRect.h, sdlWinFlags);
+		if(sdlWin) SDL_SetWindowPosition(sdlWin, mRect.l,mRect.t);
 	#elif defined USING_SDL2
-		auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mDim.l,mDim.t, mDim.w,mDim.h, sdlWinFlags);
+		auto sdlWin = SDL_CreateWindow(mTitle.c_str(), mRect.l,mRect.t, mRect.w,mRect.h, sdlWinFlags);
 	#endif
 
 	if(!sdlWin){
@@ -532,8 +532,8 @@ bool Window::implCreate(){
 
 	int top, left, bottom, right;
 	if(SDL_GetWindowBordersSize(sdlWin, &top, &left, &bottom, &right) == 0) {
-		mDim.l += left;
-		mDim.t += top;
+		mRect.l += left;
+		mRect.t += top;
 	}
 
 	#ifdef USING_SDL2
@@ -557,7 +557,7 @@ bool Window::implCreate(){
 	callHandlersOnCreate();
 
 	// SDL doesn't trigger a resize on window creation, so do it here
-	callHandlersOnResize(mDim.w, mDim.h);
+	callHandlersOnResize(mRect.w, mRect.h);
 
 	// Set fullscreen according to mFullScreen member
 	{	bool fs = fullScreen();
@@ -598,9 +598,9 @@ bool Window::created() const {
 	return mImpl->created();
 }
 
-void Window::implSetDimensions(){
-	SDL_SetWindowPosition(mImpl->mSDLWindow, mDim.l, mDim.t);
-	SDL_SetWindowSize(mImpl->mSDLWindow, mDim.w, mDim.h);
+void Window::implSetRect(){
+	SDL_SetWindowPosition(mImpl->mSDLWindow, mRect.l, mRect.t);
+	SDL_SetWindowSize(mImpl->mSDLWindow, mRect.w, mRect.h);
 }
 
 void Window::implSetCursor(){

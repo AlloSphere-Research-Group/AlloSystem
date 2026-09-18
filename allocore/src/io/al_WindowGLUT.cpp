@@ -72,7 +72,7 @@ public:
 	typedef std::map<int, WindowImpl *> WindowsMap;
 
 	WindowImpl(Window * w)
-	:	mWindow(w), mDimPrev(0)
+	:	mWindow(w), mRectPrev(0)
 	{
 		resetState();
 		// ensure that GLUT and mainloop exist:
@@ -96,8 +96,8 @@ public:
 
 	int id() const { return mInGameMode ? mIDGameMode : mID; }
 
-	Window::Dim dimensionsGLUT() const {
-		Window::Dim d(0,0,0,0);
+	Window::Rect rectGLUT() const {
+		Window::Rect d(0,0,0,0);
 		if(created()){
 			glutSetWindow(id());
 			d.l = glutGet(GLUT_WINDOW_X);
@@ -432,11 +432,11 @@ public:
 		//printf("GLUT reshape: w = %4d, h = %4d\n", w,h);
 		Window * win = getWindow();
 		if(win){
-			Window::Dim& dimCurr = win->mDim;
+			auto& rectCurr = win->mRect;
 			//printf("mDim: w = %4d, h = %4d\n", dimCurr.w, dimCurr.h);
-			if(dimCurr.w != w || dimCurr.h != h){
-				dimCurr.w = w;
-				dimCurr.h = h;
+			if(rectCurr.w != w || rectCurr.h != h){
+				rectCurr.w = w;
+				rectCurr.h = h;
 				//printf("trigger resize with %d %d\n", w,h);
 				win->callHandlersOnResize(w, h);
 
@@ -577,7 +577,7 @@ private:
 	Window * mWindow;
 	int mID;
 	int mIDGameMode;
-	Window::Dim mDimPrev;
+	Window::Rect mRectPrev;
 
 	bool mInGameMode;
 	bool mScheduled;
@@ -615,16 +615,16 @@ bool Window::implCreate(){
 		M.driver(Main::USER);
 	}
 
-	mImpl->mDimPrev.set(0,0,0,0);
+	mImpl->mRectPrev.set(0,0,0,0);
 
 	// We must zero extent of Dim member so resize callback detects a change
-	int w = mDim.w;
-	int h = mDim.h;
-	mDim.w = 0;
-	mDim.h = 0;
+	int w = mRect.w;
+	int h = mRect.h;
+	mRect.w = 0;
+	mRect.h = 0;
 
 	glutInitWindowSize(w, h);
-	glutInitWindowPosition(mDim.l, mDim.t);
+	glutInitWindowPosition(mRect.l, mRect.t);
 
     int bits =
         (enabled(SINGLE_BUF )	? GLUT_SINGLE		:0) |
@@ -691,16 +691,16 @@ bool Window::created() const {
 	return mImpl->created();
 }
 
-void Window::implSetDimensions(){
+void Window::implSetRect(){
 	mImpl->makeMainWindow();
-	glutPositionWindow(mDim.l, mDim.t);
+	glutPositionWindow(mRect.l, mRect.t);
 
 	// Set mDim extent to actual window extent so reshape callback triggers
 	// handlers.
-	int w = mDim.w;
-	int h = mDim.h;
-	mDim.w = glutGet(GLUT_WINDOW_WIDTH);
-	mDim.h = glutGet(GLUT_WINDOW_HEIGHT);
+	int w = mRect.w;
+	int h = mRect.h;
+	mRect.w = glutGet(GLUT_WINDOW_WIDTH);
+	mRect.h = glutGet(GLUT_WINDOW_HEIGHT);
 	glutReshapeWindow(w, h);
 }
 
@@ -747,7 +747,7 @@ void Window::implSetFullScreen(){
 			cursorHide(cursorHide());
 		#else
 			glutSetWindow(mImpl->mID);
-			mImpl->mDimPrev = mImpl->dimensionsGLUT();
+			mImpl->mRectPrev = mImpl->rectGLUT();
 			glutFullScreen(); // calls glutReshapeWindow
 		#endif
 	}
@@ -757,14 +757,14 @@ void Window::implSetFullScreen(){
 		#ifdef AL_LINUX
 			callHandlersOnDestroy();
 			mImpl->gameMode(false);
-			mDim = mImpl->dimensionsGLUT();
+			mDim = mImpl->rectGLUT();
 			callHandlersOnCreate();
 			callHandlersOnResize(mDim.w, mDim.h);
 			hide(); show(); // need to force focus to get key callbacks to work
 		#else
 			// Calls glutReshapeWindow which exits from a glutFullScreen call.
 			// This also calls our reshape callback which sets the mDim member.
-			dimensions(mImpl->mDimPrev);
+			rect(mImpl->mRectPrev);
 		#endif
 	}
 }

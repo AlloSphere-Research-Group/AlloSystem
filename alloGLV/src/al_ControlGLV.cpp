@@ -154,11 +154,11 @@ GLVDetachable& GLVDetachable::detached(bool v){
 		//detachedWindow().create(Window::Dim(ru.w, ru.h));
 		int pl=0, pt=0;
 		if(mParentWindow){
-			pl = parentWindow().dimensions().l;
-			pt = parentWindow().dimensions().t;
+			pl = parentWindow().rect().l;
+			pt = parentWindow().rect().t;
 			//printf("%d %d\n", pl, pt);
 		}
-		detachedWindow().create(Window::Dim(pl, pt, ru.w, ru.h));
+		detachedWindow().create(Window::Rect(pl, pt, ru.w, ru.h));
 		addGUI(detachedWindow());
 	}
 	else if(detached()){ // is currently detached, attach back to parent, if any

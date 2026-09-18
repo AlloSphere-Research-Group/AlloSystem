@@ -41,8 +41,8 @@ public:
 		glfwSetWindowSizeCallback(mGLFWWindow,
 			[](GLFWwindow * glfwWin, int w, int h){
 				DECL_REFS(glfwWin)
-				win.mDim.w = w;
-				win.mDim.h = h;
+				win.mRect.w = w;
+				win.mRect.h = h;
 				win.callHandlersOnResize(w, h);
 			}
 		);
@@ -50,8 +50,8 @@ public:
 		glfwSetWindowPosCallback(mGLFWWindow,
 			[](GLFWwindow* glfwWin, int x, int y){
 				DECL_REFS(glfwWin)
-				win.mDim.l = x;
-				win.mDim.t = y;
+				win.mRect.l = x;
+				win.mRect.t = y;
 				// no al::Window callback
 			}
 		);
@@ -227,9 +227,9 @@ bool Window::implCreate(){
 	if(glfwWin){
 		mImpl->mGLFWWindow = glfwWin;
 		mImpl->setCallbacks();
-		mImpl->mWindowedW = mDim.w;
-		mImpl->mWindowedH = mDim.h;
-		implSetDimensions();
+		mImpl->mWindowedW = mRect.w;
+		mImpl->mWindowedH = mRect.h;
+		implSetRect();
 		scheduleDraw(Main::get().now(), 0, mImpl);
 		return true;
 	}
@@ -253,10 +253,10 @@ bool Window::created() const {
 	return mImpl->mGLFWWindow;
 }
 
-void Window::implSetDimensions(){
-	//printf("implSetDimensions l:%d t:%d w:%d h:%d\n", mDim.l, mDim.t, mDim.w, mDim.h);
-	glfwSetWindowPos(mImpl->mGLFWWindow, mDim.l, mDim.t);
-	glfwSetWindowSize(mImpl->mGLFWWindow, mDim.w, mDim.h);
+void Window::implSetRect(){
+	//printf("implSetDimensions l:%d t:%d w:%d h:%d\n", mRect.l, mRect.t, mRect.w, mRect.h);
+	glfwSetWindowPos(mImpl->mGLFWWindow, mRect.l, mRect.t);
+	glfwSetWindowSize(mImpl->mGLFWWindow, mRect.w, mRect.h);
 }
 
 void Window::implSetCursor(){
@@ -275,12 +275,12 @@ void Window::implSetFullScreen(){
 	if(mFullScreen){
 		auto * mon = glfwGetPrimaryMonitor();
 		const auto * mode = glfwGetVideoMode(mon);
-		mImpl->mWindowedW = mDim.w;
-		mImpl->mWindowedH = mDim.h;
+		mImpl->mWindowedW = mRect.w;
+		mImpl->mWindowedH = mRect.h;
 		glfwSetWindowMonitor(mImpl->mGLFWWindow, mon, 0, 0, mode->width, mode->height, mode->refreshRate);
 		vsync(mVSync);
 	} else {
-		glfwSetWindowMonitor(mImpl->mGLFWWindow, NULL, mDim.l, mDim.t, mImpl->mWindowedW, mImpl->mWindowedH, GLFW_DONT_CARE);
+		glfwSetWindowMonitor(mImpl->mGLFWWindow, NULL, mRect.l, mRect.t, mImpl->mWindowedW, mImpl->mWindowedH, GLFW_DONT_CARE);
 		vsync(mVSync);
 	}
 }

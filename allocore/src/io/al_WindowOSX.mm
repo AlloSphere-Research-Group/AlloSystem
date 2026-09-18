@@ -82,9 +82,9 @@ public:
 	}
 
 	void onResize(int w, int h){
-		if(mAlloWin->mDim.w != w || mAlloWin->mDim.h != h){
-			mAlloWin->mDim.w = w;
-			mAlloWin->mDim.h = h;
+		if(mAlloWin->mRect.w != w || mAlloWin->mRect.h != h){
+			mAlloWin->mRect.w = w;
+			mAlloWin->mRect.h = h;
 			mAlloWin->callHandlersOnResize(w,h);
 		}
 	}
@@ -196,13 +196,13 @@ bool Window::implCreate(){
 	[format initWithAttributes: attribs];
 
 	// ensures onResize handlers get called
-	int w = mDim.w;
-	int h = mDim.h;
-	mDim.w = 0;
-	mDim.h = 0;
+	int w = mRect.w;
+	int h = mRect.h;
+	mRect.w = 0;
+	mRect.h = 0;
 
 	[mImpl->mCocoaWin
-		create: NSMakeRect(mDim.l, mDim.t, w, h)
+		create: NSMakeRect(mRect.l, mRect.t, w, h)
 		title: [NSString stringWithUTF8String:mTitle.c_str()]
 		pixelFormat: format
 	];
@@ -226,10 +226,10 @@ void Window::implDestroy(){
 	[mImpl->mCocoaWin->win close];
 }
 
-void Window::implSetDimensions(){
-	mImpl->mCocoaWin.frame = NSMakeRect(0, 0, mDim.w, mDim.h);
-	int y = [mImpl->mCocoaWin->win screen].frame.size.height - mDim.t;
-	[mImpl->mCocoaWin->win setFrameTopLeftPoint:NSMakePoint(mDim.l, y)];
+void Window::implSetRect(){
+	mImpl->mCocoaWin.frame = NSMakeRect(0, 0, mRect.w, mRect.h);
+	int y = [mImpl->mCocoaWin->win screen].frame.size.height - mRect.t;
+	[mImpl->mCocoaWin->win setFrameTopLeftPoint:NSMakePoint(mRect.l, y)];
 }
 
 void Window::implSetCursor(){
