@@ -320,6 +320,20 @@ public:
 		/// Get aspect ratio as width/height
 		float aspect() const;
 
+		template <class Vec>
+		Vec pos() const {
+			static_assert(sizeof(Vec)/sizeof(typename Vec::value_type) >= 2, "Vec requires at least two elements");
+			Vec v; v[0]=l; v[1]=t;
+			return v;
+		}
+
+		template <class Vec>
+		Vec ext() const {
+			static_assert(sizeof(Vec)/sizeof(typename Vec::value_type) >= 2, "Vec requires at least two elements");
+			Vec v; v[0]=w; v[1]=h;
+			return v;
+		}
+
 		void print() const;
 	};
 

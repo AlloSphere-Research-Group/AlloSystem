@@ -413,11 +413,26 @@ const App& App::forValidWindow(int i, const std::function<void(const ViewpointWi
 	return *this;
 }
 
+template <class T>
+T clamp(T v, T min, T max){ return v<min ? min : v>max ? max : v; }
+template <class T>
+T clamp(T v, T max){ return clamp(v, T(0), max); }
+
+template <int Axis>
+int mousePos(const App * app, int window, bool clip){
+	int res = 0;
+	app->forValidWindow(window, [&](auto& win){
+		res = win.mouse().template pos<Vec2i>().template at<Axis>();
+		if(clip) res = clamp(res, win.dimensions().template ext<Vec2i>().template at<Axis>());
+	});
+	return res;
+}
+
 float mousePos1(const App * app, int window, int coord, bool clip){
 	float res = 0.f;
 	app->forValidWindow(window, [&](auto& win){
-		float v = coord==0 ? float(win.mouse().x())/win.width() : float(win.mouse().y())/win.height();
-		res = clip ? (v<0.f ? 0.f : v>1.f ? 1.f : v) : v;
+		res = coord==0 ? float(win.mouse().x())/win.width() : float(win.mouse().y())/win.height();
+		if(clip) res = clamp(res, 1.f);
 	});
 	return res;
 }
@@ -432,6 +447,11 @@ float App::mouseY1(int window, bool clip) const {
 
 Vec2f App::mouse1(int window, bool clip) const {
 	return {mouseX1(window,clip), mouseY1(window,clip)};
+}
+
+Vec3f App::mouseWorld(int window, bool clip) const {
+	Vec2i p(mousePos<0>(this, window, clip), mousePos<1>(this, window, clip));
+	return mStereo.pixelToWorld(p);
 }
 
 osc::Recv& App::oscRecv(){ return *mOSCRecv; }

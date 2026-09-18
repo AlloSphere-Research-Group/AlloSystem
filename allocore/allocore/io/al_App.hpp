@@ -321,6 +321,8 @@ public:
 	float mouseY1(int window=0, bool clip=true) const;
 	/// Get mouse coordinates in [0,1]
 	Vec2f mouse1(int window=0, bool clip=true) const;
+	/// Get mouse position in world space
+	Vec3f mouseWorld(int window=0, bool clip=true) const;
 
 
 	/// Get graphics renderer
