@@ -67,7 +67,7 @@ void RBO::onSync(){
 		for(int i=0; i<len; ++i) sizes[i] = glsamps[i];
 		return len;
 	#else
-		sizes[0] = graphics().paramInt(GL_MAX_SAMPLES);
+		sizes[0] = Graphics::paramInt(GL_MAX_SAMPLES);
 		return 1;
 	#endif
 }
