@@ -20,14 +20,12 @@ template <> float Box__bigVal<float>(){ return 3.4e38; }
 template <> double Box__bigVal<double>(){ return 1.7e308; }
 }
 
-/// @addtogroup allocore
-/// @{
-
 /// Geometric box shape
 
 /// In geometry, a box or hyperrectangle is an n-dimensional generalization of
 /// a rectangle. In one, two and three dimensions it is an interval, rectangle
 /// and cuboid, respectively. Here, the box is axis-aligned.
+/// \ingroup allocore
 template <int N=3, class T=float>
 class Box{
 public:
@@ -45,8 +43,8 @@ public:
 		return 0;
 	}
 
-
-	Box(){ reset(); }
+	/// \param[in] doReset	Initialize bounds for subsequent adjustment
+	Box(bool doReset=true){ if(doReset) reset(); }
 	Box(const Box& b){ *this = b; }
 	Box(vec min, vec max){ set(min,max); }
 
@@ -89,6 +87,8 @@ public:
 	/// Get aspect ratio
 	template <int Dim1=0, int Dim2=1>
 	T aspect() const { return extent().template quotient<Dim1,Dim2>(); }
+	/// \returns whether box has no content (is a point)
+	bool empty() const { return mMin == mMax; }
 
 	/// Fit bounds to a set of points
 	template <class GetPointAtIndex>
@@ -100,7 +100,7 @@ public:
 		return *this;
 	}
 
-	/// Reset the bounds (to be fitted again)
+	/// Reset the bounds for subsequent fitting
 	Box& reset(){ mMin=Box__bigVal<T>(); mMax=-mMin; return *this; }
 
 	/// Adjust box to include point
@@ -179,8 +179,6 @@ private:
 	vec mMin, mMax;
 	static constexpr unsigned size(){ return countof<vec>(); }
 };
-
-/// @} // end allocore group
 
 } // al::
 #endif
