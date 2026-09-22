@@ -935,15 +935,15 @@ public:
 	/// This efficiently applies A' = A*S, where S is a non-uniform scaling
 	/// matrix, in only (N-1)^2 madds. The translation part is never affected.
 	template<class V>
-	Mat& scale(const Vec<N-1,V>& amount){
+	Mat& scale(const Vec<N-1,V>& s){
 		for(int C=0; C<N-1; ++C)
-			col(C).template sub<N-1>() *= amount[C];
+			col(C).template sub<N-1>() *= s[C];
 		return *this;
 	}
 
 	/// Scale transformation matrix by uniform amount
 	template<class V>
-	Mat& scale(const V& amount){ return scale(Vec<N-1,V>(amount)); }
+	Mat& scale(const V& s){ return scale(Vec<N-1,V>(s)); }
 
 	/// Scale transformation matrix
 	template<typename... Vals>
@@ -952,17 +952,17 @@ public:
 	/// Scale transformation matrix global coordinates
 
 	/// This efficiently applies A' = S*A, where S is a non-uniform scaling
-	/// matrix, in only N(N-1) madds. The translation part is also scaled.
+	/// matrix, in only N(N-1) madds. The translation part is optionally scaled.
 	template<class V>
-	Mat& scaleGlobal(const Vec<N-1,V>& amount){
-		for(int C=0; C<N; ++C)
-			col(C).template sub<N-1>() *= amount;
+	Mat& scaleGlobal(const Vec<N-1,V>& s, bool t=true){
+		for(int C=0; C<N-int(!t); ++C)
+			col(C).template sub<N-1>() *= s;
 		return *this;
 	}
 
 	/// Scale transformation matrix by uniform amount
 	template<class V>
-	Mat& scaleGlobal(const V& amount){ return scaleGlobal(Vec<N-1,V>(amount)); }
+	Mat& scaleGlobal(const V& s, bool t=true){ return scaleGlobal(Vec<N-1,V>(s),t); }
 
 	template<typename... Vals>
 	Mat& scaleGlobal(Vals... vals){ return scaleGlobal(Vec<(sizeof...(Vals)),T>(vals...)); }
@@ -972,15 +972,15 @@ public:
 	/// This efficiently applies A' = A*T, where T is a translation matrix, in
 	/// only (N-1)^2 madds. The rotation/scaling part is never affected.
 	template<class V>
-	Mat& translate(const Vec<N-1,V>& amount){
+	Mat& translate(const Vec<N-1,V>& t){
 		for(int R=0; R<N-1; ++R)
-			at(R,N-1) += row(R).template sub<N-1>().dot(amount);
+			at(R,N-1) += row(R).template sub<N-1>().dot(t);
 		return *this;
 	}
 
 	/// Translate transformation matrix by same amount in all directions
 	template<class V>
-	Mat& translate(const V& amount){ return translate(Vec<N-1,V>(amount)); }
+	Mat& translate(const V& t){ return translate(Vec<N-1,V>(t)); }
 
 	/// Translate transformation matrix
 	template<typename... Vals>
@@ -991,9 +991,9 @@ public:
 	/// This efficiently applies A' = T*A, where T is a translation matrix, in
 	/// only N-1 additions. The rotation/scaling part is never affected.
 	template<class V>
-	Mat& translateGlobal(const Vec<N-1,V>& amount){
+	Mat& translateGlobal(const Vec<N-1,V>& t){
 		for(int R=0; R<N-1; ++R)
-			at(R, N-1) += amount[R];
+			at(R, N-1) += t[R];
 		return *this;
 	}
 
