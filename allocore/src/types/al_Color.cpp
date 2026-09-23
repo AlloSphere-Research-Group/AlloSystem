@@ -11,7 +11,7 @@ T clampValue(T v, T max = T(1)){
 	return v<T(0) ? T(0) : (v>max ? max : v);
 }
 
-void wrapHue(float& h){
+static void wrapHue(float& h){
 	if(h>1.f){ h -= int(h); }
 	else if(h<0.f){ h -= int(h)-1; }
 }
@@ -126,6 +126,34 @@ HSV& HSV::clamp(){
 	return wrapHue();
 }
 
+
+/*static*/ RGB RGB::kelvin(float K){
+	K *= 0.01f;
+	float r,g,b;
+	/*// Tanner Helland algorithm:
+	// https://tannerhelland.com/2012/09/18/convert-temperature-rgb-algorithm-code.html	
+	if(K <= 66.f) r = 1.f;
+	else r = clampValue(329.698727446f/255.f * std::pow(K - 60.f, -0.1332047592f));
+	if(K <= 66.f) g = clampValue(99.4708025861f/255.f * std::log(K) - 161.1195681661f/255.f);
+	else g = clampValue(288.1221695283f/255.f * std::pow(K - 60.f, -0.0755148492f));
+	if(K >= 66.f) b = 1.f;
+	else if(K < 19.f) b = 0.f;
+	else b = clampValue(138.5177312231f/255.f * std::log(K - 10.f) - 305.0447927307f/255.f);*/
+
+	// Improvement by Neil Bartlett: https://www.zombieprototypes.com/p-210/
+	auto map = [](float k, float a, float b, float c){
+		return clampValue((a + b*k + c*std::log(k))/255.f);
+	};
+	if(K <= 66.f) r = 1.f;
+	else r = map(K-55.f, 351.97690566805693f, 0.114206453784165f, -40.25366309332127f);
+	if(K <= 66.f) g = map(K-2.f, -155.25485562709179f, -0.44596950469579133f, 104.49216199393888f);
+	else g = map(K-50.f, 325.4494125711974f, 0.07943456536662342f, -28.0852963507957f);
+	if(K >= 66.f) b = 1.f;
+	else if(K < 20.f) b = 0.f;
+	else b = map(K-10.f, -254.76935184120902f, 0.8274096064007395f, 115.67994401066147f);
+
+	return {r,g,b};
+}
 
 RGB& RGB::complement(){
 	// max(c) - min(c) - (c - min(c)) + min(c)

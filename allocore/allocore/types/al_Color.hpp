@@ -683,6 +683,11 @@ struct RGB{
 	RGB(const HCLuv& hcluv){ *this = hcluv; }
 
 
+	/// Get color from temperature in Kelvin
+	/// \param[in] K	Temperature in [1000, 40000]K where 6500K is white.
+	static RGB kelvin(float K);
+
+
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
 
