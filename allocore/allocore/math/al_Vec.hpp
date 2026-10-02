@@ -1387,22 +1387,19 @@ inline Vec<N,T> max(const T& a, const Vec<N,T>& b){
 /// Get vector with absolute value of each element
 template <int N, class T>
 inline Vec<N,T> abs(const Vec<N,T>& v){
-	auto r=v; for(auto& e:r) e = std::abs(e);
-	return r;
+	return v.map([](T x){ return std::abs(x); });
 }
 
 /// Get vector with each element raised to a power
 template <int N, class T>
 inline Vec<N,T> pow(const Vec<N,T>& v, const T& power){
-	auto r=v; for(auto& e:r) e = std::pow(e, power);
-	return r;
+	return v.map([&](T x){ return std::pow(x, power); });
 }
 
 /// Get vector with each element raised to a power
 template <int N, class T>
 inline Vec<N,T> pow(const T& base, const Vec<N,T>& powers){
-	auto r=powers; for(auto& e:r) e = std::pow(base, e);
-	return r;
+	return powers.map([&](T x){ return std::pow(base, x); });
 }
 
 template <int N, class T>
@@ -1465,8 +1462,7 @@ inline T dot(const Vec<N,T>& a, const Vec<N,T>& b){
 /// \param[in]		sinAng	Sine of the rotation angle
 template <class T>
 void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng){
-	T c = cosAng;
-	T s = sinAng;
+	T c = cosAng, s = sinAng;
 
 	// Rodrigues' rotation formula:
 	vec = vec*c + cross(normal, vec)*s + normal*(normal.dot(vec)*(T(1)-c));
