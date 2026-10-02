@@ -47,7 +47,7 @@ Color& Color::clamp(float max){
 	return uint8_t((u.i & 0x007fffff) >> 15);
 }
 
-Colori& Colori::fromHex(const char * s){
+Colori& Colori::fromHex(const char * s, int len){
 	auto h2d = [](char h) -> unsigned char {
 		if('0'<=h && h<='9') return h-'0';
 		if('a'<=h && h<='f') return h-'a'+10;
@@ -57,12 +57,6 @@ Colori& Colori::fromHex(const char * s){
 	auto hh2d = [&](const char * hh){
 		return (h2d(hh[0])<<4) + h2d(hh[1]);
 	};
-
-	int len=0;
-	for(; len<8; ++len){
-		if(s[len] == '\0') break;
-	}
-
 	// valid strings: rgb, rgba, rrggbb, rrggbbaa
 	switch(len){
 	case 3: return set(h2d(s[0])*17, h2d(s[1])*17, h2d(s[2])*17, 255);
@@ -71,6 +65,14 @@ Colori& Colori::fromHex(const char * s){
 	case 8: return set(hh2d(s), hh2d(s+2), hh2d(s+4), hh2d(s+6));
 	default:return *this;
 	}
+}
+
+Colori& Colori::fromHex(const char * s){
+	int len=0;
+	for(; len<8; ++len){
+		if(s[len] == '\0') break;
+	}
+	return fromHex(s,len);
 }
 
 Colori::HexString Colori::toHex(unsigned len, char pre) const {

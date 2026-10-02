@@ -441,6 +441,7 @@ struct Colori {
 	/// get expanded into longhand format by duplicating digits. For example,
 	/// "8a0" is interpreted as "88aa00".
 	Colori& fromHex(const char * s);
+	Colori& fromHex(const char * s, int len);
 
 	struct HexString{
 		char data[10];
