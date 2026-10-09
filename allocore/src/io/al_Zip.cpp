@@ -148,7 +148,8 @@ bool ZipWriter::addFile(const std::string& filePath, const std::string& zipPath)
 }
 
 bool ZipWriter::addDir(const std::string& dirPath){
-	return mz_zip_writer_add_mem(&mImpl->zip, dirPath.c_str(), nullptr, 0, 0);
+	auto& path = dirPath.back()=='/' ? dirPath : dirPath+'/';
+	return mz_zip_writer_add_mem(&mImpl->zip, path.c_str(), nullptr, 0, 0);
 }
 
 bool ZipWriter::addMem(const void * buf, int bytes, const std::string& zipPath){

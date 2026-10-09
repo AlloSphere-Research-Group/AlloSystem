@@ -133,6 +133,10 @@ public:
 	bool addFile(const std::string& filePath, const std::string& zipPath="");
 
 	/// Add directory to archive
+
+	/// \param[in] zipDir	Name of directory to create within the archive. For
+	///						efficiency, it is strongly recommended to end the
+	///						name with a forward slash '/'.
 	bool addDir(const std::string& zipDir);
 
 	/// Add memory buffer to archive
