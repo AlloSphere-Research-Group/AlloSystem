@@ -35,8 +35,8 @@ namespace al{
 
 class FilePath;
 
-/// @addtogroup allocore
-/// @{
+/// \addtogroup allocore
+/// \{
 
 /// File information
 class FileInfo{
@@ -85,9 +85,9 @@ private:
 class File{
 public:
 
-	/// @param[in] path		path of file
-	/// @param[in] mode		i/o mode "w", "r", "wb", "rb"
-	/// @param[in] open		whether to open the file
+	/// \param[in] path		path of file
+	/// \param[in] mode		i/o mode "w", "r", "wb", "rb"
+	/// \param[in] open		whether to open the file
 	File(const std::string& path=".", const std::string& mode="r", bool open=false);
 	File(const FilePath& path, const std::string& mode="r", bool open=false);
 
@@ -96,8 +96,8 @@ public:
 
 	/// Open file
 
-	/// @param[in] path		path of file
-	/// @param[in] mode		i/o mode "w", "r", "wb", "rb"
+	/// \param[in] path		path of file
+	/// \param[in] mode		i/o mode "w", "r", "wb", "rb"
 	/// \returns true on success, false otherwise
 	bool open(const std::string& path, const std::string& mode="r");
 
@@ -113,7 +113,7 @@ public:
 
 	/// Set i/o mode
 
-	/// @param[in] v	A string indicating the i/o mode.
+	/// \param[in] v	A string indicating the i/o mode.
 	///
 	File& mode(const std::string& v){ mMode=v; return *this; }
 
@@ -220,8 +220,8 @@ public:
 	/// Returns the base name of path.
 
 	/// The base name is everything following the last slash.
-	/// @param[in] path		The input path
-	/// @param[in] suffix	An optional suffix to strip from the end of the base
+	/// \param[in] path		The input path
+	/// \param[in] suffix	An optional suffix to strip from the end of the base
 	///						name. To remove the extension, use ".*".
 	static std::string baseName(const std::string& path, const std::string& suffix="");
 
@@ -229,23 +229,23 @@ public:
 
 	/// The directory part of the path is everything up through (and including)
 	/// the last slash in it. If the path contains no slash, the directory part
-	/// is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
+	/// is the string "./". E.g., /usr/bin/man -> /usr/bin/.
 	static std::string directory(const std::string& path);
 
 	/// Returns extension of file name.
 
 	/// The extension is everything after the last period and may or may not
 	/// include the period.
-	/// @param[in] path			File path
-	/// @param[in] excPeriod	Whether to exclude period from result
-	/// @param[in] toLower		Whether to convert result to lowercase
+	/// \param[in] path			File path
+	/// \param[in] excPeriod	Whether to exclude period from result
+	/// \param[in] toLower		Whether to convert result to lowercase
 	/// \returns the extension, otherwise, if no period is found, an empty string.
 	static std::string extension(const std::string& path, bool excPeriod=false, bool toLower=false);
 
 	/// Returns string with extension replaced
 
-	/// @param[in] path		File path
-	/// @param[in] ext		New file extension with or without a leading '.'
+	/// \param[in] path		File path
+	/// \param[in] ext		New file extension with or without a leading '.'
 	static std::string replaceExtension(const std::string& path, const std::string& ext);
 
 
@@ -277,23 +277,23 @@ public:
 
 	/// Search for file or directory back from current directory
 
-	/// @param[in,out] rootPath	The input should contain the path to search
+	/// \param[in,out] rootPath	The input should contain the path to search
 	///							relative to. If the input is empty, then "./" is
 	///							assumed. If a match is made, then the output is
 	///							a string that can be prefixed to 'matchPath' to
 	///							get the actual location of the match.
-	/// @param[in]  matchPath	File or directory to search for
-	/// @param[in]  maxDepth	Maximum number of directories to search back
+	/// \param[in]  matchPath	File or directory to search for
+	/// \param[in]  maxDepth	Maximum number of directories to search back
 	/// \returns whether the file or directory was found
 	static bool searchBack(std::string& rootPath, const std::string& matchPath, int maxDepth=6);
 
 	/// Search for file or directory back from current directory
 
-	/// @param[in,out] path		Input is a file or directory to search for.
+	/// \param[in,out] path		Input is a file or directory to search for.
 	///							If the file is found, the output contains a series of
 	///							"../" prefixed to the input. Otherwise, the input
 	///							path is not modified.
-	/// @param[in]  maxDepth	Maximum number of directories to search back
+	/// \param[in]  maxDepth	Maximum number of directories to search back
 	/// \returns whether the file or directory was found
 	static bool searchBack(std::string& path, int maxDepth=6);
 
@@ -320,7 +320,7 @@ public:
 	/// Constructor. This does not attempt to open the directory.
 	Dir();
 
-	/// @param[in] dirToOpen	path to directory to open
+	/// \param[in] dirToOpen	path to directory to open
 	Dir(const std::string& dirToOpen);
 
 	~Dir();
@@ -328,7 +328,7 @@ public:
 
 	/// Open a directory
 
-	/// @param[in] dirPath	path to directory
+	/// \param[in] dirPath	path to directory
 	/// \returns whether the directory was successfully opened
 	bool open(const std::string& dirPath);
 
@@ -420,12 +420,12 @@ class FilePath {
 public:
 	FilePath(){}
 
-	/// @param[in] file			File name without directory
-	/// @param[in] path			Directory of file
+	/// \param[in] file			File name without directory
+	/// \param[in] path			Directory of file
 	FilePath(const std::string& file, const std::string& path)
 	:	mPath(path), mFile(file) {}
 
-	/// @param[in] fullpath		Full path to file (directory + file name)
+	/// \param[in] fullpath		Full path to file (directory + file name)
 	explicit FilePath(const std::string& fullpath);
 
 
@@ -531,7 +531,7 @@ protected:
 	std::string mAppPath;
 };
 
-/// @} // end allocore group
+/// \} // end allocore group
 
 } // al::
 #endif
