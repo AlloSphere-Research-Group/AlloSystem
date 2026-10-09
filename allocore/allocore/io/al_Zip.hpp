@@ -17,8 +17,8 @@
 
 namespace al{
 
-/// @addtogroup allocore
-/// @{
+/// \addtogroup allocore
+/// \{
 
 /// Read and extract contents of zip archive
 class ZipReader {
@@ -110,16 +110,26 @@ public:
 	ZipWriter();
 	~ZipWriter();
 
-	/// Open archive file
+	/// Open archive for writing to a file
 	bool open(const std::string& path);
 
-	/// Finalize and close the archive
+	/// Open archive for writing to heap memory
+	bool openHeap(int initialSize = 8192);
+
+	/// Finalize and close archive
 	void close();
+
+	/// Finalize, get heap and close archive
+
+	/// \param[in] onHeap	Function called with heap memory of archive. Only 
+	///						called if archive opened to write to heap memory and
+	///						the archive was successfully finalized.
+	void close(const std::function<void(const void * mem, int size)>& onHeap);
 
 	/// Add file to archive
 
-	/// @param[in] filePath		Path of file on disk
-	/// @param[in] zipPath		Destination file path in archive
+	/// \param[in] filePath		Path of file on disk
+	/// \param[in] zipPath		Destination file path in archive
 	bool addFile(const std::string& filePath, const std::string& zipPath="");
 
 	/// Add directory to archive
@@ -141,7 +151,7 @@ private:
 	int mCompression = -1;
 };
 
-/// @} // end allocore group
+/// \} // end allocore group
 
 } // al::
 #endif

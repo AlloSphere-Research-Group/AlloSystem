@@ -119,13 +119,27 @@ bool ZipWriter::open(const std::string& path){
 	return mz_zip_writer_init_file(&mImpl->zip, path.c_str(), 0);
 }
 
+bool ZipWriter::openHeap(int initialSize){
+	return mz_zip_writer_init_heap(&mImpl->zip, 0, initialSize);
+}
+
 void ZipWriter::close(){
 	mz_zip_writer_finalize_archive(&mImpl->zip);
 	mz_zip_writer_end(&mImpl->zip);
 }
 
-ZipWriter& ZipWriter::compression(int level){
-	mCompression = level;
+void ZipWriter::close(const std::function<void(const void *, int)>& onHeap){
+	if(MZ_ZIP_TYPE_FILE == mImpl->zip.m_zip_type){ close(); return; }
+	void * mem;
+	size_t size;
+	if(mz_zip_writer_finalize_heap_archive(&mImpl->zip, &mem, &size)){
+		onHeap(mem, size);
+	}
+	mz_zip_writer_end(&mImpl->zip);
+}
+
+ZipWriter& ZipWriter::compression(int v){
+	mCompression = v;
 	return *this;
 }
 
