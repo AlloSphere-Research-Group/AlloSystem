@@ -445,7 +445,7 @@ private:
     uint32_t a,b,c,d;
 
     static uint64_t splitmix(uint64_t s) {
-		auto r = (s += 0x9E3779B97f4A7C15ULL);
+		auto r = s + 0x9E3779B97f4A7C15ULL;
 		r = (r ^ (r >> 30)) * 0xBF58476D1CE4E5B9ULL;
 		r = (r ^ (r >> 27)) * 0x94D049BB133111EBULL;
 		return r ^ (r >> 31);
