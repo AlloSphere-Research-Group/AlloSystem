@@ -72,7 +72,7 @@ template<class T> T ceil(const T& val, const T& step);
 template<class T> T ceil(const T& val, const T& step, const T& recStep);
 
 /// Returns even number ceiling
-inline uint32_t ceilEven(uint32_t v){ return v += v & 1UL; }
+inline uint32_t ceilEven(uint32_t v){ return v + (v&1); }
 
 /// Returns power of two ceiling of value
 
