@@ -437,18 +437,22 @@ public:
 	/// Set seed
 	void seed(uint64_t v){
 		// use SplitMix64 generator to avoid degenerate all-zero state
-		v = splitmix(v); a = v; b = v>>32;
-		v = splitmix(v); c = v; d = v>>32;
+		splitmix(v, a,b);
+		splitmix(v, c,d);
 	}
 
 private:
     uint32_t a,b,c,d;
 
-    static uint64_t splitmix(uint64_t s) {
-		auto r = s + 0x9E3779B97f4A7C15ULL;
+    static uint64_t splitmix(uint64_t& s){
+		auto r = (s += 0x9E3779B97f4A7C15ULL);
 		r = (r ^ (r >> 30)) * 0xBF58476D1CE4E5B9ULL;
 		r = (r ^ (r >> 27)) * 0x94D049BB133111EBULL;
 		return r ^ (r >> 31);
+	}
+
+    static void splitmix(uint64_t& s, uint32_t& r1, uint32_t& r2){
+		auto r = splitmix(s); r1 = r; r2 = r>>32;
 	}
 };
 
