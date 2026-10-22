@@ -447,9 +447,8 @@ public:
 
 	template <int Row, int Col>
 	T& at(){
-		static_assert(Row<N && Col<N, "Row or column out of bounds");
-		constexpr auto idx = Col*N+Row;
-		return mElems[idx];
+		constexpr auto i = safeIndex<Col>()*N + safeIndex<Row>();
+		return mElems[i];
 	}
 
 	template <int Row, int Col>
@@ -459,20 +458,13 @@ public:
 	const Vec<N,T>& col(int i) const { return Vec<N,T>::pun(elems() + i*N); }
 	Vec<N,T>& col(int i){ return Vec<N,T>::pun(elems() + i*N); }
 
-	template <int Index>
-	static constexpr int toSafeIndex(){
-		constexpr int i = Index>=0 ? Index : N+Index;
-		static_assert(0 <= i && i < N, "Index out of bounds");
-		return i;
-	}
-
 	/// Get column as vector
 
 	/// \tparam Index	Column index. If negative, uses N+Index.
 	///
 	template <int Index>
 	Vec<N,T>& col(){
-		constexpr auto j = toSafeIndex<Index>()*N;
+		constexpr auto j = safeIndex<Index>()*N;
 		return Vec<N,T>::pun(elems() + j);
 	}
 	template <int Index>
@@ -487,7 +479,7 @@ public:
 	///
 	template <int Index>
 	Vec<N,T> row() const {
-		return row(toSafeIndex<Index>());
+		return row(safeIndex<Index>());
 	}
 
 	/// Set row values
@@ -503,7 +495,7 @@ public:
 	/// \tparam V		Type of source values
 	template <int Index, class V>
 	Mat& row(const Vec<N,V>& v){
-		return row(toSafeIndex<Index>(), v);
+		return row(safeIndex<Index>(), v);
 	}
 
 	/// Return diagonal
@@ -1014,6 +1006,13 @@ private:
 	template <int Dim1, int Dim2>
 	static constexpr int static_assert_plane_homog(){
 		return static_assert_plane<Dim1,Dim2,N-1>();
+	}
+
+	template <int Index>
+	static constexpr int safeIndex(){
+		constexpr int i = Index>=0 ? Index : N+Index;
+		static_assert(0 <= i && i < N, "Index out of bounds");
+		return i;
 	}
 
 	Mat& mut() const { return const_cast<Mat&>(*this); }
