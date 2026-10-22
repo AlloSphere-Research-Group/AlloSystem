@@ -453,9 +453,7 @@ public:
 	}
 
 	template <int Row, int Col>
-	const T& at() const {
-		return const_cast<Mat*>(this)->at<Row,Col>();
-	}
+	const T& at() const { return mut().template at<Row,Col>(); }
 
 	/// Get column as vector
 	const Vec<N,T>& col(int i) const { return Vec<N,T>::pun(elems() + i*N); }
@@ -478,9 +476,7 @@ public:
 		return Vec<N,T>::pun(elems() + j);
 	}
 	template <int Index>
-	const Vec<N,T>& col() const {
-		return const_cast<Mat*>(this)->col<Index>();
-	}
+	const Vec<N,T>& col() const { return mut().template col<Index>(); }
 
 	/// Get row as vector
 	Vec<N,T> row(int i) const { return Vec<N,T>(elems()+i, N); }
@@ -587,9 +583,7 @@ public:
 	}
 
 	template <class V>
-	const V& as() const {
-		return const_cast<Mat*>(this)->as<V>();
-	}
+	const V& as() const { return mut().template as<V>(); }
 
 	/// Return self punned as flat vector
 	Vec<N*N,T>& vec(){ return as<Vec<N*N,T>>(); }
@@ -1002,7 +996,7 @@ public:
 
 	/// Get translation part
 	Vec<N-1,T>& translation(){ return col<-1>().template sub<-1>(); }
-	const Vec<N-1,T>& translation() const { return const_cast<Mat*>(this)->translation(); }
+	const Vec<N-1,T>& translation() const { return mut().translation(); }
 
 	/// Set translation part
 	Mat& setTranslation(const Vec<N-1,T>& t){ translation() = t; return *this; }
@@ -1021,6 +1015,8 @@ private:
 	static constexpr int static_assert_plane_homog(){
 		return static_assert_plane<Dim1,Dim2,N-1>();
 	}
+
+	Mat& mut() const { return const_cast<Mat&>(*this); }
 };
 
 
