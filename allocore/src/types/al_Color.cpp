@@ -4,6 +4,8 @@
 
 namespace al{
 
+/// Note: Lab, HCLab, Luv and HCLuv ranges are normalized to an 8-bit RGB gamut using a 16-million RGB color image from http://brucelindbloom.com
+
 constexpr auto twoPi = 6.28318530717958647692;
 
 template <class T>
