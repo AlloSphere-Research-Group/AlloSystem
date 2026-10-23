@@ -17,8 +17,8 @@
 #include <cstdint> // uint8_t, uint32_t in Colori
 
 namespace al{
-/// @addtogroup allocore
-/// @{
+/// \addtogroup allocore
+/// \{
 
 struct RGB;
 struct HSV;
@@ -49,64 +49,64 @@ struct Color{
 	};
 
 
-	/// @param[in] r			red component
-	/// @param[in] g			green component
-	/// @param[in] b			blue component
-	/// @param[in] a			alpha component
+	/// \param[in] r			red component
+	/// \param[in] g			green component
+	/// \param[in] b			blue component
+	/// \param[in] a			alpha component
 	Color(float r, float g, float b, float a=1.f)
 	:	r(r), g(g), b(b), a(a){}
 
-	/// @param[in] rgba			4-vector of RGBA components
+	/// \param[in] rgba			4-vector of RGBA components
 	template<class T>
 	Color(const T * rgba)
 	:	Color(rgba[0], rgba[1], rgba[2], rgba[3]){}
 
-	/// @param[in] gray			red/green/blue components
-	/// @param[in] a			alpha component
+	/// \param[in] gray			red/green/blue components
+	/// \param[in] a			alpha component
 	Color(float gray=1.f, float a=1.f)
 	:	Color(gray, gray, gray, a){}
 
-	/// @param[in] c	RGBA color to convert from
+	/// \param[in] c	RGBA color to convert from
 	Color(const Colori& c){ *this = c; }
 
-	/// @param[in] hsv			HSV value
-	/// @param[in] a			alpha component
+	/// \param[in] hsv			HSV value
+	/// \param[in] a			alpha component
 	Color(const HSV& hsv, float a=1.f)
 	:	a(a)
 	{	*this = hsv; }
 
-	/// @param[in] rgb			RGB value
-	/// @param[in] a			alpha component
+	/// \param[in] rgb			RGB value
+	/// \param[in] a			alpha component
 	Color(const RGB& rgb, float a=1.f)
 	:	a(a)
 	{	*this = rgb; }
 
-	/// @param[in] xyz			CIEXYZ value
-	/// @param[in] a			alpha component
+	/// \param[in] xyz			CIEXYZ value
+	/// \param[in] a			alpha component
 	Color(const CIEXYZ& xyz, float a =1.f)
 	:	a(a)
 	{	*this = xyz; }
 
-	/// @param[in] lab			Lab value
-	/// @param[in] a			alpha component
+	/// \param[in] lab			Lab value
+	/// \param[in] a			alpha component
 	Color(const Lab& lab, float a =1.f)
 	:	a(a)
 	{	*this = lab; }
 
-	/// @param[in] hclab		HCLab value
-	/// @param[in] a			alpha component
+	/// \param[in] hclab		HCLab value
+	/// \param[in] a			alpha component
 	Color(const HCLab& hclab, float a =1.f)
 	:	a(a)
 	{	*this = hclab; }
 
-	/// @param[in] luv			Luv value
-	/// @param[in] a			alpha component
+	/// \param[in] luv			Luv value
+	/// \param[in] a			alpha component
 	Color(const Luv& luv, float a =1.f)
 	:	a(a)
 	{	*this = luv; }
 
-	/// @param[in] hcluv		HCLuv value
-	/// @param[in] a			alpha component
+	/// \param[in] hcluv		HCLuv value
+	/// \param[in] a			alpha component
 	Color(const HCLuv& hcluv, float a =1.f)
 	:	a(a)
 	{	*this = hcluv; }
@@ -269,64 +269,64 @@ struct Colori {
 	};
 
 
-	/// @param[in] r			red component
-	/// @param[in] g			green component
-	/// @param[in] b			blue component
-	/// @param[in] a			alpha component
+	/// \param[in] r			red component
+	/// \param[in] g			green component
+	/// \param[in] b			blue component
+	/// \param[in] a			alpha component
 	constexpr Colori(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255)
 	:	r(r), g(g), b(b), a(a){}
 
-	/// @param[in] rgba			4-vector of RGBA components
+	/// \param[in] rgba			4-vector of RGBA components
 	template<class T>
 	Colori(const T * rgba)
 	:	Colori(rgba[0], rgba[1], rgba[2], rgba[3]){}
 
-	/// @param[in] gray			red/green/blue components
-	/// @param[in] a			alpha component
+	/// \param[in] gray			red/green/blue components
+	/// \param[in] a			alpha component
 	constexpr Colori(uint8_t gray=255, uint8_t a=255)
 	:	Colori(gray, gray, gray, a){}
 
-	/// @param[in] c			RGBA color to convert from
+	/// \param[in] c			RGBA color to convert from
 	Colori(const Color& c){ *this = c; }
 
-	/// @param[in] hsv			HSV color
-	/// @param[in] a			alpha component
+	/// \param[in] hsv			HSV color
+	/// \param[in] a			alpha component
 	Colori(const HSV& hsv, uint8_t a=255)
 	:	a(a)
 	{	*this = hsv; }
 
-	/// @param[in] rgb			RGB color
-	/// @param[in] a			alpha component
+	/// \param[in] rgb			RGB color
+	/// \param[in] a			alpha component
 	Colori(const RGB& rgb, uint8_t a=255)
 	:	a(a)
 	{	*this = rgb; }
 
-	/// @param[in] xyz			CIEXYZ color
-	/// @param[in] a			alpha component
+	/// \param[in] xyz			CIEXYZ color
+	/// \param[in] a			alpha component
 	Colori(const CIEXYZ& xyz, uint8_t a=255)
 	:	a(a)
 	{	*this = xyz; }
 
-	/// @param[in] lab			Lab color
-	/// @param[in] a			alpha component
+	/// \param[in] lab			Lab color
+	/// \param[in] a			alpha component
 	Colori(const Lab& lab, uint8_t a=255)
 	:	a(a)
 	{	*this = lab; }
 
-	/// @param[in] hclab		HCLab value
-	/// @param[in] a			alpha component
+	/// \param[in] hclab		HCLab value
+	/// \param[in] a			alpha component
 	Colori(const HCLab& hclab, uint8_t a=255)
 	:	a(a)
 	{	*this = hclab; }
 
-	/// @param[in] luv			Luv value
-	/// @param[in] a			alpha component
+	/// \param[in] luv			Luv value
+	/// \param[in] a			alpha component
 	Colori(const Luv& luv, uint8_t a=255)
 	:	a(a)
 	{	*this = luv; }
 
-	/// @param[in] hcluv		HCLuv value
-	/// @param[in] a			alpha component
+	/// \param[in] hcluv		HCLuv value
+	/// \param[in] a			alpha component
 	Colori(const HCLuv& hcluv, uint8_t a=255)
 	:	a(a)
 	{	*this = hcluv; }
@@ -525,39 +525,39 @@ struct HSV{
 	};
 
 
-	/// @param[in] h	hue
-	/// @param[in] s	saturation
-	/// @param[in] v	value (brightness)
+	/// \param[in] h	hue
+	/// \param[in] s	saturation
+	/// \param[in] v	value (brightness)
 	HSV(float h=0, float s=1, float v=1)
 	:	h(h), s(s), v(v){}
 
-	/// @param[in] hsv	3-vector of HSV components
+	/// \param[in] hsv	3-vector of HSV components
 	template<class T>
 	HSV(const T * hsv)
 	:	HSV(hsv[0], hsv[1], hsv[2]){}
 
-	/// @param[in] v	RGB color to convert from
+	/// \param[in] v	RGB color to convert from
 	HSV(const Color& v){ *this = v; }
 
-	/// @param[in] v	RGB color to convert from
+	/// \param[in] v	RGB color to convert from
 	HSV(const Colori& v){ *this = v; }
 
-	/// @param[in] v	RGB color to convert from
+	/// \param[in] v	RGB color to convert from
 	HSV(const RGB& v){ *this = v; }
 
-	/// @param[in] v	CIEXYZ color to convert from
+	/// \param[in] v	CIEXYZ color to convert from
 	HSV(const CIEXYZ& v){ *this = v; }
 
-	/// @param[in] v	Lab color to convert from
+	/// \param[in] v	Lab color to convert from
 	HSV(const Lab& v){ *this = v; }
 
-	/// @param[in] v	HCLab color to convert from
+	/// \param[in] v	HCLab color to convert from
 	HSV(const HCLab& v){ *this = v; }
 
-	/// @param[in] v	Luv color to convert from
+	/// \param[in] v	Luv color to convert from
 	HSV(const Luv& v){ *this = v; }
 
-	/// @param[in] v	HCLuv color to convert from
+	/// \param[in] v	HCLuv color to convert from
 	HSV(const HCLuv& v){ *this = v; }
 
 
@@ -646,43 +646,43 @@ struct RGB{
 	};
 
 
-	/// @param[in] r			red component
-	/// @param[in] g			green component
-	/// @param[in] b			blue component
+	/// \param[in] r			red component
+	/// \param[in] g			green component
+	/// \param[in] b			blue component
 	RGB(float r, float g, float b)
 	:	r(r), g(g), b(b){}
 
-	/// @param[in] rgb			3-vector of RGB components
+	/// \param[in] rgb			3-vector of RGB components
 	template<class T>
 	RGB(const T * rgb)
 	:	RGB(rgb[0], rgb[1], rgb[2]){}
 
-	/// @param[in] gray			red/green/blue components
+	/// \param[in] gray			red/green/blue components
 	RGB(float gray=1.f)
 	:	RGB(gray, gray, gray){}
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	RGB(const Color& v){ *this = v; }
 
-	/// @param[in] v			Colori to convert from
+	/// \param[in] v			Colori to convert from
 	RGB(const Colori& v){ *this = v; }
 
-	/// @param[in] hsv			HSV value
+	/// \param[in] hsv			HSV value
 	RGB(const HSV& hsv){ *this = hsv; }
 
-	/// @param[in] xyz			CIEXYZ value
+	/// \param[in] xyz			CIEXYZ value
 	RGB(const CIEXYZ& xyz){ *this = xyz; }
 
-	/// @param[in] lab			Lab value
+	/// \param[in] lab			Lab value
 	RGB(const Lab& lab){ *this = lab; }
 
-	/// @param[in] hclab		HCLab value
+	/// \param[in] hclab		HCLab value
 	RGB(const HCLab& hclab){ *this = hclab; }
 
-	/// @param[in] luv			Luv value
+	/// \param[in] luv			Luv value
 	RGB(const Luv& luv){ *this = luv; }
 
-	/// @param[in] hcluv		HCLuv value
+	/// \param[in] hcluv		HCLuv value
 	RGB(const HCLuv& hcluv){ *this = hcluv; }
 
 
@@ -866,31 +866,31 @@ struct CIEXYZ{
 		float components[3];	///< CIE XYZ component vector
 	};
 
-	/// @param[in] x			CIE X
-	/// @param[in] y			CIE Y
-	/// @param[in] z			CIE Z
+	/// \param[in] x			CIE X
+	/// \param[in] y			CIE Y
+	/// \param[in] z			CIE Z
 	CIEXYZ(float x=0, float y=1, float z=1): x(x), y(y), z(z){}
 
-	/// @param[in] xyz			3-vector of CIEXYZ components
+	/// \param[in] xyz			3-vector of CIEXYZ components
 	template<class T>
 	CIEXYZ(const T * xyz): CIEXYZ(xyz[0], xyz[1], xyz[2]){}
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	CIEXYZ(const Color& v){ *this = v; }
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	CIEXYZ(const Colori& v){ *this = v; }
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	CIEXYZ(const RGB& v){ *this = v; }
 
-	/// @param[in] v			HSV color to convert from
+	/// \param[in] v			HSV color to convert from
 	CIEXYZ(const HSV& v){ *this = v; }
 
-	/// @param[in] v			Lab color to convert from
+	/// \param[in] v			Lab color to convert from
 	CIEXYZ(const Lab& v){ *this = v; }
 
-	/// @param[in] v			Luv color to convert from
+	/// \param[in] v			Luv color to convert from
 	CIEXYZ(const Luv& v){ *this = v; }
 
 
@@ -948,31 +948,31 @@ struct Lab{
 	};
 
 
-	/// @param[in] l			Lightness
-	/// @param[in] a			a
-	/// @param[in] b			b
+	/// \param[in] l			Lightness
+	/// \param[in] a			a
+	/// \param[in] b			b
 	Lab(float l=1, float a=1, float b=1): l(l), a(a), b(b){}
 
-	/// @param[in] lab			3-vector of Lab components
+	/// \param[in] lab			3-vector of Lab components
 	template<class T>
 	Lab(const T * lab): Lab(lab[0], lab[1], lab[2]){}
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	Lab(const Color& v){ *this = v; }
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	Lab(const Colori& v){ *this = v; }
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	Lab(const RGB& v){ *this = v; }
 
-	/// @param[in] v			HSV color to convert from
+	/// \param[in] v			HSV color to convert from
 	Lab(const HSV& v){ *this = v; }
 
-	/// @param[in] v			CIEXYZ color to convert from
+	/// \param[in] v			CIEXYZ color to convert from
 	Lab(const CIEXYZ& v){ *this = v; }
 
-	/// @param[in] v			HCLab color to convert from
+	/// \param[in] v			HCLab color to convert from
 	Lab(const HCLab& v){ *this = v; }
 
 
@@ -1033,31 +1033,31 @@ struct HCLab{
 		float components[3];/// < HCLab component vector
 	};
 
-	/// @param[in] h			hue
-	/// @param[in] c			chroma
-	/// @param[in] l			luminance(ab)
+	/// \param[in] h			hue
+	/// \param[in] c			chroma
+	/// \param[in] l			luminance(ab)
 	HCLab(float h=1, float c=1, float l=1): h(h), c(c), l(l){}
 
-	/// @param[in] hcl			3-vector of HCLab components
+	/// \param[in] hcl			3-vector of HCLab components
 	template<class T>
 	HCLab(const T * hcl): HCLab(hcl[0], hcl[1], hcl[2]){}
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	HCLab(const Color& v){ *this = v; }
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	HCLab(const Colori& v){ *this = v; }
 
-	/// @param[in] v			RGB color to convert from
+	/// \param[in] v			RGB color to convert from
 	HCLab(const RGB& v){ *this = v; }
 
-	/// @param[in] v			HSV color to convert from
+	/// \param[in] v			HSV color to convert from
 	HCLab(const HSV& v){ *this = v; }
 
-	/// @param[in] v			CIEXYZ color to convert from
+	/// \param[in] v			CIEXYZ color to convert from
 	HCLab(const CIEXYZ& v){ *this = v; }
 
-	/// @param[in] v			Lab color to convert from
+	/// \param[in] v			Lab color to convert from
 	HCLab(const Lab& v){ *this = v; }
 
 
@@ -1126,31 +1126,31 @@ struct Luv{
 	};
 
 
-	/// @param[in] l			Lightness
-	/// @param[in] u			u
-	/// @param[in] v			v
+	/// \param[in] l			Lightness
+	/// \param[in] u			u
+	/// \param[in] v			v
 	Luv(float l=1, float u=1, float v=1): l(l), u(u), v(v){}
 
-	/// @param[in] luv			3-vector of Luv components
+	/// \param[in] luv			3-vector of Luv components
 	template<class T>
 	Luv(const T * luv): Luv(luv[0], luv[1], luv[2]){}
 
-	/// @param[in] w			RGB color to convert from
+	/// \param[in] w			RGB color to convert from
 	Luv(const Color& w){ *this = w; }
 
-	/// @param[in] w			RGB color to convert from
+	/// \param[in] w			RGB color to convert from
 	Luv(const Colori& w){ *this = w; }
 
-	/// @param[in] w			RGB color to convert from
+	/// \param[in] w			RGB color to convert from
 	Luv(const RGB& w){ *this = w; }
 
-	/// @param[in] w			HSV color to convert from
+	/// \param[in] w			HSV color to convert from
 	Luv(const HSV& w){ *this = w; }
 
-	/// @param[in] w			CIEXYZ color to convert from
+	/// \param[in] w			CIEXYZ color to convert from
 	Luv(const CIEXYZ& w){ *this = w; }
 
-	/// @param[in] w			HCLuv color to convert from
+	/// \param[in] w			HCLuv color to convert from
 	Luv(const HCLuv& w){ *this = w; }
 
 
@@ -1213,31 +1213,31 @@ struct HCLuv{
 	};
 
 
-	/// @param[in] h			hue
-	/// @param[in] c			chroma
-	/// @param[in] l			luminance(uv)
+	/// \param[in] h			hue
+	/// \param[in] c			chroma
+	/// \param[in] l			luminance(uv)
 	HCLuv(float h=1, float c=1, float l=1): h(h), c(c), l(l){}
 
-	/// @param[in] hcl			3-vector of HCLuv components
+	/// \param[in] hcl			3-vector of HCLuv components
 	template<class T>
 	HCLuv(const T * hcl): HCLuv(hcl[0], hcl[1], hcl[2]){}
 
-	/// @param[in] w			RGB color to convert from
+	/// \param[in] w			RGB color to convert from
 	HCLuv(const Color& w){ *this = w; }
 
-	/// @param[in] w			RGB color to convert from
+	/// \param[in] w			RGB color to convert from
 	HCLuv(const Colori& w){ *this = w; }
 
-	/// @param[in] w			RGB color to convert from
+	/// \param[in] w			RGB color to convert from
 	HCLuv(const RGB& w){ *this = w; }
 
-	/// @param[in] w			HSV color to convert from
+	/// \param[in] w			HSV color to convert from
 	HCLuv(const HSV& w){ *this = w; }
 
-	/// @param[in] w			CIEXYZ color to convert from
+	/// \param[in] w			CIEXYZ color to convert from
 	HCLuv(const CIEXYZ& w){ *this = w; }
 
-	/// @param[in] w			Luv color to convert from
+	/// \param[in] w			Luv color to convert from
 	HCLuv(const Luv& w){ *this = w; }
 
 
@@ -1278,7 +1278,7 @@ struct HCLuv{
 	HCLuv& wrapHue();
 };
 
-/// @} // end allocore group
+/// \} // end allocore group
 
 
 // Implementation --------------------------------------------------------------
