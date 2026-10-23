@@ -598,6 +598,9 @@ public:
 		return *this;
 	}
 
+	template<int Row, int Col>
+	Mat& set(const T& v){ at<Row,Col>() = v; return *this; }
+
 	/// Set all elements to value
 	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
 
