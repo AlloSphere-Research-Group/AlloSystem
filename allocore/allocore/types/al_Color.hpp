@@ -525,40 +525,40 @@ struct HSV{
 	};
 
 
-	/// @param[in] h			hue
-	/// @param[in] s			saturation
-	/// @param[in] v			value (brightness)
+	/// @param[in] h	hue
+	/// @param[in] s	saturation
+	/// @param[in] v	value (brightness)
 	HSV(float h=0, float s=1, float v=1)
 	:	h(h), s(s), v(v){}
 
-	/// @param[in] hsv			3-vector of HSV components
+	/// @param[in] hsv	3-vector of HSV components
 	template<class T>
 	HSV(const T * hsv)
 	:	HSV(hsv[0], hsv[1], hsv[2]){}
 
-	/// @param[in] v			RGB color to convert from
+	/// @param[in] v	RGB color to convert from
 	HSV(const Color& v){ *this = v; }
 
-	/// @param[in] v			RGB color to convert from
+	/// @param[in] v	RGB color to convert from
 	HSV(const Colori& v){ *this = v; }
 
-	/// @param[in] v			RGB color to convert from
+	/// @param[in] v	RGB color to convert from
 	HSV(const RGB& v){ *this = v; }
 
-	/// @param[in] xyz			CIEXYZ color to convert from
-	HSV(const CIEXYZ& xyz){ *this = xyz; }
+	/// @param[in] v	CIEXYZ color to convert from
+	HSV(const CIEXYZ& v){ *this = v; }
 
-	/// @param[in] lab			Lab color to convert from
-	HSV(const Lab& lab){ *this = lab; }
+	/// @param[in] v	Lab color to convert from
+	HSV(const Lab& v){ *this = v; }
 
-	/// @param[in] hclab		HCLab color to convert from
-	HSV(const HCLab& hclab){ *this = hclab; }
+	/// @param[in] v	HCLab color to convert from
+	HSV(const HCLab& v){ *this = v; }
 
-	/// @param[in] luv			Luv color to convert from
-	HSV(const Luv& luv){ *this = luv; }
+	/// @param[in] v	Luv color to convert from
+	HSV(const Luv& v){ *this = v; }
 
-	/// @param[in] hcluv		HCLuv color to convert from
-	HSV(const HCLuv& hcluv){ *this = hcluv; }
+	/// @param[in] v	HCLuv color to convert from
+	HSV(const HCLuv& v){ *this = v; }
 
 
 	HSV dup() const { return *this; }
@@ -568,6 +568,8 @@ struct HSV{
 
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
+
+	HSV& set(float hue, float sat, float val){ h=hue; s=sat; v=val; return *this; }
 
 
 	/// Set from RGBA color
