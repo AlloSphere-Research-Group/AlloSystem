@@ -16,39 +16,39 @@ using namespace al;
 
 struct MyWindow : Window {
 
-	bool onFrame(){
-		// This is where your drawing code goes ...
+	// Window has several virtual functions that can be overridden. Here they are:
+
+	bool onFrame() override {
+		// We typically clear the color buffer first
 		glClearColor(1,0,0,1);
 		glClear(GL_COLOR_BUFFER_BIT);
-
+		// This is where your drawing code goes ...
 		return true;
 	}
 
-	bool onCreate(){ 					printTitle(); printf("onCreate\n"); return 1; }
-	bool onDestroy(){					printTitle(); printf("onDestroy\n"); return 1; }
-	bool onResize(int w, int h){		printTitle(); printf("onResize     %d, %d\n", w, h); return 1; }
-	bool onVisibility(bool v){			printTitle(); printf("onVisibility %s\n", v?"true":"false"); return 1; }
+	bool onCreate() override { 					printf("onCreate\n"); return 1; }
+	bool onDestroy() override {					printf("onDestroy\n"); return 1; }
+	bool onResize(int w, int h) override {		printf("onResize     %d, %d\n", w, h); return 1; }
+	bool onVisibility(bool v) override {		printf("onVisibility %s\n", v?"true":"false"); return 1; }
 
-	bool onKeyDown(const Keyboard& k){	printTitle(); printf("onKeyDown    "); printKey(); return 1; }
-	bool onKeyUp(const Keyboard& k){	printTitle(); printf("onKeyUp      "); printKey(); return 1;}
+	bool onKeyDown(const Keyboard& k) override {printf("onKeyDown    "); printKey(); return 1; }
+	bool onKeyUp(const Keyboard& k) override {	printf("onKeyUp      "); printKey(); return 1;}
 
-	bool onMouseDown(const Mouse& m){	printTitle(); printf("onMouseDown  "); printMouse(); return 1;}
-	bool onMouseUp(const Mouse& m){		printTitle(); printf("onMouseUp    "); printMouse(); return 1;}
-	bool onMouseWheel(const Mouse& m){	printTitle(); printf("onMouseWheel "); printMouse(); return 1; }
-	bool onMouseDrag(const Mouse& m){	printTitle(); printf("onMouseDrag  "); printMouse(); return 1;}
-	//bool onMouseMove(const Mouse& m){	printTitle(); printf("onMouseMove  "); printMouse(); return 1;}
+	bool onMouseDown(const Mouse& m) override {	printf("onMouseDown  "); printMouse(); return 1;}
+	bool onMouseUp(const Mouse& m) override {	printf("onMouseUp    "); printMouse(); return 1;}
+	bool onMouseWheel(const Mouse& m) override {printf("onMouseWheel "); printMouse(); return 1; }
+	bool onMouseDrag(const Mouse& m) override {	printf("onMouseDrag  "); printMouse(); return 1;}
+	//bool onMouseMove(const Mouse& m) override {	printf("onMouseMove  "); printMouse(); return 1;}
 
-	void printMouse(){
-		const Mouse& m = mouse();
+	void printMouse() const {
+		const auto& m = mouse();
 		printf("x:%4d y:%4d b:%d,%d w:%d,%d\n", m.x(), m.y(), m.button(), m.down(), m.wheelX(), m.wheelY());
 	}
 
-	void printKey(){
-		const Keyboard& k = keyboard();
+	void printKey() const {
+		const auto& k = keyboard();
 		printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
 	}
-
-	void printTitle(){ printf("%s: ", &title()[0]); }
 };
 
 
@@ -62,10 +62,10 @@ int main(){
 
 	// This creates the window
 	win.create(
-		Window::Dim(100, 0, 400,300),	// dimensions, in pixels
-		"Window",						// title
-		40,								// ideal frames/second; actual rate will vary
-		Window::DEFAULT_BUF				// display mode
+		{100, 0, 400,300},		// rect position and extent, in pixels
+		"Window",				// title
+		40,						// ideal frames/second; actual rate will vary
+		Window::DEFAULT_BUF		// display mode
 	);
 
 	// Other options (can be set before or after creation):
