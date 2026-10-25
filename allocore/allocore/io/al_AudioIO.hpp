@@ -16,8 +16,8 @@
 
 namespace al {
 
-/// @addtogroup allocore
-/// @{
+/// \addtogroup allocore
+/// \{
 
 /// Buffer of multi-channel audio samples
 class AudioBlock {
@@ -186,10 +186,10 @@ public:
 
 	/// This should be called after setting the devices and before opening them.
 	///
-	/// @param[in] framesPerBuf		Number of frames per buffer
-	/// @param[in] framesPerSec		Frame rate of streams
-	/// @param[in] chansOut			Number of output channels (-1 for max)
-	/// @param[in] chansIn			Number of input channels (-1 for max)
+	/// \param[in] framesPerBuf		Number of frames per buffer
+	/// \param[in] framesPerSec		Frame rate of streams
+	/// \param[in] chansOut			Number of output channels (-1 for max)
+	/// \param[in] chansIn			Number of input channels (-1 for max)
 	AudioIO& configure(int framesPerBuf, double framesPerSec, int chansOut, int chansIn);
 
 	AudioIO& configure(const Callback& cb, int framesPerBuf=512, double framesPerSec=44100, int chansOut=2, int chansIn=1){
@@ -234,7 +234,7 @@ private:
 	bool mClipOut = true;		// whether to clip output between -1 and 1
 };
 
-/// @} // end allocore group
+/// \} // end allocore group
 
 }  // al::
 #endif
