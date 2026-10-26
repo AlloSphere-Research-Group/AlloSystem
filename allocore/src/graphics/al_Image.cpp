@@ -660,6 +660,7 @@ Image& Image::operator= (const Image& o){
 	if(this != &o){
 		mArray = o.mArray;
 		mFilePath = o.mFilePath;
+		mFileType = o.mFileType;
 		mCompression = o.mCompression;
 		mPaletteSize = o.mPaletteSize;
 		mLoaded = o.mLoaded;

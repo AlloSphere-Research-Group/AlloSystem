@@ -148,6 +148,9 @@ public:
 	/// Get pixel format
 	Format format() const;
 
+	/// Get file type (if loaded from file)
+	FileType fileType() const { return mFileType; }
+
 	/// Get width, in pixels
 	unsigned width() const { return mArray.width(); }
 
