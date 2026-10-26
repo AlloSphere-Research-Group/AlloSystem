@@ -512,20 +512,6 @@ public:
 	// Reader supports: JPG PNG BMP TGA GIF HDR PSD PIC PNM
 	// Writer supports: JPG PNG BMP TGA GIF HDR
 
-	FileType fileTypeFromName(const std::string& s){
-		auto pos = s.find_last_of('.');
-		if(pos != std::string::npos){
-			++pos;
-			auto ext = s.substr(pos, s.size()-pos);
-			for(auto& c : ext) c = std::tolower(c);
-			     if("png"==ext) return PNG;
-			else if("tga"==ext) return TGA;
-			else if("jpg"==ext || "jpeg"==ext) return JPG;
-			else if("bmp"==ext) return BMP;
-		}
-		return FILE_TYPE_UNKNOWN;
-	}
-
 	template <class Func, class... Args>
 	bool loadData(Array& arr, Func loadFunc, Args... args){
 		stbi_set_flip_vertically_on_load(1); // rows go bottom to top
@@ -551,7 +537,7 @@ public:
 	FileType load(const unsigned char * src, int len, Array& arr){
 		if(loadData(arr, stbi_load_from_memory, src, len)){
 			// STB loader detects file format, but does not expose result
-			return FILE_TYPE_UNKNOWN;
+			return fileTypeFromData(src, len);
 		}
 		return FILE_TYPE_INVALID;
 	}
@@ -773,5 +759,66 @@ Image::Format Image::format() const {
 	}
 	return 0;
 }
+
+using ubyte = unsigned char;
+
+inline bool match(const ubyte * src){ return true; }
+
+template <class... UBytes>
+bool match(const ubyte * src, ubyte a, UBytes... ubytes){
+	return src[0]==a && match(src+1, ubytes...);
+}
+
+inline bool inSet(ubyte val, ubyte x){ return val==x; }
+
+template <class... Ts>
+bool inSet(ubyte val, ubyte x, Ts&&... xs){
+	return inSet(val, x) || inSet(val, std::forward<Ts>(xs)...);
+}
+
+/*static*/ Image::FileType Image::fileTypeFromData(const void * src, unsigned len){
+	const auto * data = (unsigned char *)src;
+
+	if(len>=8 && match(data, 137,'P','N','G','\r','\n',26,'\n')){
+		return PNG;
+	} else if(len >= 11 && match(data, 0xff,0xd8,0xff,0xe0) && match(data+6, 'J','F','I','F','\0')){
+		return JPG;
+	} else if(len >= 2 && match(data, 'B','M')){
+		return BMP;
+	/*} else if(len >= 3 && match(data, 'G','I','F')){
+		return GIF;
+	} else if(len >=10 && (match(data, '#','?','R','A','D','I','A','N','C','E') || match(data, '#','?','R','G','B','E'))){
+		return HDR;*/
+	} else { // no magic number
+		if(len >= 18){ // try TGA
+			auto idlen = data[0]; // length of image id string following header, usually 0
+			auto colMap = data[1]; // usually 0 or 1
+			auto dataType = data[2];
+			auto bpp = data[16]; // bits/pixel
+			auto idesc = data[17]; // usually 0
+			const auto * iid = data + 18;
+			//printf("idlen:%u colMap:%u dataType:%u bpp:%u idesc:%u\n", idlen, colMap, dataType, bpp, idesc);
+			if(inSet(bpp, 8,15,16,24,32) && inSet(dataType, 0,1,2,3,9,10,11,32,33)){
+				return TGA;
+			}
+		}
+	}
+	return FILE_TYPE_UNKNOWN;
+}
+
+/*static*/ Image::FileType Image::fileTypeFromName(const std::string& s){
+	auto pos = s.find_last_of('.');
+	if(pos != std::string::npos){
+		++pos;
+		auto ext = s.substr(pos, s.size()-pos);
+		for(auto& c : ext) c = std::tolower(c);
+			 if("png"==ext) return PNG;
+		else if("tga"==ext) return TGA;
+		else if("jpg"==ext || "jpeg"==ext) return JPG;
+		else if("bmp"==ext) return BMP;
+	}
+	return FILE_TYPE_UNKNOWN;
+}
+
 
 } // al::

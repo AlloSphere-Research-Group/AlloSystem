@@ -216,6 +216,12 @@ public:
 
 	static Format getFormat(int planes);
 
+	/// Try to infer file type from image data
+	static FileType fileTypeFromData(const void * src, unsigned len);
+
+	/// Try to infer file type from file name (by reading extension)
+	static FileType fileTypeFromName(const std::string& fileName);
+
 protected:
 	class Impl;
 	Impl * mImpl = NULL;	// backend implementation
