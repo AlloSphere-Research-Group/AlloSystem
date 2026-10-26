@@ -347,6 +347,21 @@ struct Colori {
 	template <unsigned i>
 	Colori& set(uint8_t v){ at<i>() = v; return *this; }
 
+	/// Set from pixel pointer
+
+	/// \param[in] p	Pointer to contiguous pixel data to read from
+	/// \param[in] len	Number of components pointed to. Should be 1
+	/// 				(luminance), 2 (luminance-alpha), 3 (RGB) or 4 (RGBA).
+	Colori& set(const uint8_t * p, int len);
+
+	/// Copy into pixel pointer
+
+	/// \param[in] p	Pointer to contiguous pixel data to copy into
+	/// \param[in] len	Number of components pointed to. Should be 1
+	/// 				(luminance), 2 (luminance-alpha), 3 (RGB) or 4 (RGBA).
+	/// \returns Number of components copied.
+	int copy(uint8_t * p, int len) const;
+
 	/// Set from floating-point color
 	Colori& operator= (const Color& v){
 		return set(toi(v.r), toi(v.g), toi(v.b), toi(v.a)); }

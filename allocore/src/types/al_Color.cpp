@@ -49,6 +49,28 @@ Color& Color::clamp(float max){
 	return uint8_t((u.i & 0x007fffff) >> 15);
 }
 
+Colori& Colori::set(const uint8_t * p, int len){
+	switch(len){
+	case 4: set(p[0], p[1], p[2], p[3]); break;
+	case 3: set(p[0], p[1], p[2], 255); break;
+	case 2: set(p[0], p[0], p[0], p[1]); break;
+	case 1: set(p[0], p[0], p[0], 255); break;
+	default:;
+	}
+	return *this;
+}
+
+int Colori::copy(uint8_t * p, int len) const {
+	// TODO: better luminance calc (not just green!)
+	switch(len){
+	case 4: p[0]=r; p[1]=g; p[2]=b; p[3]=a; return len;
+	case 3: p[0]=r; p[1]=g; p[2]=b; return len;
+	case 2: p[0]=g; p[1]=a; return len;
+	case 1: p[0]=g; return len;
+	default: return 0;
+	}
+}
+
 Colori& Colori::fromHex(const char * s, int len){
 	auto h2d = [](char h) -> unsigned char {
 		if('0'<=h && h<='9') return h-'0';
