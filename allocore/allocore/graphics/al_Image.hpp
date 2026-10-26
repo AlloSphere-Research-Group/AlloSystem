@@ -55,7 +55,13 @@ public:
 	/// \param[in] filePath		Image file to load
 	Image(const std::string& filePath);
 
+	/// Construct deep copy of other image
+	Image(const Image& image);
+
 	~Image();
+
+
+	Image& operator= (const Image& other);
 
 
 	/// Load image from disk
@@ -115,7 +121,7 @@ public:
 
 
 	/// File path to image
-	const std::string& filepath() const { return mFilename; }
+	const std::string& filePath() const { return mFilePath; }
 
 	/// Whether image was loaded from file
 	bool loaded() const { return mLoaded; }
@@ -214,10 +220,12 @@ protected:
 	class Impl;
 	Impl * mImpl = NULL;	// backend implementation
 	Array mArray;			// pixel data
-	std::string mFilename;
+	std::string mFilePath;
 	int mCompression = 50;
 	int mPaletteSize = -1;	// number of colors in palette
 	bool mLoaded = false;	// true after image data is loaded
+
+	Impl& impl();
 
 	// Wrap raw pixel data with Array object if valid
 	template <class T, class OnArray>

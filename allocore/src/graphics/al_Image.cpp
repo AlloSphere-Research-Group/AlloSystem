@@ -662,16 +662,34 @@ Image::Image(const std::string& filename){
 	load(filename);
 }
 
+Image::Image(const Image& o){
+	*this = o;
+}
+
 Image::~Image() {
 	if(mImpl) delete mImpl;
 }
 
-Image::FileType Image::load(const std::string& filename){
-	if(!mImpl) mImpl = new Impl();
+Image& Image::operator= (const Image& o){
+	if(this != &o){
+		mArray = o.mArray;
+		mFilePath = o.mFilePath;
+		mCompression = o.mCompression;
+		mPaletteSize = o.mPaletteSize;
+		mLoaded = o.mLoaded;
+	}
+	return *this;
+}
 
-	auto fileType = mImpl->load(filename, mArray);
+Image::Impl& Image::impl(){
+	if(!mImpl) mImpl = new Impl();
+	return *mImpl;
+}
+
+Image::FileType Image::load(const std::string& filePath){
+	auto fileType = impl().load(filePath, mArray);
 	if(fileType){
-		mFilename = filename;
+		mFilePath = filePath;
 		mLoaded = true;
 	} else {
 		mLoaded = false;
@@ -681,22 +699,19 @@ Image::FileType Image::load(const std::string& filename){
 }
 
 Image::FileType Image::load(const unsigned char * src, int len){
-	if(!mImpl) mImpl = new Impl();
-	auto fileType = mImpl->load(src, len, mArray);
+	auto fileType = impl().load(src, len, mArray);
 	mLoaded = fileType;
 	return fileType;
 }
 
-bool Image::save(const std::string& filename){
-	if(!mImpl) mImpl = new Impl();
-	mLoaded = mImpl->save(filename, mArray, mCompression, mPaletteSize);
-	if(mLoaded) mFilename = filename;
+bool Image::save(const std::string& filePath){
+	mLoaded = impl().save(filePath, mArray, mCompression, mPaletteSize);
+	if(mLoaded) mFilePath = filePath;
 	return mLoaded;
 }
 
 bool Image::save(FileType fileType, ByteArray& buffer){
-	if(!mImpl) mImpl = new Impl();
-	return mImpl->save(fileType, buffer, mArray, mCompression, mPaletteSize);
+	return impl().save(fileType, buffer, mArray, mCompression, mPaletteSize);
 }
 
 template <class OnSave>
