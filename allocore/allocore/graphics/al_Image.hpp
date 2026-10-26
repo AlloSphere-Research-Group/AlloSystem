@@ -221,11 +221,13 @@ protected:
 	Impl * mImpl = NULL;	// backend implementation
 	Array mArray;			// pixel data
 	std::string mFilePath;
+	FileType mFileType = FILE_TYPE_INVALID;
 	int mCompression = 50;
 	int mPaletteSize = -1;	// number of colors in palette
 	bool mLoaded = false;	// true after image data is loaded
 
 	Impl& impl();
+	FileType loadStatus(FileType t, const std::string& filePath);
 
 	// Wrap raw pixel data with Array object if valid
 	template <class T, class OnArray>

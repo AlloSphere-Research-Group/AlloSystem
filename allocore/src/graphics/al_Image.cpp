@@ -686,22 +686,25 @@ Image::Impl& Image::impl(){
 	return *mImpl;
 }
 
-Image::FileType Image::load(const std::string& filePath){
-	auto fileType = impl().load(filePath, mArray);
-	if(fileType){
+Image::FileType Image::loadStatus(FileType t, const std::string& filePath){
+	if(t){
 		mFilePath = filePath;
+		mFileType = t;
 		mLoaded = true;
 	} else {
 		mLoaded = false;
 	}
+	return t;
+}
 
-	return fileType;
+Image::FileType Image::load(const std::string& filePath){
+	auto t = impl().load(filePath, mArray);
+	return loadStatus(t, filePath);
 }
 
 Image::FileType Image::load(const unsigned char * src, int len){
-	auto fileType = impl().load(src, len, mArray);
-	mLoaded = fileType;
-	return fileType;
+	auto t = impl().load(src, len, mArray);
+	return loadStatus(t, "");
 }
 
 bool Image::save(const std::string& filePath){
