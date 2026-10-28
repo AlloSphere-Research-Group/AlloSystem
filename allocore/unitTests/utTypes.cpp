@@ -20,62 +20,8 @@ int utTypes(){
 	{ auto v = fromString<double>("0.3"); assert(double(0.3)==v); }
 	{ auto v = fromString<int>("333"); assert(int(333)==v); }
 
-	// Array
-	{	// test the basic C functionality
-		const int comps = 1;	//
-		const int dims = 2;		// no. dimensions
-		const int size0 = 2;	// no. elements in dimension 1
-		const int size1 = 64;	// no. elements in dimension 2
-		const int stride0 = comps * sizeof(data_t);	// byte offset at dim 0
-		const int stride1 = stride0*size0;
-
-		data_t data[comps*size0*size1];
-
-		AlloArrayHeader hdr;
-		hdr.type = AlloFloat64Ty;
-		hdr.components = comps;
-		hdr.dimcount = dims;
-		hdr.dim[0] = size0;
-		hdr.dim[1] = size1;
-		hdr.stride[0] = stride0;
-		hdr.stride[1] = stride1;
-
-		AlloArray lat;
-		lat.data.ptr = (char *)&data;
-
-		allo_array_setheader(&lat, &hdr);
-
-		assert(allo_array_elements(&lat) == size0*size1);
-		assert(allo_array_size(&lat) == sizeof(data));
-	}
-
-	{
-		AlloArrayHeader hdr;
-		hdr.type = AlloSInt8Ty;
-		hdr.components = 1;
-		hdr.dim[0] = 7;
-		hdr.dim[1] = 7;
-
-		// 2D test
-		hdr.dimcount = 2;
-
-		allo_array_header_setstride(&hdr, 1);
-		assert(hdr.stride[0] == 1);
-		assert(hdr.stride[1] == 7);
-
-		allo_array_header_setstride(&hdr, 4);
-		assert(hdr.stride[1] == 8);
-
-		allo_array_header_setstride(&hdr, 8);
-		assert(hdr.stride[1] == 8);
-
-		// 3D test
-		hdr.dimcount = 3;
-		allo_array_header_setstride(&hdr, 4);
-		assert(hdr.stride[2] == 8*7);
-	}
-
-	{
+	// ArrayArray and friends
+	{ // Conversions
 		const double u08max = 255.;
 		const double u16max = 65535.;
 		const double u32max = 4294967295.;
@@ -102,6 +48,81 @@ int utTypes(){
 		//{ int64_t x= 9e10,y; allo_type_fromnumber(AlloSInt64Ty, x/u64max+0.5, &y); assert(y==x);}
 		{  float x=1.3,y; allo_type_fromnumber(AlloFloat32Ty, x, &y); assert(y==x);}
 		{ double x=1.3,y; allo_type_fromnumber(AlloFloat64Ty, x, &y); assert(y==x);}
+	}
+
+	{ // AlloArrayHeader
+		AlloArrayHeader h;
+		h.type = AlloSInt8Ty;
+		h.components = 1;
+		h.dim[0] = 7;
+		h.dim[1] = 7;
+
+		// 2D test
+		h.dimcount = 2;
+
+		allo_array_header_setstride(&h, 1);
+		assert(h.stride[0] == 1);
+		assert(h.stride[1] == 7);
+
+		allo_array_header_setstride(&h, 4);
+		assert(h.stride[1] == 8);
+
+		allo_array_header_setstride(&h, 8);
+		assert(h.stride[1] == 8);
+
+		// 3D test
+		h.dimcount = 3;
+		allo_array_header_setstride(&h, 4);
+		assert(h.stride[2] == 8*7);
+	}
+	{
+		AlloArrayHeader a,b;
+		a.type = AlloFloat32Ty;
+		allo_array_header_setdim1d(&a, 7);
+		b.type = AlloFloat64Ty;
+		allo_array_header_setdim2d(&a, 8,9);
+
+		auto at = a;
+		auto bt = b;
+
+		assert(allo_array_header_equal(&a, &at));
+		assert(allo_array_header_equal(&b, &bt));
+
+		allo_array_header_swap(&at, &bt);
+		assert(allo_array_header_equal(&at, &b));
+		assert(allo_array_header_equal(&bt, &a));
+
+		allo_array_header_swap(&at, &bt);
+		assert(allo_array_header_equal(&at, &a));
+		assert(allo_array_header_equal(&bt, &b));
+	}
+
+	{	// test the basic C functionality
+		const int comps = 1;	//
+		const int dims = 2;		// no. dimensions
+		const int size0 = 2;	// no. elements in dimension 1
+		const int size1 = 64;	// no. elements in dimension 2
+		const int stride0 = comps * sizeof(data_t);	// byte offset at dim 0
+		const int stride1 = stride0*size0;
+
+		data_t data[comps*size0*size1];
+
+		AlloArrayHeader h;
+		h.type = AlloFloat64Ty;
+		h.components = comps;
+		h.dimcount = dims;
+		h.dim[0] = size0;
+		h.dim[1] = size1;
+		h.stride[0] = stride0;
+		h.stride[1] = stride1;
+
+		AlloArray a;
+		a.data.ptr = (char *)&data;
+
+		allo_array_setheader(&a, &h);
+
+		assert(allo_array_elements(&a) == size0*size1);
+		assert(allo_array_size(&a) == sizeof(data));
 	}
 
 	{	// Basic Array usage

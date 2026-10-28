@@ -150,6 +150,9 @@ void allo_array_header_setstride(AlloArrayHeader *, unsigned alignSize);
 */
 int allo_array_header_equal(const AlloArrayHeader *, const AlloArrayHeader *);
 
+/** Swap two headers */
+void allo_array_header_swap(AlloArrayHeader *, AlloArrayHeader *);
+
 /** Set header attributes to zero */
 void allo_array_header_clear(AlloArrayHeader *);
 
@@ -213,6 +216,9 @@ void allo_array_destroy(AlloArray *);
 
 /** Copy a array into another array */
 void allo_array_copy(AlloArray * dst, AlloArray * src);
+
+/** Swap two arrays */
+void allo_array_swap(AlloArray *, AlloArray *);
 
 
 

@@ -100,6 +100,12 @@ int allo_array_header_equal(const AlloArrayHeader * h1, const AlloArrayHeader * 
 	}
 }
 
+void allo_array_header_swap(AlloArrayHeader * a, AlloArrayHeader * b){
+	AlloArrayHeader h = *a;
+	*a = *b;
+	*b = h;
+}
+
 void allo_array_header_clear(AlloArrayHeader * h){
 	memset(h, 0, sizeof(AlloArrayHeader));
 }
@@ -199,6 +205,12 @@ void allo_array_copy(AlloArray * dst, AlloArray * src){
 	memcpy(dst->data.ptr, src->data.ptr, allo_array_size(src));
 }
 
+void allo_array_swap(AlloArray * a, AlloArray * b){
+	allo_array_header_swap(&a->header, &b->header);
+	char * t = a->data.ptr;
+	a->data.ptr = b->data.ptr;
+	b->data.ptr = t;
+}
 
 
 /* ---- AlloArrayWrapper ---- */
