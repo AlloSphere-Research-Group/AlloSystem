@@ -12,16 +12,8 @@ struct MyWindow : Window{
 	int onDestroyCalls = 0;
 	int onResizeCalls = 0;
 
-	static const Window::Dim& defaultDim(){
-		static Window::Dim res(40,50, 400,300);
-		return res;
-	}
-
-	static const std::string& defaultTitle(){
-		static std::string res("Test Window");
-		return res;
-	}
-
+	static Window::Rect defaultRect(){ return {40,50, 400,300}; }
+	static std::string defaultTitle(){ return "Test Window"; }
 
 	bool onCreate() override {
 		++onCreateCalls;
@@ -36,8 +28,8 @@ struct MyWindow : Window{
 	bool onResize(int dw, int dh) override {
 		assert(onCreateCalls);	// at least one onCreate called
 		if(onCreateCalls == 1){
-			assert(dw == dimensions().w);
-			assert(dh == dimensions().h);
+			assert(dw == rect().w);
+			assert(dh == rect().h);
 		}
 		++onResizeCalls;
 		return true;
@@ -59,15 +51,15 @@ struct MyWindow : Window{
 
 		assert(created());
 
-		assert(aspect() == defaultDim().aspect());
+		assert(aspect() == defaultRect().aspect());
 
 		assert(defaultTitle() == title());
 
-		Window::Dim dim = dimensions();
-		assert(defaultDim().l == dim.l);
-		assert(defaultDim().t == dim.t);
-		assert(defaultDim().w == dim.w);
-		assert(defaultDim().h == dim.h);
+		auto r = rect();
+		assert(defaultRect().l == r.l);
+		assert(defaultRect().t == r.t);
+		assert(defaultRect().w == r.w);
+		assert(defaultRect().h == r.h);
 
 		Window::stopLoop();
 		return true;
@@ -115,7 +107,7 @@ int utIOWindowGL(){
 
 
 	MyWindow win;
-	win.create(MyWindow::defaultDim(), MyWindow::defaultTitle(), 40);
+	win.create(MyWindow::defaultRect(), MyWindow::defaultTitle(), 40);
 
 	Window::startLoop();
 	return 0;

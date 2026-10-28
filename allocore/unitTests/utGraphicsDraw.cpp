@@ -5,15 +5,15 @@
 int utGraphicsDraw(){
 	using namespace al;
 
-	struct MyWindow2 : Window{
+	struct MyWindow : Window{
 
-		Graphics gl;
+		Graphics g;
 
 		bool onFrame(){
 
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			gl.viewport(0,0, dimensions().w, dimensions().h);
-			gl.loadIdentity();
+			g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
+			g.viewport(0,0, rect().w, rect().h);
+			g.loadIdentity();
 
 			data.reset();
 
@@ -30,10 +30,10 @@ int utGraphicsDraw(){
 				data.index((i*(N/2-1)) % N);
 			}
 
-			//gl.primitive(gl.TRIANGLE_STRIP);
-			data.primitive(gl.LINE_STRIP);
+			//gl.primitive(g.TRIANGLE_STRIP);
+			data.primitive(g.LINE_STRIP);
 
-			gl.draw(data);
+			g.draw(data);
 
 			return true;
 		}
@@ -41,9 +41,9 @@ int utGraphicsDraw(){
 		Mesh data;
 	};
 
-	MyWindow2 win;
+	MyWindow win;
 
-	win.create(Window::Dim(400,400), "Window 1", 40);
+	win.create({400,400}, "Window", 40);
 
 	Window::startLoop();
 	return 0;
