@@ -59,19 +59,19 @@ int utTypes(){
 		// 2D test
 		hdr.dimcount = 2;
 
-		allo_array_setstride(&hdr, 1);
+		allo_array_header_setstride(&hdr, 1);
 		assert(hdr.stride[0] == 1);
 		assert(hdr.stride[1] == 7);
 
-		allo_array_setstride(&hdr, 4);
+		allo_array_header_setstride(&hdr, 4);
 		assert(hdr.stride[1] == 8);
 
-		allo_array_setstride(&hdr, 8);
+		allo_array_header_setstride(&hdr, 8);
 		assert(hdr.stride[1] == 8);
 
 		// 3D test
 		hdr.dimcount = 3;
-		allo_array_setstride(&hdr, 4);
+		allo_array_header_setstride(&hdr, 4);
 		assert(hdr.stride[2] == 8*7);
 	}
 

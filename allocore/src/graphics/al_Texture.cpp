@@ -361,14 +361,14 @@ void Texture::resetArray(unsigned align){
 
 	switch(mTarget){
 	case TEXTURE_2D:
-	default: allo_array_setdim2d(&mArray.header, mWidth, mHeight); break;
+	default: allo_array_header_setdim2d(&mArray.header, mWidth, mHeight); break;
 
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_1D
-	case TEXTURE_1D: allo_array_setdim1d(&mArray.header, mWidth); break;
+	case TEXTURE_1D: allo_array_header_setdim1d(&mArray.header, mWidth); break;
 	#endif
 
 	#ifdef AL_GRAPHICS_SUPPORTS_TEXTURE_3D
-	case TEXTURE_3D: allo_array_setdim3d(&mArray.header, mWidth, mHeight, mDepth); break;
+	case TEXTURE_3D: allo_array_header_setdim3d(&mArray.header, mWidth, mHeight, mDepth); break;
 	#endif
 	}
 

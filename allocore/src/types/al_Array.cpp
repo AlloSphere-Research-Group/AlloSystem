@@ -8,7 +8,7 @@ Array::Array(){
 	header.type = AlloVoidTy;
 	header.components = 1;
 	header.dimcount = 0;
-	allo_array_resetdims(&header, 0);
+	allo_array_header_resetdims(&header, 0);
 }
 
 Array::Array(const Array& cpy){
@@ -70,7 +70,7 @@ uint32_t Array::alignment() const {
 }
 
 bool Array::isFormat(const AlloArrayHeader& h) const {
-	return allo_array_equal_headers(&header, &h);
+	return allo_array_header_equal(&header, &h);
 }
 
 void Array::configure(const AlloArrayHeader& h){
@@ -91,7 +91,7 @@ void Array::zero(){
 }
 
 /*static*/ void Array::deriveStride(AlloArrayHeader& h, size_t alignSize){
-	allo_array_setstride(&h, alignSize);
+	allo_array_header_setstride(&h, alignSize);
 }
 
 void Array::format(const AlloArrayHeader& h){
@@ -99,7 +99,7 @@ void Array::format(const AlloArrayHeader& h){
 		if(isRef()){
 			configure(h); // just set header, don't mess with memory
 		}
-		else if(size() != allo_array_size_from_header(&h)){
+		else if(size() != allo_array_header_size(&h)){
 			dataFree();
 			configure(h);
 			dataCalloc();
@@ -143,7 +143,7 @@ AlloArrayHeader Array::getHeader(int comps, AlloTy ty, uint32_t * dims, int numD
 	AlloArrayHeader h;
 	h.type = ty;
 	h.components = comps;
-	allo_array_setdimNd(&h, dims, numDims);
+	allo_array_header_setdimNd(&h, dims, numDims);
 	deriveStride(h, align);
 	return h;
 }

@@ -25,7 +25,64 @@ const char * allo_type_name(AlloTy t){
 	}
 }
 
-int allo_array_equal_headers(const AlloArrayHeader * h1, const AlloArrayHeader * h2){
+
+/* ---- AlloArrayHeader ---- */
+
+void allo_array_header_setdim1d(AlloArrayHeader * h, uint32_t nx){
+	h->dimcount	= 1;
+	h->dim[0] = nx;
+	allo_array_header_resetdims(h, 1);
+}
+
+void allo_array_header_setdim2d(AlloArrayHeader * h, uint32_t nx, uint32_t ny){
+	h->dimcount	= 2;
+	h->dim[0] = nx;
+	h->dim[1] = ny;
+	allo_array_header_resetdims(h, 2);
+}
+
+void allo_array_header_setdim3d(AlloArrayHeader * h, uint32_t nx, uint32_t ny, uint32_t nz){
+	h->dimcount	= 3;
+	h->dim[0] = nx;
+	h->dim[1] = ny;
+	h->dim[2] = nz;
+	allo_array_header_resetdims(h, 3);
+}
+
+void allo_array_header_setdimNd(AlloArrayHeader * h, uint32_t * n, uint8_t numDims){
+	if(numDims > ALLO_ARRAY_MAX_DIMS) numDims = ALLO_ARRAY_MAX_DIMS;
+	h->dimcount	= numDims;
+	uint8_t i;
+	for(i=0; i<numDims; i++) h->dim[i] = n[i];
+	allo_array_header_resetdims(h, numDims);
+}
+
+void allo_array_header_setstride(AlloArrayHeader * h, unsigned alignSize){
+	unsigned typeSize = allo_type_size(h->type);
+	unsigned numDims = h->dimcount;
+	h->stride[0] = h->components * typeSize;
+
+	if(numDims>1){
+		h->stride[1] = h->stride[0] * h->dim[0]; /* compute ideal row stride amount */
+
+		/* Pad rows to make multiple of alignment */
+		if(alignSize > 1){
+			unsigned remain = h->stride[1] % alignSize;		/* compute pad bytes */
+			if(remain){ h->stride[1] += alignSize - remain;}/* add pad bytes (if any) */
+		}
+
+		unsigned i=2;
+		for(; i<numDims; ++i){ h->stride[i] = h->stride[i-1] * h->dim[i-1]; }
+	}
+}
+
+void allo_array_header_resetdims(AlloArrayHeader * h, unsigned startDim){
+	unsigned i;
+	for(i=startDim; i<ALLO_ARRAY_MAX_DIMS; i++)
+		h->dim[i] = i!=0;
+}
+
+int allo_array_header_equal(const AlloArrayHeader * h1, const AlloArrayHeader * h2){
 	if(
 		(h1->components == h2->components) &&
 		(h1->type == h2->type) &&
@@ -43,68 +100,17 @@ int allo_array_equal_headers(const AlloArrayHeader * h1, const AlloArrayHeader *
 	}
 }
 
-void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src){
-	uint8_t ref = dst->header.ref; // do not change ref status
-	memcpy(&dst->header, src, sizeof(AlloArrayHeader));
-	dst->header.ref = ref;
-}
-
 void allo_array_header_clear(AlloArrayHeader * h){
 	memset(h, 0, sizeof(AlloArrayHeader));
 }
 
-void allo_array_resetdims(AlloArrayHeader * h, unsigned startDim){
-	unsigned i;
-	for(i=startDim; i<ALLO_ARRAY_MAX_DIMS; i++)
-		h->dim[i] = i!=0;
-}
 
-void allo_array_setdim1d(AlloArrayHeader * h, uint32_t nx){
-	h->dimcount	= 1;
-	h->dim[0] = nx;
-	allo_array_resetdims(h, 1);
-}
+/* ---- AlloArray ---- */
 
-void allo_array_setdim2d(AlloArrayHeader * h, uint32_t nx, uint32_t ny){
-	h->dimcount	= 2;
-	h->dim[0] = nx;
-	h->dim[1] = ny;
-	allo_array_resetdims(h, 2);
-}
-
-void allo_array_setdim3d(AlloArrayHeader * h, uint32_t nx, uint32_t ny, uint32_t nz){
-	h->dimcount	= 3;
-	h->dim[0] = nx;
-	h->dim[1] = ny;
-	h->dim[2] = nz;
-	allo_array_resetdims(h, 3);
-}
-
-void allo_array_setdimNd(AlloArrayHeader * h, uint32_t * n, uint8_t numDims){
-	if(numDims > ALLO_ARRAY_MAX_DIMS) numDims = ALLO_ARRAY_MAX_DIMS;
-	h->dimcount	= numDims;
-	uint8_t i;
-	for(i=0; i<numDims; i++) h->dim[i] = n[i];
-	allo_array_resetdims(h, numDims);
-}
-
-void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize){
-	unsigned typeSize = allo_type_size(h->type);
-	unsigned numDims = h->dimcount;
-	h->stride[0] = h->components * typeSize;
-
-	if(numDims>1){
-		h->stride[1] = h->stride[0] * h->dim[0]; /* compute ideal row stride amount */
-
-		/* Pad rows to make multiple of alignment */
-		if(alignSize > 1){
-			unsigned remain = h->stride[1] % alignSize;		/* compute pad bytes */
-			if(remain){ h->stride[1] += alignSize - remain;}/* add pad bytes (if any) */
-		}
-
-		unsigned i=2;
-		for(; i<numDims; ++i){ h->stride[i] = h->stride[i-1] * h->dim[i-1]; }
-	}
+void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src){
+	uint8_t ref = dst->header.ref; // do not change ref status
+	memcpy(&dst->header, src, sizeof(AlloArrayHeader));
+	dst->header.ref = ref;
 }
 
 void allo_array_clear(AlloArray * a){
@@ -142,12 +148,12 @@ void allo_array_create1d(
 	uint32_t dimx,
 	size_t align
 ){
-	AlloArrayHeader header;
-	header.type = type;
-	header.components = components;
-	allo_array_setdim1d(&header, dimx);
-	allo_array_setstride(&header, align);
-	allo_array_create(arr, &header);
+	AlloArrayHeader h;
+	h.type = type;
+	h.components = components;
+	allo_array_header_setdim1d(&h, dimx);
+	allo_array_header_setstride(&h, align);
+	allo_array_create(arr, &h);
 }
 
 void allo_array_create2d(
@@ -158,16 +164,16 @@ void allo_array_create2d(
 	uint32_t dimy,
 	size_t align
 ){
-	AlloArrayHeader header;
-	header.type = type;
-	header.components = components;
-	allo_array_setdim2d(&header, dimx, dimy);
-	allo_array_setstride(&header, align);
-	allo_array_create(arr, &header);
+	AlloArrayHeader h;
+	h.type = type;
+	h.components = components;
+	allo_array_header_setdim2d(&h, dimx, dimy);
+	allo_array_header_setstride(&h, align);
+	allo_array_create(arr, &h);
 }
 
 void allo_array_adapt(AlloArray * a, const AlloArrayHeader * h){
-	if(!allo_array_equal_headers(&a->header, h)){
+	if(!allo_array_header_equal(&a->header, h)){
 		allo_array_create(a, h);
 	}
 }
@@ -180,12 +186,12 @@ void allo_array_adapt2d(
 	uint32_t dimy,
 	size_t align
 ){
-	AlloArrayHeader header;
-	header.type = type;
-	header.components = components;
-	allo_array_setdim2d(&header, dimx, dimy);
-	allo_array_setstride(&header, align);
-	allo_array_adapt(arr, &header);
+	AlloArrayHeader h;
+	h.type = type;
+	h.components = components;
+	allo_array_header_setdim2d(&h, dimx, dimy);
+	allo_array_header_setstride(&h, align);
+	allo_array_adapt(arr, &h);
 }
 
 void allo_array_copy(AlloArray * dst, AlloArray * src){
@@ -195,6 +201,7 @@ void allo_array_copy(AlloArray * dst, AlloArray * src){
 
 
 
+/* ---- AlloArrayWrapper ---- */
 
 AlloArrayWrapper * allo_array_wrapper_new(){
 	return (AlloArrayWrapper *)malloc(sizeof(AlloArrayWrapper));

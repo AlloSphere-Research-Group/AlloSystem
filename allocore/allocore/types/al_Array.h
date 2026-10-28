@@ -62,12 +62,10 @@ enum {
 typedef uint16_t AlloTy;
 
 
-/** Return the size, in bytes, for a given type
-*/
+/** Return the size, in bytes, for a given type */
 static size_t allo_type_size(AlloTy);
 
-/** Return a human-readable string for a given type
-*/
+/** Return a human-readable string for a given type */
 const char * allo_type_name(AlloTy);
 
 /** Converts any format value into a double.
@@ -76,8 +74,7 @@ const char * allo_type_name(AlloTy);
 */
 static double allo_type_tonumber(AlloTy ty, const void * src);
 
-/** Converts a double in [0, 1] to a specified AlloTy.
-*/
+/** Converts a double in [0, 1] to a specified AlloTy */
 static void allo_type_fromnumber(AlloTy ty, double number, void * dst);
 
 
@@ -128,60 +125,52 @@ typedef struct AlloArray {
 } AlloArray;
 
 
-/** Returns the number of elements (cells) in an array
-*/
-static uint32_t allo_array_elements(const AlloArray *);
+/** Returns the total memory footprint, in bytes, based on the array header */
+static size_t allo_array_header_size(const AlloArrayHeader *);
 
-/** Returns the total memory footprint, in bytes, based on the array header
-*/
-static size_t allo_array_size_from_header(const AlloArrayHeader *);
+/** Set dimension attributes for 1D without modifying memory */
+void allo_array_header_setdim1d(AlloArrayHeader *, uint32_t nx);
 
-/** Returns the total memory footprint, in bytes
-*/
-static size_t allo_array_size(const AlloArray *);
+/** Set dimension attributes for 2D without modifying memory */
+void allo_array_header_setdim2d(AlloArrayHeader *, uint32_t nx, uint32_t ny);
 
+/** Set dimension attributes for 3D without modifying memory */
+void allo_array_header_setdim3d(AlloArrayHeader * h, uint32_t nx, uint32_t ny, uint32_t nz);
 
-/** Set an array header, e.g. just after allocating
-*/
-void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src);
+/** Set dimension attributes for n-D without modifying memory */
+void allo_array_header_setdimNd(AlloArrayHeader * h, uint32_t * n, uint8_t numDims);
 
-void allo_array_resetdims(AlloArrayHeader * h, unsigned startDim);
+void allo_array_header_resetdims(AlloArrayHeader * h, unsigned startDim);
 
-/** Set dimension attributes without modifying memory
-*/
-void allo_array_setdim1d(AlloArrayHeader *, uint32_t nx);
-
-/** Set dimension attributes without modifying memory
-*/
-void allo_array_setdim2d(AlloArrayHeader *, uint32_t nx, uint32_t ny);
-
-/** Set dimension attributes without modifying memory
-*/
-void allo_array_setdim3d(AlloArrayHeader * h, uint32_t nx, uint32_t ny, uint32_t nz);
-
-void allo_array_setdimNd(AlloArrayHeader * h, uint32_t * n, uint8_t numDims);
-
-/** Set stride factors based on a specific byte alignment
-*/
-void allo_array_setstride(AlloArrayHeader *, unsigned alignSize);
+/** Set stride factors based on a specific byte alignment */
+void allo_array_header_setstride(AlloArrayHeader *, unsigned alignSize);
 
 /** Checks if headers are equivalent.
-
-@return 1 if they are equivalent, otherwise 0.
+\returns 1 if they are equivalent, otherwise 0.
 */
-int allo_array_equal_headers(const AlloArrayHeader *, const AlloArrayHeader *);
+int allo_array_header_equal(const AlloArrayHeader *, const AlloArrayHeader *);
+
+/** Set header attributes to zero */
+void allo_array_header_clear(AlloArrayHeader *);
 
 
-/** Allocate new memory based on current size in header
-*/
+
+/** Returns the number of elements (cells) in an array */
+static uint32_t allo_array_elements(const AlloArray *);
+
+/** Returns the total memory footprint, in bytes */
+static size_t allo_array_size(const AlloArray *);
+
+/** Set an array header, e.g. just after allocating */
+void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src);
+
+/** Allocate new memory based on current size in header */
 void allo_array_allocate(AlloArray *);
 
-/** Create a new array based on a header
-*/
+/** Create a new array based on a header */
 void allo_array_create(AlloArray *, const AlloArrayHeader *);
 
-/** Create a new 1D array
-*/
+/** Create a new 1D array */
 void allo_array_create1d(
 	AlloArray *,
 	uint8_t components,
@@ -190,8 +179,7 @@ void allo_array_create1d(
 	size_t align
 );
 
-/** Create a new 2D array
-*/
+/** Create a new 2D array */
 void allo_array_create2d(
 	AlloArray *,
 	uint8_t components,
@@ -201,12 +189,10 @@ void allo_array_create2d(
 	size_t align
 );
 
-/** Adapt an array to another size
-*/
+/** Adapt an array to another size */
 void allo_array_adapt(AlloArray *, const AlloArrayHeader *);
 
-/** Adapt an array to 2D
-*/
+/** Adapt an array to 2D */
 void allo_array_adapt2d(
 	AlloArray *,
 	uint8_t components,
@@ -216,30 +202,21 @@ void allo_array_adapt2d(
 	size_t align
 );
 
-/** Set header attributes to zero
-*/
-void allo_array_header_clear(AlloArrayHeader *);
-
-/** Set all attributes, including header, to zero
-*/
+/** Set all attributes, including header, to zero */
 void allo_array_clear(AlloArray *);
 
-/** Free memory
-*/
+/** Free memory */
 void allo_array_free(AlloArray *);
 
-/** Free memory and zero attributes
-*/
+/** Free memory and zero attributes */
 void allo_array_destroy(AlloArray *);
 
-/** Copy a array into another array
-*/
+/** Copy a array into another array */
 void allo_array_copy(AlloArray * dst, AlloArray * src);
 
 
 
-/* An extended array (wrapper)
-*/
+/* An extended array (wrapper) */
 typedef struct AlloArrayWrapper {
 
 	AlloArray array;
@@ -334,7 +311,7 @@ static inline uint32_t allo_array_elements(const AlloArray * a) {
 	return elements;
 }
 
-static inline size_t allo_array_size_from_header(const AlloArrayHeader * h) {
+static inline size_t allo_array_header_size(const AlloArrayHeader * h) {
 	if(h->dimcount != 0){
 		int idx = h->dimcount-1;
 		return h->stride[idx] * h->dim[idx];
@@ -343,7 +320,7 @@ static inline size_t allo_array_size_from_header(const AlloArrayHeader * h) {
 }
 
 static inline size_t allo_array_size(const AlloArray * a) {
-	return allo_array_size_from_header(&a->header);
+	return allo_array_header_size(&a->header);
 }
 
 /* Multidimensional terminology:
