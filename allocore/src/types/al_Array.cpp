@@ -8,22 +8,25 @@ Array::Array(){
 	header.type = AlloVoidTy;
 	header.components = 1;
 	header.dimcount = 0;
+	header.ref = 0;
 	allo_array_header_resetdims(&header, 0);
 }
 
-Array::Array(const Array& cpy){
-	data.ptr = NULL;
-    (*this) = cpy;
+Array::Array(const Array& a)
+:	Array(static_cast<const AlloArray&>(a)){
 }
 
-Array::Array(const AlloArray& cpy){
-	data.ptr = NULL;
-    (*this) = cpy;
+Array::Array(const AlloArray& a): Array(){
+	if(&a != static_cast<AlloArray*>(this)){
+		format(a.header);
+		if(a.data.ptr)
+			memcpy(data.ptr, a.data.ptr, size());
+	}
 }
 
-Array::Array(const AlloArrayHeader& h2){
+Array::Array(const AlloArrayHeader& h){
 	allo_array_clear(this);
-	format(h2);
+	format(h);
 }
 
 Array::Array(int comps, AlloTy ty, uint32_t dimx){
@@ -41,8 +44,20 @@ Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz){
 	format(comps, ty, dimx, dimy, dimz);
 }
 
+Array::Array(Array&& a): Array(){ swap(a); }
+
 Array::~Array(){ dataFree(); }
 
+void Array::swap(Array& a){
+	allo_array_swap(this, &a);
+}
+
+Array& Array::operator= (Array a){
+	swap(a);
+	return *this;
+}
+
+/*
 Array& Array::operator= (const Array& cpy){
 	if(&cpy != this){
 		format(cpy.header);
@@ -59,7 +74,7 @@ Array& Array::operator= (const AlloArray& cpy){
 			memcpy(data.ptr, cpy.data.ptr, size());
 	}
 	return *this;
-}
+}*/
 
 uint32_t Array::alignment() const {
 	uint32_t i = stride(1);	// row stride

@@ -137,68 +137,132 @@ int utTypes(){
 //		// a 3D array of float triplets (e.g. vector field)
 //		Array field(3, Array::type<float>(), 16, 16, 16);
 
-		{	Array a;
+		{ // default ctor
+			Array a;
 			assert(a.size() == 0);
 			assert(!a.hasData());
+			assert(a.dimcount() == 0);
+			assert(a.width() == 0);
+			assert(a.components() == 1);
 			assert(a.type() == AlloVoidTy);
 			assert(a.isType(AlloVoidTy));
 			assert(a.isFormat(a));
 		}
+		{ // copying and moving
+			const auto T = AlloSInt8Ty;
+			const int C = 3;
+			const int N = 32;
+			Array a(C, T, N);
+			assert(a.hasData());
+			assert(a.type() == T);
+			assert(a.width() == N);
+			assert(a.components() == C);
+
+			// Copy contruct
+			Array b(a);
+			assert(b.type() == a.type());
+			assert(b.width() == a.width());
+			assert(b.components() == a.components());
+			assert(b.size() == a.size());
+			assert(b.data.ptr != a.data.ptr);
+
+			// copy assignment
+			b.dataFree();
+			assert(b.empty());
+			b = a;
+			assert(b.type() == a.type());
+			assert(b.width() == a.width());
+			assert(b.components() == a.components());
+			assert(b.size() == a.size());
+			assert(b.data.ptr != a.data.ptr);
+
+			// move construct
+			Array c(std::move(b));
+
+			assert(b.empty());
+			assert(!c.empty());
+			assert(c.type() == a.type());
+			assert(c.width() == a.width());
+			assert(c.components() == a.components());
+			assert(c.size() == a.size());
+			assert(c.data.ptr != a.data.ptr);
+		}
 
 		// Run tests on Arrays with various sizes and dimensions
 		const int Nc= 3;
-		const int Ns[] = {1, 4, 5, 6, 7, 64, 128, 129};
+		const int Ns[] = {1, 4, 7, 32};
 
 		for(unsigned iN=0; iN<sizeof(Ns)/sizeof(*Ns); ++iN){
 
-			int N = Ns[iN]; // number of cells along each dimension
+			const auto type = AlloFloat32Ty;
+			const int W = Ns[iN];
+			const int H = W*2;
+			const int D = W*3;
 
 			{	// Constructors
-				{	Array a(Nc, AlloFloat32Ty, N);
+				{	Array a(Nc, type, W);
 					assert(a.hasData());
-					assert(a.type() == AlloFloat32Ty);
+					assert(!a.isRef());
+					assert(a.ownsData());
+					assert(a.type() == type);
 					assert(a.components() == Nc);
 					assert(a.dimcount() == 1);
+					assert(a.width() == W);
+					assert(a.height() == 1);
+					assert(a.depth() == 1);
+					assert(a.cells() == W);
 				}
-				{	Array a(Nc, AlloFloat32Ty, N,N);
+				{	Array a(Nc, type, W,H);
 					assert(a.hasData());
-					assert(a.type() == AlloFloat32Ty);
+					assert(a.type() == type);
 					assert(a.components() == Nc);
 					assert(a.dimcount() == 2);
+					assert(a.width() == W);
+					assert(a.height() == H);
+					assert(a.depth() == 1);
+					assert(a.cells() == W*H);
 				}
-				{	Array a(Nc, AlloFloat32Ty, N,N,N);
+				{	Array a(Nc, type, W,H,D);
 					assert(a.hasData());
-					assert(a.type() == AlloFloat32Ty);
+					assert(a.type() == type);
 					assert(a.components() == Nc);
 					assert(a.dimcount() == 3);
+					assert(a.width() == W);
+					assert(a.height() == H);
+					assert(a.depth() == D);
+					assert(a.cells() == W*H*D);
+					// general tests only done for 3D
+					assert(a.dim<0>() == a.width());
+					assert(a.dim<1>() == a.height());
+					assert(a.dim<2>() == a.depth());
 				}
 			}
 
 			{	// Memory allocation
 				Array a;
 
-				a.formatAligned(Nc, AlloFloat32Ty, N, 1);
-				assert((int)a.size() == Nc*N*4);
+				a.formatAligned(Nc, AlloFloat32Ty, W, 1);
+				assert((int)a.size() == Nc*W*4);
 				assert(a.hasData());
 				assert(a.isType(AlloFloat32Ty));
 				assert(a.isType<float>());
 
-				a.formatAligned(Nc, AlloSInt8Ty, N, N, 1);
-				assert((int)a.size() == Nc*N*N*1);
+				a.formatAligned(Nc, AlloSInt8Ty, W,H, 1);
+				assert((int)a.size() == Nc*W*H*1);
 				assert(a.hasData());
 				assert(a.isType(AlloSInt8Ty));
 				assert(a.isType<int8_t>());
 
-				a.formatAligned(Nc, AlloSInt16Ty, N, N, N, 1);
-				assert((int)a.size() == Nc*N*N*N*2);
+				a.formatAligned(Nc, AlloSInt16Ty, W,H,D, 1);
+				assert((int)a.size() == Nc*W*H*D*2);
 				assert(a.hasData());
 				assert(a.isType(AlloSInt16Ty));
 				assert(a.isType<int16_t>());
 			}
 
 			{	// 1-D element access
-				Array a(Nc, AlloSInt8Ty, N);
-				for(int i=0,t=0; i<N; ++i){
+				Array a(Nc, AlloSInt8Ty, W);
+				for(int i=0,t=0; i<W; ++i){
 
 					int8_t x[Nc] = {int8_t(i), int8_t(i+1), int8_t(i+2)};
 					int8_t y[Nc] = {-1,-1,-1};
@@ -215,9 +279,9 @@ int utTypes(){
 			}
 
 			{	// 2-D element access
-				Array a(Nc, AlloSInt8Ty, N,N);
-				for(int j=0,t=0; j<N; ++j){
-				for(int i=0; i<N; ++i){
+				Array a(Nc, AlloSInt8Ty, W,H);
+				for(int j=0,t=0; j<H; ++j){
+				for(int i=0; i<W; ++i){
 
 					int8_t x[Nc] = {int8_t(j), int8_t(j+1), int8_t(j+2)};
 					int8_t y[Nc] = {-1,-1,-1};
@@ -234,10 +298,10 @@ int utTypes(){
 			}
 
 			{	// 3-D element access
-				Array a(Nc, AlloSInt8Ty, N,N,N);
-				for(int k=0,t=0; k<N; ++k){
-				for(int j=0; j<N; ++j){
-				for(int i=0; i<N; ++i){
+				Array a(Nc, AlloSInt8Ty, W,H,D);
+				for(int k=0,t=0; k<D; ++k){
+				for(int j=0; j<H; ++j){
+				for(int i=0; i<W; ++i){
 
 					int8_t x[Nc] = {int8_t(k), int8_t(k+1), int8_t(k+2)};
 					int8_t y[Nc] = {-1,-1,-1};

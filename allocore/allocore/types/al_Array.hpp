@@ -43,18 +43,24 @@ public:
 	/// Construct 3-dimensional array
 	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
 
-	///	Copy constructor; copies both the layout and data from cpy
+	///	Copy constructor
 	Array(const Array&);
 	explicit Array(const AlloArray&);
 	explicit Array(const AlloArrayHeader&);
 
+	Array(Array&& a);
 
 	~Array();
 
 
 	/// Assignment operator copies format and data (allocates memory if necessary)
-	Array& operator= (const Array&);
-	Array& operator= (const AlloArray&);
+	//Array& operator= (const Array&);
+	//Array& operator= (const AlloArray&);
+
+	Array& operator= (Array a);
+
+	void swap(Array& a);
+	friend void swap(Array& a, Array& b){ a.swap(b); }
 
 
 	/// Get type of elements
