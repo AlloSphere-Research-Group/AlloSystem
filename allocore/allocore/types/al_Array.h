@@ -214,8 +214,8 @@ void allo_array_free(AlloArray *);
 /** Free memory and zero attributes */
 void allo_array_destroy(AlloArray *);
 
-/** Copy a array into another array */
-void allo_array_copy(AlloArray * dst, AlloArray * src);
+/** Copy format and contents of another array; may trigger re-allocation */
+void allo_array_copy(AlloArray * dst, const AlloArray * src);
 
 /** Swap two arrays */
 void allo_array_swap(AlloArray *, AlloArray *);

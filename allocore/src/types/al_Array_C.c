@@ -200,8 +200,8 @@ void allo_array_adapt2d(
 	allo_array_adapt(arr, &h);
 }
 
-void allo_array_copy(AlloArray * dst, AlloArray * src){
-	allo_array_adapt(dst, &(src->header));
+void allo_array_copy(AlloArray * dst, const AlloArray * src){
+	allo_array_adapt(dst, &src->header);
 	memcpy(dst->data.ptr, src->data.ptr, allo_array_size(src));
 }
 
