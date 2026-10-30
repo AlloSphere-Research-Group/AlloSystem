@@ -213,6 +213,16 @@ public:
 		return indexRel(indices...);
 	}
 
+	/// Add indices for triangles forming fan
+
+	/// Given vertices v0, v1, v2, v3, ..., vm, vn add indices for triangles
+	/// (v0,v1,v2), (v0,v2,v3), ..., (v0, vm, vn).
+	/// \param[in] n	Total number of vertices in fan
+	Mesh& indexFanRel(int n){
+		for(int i=1; i<n-1; ++i) indexRel(0,i,i+1);
+		return *this;
+	}
+
 
 	/// Append vertex to vertex buffer
 	Mesh& vertex(float x, float y, float z=0){ return vertex(Vertex(x,y,z)); }
