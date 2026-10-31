@@ -8,10 +8,11 @@ sine waves are generated in the audio thread and drawn as a Lissajous curve in
 the graphics thread.
 
 Author:
-Lance Putnam, 10/2012, putnam.lance@gmail.com
+Lance Putnam, 2012
 */
 
 #include "allocore/io/al_App.hpp"
+#include "allocore/types/al_Buffer.hpp"
 using namespace al;
 
 class MyApp : public App{
@@ -22,7 +23,7 @@ public:
 	Mesh curve;
 
 	MyApp(){
-		nav().pos(0,0,4);
+		nav().pullBack(4);
 		initWindow();
 		initAudio();
 	}
@@ -40,14 +41,14 @@ public:
 			if(phase > 1) phase -= 1;
 
 			// Generate two sine waves at the 5th and 4th harmonics
-			float out1 = cos(5*phase * 2*M_PI);
-			float out2 = sin(4*phase * 2*M_PI);
+			float out1 = cos(5*phase * pi<2>());
+			float out2 = sin(4*phase * pi<2>());
 
 			/* Write the waveforms to the ring buffer.
 			Note that this call CANNOT block or wait on a lock from somewhere
 			else. The audio	thread must keep writing to the buffer without
 			regard for what other threads might be reading from it. */
-			ring.write(Vec2f(out1, out2));
+			ring.write({out1, out2});
 
 			// Send scaled waveforms to output...
 			io.out(0) = out1*0.2;
@@ -75,8 +76,8 @@ public:
 		As long as the amount of time between reading samples is faster than
 		that of writing, we can expect to stay ahead of the audio thread... */
 		for(int i=oldest; i>=0; --i){
-			Vec2f point = ring.readFrom(wpos, i);
-			curve.vertex(point.x, point.y);
+			auto point = ring.readFrom(wpos, i);
+			curve.vertex(point);
 		}
 	}
 
