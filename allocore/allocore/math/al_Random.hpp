@@ -121,7 +121,7 @@ public:
 
 	/// Returns point within a unit n-cube
 	template <class Vec>
-	Vec cube(){ Vec v; cube(v); return v; }
+	Vec cube(){ Vec v; return cube(v); }
 
 	/// Returns standard normal variate
 	float normal(){ float r; normal(r,r); return r; }
