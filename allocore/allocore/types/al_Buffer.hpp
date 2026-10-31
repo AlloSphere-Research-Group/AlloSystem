@@ -353,7 +353,7 @@ public:
 	}
 
 	/// Get reference to element relative to newest element
-	const T& read(int i) const { return const_cast<RingBuffer*>(this)->read(i); }
+	const T& read(int i) const { return mut().read(i); }
 	T& read(int i){ return readFrom(pos(), i); }
 
 	/// Get reference to older element relative to some newer element 
@@ -361,18 +361,18 @@ public:
 	/// @param[in] from		absolute index the read is relative to
 	/// @param[in] dist		distance into past relative to 'from' of the returned element
 	const T& readFrom(int from, int dist) const {
-		return const_cast<RingBuffer*>(this)->readFrom(from,dist);
+		return mut().readFrom(from,dist);
 	}
 	T& readFrom(int from, int dist){
 		return mData[wrapOnce(from-dist, size())];
 	}
 
 	/// \returns reference to newest (last in) element
-	const T& newest() const { return const_cast<RingBuffer*>(this)->newest(); }
+	const T& newest() const { return mut().newest(); }
 	T& newest(){ return mData[pos()]; }
 
 	/// \returns reference to oldest (first in) element
-	const T& oldest() const { return const_cast<RingBuffer*>(this)->oldest(); }
+	const T& oldest() const { return mut().oldest(); }
 	T& oldest(){ return read(fill()-1); }
 
 	/// Remove newest element from buffer
@@ -422,7 +422,7 @@ public:
 
 	/// @param[in] i	start index past oldest element
 	iterator begin(int i=0){ return iterator(&mData[0], mData.size(), posOldest(), i); }
-	iterator   end(){ return iterator(&mData[0], mData.size(), posOldest(), fill()); }
+	iterator end(){ return iterator(&mData[0], mData.size(), posOldest(), fill()); }
 
 	const T * data() const { return mData.data(); }
 	T * data(){ return mData.data(); }
@@ -431,6 +431,8 @@ protected:
 	Buffer<T> mData;
 	int mPos;
 	int mFill = 0;
+
+	auto& mut() const { return const_cast<RingBuffer&>(*this); }
 
 	// Moves value one period closer to interval [0, max)
 	static int wrapOnce(int v, int max){
