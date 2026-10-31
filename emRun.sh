@@ -58,7 +58,8 @@ ${EM_DIR}emmake make $@ PLATFORM=em ARCH=none BUILD_DIR=$BUILD_DIR AUTORUN=0 EXE
 # Exit if compilation errors...
 if [[ $? != 0 ]]; then exit $?; fi
 
-HTML_NAME=$PROJ_NAME
+#HTML_NAME=$PROJ_NAME
+HTML_NAME=index
 
 # Check for HTML_NAME specified in arguments
 # It will be passed to make above, but does nothing there.
