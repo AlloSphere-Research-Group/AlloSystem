@@ -48,7 +48,7 @@ public:
 	explicit Array(const AlloArray&);
 	explicit Array(const AlloArrayHeader&);
 
-	Array(Array&& a);
+	Array(Array&& a) noexcept;
 
 	~Array();
 
