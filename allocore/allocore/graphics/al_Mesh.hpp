@@ -217,10 +217,13 @@ public:
 
 	/// Given vertices v0, v1, v2, v3, ..., vm, vn add indices for triangles
 	/// (v0,v1,v2), (v0,v2,v3), ..., (v0, vm, vn).
-	/// \param[in] n	Total number of vertices in fan
+	/// \param[in] n	Total number of vertices in fan. Must be greater than 2.
 	Mesh& indexFanRel(int n){
 		for(int i=1; i<n-1; ++i) indexRel(0,i,i+1);
 		return *this;
+	}
+	Mesh& indexFanLoopRel(int n){
+		return indexFanRel(n).indexRel(0,n-1,1);
 	}
 
 
