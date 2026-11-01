@@ -44,7 +44,7 @@ Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz){
 	format(comps, ty, dimx, dimy, dimz);
 }
 
-Array::Array(Array&& a): Array(){ swap(a); }
+Array::Array(Array&& a) noexcept : Array(){ swap(a); }
 
 Array::~Array(){ dataFree(); }
 
