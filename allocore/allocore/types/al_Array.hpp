@@ -74,7 +74,7 @@ public:
 	uint8_t dimcount() const { return header.dimcount; }		///< Get number of dimensions
 	uint32_t dim(int i=0) const { return header.dim[i]; }		///< Get size of dimension
 	template <unsigned i> uint32_t dim() const {
-		static_assert(i<=ALLO_ARRAY_MAX_DIMS, "Invalid index");
+		static_assert(i<ALLO_ARRAY_MAX_DIMS, "Invalid index");
 		return dim(i);
 	}
 	unsigned width() const { return dim<0>(); }					///< Get size of first dimension
@@ -82,7 +82,7 @@ public:
 	unsigned depth() const { return dim<2>(); }					///< Get size of third dimension
 	uint32_t stride(int i=0) const { return header.stride[i]; }	///< Get stride of dimension, in bytes
 	template <unsigned i> uint32_t stride() const {
-		static_assert(i<=ALLO_ARRAY_MAX_DIMS, "Invalid index");
+		static_assert(i<ALLO_ARRAY_MAX_DIMS, "Invalid index");
 		return stride(i);
 	}
 
