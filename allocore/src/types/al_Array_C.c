@@ -8,6 +8,8 @@ extern "C" {
 
 const char * allo_type_name(AlloTy t){
 	switch(t){
+	case AlloFloat32Ty:		return "float";
+	case AlloFloat64Ty:		return "double";
 	case AlloUInt8Ty:		return "uint8_t";
 	case AlloUInt16Ty:		return "uint16_t";
 	case AlloUInt32Ty:		return "uint32_t";
@@ -16,11 +18,10 @@ const char * allo_type_name(AlloTy t){
 	case AlloSInt16Ty:		return "int16_t";
 	case AlloSInt32Ty:		return "int32_t";
 	case AlloSInt64Ty:		return "int64_t";
-	case AlloFloat32Ty:		return "float";
-	case AlloFloat64Ty:		return "double";
 	case AlloArrayTy:		return "AlloArray";
 	case AlloPointer32Ty:	return "Pointer32";
 	case AlloPointer64Ty:	return "Pointer64";
+	case AlloVoidTy:		return "void";
 	default:				return "";
 	}
 }
