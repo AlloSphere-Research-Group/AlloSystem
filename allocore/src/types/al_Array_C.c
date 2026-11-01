@@ -19,8 +19,8 @@ const char * allo_type_name(AlloTy t){
 	case AlloFloat32Ty:		return "float";
 	case AlloFloat64Ty:		return "double";
 	case AlloArrayTy:		return "AlloArray";
-	case AlloPointer32Ty:	return "int32_t";
-	case AlloPointer64Ty:	return "int64_t";
+	case AlloPointer32Ty:	return "Pointer32";
+	case AlloPointer64Ty:	return "Pointer64";
 	default:				return "";
 	}
 }
