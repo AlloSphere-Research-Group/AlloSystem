@@ -15,11 +15,14 @@
 
 #include "allocore/system/al_Config.h"
 
-/*
- Maximum number of dimensions a array may represent
- To model higher dimensional spaces, use a nested array descriptor
- */
+/** Maximum number of dimensions an AlloArray may represent.
+The constant should be set to the minimum required value to reduce the amount of
+stack allocation. The maximum value is 255.
+To model higher dimensional spaces, use a nested array descriptor.
+*/
+#ifndef ALLO_ARRAY_MAX_DIMS
 #define ALLO_ARRAY_MAX_DIMS (4)
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,10 +143,10 @@ void allo_array_header_setdim3d(AlloArrayHeader * h, uint32_t nx, uint32_t ny, u
 /** Set dimension attributes for n-D without modifying memory */
 void allo_array_header_setdimNd(AlloArrayHeader * h, uint32_t * n, uint8_t numDims);
 
-void allo_array_header_resetdims(AlloArrayHeader * h, unsigned startDim);
+void allo_array_header_resetdims(AlloArrayHeader * h, uint8_t startDim);
 
 /** Set stride factors based on a specific byte alignment */
-void allo_array_header_setstride(AlloArrayHeader *, unsigned alignSize);
+void allo_array_header_setstride(AlloArrayHeader *, uint8_t alignSize);
 
 /** Checks if headers are equivalent.
 \returns 1 if they are equivalent, otherwise 0.
@@ -179,7 +182,7 @@ void allo_array_create1d(
 	uint8_t components,
 	AlloTy type,
 	uint32_t dimx,
-	size_t align
+	uint8_t align
 );
 
 /** Create a new 2D array */
@@ -189,7 +192,7 @@ void allo_array_create2d(
 	AlloTy type,
 	uint32_t dimx,
 	uint32_t dimy,
-	size_t align
+	uint8_t align
 );
 
 /** Adapt an array to another size */
@@ -202,7 +205,7 @@ void allo_array_adapt2d(
 	AlloTy type,
 	uint32_t dimx,
 	uint32_t dimy,
-	size_t align
+	uint8_t align
 );
 
 /** Set all attributes, including header, to zero */
@@ -311,7 +314,8 @@ static inline void allo_type_fromnumber(AlloTy t, double val, void * dst) {
 }
 
 static inline uint32_t allo_array_elements(const AlloArray * a) {
-	uint32_t i, elements = 1;
+	uint32_t elements = 1;
+	uint8_t i;
 	for(i=0; i<a->header.dimcount; i++)
 		elements *= a->header.dim[i];
 	return elements;
@@ -319,8 +323,8 @@ static inline uint32_t allo_array_elements(const AlloArray * a) {
 
 static inline size_t allo_array_header_size(const AlloArrayHeader * h) {
 	if(h->dimcount != 0){
-		int idx = h->dimcount-1;
-		return h->stride[idx] * h->dim[idx];
+		uint8_t i = h->dimcount-1;
+		return h->stride[i] * h->dim[i];
 	}
 	return 0;
 }

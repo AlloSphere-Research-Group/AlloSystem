@@ -57,7 +57,7 @@ void allo_array_header_setdimNd(AlloArrayHeader * h, uint32_t * n, uint8_t numDi
 	allo_array_header_resetdims(h, numDims);
 }
 
-void allo_array_header_setstride(AlloArrayHeader * h, unsigned alignSize){
+void allo_array_header_setstride(AlloArrayHeader * h, uint8_t alignSize){
 	unsigned typeSize = allo_type_size(h->type);
 	unsigned numDims = h->dimcount;
 	h->stride[0] = h->components * typeSize;
@@ -76,8 +76,8 @@ void allo_array_header_setstride(AlloArrayHeader * h, unsigned alignSize){
 	}
 }
 
-void allo_array_header_resetdims(AlloArrayHeader * h, unsigned startDim){
-	unsigned i;
+void allo_array_header_resetdims(AlloArrayHeader * h, uint8_t startDim){
+	uint8_t i;
 	for(i=startDim; i<ALLO_ARRAY_MAX_DIMS; i++)
 		h->dim[i] = i!=0;
 }
@@ -152,7 +152,7 @@ void allo_array_create1d(
 	uint8_t components,
 	AlloTy type,
 	uint32_t dimx,
-	size_t align
+	uint8_t align
 ){
 	AlloArrayHeader h;
 	h.type = type;
@@ -168,7 +168,7 @@ void allo_array_create2d(
 	AlloTy type,
 	uint32_t dimx,
 	uint32_t dimy,
-	size_t align
+	uint8_t align
 ){
 	AlloArrayHeader h;
 	h.type = type;
@@ -190,7 +190,7 @@ void allo_array_adapt2d(
 	AlloTy type,
 	uint32_t dimx,
 	uint32_t dimy,
-	size_t align
+	uint8_t align
 ){
 	AlloArrayHeader h;
 	h.type = type;
