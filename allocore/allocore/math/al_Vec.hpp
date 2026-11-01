@@ -939,13 +939,13 @@ public:
 
 	/// Scale to fit within a cube
 
-	/// This scales all elements so the vector position lies within a cube.
+	/// This scales all elements so the vector position lies within a cube
+	/// centered at the origin. The vector direction is not changed.
 	/// All elements are divided by the element with maximum absolute value
-	/// and then scaled by the desired radius. The direction is not changed.
+	/// and then scaled by the desired radius.
 	/// \param[in] r	Radius of cube
 	Vec& fitToCube(T r = T(1)){
-		using namespace std;
-		auto mx = abs(max());
+		auto mx = extrema().absVec().max(); // avoids copy vs. absVec().max()
 		if(mx > T(0)) r/=mx;
 		return *this *= r;
 	}

@@ -149,16 +149,20 @@ int utMath(){
 		a = 2. * a;				assert(a == 6);
 //		a = 1. / a;				assert(a == 1./6);
 
+		assert(toVec(-1,2,-3).negate() == toVec(1,-2,3));
+
+		// comparison
 		a = +1;
 		b = -1;					assert(a == -b);
 
 		a = -1;
 		b = +1;
-		assert(a.absVec() == b);
+		assert(toVec(-1,2,-3).absVec() == toVec(1,2,3));
 		assert(a.dot(b) ==-N);
 		assert(a.dot(a) == N);
 		assert(Vec3i(1,2,-3).product() == -6);
 		assert(a.sum() == -N);
+		assert(a.sumAbs() == N);
 		assert(a.sumAbs() == N);
 		assert(Vec3f(1,2,3).mean() == 2);
 		assert(a.mag() == sqrt(N));
@@ -170,21 +174,31 @@ int utMath(){
 		assert(a.norm(1) == a.norm1());
 		assert(a.norm(2) == a.norm2());
 
-		(a = 1).negate();		assert(a == -1);
-		(a = 1).normalize();	assert(a == 1./sqrt(N));
+		assert((a=1).normalize() == 1.f/sqrt(N));
 		assert(a == (b = 10).normalized());
+		// normalizing null vector should produce (1,0,0,...)
+		assert((a=0).normalize() == (b=0).set<0>(1));
 
-		assert(Vec4i(-10,1,4,100).indexOfMax() == 3);
-		assert(Vec4i(-10,1,4,100).indexOfMin() == 0);
+		assert(Vec3f(1,2,4).fitToCube() == Vec3f(0.25,0.5,1));
+		assert(Vec3f(1,2,-4).fitToCube() == Vec3f(0.25,0.5,-1));
+		assert(Vec3f(1,2,4).fitToCube(2) == Vec3f(0.5,1,2));
+		assert(Vec3f(0,0,0).fitToCube() == Vec3f(0,0,0));
+
+		assert(toVec(-10,1,4,100).indexOfMax() == 3);
+		assert(toVec(1,1,1,1).indexOfMax() == 0);
+		assert(toVec(-10,1,4,100).indexOfMin() == 0);
+		assert(toVec(1,1,1,1).indexOfMin() == 0);
+		assert(toVec(1,100,4,-10).indicesOfExtrema() == toVec(3,1));
+		assert(toVec(1,1).indicesOfExtrema() == toVec(0,0));
 
 		// Vec-Vec ops
 		b = a = 1;
 		assert(concat(a,b) == 1);
 
 		{
-		a = 0;
-		Vec<N+1, double> t = concat(a, Vec<1,char>(1));
-		assert(t.size() == a.size()+1);
+			a = 0;
+			Vec<N+1, double> t = concat(a, Vec<1,char>(1));
+			assert(t.size() == a.size()+1);
 		}
 
 		// geometry and other math ops
