@@ -995,9 +995,9 @@ public:
 
 	/// Get projection of vector onto another vector
 	Vec proj(const Vec& v) const {
-		static const T eps = T(1e-30);
-		float vDotv = v.dot(v); // mag squared
-		return vDotv > eps ? dot(v)/vDotv * v : Vec(T(0));
+		static const double eps = T(1e-30);
+		double vDotv = v.dot(v); // mag squared
+		return vDotv > eps ? v * (dot(v)/vDotv) : Vec(T(0));
 	}
 
 	/// Get projection of vector onto a unit vector
@@ -1110,7 +1110,7 @@ public:
 		/*	    | c -c |
 			R = | c  c | where c = sqrt(2)/2
 
-			R p = { ax - ay, ax + ay } */
+			R p = { cx - cy, cx + cy } */
 		float c = 0.7071067811865475244; // sqrt(2)/2
 		auto x = at(dim1) * c;
 		auto y = at(dim2) * c;
