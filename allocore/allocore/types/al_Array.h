@@ -272,25 +272,25 @@ static inline size_t allo_type_size(AlloTy t){
 	}
 }
 
-inline  uint8_t _allo_ui08_max(){ return ~(( uint8_t)0); }
-inline uint16_t _allo_ui16_max(){ return ~((uint16_t)0); }
-inline uint32_t _allo_ui32_max(){ return ~((uint32_t)0); }
-inline uint64_t _allo_ui64_max(){ return ~((uint64_t)0); }
-inline double _allo_ui08f_max(){ return (double)_allo_ui08_max(); }
-inline double _allo_ui16f_max(){ return (double)_allo_ui16_max(); }
-inline double _allo_ui32f_max(){ return (double)_allo_ui32_max(); }
-inline double _allo_ui64f_max(){ return (double)_allo_ui64_max(); }
+inline double _allo_s08f_min(){ return (double) INT8_MIN; }
+inline double _allo_s16f_min(){ return (double)INT16_MIN; }
+inline double _allo_s32f_min(){ return (double)INT32_MIN; }
+inline double _allo_s64f_min(){ return (double)INT64_MIN; }
+inline double _allo_u08f_max(){ return (double) UINT8_MAX; }
+inline double _allo_u16f_max(){ return (double)UINT16_MAX; }
+inline double _allo_u32f_max(){ return (double)UINT32_MAX; }
+inline double _allo_u64f_max(){ return (double)UINT64_MAX; }
 
 static inline double allo_type_tonumber(AlloTy t, const void * src) {
 	switch(t){
-	case AlloUInt8Ty:	return (double)*(( uint8_t *)src)/_allo_ui08f_max();
-	case AlloUInt16Ty:	return (double)*((uint16_t *)src)/_allo_ui16f_max();
-	case AlloUInt32Ty:	return (double)*((uint32_t *)src)/_allo_ui32f_max();
-	case AlloUInt64Ty:	return (double)*((uint64_t *)src)/_allo_ui64f_max();
-	case AlloSInt8Ty:	return (double)*((  int8_t *)src)/_allo_ui08f_max()+0.5;
-	case AlloSInt16Ty:	return (double)*(( int16_t *)src)/_allo_ui16f_max()+0.5;
-	case AlloSInt32Ty:	return (double)*(( int32_t *)src)/_allo_ui32f_max()+0.5;
-	case AlloSInt64Ty:	return (double)*(( int64_t *)src)/_allo_ui64f_max()+0.5;
+	case AlloUInt8Ty:	return (double)*(( uint8_t *)src)/_allo_u08f_max();
+	case AlloUInt16Ty:	return (double)*((uint16_t *)src)/_allo_u16f_max();
+	case AlloUInt32Ty:	return (double)*((uint32_t *)src)/_allo_u32f_max();
+	case AlloUInt64Ty:	return (double)*((uint64_t *)src)/_allo_u64f_max();
+	case AlloSInt8Ty:	return ((double)*((  int8_t *)src)-_allo_s08f_min())/_allo_u08f_max();
+	case AlloSInt16Ty:	return ((double)*(( int16_t *)src)-_allo_s16f_min())/_allo_u16f_max();
+	case AlloSInt32Ty:	return ((double)*(( int32_t *)src)-_allo_s32f_min())/_allo_u32f_max();
+	case AlloSInt64Ty:	return ((double)*(( int64_t *)src)-_allo_s64f_min())/_allo_u64f_max();
 	case AlloFloat32Ty:	return (double)*((float *)src);
 	case AlloFloat64Ty:	return *(double *)src;
 	default:			return 0;
@@ -299,14 +299,14 @@ static inline double allo_type_tonumber(AlloTy t, const void * src) {
 
 static inline void allo_type_fromnumber(AlloTy t, double val, void * dst) {
 	switch(t){
-	case AlloUInt8Ty:	*( uint8_t *)dst = ( uint8_t)(val * _allo_ui08f_max()); break;
-	case AlloUInt16Ty:	*(uint16_t *)dst = (uint16_t)(val * _allo_ui16f_max()); break;
-	case AlloUInt32Ty:	*(uint32_t *)dst = (uint32_t)(val * _allo_ui32f_max()); break;
-	case AlloUInt64Ty:	*(uint64_t *)dst = (uint64_t)(val * _allo_ui64f_max()); break;
-	case AlloSInt8Ty:	*(  int8_t *)dst = (  int8_t)((val-0.5) * _allo_ui08f_max()); break;
-	case AlloSInt16Ty:	*( int16_t *)dst = ( int16_t)((val-0.5) * _allo_ui16f_max()); break;
-	case AlloSInt32Ty:	*( int32_t *)dst = ( int32_t)((val-0.5) * _allo_ui32f_max()); break;
-	case AlloSInt64Ty:	*( int64_t *)dst = ( int64_t)((val-0.5) * _allo_ui64f_max()); break;
+	case AlloUInt8Ty:	*( uint8_t *)dst = ( uint8_t)(val * _allo_u08f_max()); break;
+	case AlloUInt16Ty:	*(uint16_t *)dst = (uint16_t)(val * _allo_u16f_max()); break;
+	case AlloUInt32Ty:	*(uint32_t *)dst = (uint32_t)(val * _allo_u32f_max()); break;
+	case AlloUInt64Ty:	*(uint64_t *)dst = (uint64_t)(val * _allo_u64f_max()); break;
+	case AlloSInt8Ty:	*(  int8_t *)dst = (  int8_t)(val * _allo_u08f_max() - _allo_s08f_min()); break;
+	case AlloSInt16Ty:	*( int16_t *)dst = ( int16_t)(val * _allo_u16f_max() - _allo_s16f_min()); break;
+	case AlloSInt32Ty:	*( int32_t *)dst = ( int32_t)(val * _allo_u32f_max() - _allo_s32f_min()); break;
+	case AlloSInt64Ty:	*( int64_t *)dst = ( int64_t)(val * _allo_u64f_max() - _allo_s64f_min()); break;
 	case AlloFloat32Ty:	*(float *)dst = (float)val; break;
 	case AlloFloat64Ty:	*(double *)dst = val; break;
 	default:			;//*dst = 0;
