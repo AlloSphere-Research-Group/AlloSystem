@@ -19,18 +19,18 @@ void testFirstOrder2D() {
 		encoder.encode(ambiBuffer, bufferSize, i, signal[i]);
 	}
 	for (int i = 0; i < bufferSize; i++) {
-		assert(eq(ambiBuffer[i], sqrt(2.0)/4.0)); // First harmonic (W)
-		assert(eq(ambiBuffer[bufferSize + i], 0.5)); // Second harmonic (X)
-		assert(eq(ambiBuffer[(2*bufferSize) + i], 0.0)); // Third harmonic (Y)
+		assert(eq(ambiBuffer[i], sqrt(2.f)/4.f)); // First harmonic (W)
+		assert(eq(ambiBuffer[bufferSize + i], 0.5f)); // Second harmonic (X)
+		assert(eq(ambiBuffer[(2*bufferSize) + i], 0.f)); // Third harmonic (Y)
 	}
 
 	// Encoding by buffer
 	memset(ambiBuffer, 0, sizeof(float) * bufferSize * 3);
 	encoder.encode(ambiBuffer, signal, bufferSize);
 	for (int i = 0; i < bufferSize; i++) {
-		assert(eq(ambiBuffer[i], sqrt(2.0)/4.0)); // First harmonic (W)
-		assert(eq(ambiBuffer[bufferSize + i], 0.5)); // Second harmonic (X)
-		assert(eq(ambiBuffer[(2*bufferSize) + i], 0.0)); // Third harmonic (Y)
+		assert(eq(ambiBuffer[i], sqrt(2.f)/4.f)); // First harmonic (W)
+		assert(eq(ambiBuffer[bufferSize + i], 0.5f)); // Second harmonic (X)
+		assert(eq(ambiBuffer[(2*bufferSize) + i], 0.f)); // Third harmonic (Y)
 	}
 
 	//Decoding
