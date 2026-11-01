@@ -321,6 +321,24 @@ int utTypes(){
 			}
 
 		}	// end size loop
+
+		{ // reading
+			Array a(1, AlloFloat32Ty, 3);
+			a.as<float>(0) = 10.f;
+			a.as<float>(1) = 20.f;
+			a.as<float>(2) = 30.f;
+
+			float v;
+			a.read_interp(&v, 0.00); assert(v == 10.0f);
+			a.read_interp(&v, 0.25); assert(v == 12.5f);
+			a.read_interp(&v, 1.75); assert(v == 27.5f);
+			a.read_interp(&v, 2.00); assert(v == 30.0f);
+			a.read_interp(&v, 2.25); assert(v == 25.0f);
+			a.read_interp(&v, 3.00); assert(v == 10.0f);
+			a.read_interp(&v,-1.00); assert(v == 30.0f);
+			a.read_interp(&v,-0.25); assert(v == 15.0f);
+			a.read_interp(&v,-3.00); assert(v == 10.0f);
+		}
 	}
 
 

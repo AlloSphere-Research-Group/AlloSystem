@@ -304,13 +304,13 @@ protected:
 	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
 
 	struct Lookup{
-		Lookup(double pos, unsigned len){
+		Lookup(double pos, int64_t len){
 			auto q = std::floor(pos);
-			i = (int(q)%len + len) % len; // % allowing left operand to be negative
+			i = (int64_t(q)%len + len) % len; // % allowing left operand to be negative
 			j = i+1; if(j==len) j=0;
 			f = pos - q;
 		}
-		int i,j;
+		unsigned i,j;
 		double f; // fraction in [0,1]
 		template <class T>
 		T get(T a, T b) const { return (b-a)*f + a; }
