@@ -1642,11 +1642,7 @@ Vec<N,T>& Vec<N,T>::mag(T v){
 template<int N, class T>
 void Vec<N,T>::print(FILE * out, const char * append) const {
 	fprintf(out, "{");
-	if(size()){
-		fprintf(out, "%g", (double)(front()));
-		for (int i=1; i<N; ++i)
-			fprintf(out, ", %g", (double)(at(i)));
-	}
+	for(int i=0; i<N; ++i) fprintf(out, "%s%g", i?", ":"", (double)(at(i)));
 	fprintf(out, "}%s", append);
 }
 
@@ -1656,11 +1652,7 @@ void Vec<N,T>::println(FILE * out) const { print(out, "\n"); }
 template <int N, class T>
 std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
 	out << "{";
-	if(v.size()){
-		out << v[0];
-		for (int i = 1; i < N; ++i)
-			out << ", " << v[i];
-	}
+	for(int i=0; i<N; ++i) out << (i?", ":"") << v[i];
 	out << "}";
 	return out;
 }
