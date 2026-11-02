@@ -183,8 +183,8 @@ public:
 	template<class T> T * cell(int x) const;
 	template<class T> T * cell(int x, int y) const;
 	template<class T> T * cell(int x, int y, int z) const;
-	template<class T, class U> T * cell(T* val, Vec<2,U> p) const { return cell(val, p[0], p[1]); }
-	template<class T, class U> T * cell(T* val, Vec<3,U> p) const { return cell(val, p[0], p[1], p[2]); }
+	template<class T, class U> T * cell(Vec<2,U> p) const { return cell<T>(p.x, p.y); }
+	template<class T, class U> T * cell(Vec<3,U> p) const { return cell<T>(p.x, p.y, p.z); }
 
 	/// Return a particular cell casted to a typed reference (no bounds checking)
 	template<class T> T& as(int x) { return *cell<T>(x); }
@@ -196,7 +196,7 @@ public:
 	/// Return casted cell indexed by a vector (no bounds checking)
 	template<class T, class U> T& as(Vec<2,U> p) { return as<T>(p.x,p.y); }
 	template<class T, class U> const T& as(Vec<2,U> p) const { return mut().as<T>(p); }
-	template<class T, class U> T& as(Vec<3,U> p) { return as(p.x,p.y,p.z); }
+	template<class T, class U> T& as(Vec<3,U> p) { return as<T>(p.x,p.y,p.z); }
 	template<class T, class U> const T& as(Vec<3,U> p) const { return mut().as<T>(p); }
 
 	/// Get component using 1-D index
@@ -204,7 +204,7 @@ public:
 	template<class T> const T& elem(int c, int x) const { return mut().elem<T>(c,x); }
 
 	/// Get mutable component using 2-D index
-	template<class T> T& elem(int ic, int ix, int iy){ return cell<T>(ix,iy)[ic]; }
+	template<class T> T& elem(int c, int x, int y){ return cell<T>(x,y)[c]; }
 	template<class T> const T& elem(int c, int x, int y) const { return mut().elem<T>(c,x,y); }
 
 	/// Get mutable component using 3-D index
@@ -231,8 +231,8 @@ public:
 	template<class T> void read(T* val, int x, int y) const;
 	template<class T> void read(T* val, int x, int y, int z) const;
 
-	template<class T, class U> void read(T* val, Vec<2,U> p) const { read(val, p[0], p[1]); }
-	template<class T, class U> void read(T* val, Vec<3,U> p) const { read(val, p[0], p[1], p[2]); }
+	template<class T, class U> void read(T* val, Vec<2,U> p) const { read(val, p.x, p.y); }
+	template<class T, class U> void read(T* val, Vec<3,U> p) const { read(val, p.x, p.y, p.z); }
 
 	/// Copy component values to destination array applying type conversion
 	/// The destination type does NOT have to match the array type.
@@ -259,16 +259,16 @@ public:
 	template<class T> void read_interp(T * val, double x, double y) const;
 	template<class T> void read_interp(T * val, double x, double y, double z) const;
 
-	template<class T, class U> void read_interp(T* val, Vec<2,U> p) const { read_interp(val, p[0], p[1]); }
-	template<class T, class U> void read_interp(T* val, Vec<3,U> p) const { read_interp(val, p[0], p[1], p[2]); }
+	template<class T, class U> void read_interp(T* val, Vec<2,U> p) const { read_interp(val, p.x, p.y); }
+	template<class T, class U> void read_interp(T* val, Vec<3,U> p) const { read_interp(val, p.x, p.y, p.z); }
 
 	/// Write component values from val array into array (no bounds checking)
 	template<class T> void write(const T* val, int x);
 	template<class T> void write(const T* val, int x, int y);
 	template<class T> void write(const T* val, int x, int y, int z);
 
-	template<class T, class U> void write(const T* val, Vec<2,U> p) { write(val, p[0], p[1]); }
-	template<class T, class U> void write(const T* val, Vec<3,U> p) { write(val, p[0], p[1], p[2]); }
+	template<class T, class U> void write(const T* val, Vec<2,U> p) { write(val, p.x, p.y); }
+	template<class T, class U> void write(const T* val, Vec<3,U> p) { write(val, p.x, p.y, p.z); }
 
 
 	/// Linear interpolated write (virtual array index)
@@ -279,8 +279,8 @@ public:
 	template<class T> void write_interp(const T* val, double x, double y);
 	template<class T> void write_interp(const T* val, double x, double y, double z);
 
-	template<class T, class U> void write_interp(const T* val, Vec<2,U> p) { write_interp(val, p[0], p[1]); }
-	template<class T, class U> void write_interp(const T* val, Vec<3,U> p) { write_interp(val, p[0], p[1], p[2]); }
+	template<class T, class U> void write_interp(const T* val, Vec<2,U> p) { write_interp(val, p.x, p.y); }
+	template<class T, class U> void write_interp(const T* val, Vec<3,U> p) { write_interp(val, p.x, p.y, p.z); }
 
 	/// Print array information
 	void print(FILE * fp = stdout) const;

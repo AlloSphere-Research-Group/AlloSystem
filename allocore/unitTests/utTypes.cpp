@@ -192,7 +192,7 @@ int utTypes(){
 		}
 
 		// Run tests on Arrays with various sizes and dimensions
-		const int Nc= 3;
+		constexpr int Nc= 3;
 		const int Ns[] = {1, 4, 7, 32};
 
 		for(unsigned iN=0; iN<sizeof(Ns)/sizeof(*Ns); ++iN){
@@ -264,58 +264,73 @@ int utTypes(){
 			}
 
 			{	// 1-D element access
-				Array a(Nc, AlloSInt8Ty, W);
+				using T = int8_t;
+				Array a(Nc, Array::type<T>(), W);
+				T t=0;
 				for(int i=0,t=0; i<W; ++i){
 
-					int8_t x[Nc] = {int8_t(i), int8_t(i+1), int8_t(i+2)};
-					int8_t y[Nc] = {-1,-1,-1};
+					T x[Nc] = {T(i), T(i+1), T(i+2)};
+					T y[Nc] = {-1,-1,-1};
 					a.write(x, i);
 					a.read(y, i);
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
 
-					for(int c=0; c<Nc; ++c){
-						a.elem<int8_t>(c,i) = t+1;
-						assert(a.elem<int8_t>(c,i) == int8_t(t+1));
-						++t;
+					for(int c=0; c<Nc; ++c, ++t){
+						a.elem<T>(c,i) = t;
+						assert(a.elem<T>(c,i) == t);
+						assert(a.cell<T>(i)[c] == t);
+						using V = Vec<Nc,T>;
+						assert(a.as<V>(i)[c] == t);
 					}
 				}
 			}
 
 			{	// 2-D element access
-				Array a(Nc, AlloSInt8Ty, W,H);
-				for(int j=0,t=0; j<H; ++j){
+				using T = int8_t;
+				Array a(Nc, Array::type<T>(), W,H);
+				T t=0;
+				for(int j=0; j<H; ++j){
 				for(int i=0; i<W; ++i){
 
-					int8_t x[Nc] = {int8_t(j), int8_t(j+1), int8_t(j+2)};
-					int8_t y[Nc] = {-1,-1,-1};
+					T x[Nc] = {T(j), T(j+1), T(j+2)};
+					T y[Nc] = {-1,-1,-1};
 					a.write(x, i,j);
 					a.read(y, i,j);
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
 
-					for(int c=0; c<Nc; ++c){
-						a.elem<int8_t>(c,i,j) = t+1;
-						assert(a.elem<int8_t>(c,i,j) == int8_t(t+1));
-						++t;
+					for(int c=0; c<Nc; ++c, ++t){
+						a.elem<T>(c,i,j) = t;
+						assert(a.elem<T>(c,i,j) == t);
+						assert(a.cell<T>(i,j)[c] == t);
+						assert(a.cell<T>(toVec(i,j))[c] == t);
+						using V = Vec<Nc,T>;
+						assert(a.as<V>(i,j)[c] == t);
 					}
 				}}
 			}
 
 			{	// 3-D element access
-				Array a(Nc, AlloSInt8Ty, W,H,D);
-				for(int k=0,t=0; k<D; ++k){
+				using T = int8_t;
+				Array a(Nc, Array::type<T>(), W,H,D);
+				T t=0;
+				for(int k=0; k<D; ++k){
 				for(int j=0; j<H; ++j){
 				for(int i=0; i<W; ++i){
 
-					int8_t x[Nc] = {int8_t(k), int8_t(k+1), int8_t(k+2)};
-					int8_t y[Nc] = {-1,-1,-1};
+					T x[Nc] = {T(k), T(k+1), T(k+2)};
+					T y[Nc] = {-1,-1,-1};
 					a.write(x, i,j,k);
 					a.read(y, i,j,k);
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
 
-					for(int c=0; c<Nc; ++c){
-						a.elem<int8_t>(c,i,j,k) = t+1;
-						assert(a.elem<int8_t>(c,i,j,k) == int8_t(t+1));
-						++t;
+					for(int c=0; c<Nc; ++c, ++t){
+						T v = t+1;
+						a.elem<T>(c,i,j,k) = t;
+						assert(a.elem<T>(c,i,j,k) == t);
+						assert(a.cell<T>(i,j,k)[c] == t);
+						assert(a.cell<T>(toVec(i,j,k))[c] == t);
+						using V = Vec<Nc,T>;
+						assert(a.as<V>(i,j,k)[c] == t);
 					}
 				}}}
 			}
@@ -323,12 +338,13 @@ int utTypes(){
 		}	// end size loop
 
 		{ // reading
-			Array a(1, AlloFloat32Ty, 3);
-			a.as<float>(0) = 10.f;
-			a.as<float>(1) = 20.f;
-			a.as<float>(2) = 30.f;
+			using T = float;
+			Array a(1, Array::type<T>(), 3);
+			a.as<T>(0) = 10.f;
+			a.as<T>(1) = 20.f;
+			a.as<T>(2) = 30.f;
 
-			float v;
+			T v;
 			a.read_interp(&v, 0.00); assert(v == 10.0f);
 			a.read_interp(&v, 0.25); assert(v == 12.5f);
 			a.read_interp(&v, 1.75); assert(v == 27.5f);
@@ -342,7 +358,7 @@ int utTypes(){
 	}
 
 
-	{
+	{ // Buffer
 		{ // default constructor
 			Buffer<int> a;
 			assert(a.size() == 0);
