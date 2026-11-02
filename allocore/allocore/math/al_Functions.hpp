@@ -113,11 +113,6 @@ inline bool aeq(double a, double b, int maxULP=10){
 	return aeqBase<uint64_t,int64_t>(a,b,maxULP);
 }
 
-
-/// Convert amplitude to decibels
-template <class T>
-inline T ampTodB(const T& amp){ return 20*std::log(amp); }
-
 /// Returns value clipped ouside of range [-eps, eps]
 template<class T> T atLeast(const T& v, const T& eps){
 	return v >= T(0) ? max(v, eps) : min(v, -eps);
@@ -199,10 +194,6 @@ template<class T> T clip(const T& v, int& clipFlag, const T& hi, const T& lo){
 template<class T> T clipS(const T& v, const T& hi=T(1)){
 	return al::clip(v, hi, -hi);
 }
-
-/// Convert decibels to amplitude
-template <class T>
-inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 
 /// The Gauss error function or probability integral
 /// \see http://en.wikipedia.org/wiki/Error_function
