@@ -766,6 +766,7 @@ int utMath(){
 	assert(isPrime(2));
 	assert(isPrime(3));
 	assert(isPrime(13));
+	assert(isPrime(4294967291u)); // largest prime below 2^32
 	assert(!isPrime(0));
 	assert(!isPrime(1));
 	assert(!isPrime(4));
