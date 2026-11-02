@@ -67,9 +67,9 @@ template<class T> T atan2Fast(const T& y, const T& x);
 uint32_t bitsSet(uint32_t v);
 
 /// Returns floating point value rounded to next highest integer
-template<class T> T ceil(const T& val);
-template<class T> T ceil(const T& val, const T& step);
-template<class T> T ceil(const T& val, const T& step, const T& recStep);
+template<class T> T ceil(const T& v);
+template<class T> T ceil(const T& v, const T& step);
+template<class T> T ceil(const T& v, const T& step, const T& recStep);
 
 /// Returns even number ceiling
 inline uint32_t ceilEven(uint32_t v){ return v + (v&1); }
@@ -81,7 +81,7 @@ inline uint32_t ceilEven(uint32_t v){ return v + (v&1); }
 uint32_t ceilPow2(uint32_t value);
 
 /// Returns value clipped to [lo, hi]
-template<class T> T clip(const T& value, const T& hi=T(1), const T& lo=T(0));
+template<class T> T clip(const T& v, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns value clipped to [lo, hi] and signifies clipping behavior
 
@@ -91,7 +91,7 @@ template<class T> T clip(const T& value, const T& hi=T(1), const T& lo=T(0));
 template<class T> T clip(const T& v, int& clipFlag, const T& hi, const T& lo);
 
 /// Returns value clipped to [-hi, hi]
-template<class T> T clipS(const T& value, const T& hi=T(1));
+template<class T> T clipS(const T& v, const T& hi=T(1));
 
 /// Convert decibels to amplitude
 template <class T>
@@ -111,25 +111,25 @@ uint32_t factorial(uint32_t n0to12);
 double factorialSqrt(int v);
 
 /// Returns floor of floating point value
-template<class T> T floor(const T& val);
-template<class T> T floor(const T& val, const T& step);
-template<class T> T floor(const T& val, const T& step, const T& recStep);
+template<class T> T floor(const T& v);
+template<class T> T floor(const T& v, const T& step);
+template<class T> T floor(const T& v, const T& step, const T& recStep);
 
 /// Returns power of two floor of value
 
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-uint32_t floorPow2(uint32_t value);
+uint32_t floorPow2(uint32_t v);
 
 /// Returns value folded into [lo, hi]
 
 /// For out-of-range values, the boundaries act like mirrors reflecting
 /// the value into the range. For an even number of periods out of the range
 /// this is identical to a wrap().
-template<class T> T fold(const T& value, const T& hi=T(1), const T& lo=T(0));
+template<class T> T fold(const T& v, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns value folded into [lo, hi] one time
-template<class T> T foldOnce(const T& value, const T& hi=T(1), const T& lo=T(0));
+template<class T> T foldOnce(const T& v, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns e^(-v*v)
 template<class T> T gaussian(const T& v);
@@ -219,19 +219,19 @@ auto makeCoprime(Args&... args) -> decltype(al::gcd(args...)){
 }
 
 /// Returns maximum of two values
-template<class T> T max(const T& v1, const T& v2);
+template<class T> T max(const T& a, const T& b);
 
 /// Returns maximum of three values
-template<class T> T max(const T& v1, const T& v2, const T& v3);
+template<class T> T max(const T& a, const T& b, const T& c);
 
 /// Returns mean of two values
-template<class T> T mean(const T& v1, const T& v2);
+template<class T> T mean(const T& a, const T& b);
 
 /// Returns minimum of two values
-template<class T> T min(const T& v1, const T& v2);
+template<class T> T min(const T& a, const T& b);
 
 /// Returns minimum of three values
-template<class T> T min(const T& v1, const T& v2, const T& v3);
+template<class T> T min(const T& a, const T& b, const T& c);
 
 /// Returns nearest integer division of one value to another
 template<class T> inline T nearestDiv(T of, T to);
@@ -308,8 +308,8 @@ template<class T> T sinc(const T& radians, const T& eps=T(0.0001));
 /// Returns slope of line passing through two points
 template<class T> T slope(const T& x1, const T& y1, const T& x2, const T& y2);
 
-/// Sort values so that value1 <= value2
-template<class T> void sort(T& value1, T& value2);
+/// Sort values so that a <= b
+template<class T> void sort(T& a, T& b);
 
 /// Sum of integers squared from 1 to n
 template<class T> T sumOfSquares(T n);
@@ -340,21 +340,18 @@ template<class T> bool within3(const T& v1, const T& v2, const T& v3, const T& l
 template<class T> bool withinIE(const T& v, const T& lo, const T& hi);
 
 /// Returns value wrapped in [lo, hi)
-template<class T> T wrap(const T& value, const T& hi=T(1), const T& lo=T(0));
+template<class T> T wrap(const T& v, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns value wrapped in [lo, hi)
 
 /// 'numWraps' reports how many wrappings occured where the sign, + or -,
 /// signifies above 'hi' or below 'lo', respectively.
-template<class T> T wrap(const T& value, long& numWraps, const T& hi=T(1), const T& lo=T(0));
-
-/// Returns value incremented by 1 and wrapped into interval [0, max)
-template<class T> T wrapAdd1(const T& v, const T& max){ ++v; return v == max ? 0 : v; }
+template<class T> T wrap(const T& v, long& numWraps, const T& hi=T(1), const T& lo=T(0));
 
 /// Like wrap(), but only adds or subtracts 'hi' once from value
-template<class T> T wrapOnce(const T& value, const T& hi=T(1));
+template<class T> T wrapOnce(const T& v, const T& hi=T(1));
 
-template<class T> T wrapOnce(const T& value, const T& hi, const T& lo);
+template<class T> T wrapOnce(const T& v, const T& hi, const T& lo);
 
 /// Returns value wrapped in [-pi, pi)
 template<class T> T wrapPhase(const T& radians);
@@ -675,11 +672,12 @@ TEM inline bool lessAbs(const T& v, const T& eps){ return al::abs(v) < eps; }
 
 inline uint32_t log2(uint32_t v){ return deBruijn(al::ceilPow2(v)); }
 
-TEM inline T max(const T& v1, const T& v2){ return v1<v2?v2:v1; }
-TEM inline T max(const T& v1, const T& v2, const T& v3){ return al::max(al::max(v1,v2),v3); }
-TEM inline T mean(const T& v1, const T& v2){ return (v1 + v2) * T(0.5); }
-TEM inline T min(const T& v1, const T& v2){ return v1<v2?v1:v2; }
-TEM inline T min(const T& v1, const T& v2, const T& v3){ return al::min(al::min(v1,v2),v3); }
+TEM inline T max(const T& a, const T& b){ return a<b?b:a; }
+TEM inline T max(const T& a, const T& b, const T& c){ return al::max(al::max(a,b),c); }
+TEM inline T min(const T& a, const T& b){ return a<b?a:b; }
+TEM inline T min(const T& a, const T& b, const T& c){ return al::min(al::min(a,b),c); }
+
+TEM inline T mean(const T& a, const T& b){ return (a + b) * T(0.5); }
 
 TEM inline T nearestDiv(T of, T to){ return to / al::round(to/of); }
 
@@ -771,7 +769,7 @@ TEM inline T sinc(const T& r, const T& eps){ return (al::abs(r) > eps) ? std::si
 
 TEM inline T slope(const T& x1, const T& y1, const T& x2, const T& y2){ return (y2-y1)/(x2-x1); }
 
-TEM inline void sort(T& v1, T& v2){ if(v1>v2){ T t=v1; v1=v2; v2=t; } }
+TEM inline void sort(T& a, T& b){ if(a>b){ T t=a; a=b; b=t; } }
 
 TEM inline T sumOfSquares(T n){
 	// 0^2 + 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6
@@ -878,9 +876,9 @@ TEM inline T wrapPhaseOnce(const T& r){
 	return r;
 }
 
-TEM inline T mapRange(T value, T inlow, T inhigh, T outlow, T outhigh){
-  float tmp = (value - inlow) / (inhigh-inlow);
-  return tmp*(outhigh-outlow) + outlow;
+TEM inline T mapRange(T v, T ilo, T ihi, T olo, T ohi){
+	auto f = (v - ilo) / (ihi - ilo); // to fraction in [0,1]
+	return (ohi - olo)*f + olo; // lerp to output range
 }
 
 #undef TEM
