@@ -151,7 +151,7 @@ template<class T> T atan2Fast(const T& y, const T& x){
 inline uint32_t bitsSet(uint32_t v){
 	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
-	return ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
+	return (((v + (v >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24; // count
 }
 
 /// Returns floating point value rounded to next highest integer

@@ -702,11 +702,11 @@ int utMath(){
 	T(0) T(1) T(-1)
 	#undef T
 
-	#define T(x,y, r) assert(al::atLeast(x,y) == r);
+	#define T(x,y, r) assert(atLeast(x,y) == r);
 	T(0.,1., 1.) T(+0.1,1., 1.) T(-0.1,1., -1.)
 	#undef T
 
-	#define T(x,y) assert(al::abs(al::atan2Fast(x,y) - std::atan2(x,y)) < 1e-5);
+	#define T(x,y) assert(al::abs(atan2Fast(x,y) - std::atan2(x,y)) < 1e-5);
 	T(1.,0.) T(1.,1.) T(0.,1.) T(-1.,1.) T(-1.,0.) T(-1.,-1.) T(0.,-1.) T(1.,-1.)
 	#undef T
 
@@ -715,28 +715,28 @@ int utMath(){
 				T(-1.,-1.) T(-1.2,-1.) T(-1.8,-1.) T(-1000.1,-1000.)
 	#undef T
 
-	#define T(x, y) assert(al::ceilEven(x) == y);
+	#define T(x, y) assert(ceilEven(x) == y);
 	T(0, 0) T(1, 2) T(2, 2) T(3, 4) T(1001, 1002)
 	#undef T
 
-	#define T(x, y) assert(al::ceilPow2(x) == y);
+	#define T(x, y) assert(ceilPow2(x) == y);
 	T(0, 0) T(1, 1) T(2, 2) T(3, 4)
 	T(500, 512) T(999, 1024)
 	#undef T
 
-	#define T(x, y) assert(al::clip(x) == y);
+	#define T(x, y) assert(clip(x) == y);
 	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, 0.) T(pinf, 1.) T(ninf, 0.)
 	#undef T
 
-	#define T(x, y) assert(al::clipS(x) == y);
+	#define T(x, y) assert(clipS(x) == y);
 	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, -0.5) T(-1., -1) T(-1.2, -1.)
 	#undef T
 
-	#define T(x,r) assert(al::even(x) == r);
+	#define T(x,r) assert(even(x) == r);
 	T(0,true) T(1,false) T(-2,true)
 	#undef T
 
-	#define T(x, y) assert(al::factorial(x) == y);
+	#define T(x, y) assert(factorial(x) == y);
 	T(0, 1) T(1, 1) T(2, 2*1) T(3, 3*2*1) T(4, 4*3*2*1)
 	T(5, 5*4*3*2*1) T(6, 6*5*4*3*2*1) T(7, 7*6*5*4*3*2*1) T(8, 8*7*6*5*4*3*2*1)
 	T(9, 9*8*7*6*5*4*3*2*1) T(10, 10*9*8*7*6*5*4*3*2*1) T(11, 11*10*9*8*7*6*5*4*3*2*1)
@@ -745,34 +745,52 @@ int utMath(){
 
 	for(int i=0; i<=12; ++i){
 		assert(
-			al::aeq(al::factorialSqrt(i), sqrt(al::factorial(i)))
+			aeq(factorialSqrt(i), std::sqrt(factorial(i)))
 		);
 	}
+
+	assert(gcd(7,7) == 7);
+	assert(gcd(7,4) == 1);
+	assert(gcd(8,4) == 4);
+	assert(gcd(3,6,12) == 3);
+	assert(gcd(7,-7,14,42) == 7);
+	assert(gcd(0,0) == 0);
+	assert(gcd(0,7) == 7);
+
+	assert(lcm(7,3) == 21);
+	assert(lcm(8,4) ==  8);
+	assert(lcm(3,1) ==  3);
+	assert(lcm(7,0) ==  0);
+	assert(lcm(0,0) ==  0);
+
+	assert(isPrime(2));
+	assert(isPrime(3));
+	assert(isPrime(13));
+	assert(!isPrime(0));
+	assert(!isPrime(1));
+	assert(!isPrime(4));
+
+	assert(coprime(1,2,3));
+	assert(coprime(2,3,4,5));
+	assert(coprime(2,3,4,6));
+	assert(!coprime(2,4,6));
 
 	#define T(x, y) assert(al::floor(x) == y);
 	T(0., 0.)	T( 1., 1.) T( 1.2, 1.) T( 1.8, 1.) T( 1000.1, 1000.)
 				T(-1.,-1.) T(-1.2,-2.) T(-1.8,-2.) T(-1000.1,-1001.)
 	#undef T
 
-	#define T(x, y) assert(al::floorPow2(x) == y);
+	#define T(x, y) assert(floorPow2(x) == y);
 	T(0, 1) T(1, 1) T(2, 2) T(3, 2)
 	T(513, 512) T(1090, 1024)
 	#undef T
 
-	#define T(x, y) assert(eq(al::fold(x), y));
+	#define T(x, y) assert(eq(fold(x), y));
 	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 0.8) T(-0.2, 0.2)
 	T(2.2, 0.2) T(3.2, 0.8) T(4.2, 0.2) T(5.2, 0.8)
 	#undef T
 
-	#define T(x,y,r) assert(al::gcd(x,y) == r);
-	T(7,7,7) T(7,4,1) T(8,4,4)
-	#undef T
-
-	#define T(x,y,r) assert(al::lcm(x,y)==r);
-	T(7,3,21) T(8,4,8) T(3,1,3)
-	#undef T
-
-	#define T(x,y,r) assert(al::lessAbs(x,y)==r);
+	#define T(x,y,r) assert(lessAbs(x,y)==r);
 	T(0.1,1., true) T(-0.1,1., true) T(1.,1., false) T(-1.,1., false)
 	#undef T
 
@@ -788,82 +806,83 @@ int utMath(){
 	T(0,0,0, 0) T(0,1,2, 2) T(1,2,0, 2) T(2,1,0, 2)
 	#undef T
 
-	assert(al::mean(-1., 1.) == 0.);
+	assert(mean(-1., 1.) == 0.);
+	//assert(mean(2, 4) == 3); // FIXME
 
 	#define T(x,y,r) assert(al::min(x,y)==r);
 	T(0,0,0) T(0,1,0) T(1,0,0) T(-1,1,-1)
 	#undef T
 
-	#define T(x,r) assert(al::odd(x) == r);
+	#define T(x,r) assert(odd(x) == r);
 	T(0,false) T(1,true) T(-2,false)
 	#undef T
 
-	#define T(x) assert(al::pow2(x) == x*x);
+	#define T(x) assert(pow2(x) == x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(al::pow2S(x) == x*al::abs(x));
+	#define T(x) assert(pow2S(x) == x*al::abs(x));
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(al::pow3(x) == x*x*x);
+	#define T(x) assert(pow3(x) == x*x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(al::pow3Abs(x) == al::abs(x*x*x));
+	#define T(x) assert(pow3Abs(x) == al::abs(x*x*x));
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(al::pow4(x) == x*x*x*x);
+	#define T(x) assert(pow4(x) == x*x*x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(al::pow5(x) == x*x*x*x*x);
+	#define T(x) assert(pow5(x) == x*x*x*x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(al::pow6(x) == x*x*x*x*x*x);
+	#define T(x) assert(pow6(x) == x*x*x*x*x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(al::pow8(x) == x*x*x*x*x*x*x*x);
+	#define T(x) assert(pow8(x) == x*x*x*x*x*x*x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(al::pow16(x) == x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
+	#define T(x) assert(pow16(x) == x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(eq(al::pow64(x), x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x));
+	#define T(x) assert(eq(pow64(x), x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x));
 	T(0.) T(1.) T(1.01) T(1.02) T(-1.) T(-1.01) T(-1.02)
 	#undef T
 
-//	#define T(x,r) assert(al::powerOf2(x) == r);
+//	#define T(x,r) assert(powerOf2(x) == r);
 //	T(0, false) T(1, true) T(2, true) T(3, false) T(4, true)
 //	#undef T
 
-	#define T(x,y,r) assert(al::remainder(x,y) == r);
+	#define T(x,y,r) assert(remainder(x,y) == r);
 	T(7,7,0) T(7,1,0) T(7,4,3) T(7,3,1) T(14,3,2)
 	#undef T
 
-	#define T(x,y) assert(al::round(x) == y);
+	#define T(x,y) assert(round(x) == y);
 	T(0.f, 0.f) T(0.2f, 0.f) T(0.8f, 1.f) T(-0.2f, 0.f) T(-0.8f,-1.f) T(0.5f, 1.f) T(-0.5f, -1.f)
 	T(0.0, 0.0) T(0.20, 0.0) T(0.80, 1.0) T(-0.20, 0.0) T(-0.80,-1.0) T(0.50, 1.0) T(-0.50, -1.0)
 	#undef T
 
-	#define T(x,y,r) assert(al::round(x,y) == r);
+	#define T(x,y,r) assert(round(x,y) == r);
 	T(0.0,0.1, 0.0) T(0.1,0.1, 0.1) T(0.15,0.1, 0.1) T(-0.15,0.1, -0.1)
 	#undef T
 
-	#define T(x,y,r) assert(al::roundAway(x,y) == r);
+	#define T(x,y,r) assert(roundAway(x,y) == r);
 	T(0.0,0.1, 0.0) T(0.1,0.1, 0.1) T(0.15,0.1, 0.2) T(-0.15,0.1, -0.2)
 	#undef T
 
-	#define T(x,r) assert(al::sgn(x) == r);
+	#define T(x,r) assert(sgn(x) == r);
 	T(-0.1, -1.) T(0.1, 1.) T(0., 0.)
 	#undef T
 
-	#define T(x1,y1,x2,y2, r) assert(al::slope(x1,y1,x2,y2) == r);
+	#define T(x1,y1,x2,y2, r) assert(slope(x1,y1,x2,y2) == r);
 	T(3.,3.,4.,4., 1.) T(3.,-3.,4.,-4., -1.)
 	#undef T
 
@@ -872,21 +891,34 @@ int utMath(){
 		sort(x,y); assert(x==0 && y==1);
 	}
 
-	#define T(x,y) assert(eq(al::sumOfSquares(x), y));
+	#define T(x,y) assert(eq(sumOfSquares(x), y));
 	T(1., 1.) T(2., 1*1+2*2.) T(3., 1*1+2*2+3*3.) T(4., 1*1+2*2+3*3+4*4.) T(5., 1*1+2*2+3*3+4*4+5*5.)
 	T(1, 1) T(5, 1*1+2*2+3*3+4*4+5*5)
 	#undef T
 
-	#define T(x,r) assert(al::trailingZeroes(x) == r);
+	assert(bitsSet(0) == 0);
+	assert(bitsSet(1) == 1);
+	assert(bitsSet(2) == 1);
+	assert(bitsSet(3) == 2);
+	assert(bitsSet(4) == 1);
+	assert(bitsSet(5) == 2);
+	assert(bitsSet(7) == 3);
+	assert(bitsSet(15) == 4);
+	assert(bitsSet(0xfe) == 7);
+	assert(bitsSet(0xff) == 8);
+	assert(bitsSet(0xfff) == 12);
+	assert(bitsSet(0xfffffffe) == 31);
+
+	#define T(x,r) assert(trailingZeroes(x) == r);
 	T(0, 0) T(1, 0) T(2, 1) T(3, 0) T(4, 2) T(8, 3) T(9, 0)
 	#undef T
 
-	#define T(x,y) assert(al::trunc(x) == y);
+	#define T(x,y) assert(trunc(x) == y);
 	T(0.f, 0.f) T(0.2f, 0.f) T(0.8f, 0.f) T(-0.2f, 0.f) T(-0.8f, 0.f) T(0.5f, 0.f) T(-0.5f, 0.f)
 	T(0.0, 0.0) T(0.20, 0.0) T(0.80, 0.0) T(-0.20, 0.0) T(-0.80, 0.0) T(0.50, 0.0) T(-0.50, 0.0)
 	#undef T
 
-	#define T(x,l,h,r) assert(al::within(x,l,h)==r);
+	#define T(x,l,h,r) assert(within(x,l,h)==r);
 	T(0,0,1, true) T(1,0,1, true)
 	#undef T
 
@@ -894,16 +926,26 @@ int utMath(){
 //	printf("%.20g\n", wrap<double>(-64.0, 32.0, 0.));  // should be 0.0
 //	printf("%.20g\n", wrap<double>(-1e-16, 32., 0.));  // should be 31.999999999999996447
 
-	#define T(x, y) assert(eq(al::wrap(x, 1., -1.), y));
+	#define T(x, y) assert(eq(wrap(x, 1., -1.), y));
 	T(0., 0.)	T( 0.5, 0.5) T( 1.,-1.) T( 1.2,-0.8) T( 2.2, 0.2)
 				T(-0.5,-0.5) T(-1.,-1.) T(-1.2, 0.8) T(-2.2,-0.2)
 	#undef T
-	}
 
-	#define T(x, y) assert(eq(al::wrapPhase(x), y));
+	#define T(x, y) assert(eq(wrapOnce(x, 1., -1.), y));
+	T( 1.2, -0.8);
+	T( 2.0,  0.0);
+	T( 3.2,  1.2);
+	T( 0.0,  0.0);
+	T(-1.0, -1.0);
+	T(-2.2, -0.2);
+	T(-3.2, -1.2);
+	#undef T
+
+	#define T(x, y) assert(eq(wrapPhase(x), y));
 	T(0., 0.)	T( 1., 1.) T( M_PI,-M_PI) T( M_PI+1, -M_PI+1) T( 7*M_PI+1, -M_PI+1)
 				T(-1.,-1.) T(-M_PI,-M_PI) T(-M_PI-1,  M_PI-1) T(-7*M_PI+1, -M_PI+1)
 	#undef T
+	}
 
 	// Special Functions
 	{
@@ -937,7 +979,7 @@ int utMath(){
 					case  0:	return 0.5 * x * (5*x*x - 3);
 					case  1:	return 1.5 * (1 - 5*x*x) * sqrt(1-x*x);
 					case  2:	return 15 * x * (1 - x*x);
-					case  3:	return -15 * al::pow3(sqrt(1-x*x));
+					case  3:	return -15 * pow3(sqrt(1-x*x));
 					}
 					break;
 				}
@@ -963,9 +1005,9 @@ int utMath(){
 		for(int m=0; m<=l; ++m){
 		for(int i=0; i<M; ++i){
 			double theta = double(i)*M_PI / M;
-			double a = al::legendreP(l, m, theta);
+			double a = legendreP(l, m, theta);
 			double b = F::testLegendreP(l, m, cos(theta));
-	//		if(!al::aeq(a, b, 1<<16)){
+	//		if(!aeq(a, b, 1<<16)){
 			if(!(al::abs(a - b)<1e-10)){
 				printf("\nP(%d, %d, %g) = %.16g (actual = %.16g)\n", l,m, cos(theta), a,b);
 				assert(false);
@@ -976,7 +1018,7 @@ int utMath(){
 		for(int n=0; n<=3; ++n){
 		for(int i=0; i<M; ++i){
 			double x =double(i)/M * 4;
-			double a = al::laguerreL(n,1, x);
+			double a = laguerreL(n,1, x);
 			double b = F::testLaguerre(n,1, x);
 
 			if(!(al::abs(a - b)<1e-10)){
