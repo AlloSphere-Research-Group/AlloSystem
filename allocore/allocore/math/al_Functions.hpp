@@ -33,8 +33,70 @@ namespace al {
 /// \addtogroup allocore
 /// @{
 
+// Define base functions first that other functions depend on
+
 /// Returns absolute value
-template<class T> T abs(const T& v);
+template<class T> T abs(const T& v){ return v>T(0) ? v : -v; }
+template<> inline float abs<float>(const float& v){ return std::abs(v); }
+template<> inline double abs<double>(const double& v){ return std::abs(v); }
+
+/// Returns maximum of two values
+template<class T> T max(const T& a, const T& b){ return a<b?b:a; }
+
+/// Returns maximum of three values
+template<class T> T max(const T& a, const T& b, const T& c){ return al::max(al::max(a,b),c); }
+
+/// Returns minimum of two values
+template<class T> T min(const T& a, const T& b){ return a<b?a:b; }
+
+/// Returns minimum of three values
+template<class T> T min(const T& a, const T& b, const T& c){ return al::min(al::min(a,b),c); }
+
+/// Returns the value r such that r = x - n*y
+template<class T> T remainder(const T& x, const T& y){ return x - long(x/y) * y; }
+
+/// Returns value rounded to nearest integer towards zero
+template<class T> T round(const T& v);
+
+/// Returns value rounded to nearest integer multiple of 'step' towards zero
+template<class T> T round(const T& v, const T& step);
+
+/// Returns value rounded to nearest integer multiple of 'step' towards zero. Faster version to avoid 1/step divide.
+template<class T> T round(const T& v, const T& step, const T& recStep);
+
+/// Returns value rounded to nearest integer away from zero
+template<class T> T roundAway(const T& v);
+
+/// Returns value rounded to nearest to nearest integer multiple of 'step' away from zero
+template<class T> T roundAway(const T& v, const T& step);
+
+/// Signum function for real numbers
+template<class T> T sgn(const T& v, const T& norm=T(1)){
+	return v==T(0) ? T(0) : v<T(0) ? -norm : norm;
+}
+
+/// Returns whether or not an integer value is odd
+template<class T> bool odd(const T& v){ return v & T(1); }
+
+/// Returns whether or not an integer value is even
+template<class T> bool even(const T& v){ return 0 == al::odd(v); }
+
+template <class UInt, class Int, class Float>
+bool aeqBase(Float a, Float b, int maxULP){
+	static_assert(sizeof(Float)==sizeof(Int), "Float/int size mismatch");
+	static_assert(sizeof(UInt) ==sizeof(Int), "Int size mismatch");
+	// Make sure maxULP is non-negative and small enough that the
+	// default NAN won't compare as equal to anything.
+	//assert(maxULP > 0 && maxULP < 4 * 1024 * 1024);
+	union{ Float f; Int i; };
+	f=a; auto ai = i;
+	f=b; auto bi = i;
+	static constexpr UInt msb = UInt(1)<<(sizeof(UInt)*8-1);
+	// Make ai and bi lexicographically ordered as a twos-complement int
+	if(ai < 0) ai = msb - ai;
+	if(bi < 0) bi = msb - bi;
+	return al::abs(ai - bi) <= maxULP;
+}
 
 /// Return whether two floats are almost equal
 
@@ -44,27 +106,53 @@ template<class T> T abs(const T& v);
 ///
 /// Algorithm from Dawson, B. "Comparing floating point numbers",
 /// http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
-bool aeq(float a, float b, int maxULP=10);
-bool aeq(double a, double b, int maxULP=10);
+inline bool aeq(float a, float b, int maxULP=10){
+	return aeqBase<uint32_t,int32_t>(a,b,maxULP);
+}
+inline bool aeq(double a, double b, int maxULP=10){
+	return aeqBase<uint64_t,int64_t>(a,b,maxULP);
+}
+
 
 /// Convert amplitude to decibels
 template <class T>
 inline T ampTodB(const T& amp){ return 20*std::log(amp); }
 
 /// Returns value clipped ouside of range [-eps, eps]
-template<class T> T atLeast(const T& v, const T& eps);
+template<class T> T atLeast(const T& v, const T& eps){
+	return v >= T(0) ? max(v, eps) : min(v, -eps);
+}
 
 /// Fast approximation to atan2()
 
 // Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
 // |error| < 0.01 rad
-template<class T> T atan2Fast(const T& y, const T& x);
+template<class T> T atan2Fast(const T& y, const T& x){
+	T r, angle;
+	T ay = al::abs(y) + T(1e-10);      // kludge to prevent 0/0 condition
+
+	if(x < T(0)){
+		r = (x + ay) / (ay - x);
+		angle = T(M_3PI_4);
+	}
+	else{
+		r = (x - ay) / (x + ay);
+		angle = T(M_PI_4);
+	}
+
+	angle += (T(0.1963)*r*r - T(0.9817))*r;
+	return y < T(0) ? -angle : angle;
+}
 
 /// Returns number of bits set to 1
 
 /// From "Bit Twiddling Hacks",
 /// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
-uint32_t bitsSet(uint32_t v);
+inline uint32_t bitsSet(uint32_t v){
+	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
+	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
+	return ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
+}
 
 /// Returns floating point value rounded to next highest integer
 template<class T> T ceil(const T& v);
@@ -78,37 +166,68 @@ inline uint32_t ceilEven(uint32_t v){ return v + (v&1); }
 
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-uint32_t ceilPow2(uint32_t value);
+inline uint32_t ceilPow2(uint32_t v){
+	--v;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >>16;
+	return v+1;
+}
 
 /// Returns value clipped to [lo, hi]
-template<class T> T clip(const T& v, const T& hi=T(1), const T& lo=T(0));
+template<class T> T clip(const T& v, const T& hi=T(1), const T& lo=T(0)){
+	     if(v < lo) return lo;
+	else if(v > hi)	return hi;
+	return v;
+}
 
 /// Returns value clipped to [lo, hi] and signifies clipping behavior
 
 /// clipFlag signifies if and where clipping occured.  0 means no clipping
 /// occured, -1 means clipping occured at the lower bound, and 1 means
 /// clipping at the upper bound.
-template<class T> T clip(const T& v, int& clipFlag, const T& hi, const T& lo);
+template<class T> T clip(const T& v, int& clipFlag, const T& hi, const T& lo){
+	clipFlag = 0;
+	     if(v < lo){ clipFlag = -1; return lo; }
+	else if(v > hi){ clipFlag =  1; return hi; }
+	return v;
+}
 
 /// Returns value clipped to [-hi, hi]
-template<class T> T clipS(const T& v, const T& hi=T(1));
+template<class T> T clipS(const T& v, const T& hi=T(1)){
+	return al::clip(v, hi, -hi);
+}
 
 /// Convert decibels to amplitude
 template <class T>
 inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 
-/// Returns whether or not an integer value is even
-template<class T> bool even(const T& v);
-
 /// The Gauss error function or probability integral
 /// \see http://en.wikipedia.org/wiki/Error_function
-template<class T> T erf(const T& v);
+template<class T> T erf(const T& x){
+	const T xx = x*x;
+	const T axx = T(0.147) * xx;
+	return al::sgn(x)*std::sqrt(T(1) - std::exp(xx*(T(-4./M_PI) - axx)/(T(1)+axx)));
+}
 
 /// Returns factorial. Argument must be less than or equal to 12.
-uint32_t factorial(uint32_t n0to12);
+inline uint32_t factorial(uint32_t n0to12){
+	static const uint32_t factorial12u[13] = {
+		1, 1, 2, 6, 24, 120, 720, 5040, 40320,
+		362880, 3628800, 39916800, 479001600
+	};
+	return factorial12u[n0to12];
+}
 
 /// Returns square root of factorial
-double factorialSqrt(int v);
+inline double factorialSqrt(int v){
+	if(v<=1) return 1;
+	double r=1;
+	for(int i=2; i<=v; ++i) r *= std::sqrt(i);
+	return r;
+}
 
 /// Returns floor of floating point value
 template<class T> T floor(const T& v);
@@ -119,7 +238,14 @@ template<class T> T floor(const T& v, const T& step, const T& recStep);
 
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
 /// From "Bit Twiddling Hacks", http://graphics.stanford.edu/~seander/bithacks.html.
-uint32_t floorPow2(uint32_t v);
+inline uint32_t floorPow2(uint32_t v){
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	return (v >> 1) + 1;
+}
 
 /// Returns value folded into [lo, hi]
 
@@ -132,22 +258,44 @@ template<class T> T fold(const T& v, const T& hi=T(1), const T& lo=T(0));
 template<class T> T foldOnce(const T& v, const T& hi=T(1), const T& lo=T(0));
 
 /// Returns e^(-v*v)
-template<class T> T gaussian(const T& v);
+template<class T> T gaussian(const T& v){ return std::exp(-v*v); }
 
 /// Return greatest common divisor of two arguments
-template<class T> T gcd(const T& x, const T& y);
+template<class T> T gcd(const T& x, const T& y){
+	if(y==T(0)) return al::abs(x);
+	return al::gcd(y, al::remainder(x,y));
+}
 
 template <typename T, typename... Ts>
 T gcd(const T& x, const Ts&... rest){ return gcd(x, gcd(rest...)); }
 
+/// Returns least common multiple
+template<class T> T lcm(const T& x, const T& y){ return (x*y)/al::gcd(x,y); }
+
+/// Returns whether values have no common multiple
 template <typename... Ts>
 bool coprime(const Ts&... vals){ return gcd(vals...) == 1; }
 
-/// The Gudermannian function
+/// Returns true if integer is prime
+inline bool isPrime(unsigned n){
+	if(n<=1) return false;
+	else if(n<=3) return true;
+	else if(n%2 == 0 || n%3 == 0) return false;
+	unsigned i = 5;
+	while(i*i <= n){
+		if(n%i == 0 || n%(i+2) == 0) return false;
+		i += 6;
+	}
+	return true;
+}
+
+/// Gudermannian function
 
 /// Relates circular and hyperbolic functions without using complex numbers.
 /// \see http://en.wikipedia.org/wiki/Gudermannian_function
-template<class T> T gudermannian(const T& x);
+template<class T> T gudermannian(const T& x){
+	return T(2) * std::atan(std::exp(x)) - T(M_PI_2);
+}
 
 template <class T>
 bool inSet(const T& val, const T& x){ return val==x; }
@@ -162,9 +310,6 @@ bool inSet(const T& val, const T& x, Ts&&... xs){
 	return inSet(val, x) || inSet<T>(val, std::forward<Ts>(xs)...);
 }
 
-/// Returns true if integer is prime
-bool isPrime(unsigned n);
-
 /// Generalized Laguerre polynomial L{n,k}
 
 /// \param[in] n	degree, a non-negative integer
@@ -172,9 +317,6 @@ bool isPrime(unsigned n);
 /// \param[in] x	position
 /// http://en.wikipedia.org/wiki/Laguerre_polynomials
 template<class T> T laguerreL(int n, int k, T x);
-
-/// Returns least common multiple
-template<class T> T lcm(const T& x, const T& y);
 
 /// Associated Legendre polynomial
 ///
@@ -189,7 +331,9 @@ template<class T> T legendreP(int l, int m, T t);
 template<class T> T legendreP(int l, int m, T ct, T st);
 
 /// Returns whether the absolute value is less than an epsilon
-template<class T> bool lessAbs(const T& v, const T& eps=T(0.000001));
+template<class T> bool lessAbs(const T& v, const T& eps=T(0.000001)){
+	return al::abs(v) < eps;
+}
 
 /// Returns base 2 logarithm of value
 
@@ -218,101 +362,125 @@ auto makeCoprime(Args&... args) -> decltype(al::gcd(args...)){
 	return gcdiv;
 }
 
-/// Returns maximum of two values
-template<class T> T max(const T& a, const T& b);
-
-/// Returns maximum of three values
-template<class T> T max(const T& a, const T& b, const T& c);
+template<class T> T mapRange(T v, T ilo, T ihi, T olo, T ohi){
+	auto f = (v - ilo) / (ihi - ilo); // to fraction in [0,1]
+	return (ohi - olo)*f + olo; // lerp to output range
+}
 
 /// Returns mean of two values
-template<class T> T mean(const T& a, const T& b);
-
-/// Returns minimum of two values
-template<class T> T min(const T& a, const T& b);
-
-/// Returns minimum of three values
-template<class T> T min(const T& a, const T& b, const T& c);
+template<class T> T mean(const T& a, const T& b){ return (a + b) * T(0.5); }
 
 /// Returns nearest integer division of one value to another
-template<class T> inline T nearestDiv(T of, T to);
+template<class T> T nearestDiv(T of, T to){ return to / al::round(to/of); }
 
 /// Returns the next representable floating-point or integer value following x in the direction of y
 template<class T> T nextAfter(const T& x, const T& y);
 
-/// Returns next largest value of 'val' that is a multiple of 'multiple'
-template<class T> T nextMultiple(T val, T multiple);
+/// Returns next largest value that is a multiple of 'm'
+template<class T> T nextMultiple(T v, T m){
+	auto q = (uint32_t)(v / m);
+	return T(q + 1) * m;
+}
 
 /// Returns the number of digits in the integer portion
-template<class T> T numInt(const T& v);
-
-/// Returns whether or not an integer value is odd
-template<class T> bool odd(const T& v);
+template<class T> T numInt(const T& v){ return al::floor(std::log10(v)) + 1; }
 
 /// Evaluates polynomial a0 + a1 x + a2 x^2
-template<class T> T poly(const T& x, const T& a0, const T& a1, const T& a2);
+template<class T> T poly(const T& x, const T& a0, const T& a1, const T& a2){
+	return a0 + x*(a1 + x*a2);
+}
 
 /// Evaluates polynomial a0 + a1 x + a2 x^2 + a3 x^3
-template<class T> T poly(const T& x, const T& a0, const T& a1, const T& a2, const T& a3);
+template<class T> T poly(const T& x, const T& a0, const T& a1, const T& a2, const T& a3){
+	return a0 + x*(a1 + x*(a2 + x*a3));
+}
 
-template<class T> T pow2(const T& v);		///< Returns value to the 2nd power
-template<class T> T pow2S(const T& v);		///< Returns value to the 2nd power preserving sign
-template<class T> T pow3(const T& v);		///< Returns value to the 3rd power
-template<class T> T pow3Abs(const T& v);	///< Returns absolute value to the 3rd power
-template<class T> T pow4(const T& v);		///< Returns value to the 4th power
-template<class T> T pow5(const T& v);		///< Returns value to the 5th power
-template<class T> T pow6(const T& v);		///< Returns value to the 6th power
-template<class T> T pow7(const T& v);		///< Returns value to the 7th power
-template<class T> T pow8(const T& v);		///< Returns value to the 8th power
-template<class T> T pow9(const T& v);		///< Returns value to the 9th power
-template<class T> T pow16(const T& v);		///< Returns value to the 16th power
-template<class T> T pow17(const T& v);		///< Returns value to the 17th power
-template<class T> T pow32(const T& v);		///< Returns value to the 32nd power
-template<class T> T pow33(const T& v);		///< Returns value to the 33rd power
-template<class T> T pow64(const T& v);		///< Returns value to the 64th power
-template<class T> T pow65(const T& v);		///< Returns value to the 65th power
+#define TEM template<class T>
+TEM T pow2(const T& v){ return v*v; }				///< Returns value to the 2nd power
+TEM T pow2S(const T& v){ return v*al::abs(v); }		///< Returns value to the 2nd power preserving sign
+TEM T pow3 (const T& v){ return v*v*v; }			///< Returns value to the 3rd power
+TEM T pow3Abs(const T& v){ return al::abs(pow3(v)); } ///< Returns absolute value to the 3rd power
+TEM T pow4 (const T& v){ return pow2(pow2(v)); }	///< Returns value to the 4th power
+TEM T pow5 (const T& v){ return v * pow4(v); }		///< Returns value to the 5th power
+TEM T pow6 (const T& v){ return pow3(pow2(v)); }	///< Returns value to the 6th power
+TEM T pow7 (const T& v){ return v * pow6(v); }		///< Returns value to the 7th power
+TEM T pow8 (const T& v){ return pow4(pow2(v)); }	///< Returns value to the 8th power
+TEM T pow9 (const T& v){ return v * pow8(v); }		///< Returns value to the 9th power
+TEM T pow16(const T& v){ return pow4(pow4(v)); }	///< Returns value to the 16th power
+TEM T pow17(const T& v){ return pow16(v)*v; }		///< Returns value to the 17th power
+TEM T pow32(const T& v){ return pow4(pow8(v)); }	///< Returns value to the 32nd power
+TEM T pow33(const T& v){ return pow32(v)*v; }		///< Returns value to the 33rd power
+TEM T pow64(const T& v){ return pow8(pow8(v)); }	///< Returns value to the 64th power
+TEM T pow65(const T& v){ return pow64(v)*v; }		///< Returns value to the 65th power
+#undef TEM
 
 /// Returns value to a positive integer power
 
 /// \param[in] base		the base value to exponentiate
 /// \param[in] power	the power to exponentiate by
 template<class T>
-T powN(T base, unsigned power);
+T powN(T base, unsigned power){
+	switch(power){
+		case  0: return T(1);
+		case  1: return base;
+		case  2: return pow2(base);
+		case  3: return pow3(base);
+		case  4: return pow4(base);
+		case  5: return pow5(base);
+		case  6: return pow6(base);
+		case  7: return pow7(base);
+		case  8: return pow8(base);
+		case  9: return pow9(base);
+		case 16: return pow16(base);
+		case 32: return pow32(base);
+		case 64: return pow64(base);
+		default:{
+			T r = pow8(base)*pow2(base);
+			for(unsigned i=10; i<power; ++i) r *= base;
+			return r;
+		}
+	}
+}
 
 /// Returns (n+1)th prime number up to n=53
-unsigned char prime(uint32_t n);
-
-/// Returns the value r such that r = x - n*y
-template<class T> T remainder(const T& x, const T& y);
-
-/// Returns value rounded to nearest integer towards zero
-template<class T> T round(const T& v);
-
-/// Returns value rounded to nearest integer multiple of 'step' towards zero
-template<class T> T round(const T& v, const T& step);
-
-/// Returns value rounded to nearest integer multiple of 'step' towards zero. Faster version to avoid 1/step divide.
-template<class T> T round(const T& v, const T& step, const T& recStep);
-
-/// Returns value rounded to nearest integer away from zero
-template<class T> T roundAway(const T& v);
-
-/// Returns value rounded to nearest to nearest integer multiple of 'step' away from zero
-template<class T> T roundAway(const T& v, const T& step);
-
-/// Signum function for real numbers
-template<class T> T sgn(const T& v, const T& norm=T(1));
+inline uint8_t prime(uint8_t n){
+	static const uint8_t primes54[54] = {
+	/*	  0    1    2    3    4    5    6    7    8    9   */
+		  2,   3,   5,   7,  11,  13,  17,  19,  23,  29, // 0
+		 31,  37,  41,  43,  47,  53,  59,  61,	 67,  71, // 1
+		 73,  79,  83,  89,  97, 101, 103, 107, 109, 113, // 2
+		127, 131, 137, 139, 149, 151, 157, 163, 167, 173, // 3
+		179, 181, 191, 193, 197, 199, 211, 223, 227, 229, // 4
+		233, 239, 241, 251								  // 5
+	};
+	return primes54[n];
+}
 
 /// Unnormalized sinc function
-template<class T> T sinc(const T& radians, const T& eps=T(0.0001));
+
+/// \param[in] r	Value in radians
+/// \param[in] eps	Small value to avoid division by zero
+template<class T> T sinc(const T& r, const T& eps=T(0.0001)){
+	return (al::abs(r) > eps) ? std::sin(r)/r : std::cos(r);
+}
 
 /// Returns slope of line passing through two points
-template<class T> T slope(const T& x1, const T& y1, const T& x2, const T& y2);
+template<class T> T slope(const T& x1, const T& y1, const T& x2, const T& y2){
+	return (y2-y1)/(x2-x1);
+}
 
 /// Sort values so that a <= b
-template<class T> void sort(T& a, T& b);
+template<class T> void sort(T& a, T& b){
+	if(a>b){ T t=a; a=b; b=t; }
+}
 
 /// Sum of integers squared from 1 to n
-template<class T> T sumOfSquares(T n);
+template<class T> T sumOfSquares(T n){
+	// 0^2 + 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6
+	static constexpr double c1_6 = 1./6.;
+	static constexpr double c2_6 = 2./6.;
+	return n*(n+T(1))*(c2_6*n+c1_6);
+}
 
 /// Returns number of trailing zeros in 32-bit int
 
@@ -331,13 +499,19 @@ template<class T> T trunc(const T& v, const T& step);
 template<class T> T trunc(const T& v, const T& step, const T& recStep);
 
 /// Returns whether value is in interval [lo, hi]
-template<class T> bool within(const T& v, const T& lo, const T& hi);
+template<class T> bool within(const T& v, const T& lo, const T& hi){
+	return !((v < lo) || (v > hi));
+}
 
-/// Returns whether 3 values are in interval [lo, hi]
-template<class T> bool within3(const T& v1, const T& v2, const T& v3, const T& lo, const T& hi);
+/// Returns whether three values are in interval [lo, hi]
+template<class T> bool within3(const T& a, const T& b, const T& c, const T& lo, const T& hi){
+	return al::within(a,lo,hi) && al::within(b,lo,hi) && al::within(c,lo,hi);
+}
 
 /// Returns whether value is in interval [lo, hi)
-template<class T> bool withinIE(const T& v, const T& lo, const T& hi);
+template<class T> bool withinIE(const T& v, const T& lo, const T& hi){
+	return (!(v < lo)) && (v < hi);
+}
 
 /// Returns value wrapped in [lo, hi)
 template<class T> T wrap(const T& v, const T& hi=T(1), const T& lo=T(0));
@@ -381,138 +555,15 @@ namespace{
 		};
 		return bitPos[(uint32_t(v * 0x077CB531UL)) >> 27];
 	}
-
-	const uint32_t mFactorial12u[13] = {
-		1, 1, 2, 6, 24, 120, 720, 5040, 40320,
-		362880, 3628800, 39916800, 479001600
-	};
-
-	const uint8_t mPrimes54[54] = {
-	/*	  0    1    2    3    4    5    6    7    8    9   */
-		  2,   3,   5,   7,  11,  13,  17,  19,  23,  29, // 0
-		 31,  37,  41,  43,  47,  53,  59,  61,	 67,  71, // 1
-		 73,  79,  83,  89,  97, 101, 103, 107, 109, 113, // 2
-		127, 131, 137, 139, 149, 151, 157, 163, 167, 173, // 3
-		179, 181, 191, 193, 197, 199, 211, 223, 227, 229, // 4
-		233, 239, 241, 251								  // 5
-	};
-}
-
-template<> inline float abs<float>(const float& v){ return std::abs(v); }
-template<> inline double abs<double>(const double& v){ return std::abs(v); }
-TEM inline T abs(const T& v){ return v>T(0) ? v : -v; }
-
-inline bool aeq(float a, float b, int maxULP){
-	// Make sure maxULP is non-negative and small enough that the
-	// default NAN won't compare as equal to anything.
-	//assert(maxULP > 0 && maxULP < 4 * 1024 * 1024);
-	union{ float f; int32_t i; };
-	f=a; auto ai = i;
-	f=b; auto bi = i;
-	// Make ai and bi lexicographically ordered as a twos-complement int
-	if(ai < 0) ai = 0x80000000 - ai;
-	if(bi < 0) bi = 0x80000000 - bi;
-	return al::abs(ai - bi) <= maxULP;
-}
-
-inline bool aeq(double a, double b, int maxULP){
-	// Make sure maxULP is non-negative and small enough that the
-	// default NAN won't compare as equal to anything.
-	//assert(maxULP > 0 && maxULP < 4 * 1024 * 1024);
-	union{ double f; int64_t i; };
-	f=a; auto ai = i;
-	f=b; auto bi = i;
-	// Make ai and bi lexicographically ordered as a twos-complement int
-	if(ai < 0) ai = 0x8000000000000000ULL - ai;
-	if(bi < 0) bi = 0x8000000000000000ULL - bi;
-	return al::abs(ai - bi) <= maxULP;
-}
-
-TEM inline T atLeast(const T& v, const T& e){ return (v >= T(0)) ? max(v, e) : min(v, -e); }
-
-TEM T atan2Fast(const T& y, const T& x){
-
-	T r, angle;
-	T ay = al::abs(y) + T(1e-10);      // kludge to prevent 0/0 condition
-
-	if(x < T(0)){
-		r = (x + ay) / (ay - x);
-		angle = T(M_3PI_4);
-	}
-	else{
-		r = (x - ay) / (x + ay);
-		angle = T(M_PI_4);
-	}
-
-	angle += (T(0.1963)*r*r - T(0.9817))*r;
-	return y < T(0) ? -angle : angle;
-}
-
-inline uint32_t bitsSet(uint32_t v){
-	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
-	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
-	return ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
 }
 
 TEM inline T ceil(const T& v){ return al::round(v + roundEps<T>()); }
 TEM inline T ceil(const T& v, const T& s){ return al::ceil(v/s)*s; }
 TEM inline T ceil(const T& v, const T& s, const T& r){ return al::ceil(v*r)*s; }
 
-inline uint32_t ceilPow2(uint32_t v){
-	--v;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >>16;
-	return v+1;
-}
-
-TEM inline T clip(const T& v, const T& hi, const T& lo){
-	     if(v < lo) return lo;
-	else if(v > hi)	return hi;
-	return v;
-}
-
-TEM inline T clip(const T& v, int & clipFlag, const T& hi, const T& lo){
-	clipFlag = 0;
-	     if(v < lo){ clipFlag = -1; return lo; }
-	else if(v > hi){ clipFlag =  1; return hi; }
-	return v;
-}
-
-TEM inline T clipS(const T& v, const T& hi){ return al::clip(v, hi, -hi); }
-
-TEM inline bool even(const T& v){ return 0 == al::odd(v); }
-
-/// \see http://en.wikipedia.org/wiki/Error_function
-TEM inline T erf(const T& x) {
-	const T x2 = x*x;
-	const T ax2 = T(0.147) * x2;
-	return al::sgn(x)*std::sqrt(T(1) - std::exp(x2*(T(-4./M_PI) - ax2)/(T(1)+ax2)));
-}
-
-inline uint32_t factorial(uint32_t v){ return mFactorial12u[v]; }
-
-inline double factorialSqrt(int v){
-	if(v<=1) return 1;
-	double r=1;
-	for(int i=2; i<=v; ++i) r *= std::sqrt(i);
-	return r;
-}
-
 TEM inline T floor(const T& v){ return al::round(v - roundEps<T>()); }
 TEM inline T floor(const T& v, const T& s){ return al::floor(v/s)*s; }
 TEM inline T floor(const T& v, const T& s, const T& r){ return al::floor(v*r)*s; }
-
-inline uint32_t floorPow2(uint32_t v){
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	return (v >> 1) + 1;
-}
 
 TEM inline T fold(const T& v, const T& hi, const T& lo){
 	long numWraps;
@@ -525,30 +576,6 @@ TEM inline T foldOnce(const T& v, const T& hi, const T& lo){
 	if(v > hi) return hi + (hi - v);
 	if(v < lo) return lo + (lo - v);
 	return v;
-}
-
-TEM inline T gaussian(const T& v){ return std::exp(-v*v); }
-
-TEM T gcd(const T& x, const T& y){
-	if(y==T(0)) return al::abs(x);
-	return al::gcd(y, al::remainder(x,y));
-}
-
-/// \see http://en.wikipedia.org/wiki/Gudermannian_function
-TEM T gudermannian(const T& x) {
-	return T(2) * std::atan(exp(x)) - T(M_PI_2);
-}
-
-inline bool isPrime(unsigned n){
-	if(n<=1) return false;
-	else if(n<=3) return true;
-	else if(n%2 == 0 || n%3 == 0) return false;
-	unsigned i = 5;
-	while(i*i <= n){
-		if(n%i == 0 || n%(i+2) == 0) return false;
-		i += 6;
-	}
-	return true;
 }
 
 TEM T laguerreL(int n, int k, T x){
@@ -570,9 +597,6 @@ TEM T laguerreL(int n, int k, T x){
 	}
 	return R;
 }
-
-
-TEM inline T lcm(const T& x, const T& y){ return (x*y)/al::gcd(x,y); }
 
 TEM T legendreP(int l, int m, T ct, T st){
 
@@ -668,18 +692,7 @@ TEM T legendreP(int l, int m, T t){
 	return al::legendreP(l,m, std::cos(t), std::sin(t));
 }
 
-TEM inline bool lessAbs(const T& v, const T& eps){ return al::abs(v) < eps; }
-
 inline uint32_t log2(uint32_t v){ return deBruijn(al::ceilPow2(v)); }
-
-TEM inline T max(const T& a, const T& b){ return a<b?b:a; }
-TEM inline T max(const T& a, const T& b, const T& c){ return al::max(al::max(a,b),c); }
-TEM inline T min(const T& a, const T& b){ return a<b?a:b; }
-TEM inline T min(const T& a, const T& b, const T& c){ return al::min(al::min(a,b),c); }
-
-TEM inline T mean(const T& a, const T& b){ return (a + b) * T(0.5); }
-
-TEM inline T nearestDiv(T of, T to){ return to / al::round(to/of); }
 
 #ifdef __MSYS__
 // MSYS2 does not support C++11 std::nextafter like it should
@@ -692,62 +705,6 @@ inline double nextAfter(const double& x, const double& y){ return nextafter(x,y)
 #else
 TEM inline T nextAfter(const T& x, const T& y){ return std::nextafter(x,y); }
 #endif
-
-TEM inline T nextMultiple(T v, T m){
-	uint32_t div = (uint32_t)(v / m);
-	return T(div + 1) * m;
-}
-
-TEM inline T numInt(const T& v){ return al::floor(std::log10(v)) + 1; }
-
-TEM inline bool odd(const T& v){ return v & T(1); }
-
-TEM inline T poly(const T& v, const T& a0, const T& a1, const T& a2){ return a0 + v*(a1 + v*a2); }
-TEM inline T poly(const T& v, const T& a0, const T& a1, const T& a2, T a3){ return a0 + v*(a1 + v*(a2 + v*a3)); }
-
-TEM inline T pow2 (const T& v){ return v*v; }
-TEM inline T pow2S(const T& v){ return v*al::abs(v); }
-TEM inline T pow3 (const T& v){ return v*v*v; }
-TEM inline T pow3Abs(const T& v){ return al::abs(pow3(v)); }
-TEM inline T pow4 (const T& v){ return pow2(pow2(v)); }
-TEM inline T pow5 (const T& v){ return v * pow4(v); }
-TEM inline T pow6 (const T& v){ return pow3(pow2(v)); }
-TEM inline T pow7 (const T& v){ return v * pow6(v); }
-TEM inline T pow8 (const T& v){ return pow4(pow2(v)); }
-TEM inline T pow9 (const T& v){ return v * pow8(v); }
-TEM inline T pow16(const T& v){ return pow4(pow4(v)); }
-TEM inline T pow17(const T& v){ return pow16(v)*v; }
-TEM inline T pow32(const T& v){ return pow4(pow8(v)); }
-TEM inline T pow33(const T& v){ return pow32(v)*v; }
-TEM inline T pow64(const T& v){ return pow8(pow8(v)); }
-TEM inline T pow65(const T& v){ return pow64(v)*v; }
-
-TEM inline T powN(T base, unsigned power){
-	switch(power){
-		case  0: return T(1);
-		case  1: return base;
-		case  2: return pow2(base);
-		case  3: return pow3(base);
-		case  4: return pow4(base);
-		case  5: return pow5(base);
-		case  6: return pow6(base);
-		case  7: return pow7(base);
-		case  8: return pow8(base);
-		case  9: return pow9(base);
-		case 16: return pow16(base);
-		case 32: return pow32(base);
-		case 64: return pow64(base);
-		default:{
-			T r = pow8(base)*pow2(base);
-			for(unsigned i=10; i<power; ++i) r *= base;
-			return r;
-		}
-	}
-}
-
-inline uint8_t prime(uint32_t n){ return mPrimes54[n]; }
-
-TEM inline T remainder(const T& x, const T& y){ return x - long(x/y) * y; }
 
 TEM inline T round(const T& v){
 #ifdef AL_USE_STD_ROUND
@@ -763,33 +720,11 @@ TEM inline T round(const T& v, const T& s, const T& r){ return al::round<T>(v * 
 TEM inline T roundAway(const T& v){ return v<T(0) ? al::floor(v) : al::ceil(v); }
 TEM inline T roundAway(const T& v, const T& s){ return v<T(0) ? al::floor(v,s) : al::ceil(v,s); }
 
-TEM inline T sgn(const T& v, const T& norm){ return v==T(0) ? T(0) : v<T(0) ? -norm : norm; }
-
-TEM inline T sinc(const T& r, const T& eps){ return (al::abs(r) > eps) ? std::sin(r)/r : std::cos(r); }
-
-TEM inline T slope(const T& x1, const T& y1, const T& x2, const T& y2){ return (y2-y1)/(x2-x1); }
-
-TEM inline void sort(T& a, T& b){ if(a>b){ T t=a; a=b; b=t; } }
-
-TEM inline T sumOfSquares(T n){
-	// 0^2 + 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6
-	static constexpr double c1_6 = 1./6.;
-	static constexpr double c2_6 = 2./6.;
-	return n*(n+T(1))*(c2_6*n+c1_6);
-}
-
 inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -v); }
 
 TEM inline T trunc(const T& v){ return al::round( (v > (T)0) ? v-roundEps<T>() : v+roundEps<T>() ); }
 TEM inline T trunc(const T& v, const T& s){ return al::trunc(v/s)*s; }
 TEM inline T trunc(const T& v, const T& s, const T& r){ return al::trunc(v*r)*s; }
-
-TEM inline bool within  (const T& v, const T& lo, const T& hi){ return !((v < lo) || (v > hi)); }
-TEM inline bool withinIE(const T& v, const T& lo, const T& hi){ return (!(v < lo)) && (v < hi); }
-
-TEM inline bool within3(const T& v1, const T& v2, const T& v3, const T& lo, const T& hi){
-	return al::within(v1,lo,hi) && al::within(v2,lo,hi) && al::within(v3,lo,hi);
-}
 
 // TODO: fuse the following two functions
 TEM inline T wrap(const T& v, const T& hi, const T& lo){
@@ -874,11 +809,6 @@ TEM inline T wrapPhaseOnce(const T& r){
 	if(r >= T(M_PI))		return r - T(M_2PI);
 	else if(r < T(-M_PI))	return r + T(M_2PI);
 	return r;
-}
-
-TEM inline T mapRange(T v, T ilo, T ihi, T olo, T ohi){
-	auto f = (v - ilo) / (ihi - ilo); // to fraction in [0,1]
-	return (ohi - olo)*f + olo; // lerp to output range
 }
 
 #undef TEM
