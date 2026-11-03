@@ -807,9 +807,6 @@ int utMath(){
 	T(0,0,0, 0) T(0,1,2, 2) T(1,2,0, 2) T(2,1,0, 2)
 	#undef T
 
-	assert(mean(-1., 1.) == 0.);
-	//assert(mean(2, 4) == 3); // FIXME
-
 	#define T(x,y,r) assert(al::min(x,y)==r);
 	T(0,0,0) T(0,1,0) T(1,0,0) T(-1,1,-1)
 	#undef T
@@ -883,10 +880,6 @@ int utMath(){
 	T(-0.1, -1.) T(0.1, 1.) T(0., 0.)
 	#undef T
 
-	#define T(x1,y1,x2,y2, r) assert(slope(x1,y1,x2,y2) == r);
-	T(3.,3.,4.,4., 1.) T(3.,-3.,4.,-4., -1.)
-	#undef T
-
 	{	double x=1, y=0;
 		sort(x,y); assert(x==0 && y==1);
 		sort(x,y); assert(x==0 && y==1);
@@ -894,7 +887,7 @@ int utMath(){
 
 	#define T(x,y) assert(eq(sumOfSquares(x), y));
 	T(1., 1.) T(2., 1*1+2*2.) T(3., 1*1+2*2+3*3.) T(4., 1*1+2*2+3*3+4*4.) T(5., 1*1+2*2+3*3+4*4+5*5.)
-	T(1, 1) T(5, 1*1+2*2+3*3+4*4+5*5)
+	T(1, 1) T(5, 1*1+2*2+3*3+4*4+5*5) T(7, 1*1+2*2+3*3+4*4+5*5+6*6+7*7)
 	#undef T
 
 	assert(bitsSet(0) == 0);
@@ -931,6 +924,14 @@ int utMath(){
 	T(0., 0.)	T( 0.5, 0.5) T( 1.,-1.) T( 1.2,-0.8) T( 2.2, 0.2)
 				T(-0.5,-0.5) T(-1.,-1.) T(-1.2, 0.8) T(-2.2,-0.2)
 	#undef T
+
+	{
+		double lo=-1., hi=3.;
+		for(double v = -50.; v <= 50.; v += 0.0625){
+			const double r = wrap(v, hi, lo);
+			assert(r >= lo && r < hi);
+		}
+	}
 
 	#define T(x, y) assert(eq(wrapOnce(x, 1., -1.), y));
 	T( 1.2, -0.8);
