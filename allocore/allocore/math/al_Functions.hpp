@@ -376,16 +376,6 @@ template<class T> T nextMultiple(T v, T m){
 /// Returns the number of digits in the integer portion
 template<class T> T numInt(const T& v){ return al::floor(std::log10(v)) + 1; }
 
-/// Evaluates polynomial a0 + a1 x + a2 x^2
-template<class T> T poly(const T& x, const T& a0, const T& a1, const T& a2){
-	return a0 + x*(a1 + x*a2);
-}
-
-/// Evaluates polynomial a0 + a1 x + a2 x^2 + a3 x^3
-template<class T> T poly(const T& x, const T& a0, const T& a1, const T& a2, const T& a3){
-	return a0 + x*(a1 + x*(a2 + x*a3));
-}
-
 #define TEM template<class T>
 TEM T pow2(const T& v){ return v*v; }				///< Returns value to the 2nd power
 TEM T pow2S(const T& v){ return v*al::abs(v); }		///< Returns value to the 2nd power preserving sign
@@ -453,11 +443,6 @@ inline uint8_t prime(uint8_t n){
 /// \param[in] eps	Small value to avoid division by zero
 template<class T> T sinc(const T& r, const T& eps=T(0.0001)){
 	return (al::abs(r) > eps) ? std::sin(r)/r : std::cos(r);
-}
-
-/// Returns slope of line passing through two points
-template<class T> T slope(const T& x1, const T& y1, const T& x2, const T& y2){
-	return (y2-y1)/(x2-x1);
 }
 
 /// Sort values so that a <= b
