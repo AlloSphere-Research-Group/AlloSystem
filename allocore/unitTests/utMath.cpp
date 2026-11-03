@@ -183,7 +183,12 @@ int utMath(){
 		assert(Vec3f(1,2,4).fitToCube() == Vec3f(0.25,0.5,1));
 		assert(Vec3f(1,2,-4).fitToCube() == Vec3f(0.25,0.5,-1));
 		assert(Vec3f(1,2,4).fitToCube(2) == Vec3f(0.5,1,2));
+		assert(Vec3f(1,2,-4).fitToCube(0) == Vec3f(0,0,0));
 		assert(Vec3f(0,0,0).fitToCube() == Vec3f(0,0,0));
+
+		assert(Vec3f(1,2,-4).withinCube() == Vec3f(0.25,0.5,-1));
+		assert(Vec3f(1,2,-4).withinCube(8) == Vec3f(1,2,-4));
+		assert(Vec3f(1,2,-4).withinCube(0) == Vec3f(0,0,0));
 
 		assert(toVec(-10,1,4,100).indexOfMin() == 0);
 		assert(toVec(1,1,1,1).indexOfMin() == 0);

@@ -942,9 +942,20 @@ public:
 	/// and then scaled by the desired radius.
 	/// \param[in] r	Radius of cube
 	Vec& fitToCube(T r = T(1)){
-		auto mx = extrema().absVec().max(); // avoids copy vs. absVec().max()
-		if(mx > T(0)) r/=mx;
-		return *this *= r;
+		auto mx = maxAbs();
+		return mx > T(0) ? *this *= r/mx : *this;
+	}
+
+	/// Return nearest vector within a cube
+
+	/// Changes the magnitude, but not direction, of the vector to ensure it is
+	/// contained entirely within the cube. If the vector already lies within
+	/// the cube, no operation is performed. For a zero radius cube, a null
+	/// vector is returned.
+	/// \param[in] r	Radius of cube
+	Vec withinCube(T r = T(1)) const {
+		auto mx = maxAbs();
+		return mx > r ? *this * (r/mx) : *this;
 	}
 
 	/// Normalize magnitude (preserving direction)
