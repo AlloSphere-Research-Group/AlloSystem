@@ -828,10 +828,7 @@ public:
 
 	/// Returns vector filled with absolute values of elements
 	Vec absVec() const {
-		using namespace std;
-		Vec res(*this);
-		for(auto& v : res) v=abs(v);
-		return res;
+		return map([](T x){ return abs1(x); });
 	}
 
 	/// Returns component-wise signum function
@@ -1197,6 +1194,18 @@ public:
 		return j;
 	}
 
+	/// Get index of maximum absolute value
+	int indexOfMaxAbs() const {
+		using namespace std;
+		int j = 0;
+		T v = abs1(at<0>());
+		for(int i=1; i<N; ++i){
+			auto u = abs1(at(i));
+			if(u > v) j=i, v=u;
+		}
+		return j;
+	}
+
 	/// Get indices of minimum and maximum values
 	Vec<2,int> indicesOfExtrema() const {
 		int j = 0, J = 0;
@@ -1214,6 +1223,9 @@ public:
 	/// Get maximum value
 	const T& max() const { return mut().max(); }
 	T& max(){ return at(indexOfMax()); }
+
+	/// Get maximum absolute value
+	T maxAbs() const { return abs1(at(indexOfMaxAbs())); }
 
 	/// Get minimum and maximum values
 	Vec<2,T> extrema() const { return get(indicesOfExtrema()); }
@@ -1255,6 +1267,12 @@ public:
 private:
 	// Get non-const reference (for creating const overload from non-const)
 	Vec& mut() const { return const_cast<Vec&>(*this); }
+
+	// Scalar absolute value that can choose correct overload
+	static T abs1(T v){
+		using namespace std;
+		return abs(v);
+	}
 
 	// set last N-M elements to default value
 	template <int M>
@@ -1386,9 +1404,7 @@ inline Vec<N,T> max(const T& a, const Vec<N,T>& b){
 
 /// Get vector with absolute value of each element
 template <int N, class T>
-inline Vec<N,T> abs(const Vec<N,T>& v){
-	return v.map([](T x){ return std::abs(x); });
-}
+inline Vec<N,T> abs(const Vec<N,T>& v){ return v.absVec(); }
 
 /// Get vector with each element raised to a power
 template <int N, class T>

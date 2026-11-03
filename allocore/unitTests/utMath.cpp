@@ -158,6 +158,7 @@ int utMath(){
 		a = -1;
 		b = +1;
 		assert(toVec(-1,2,-3).absVec() == toVec(1,2,3));
+		assert(abs(toVec(-1,2,-3)) == toVec(1,2,3));
 		assert(a.dot(b) ==-N);
 		assert(a.dot(a) == N);
 		assert(Vec3i(1,2,-3).product() == -6);
@@ -184,10 +185,16 @@ int utMath(){
 		assert(Vec3f(1,2,4).fitToCube(2) == Vec3f(0.5,1,2));
 		assert(Vec3f(0,0,0).fitToCube() == Vec3f(0,0,0));
 
-		assert(toVec(-10,1,4,100).indexOfMax() == 3);
-		assert(toVec(1,1,1,1).indexOfMax() == 0);
 		assert(toVec(-10,1,4,100).indexOfMin() == 0);
 		assert(toVec(1,1,1,1).indexOfMin() == 0);
+		assert(toVec(1).indexOfMin() == 0);
+		assert(toVec(1,-10,7,3).min() == -10);
+		assert(toVec(-10,1,4,100).indexOfMax() == 3);
+		assert(toVec(1,1,1,1).indexOfMax() == 0);
+		assert(toVec(1).indexOfMax() == 0);
+		assert(toVec(1,-10,7,3).max() == 7);
+		assert(toVec(1,-10,7,3).indexOfMaxAbs() == 1);
+		assert(toVec(1,-10,7,3).maxAbs() == 10);
 		assert(toVec(1,100,4,-10).indicesOfExtrema() == toVec(3,1));
 		assert(toVec(1,1).indicesOfExtrema() == toVec(0,0));
 
