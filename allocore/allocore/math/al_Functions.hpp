@@ -729,14 +729,15 @@ TEM inline T wrap(const T& v, const T& hi, const T& lo){
 		if(R >= hi) R -= diff * uint32_t((R - lo)/diff);
 	}
 	else if(R < lo){
+		// Try one wrap first before resorting to more expensive operations
 		R += diff;
 
-		// If value is very slightly less than 'lo', then less significant
+		// If value was very slightly less than 'lo', then less significant
 		// digits might get truncated by adding a larger number.
-		if(R==diff) return al::nextAfter(R, lo);
+		if(R==hi) return al::nextAfter(R, lo);
 
 		if(R < lo) R += diff * uint32_t(((lo - R)/diff) + 1);
-		if(R==diff) return lo;
+		if(R==hi) return lo;
 	}
 	return R;
 }
