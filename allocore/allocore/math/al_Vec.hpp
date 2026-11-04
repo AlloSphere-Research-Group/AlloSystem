@@ -1541,6 +1541,12 @@ inline Vec<N,T> centroid(const Vec<N,T>& p1, const Vec<N,T>& p2, const Vec<N,T>&
 	return (p1+p2+p3)/T(3);
 }
 
+/// Get area of triangle
+template <class T>
+T area(const Vec<2,T>& a, const Vec<2,T>& b, const Vec<2,T>& c){
+	return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) / T(2);
+}
+
 /// Get closest point on a line to a point p
 
 /// \param[in] linePnt	A point on the line
