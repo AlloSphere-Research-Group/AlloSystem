@@ -1169,6 +1169,11 @@ public:
 	//--------------------------------------------------------------------------
 	// Analysis
 
+	/// Returns whether vectors are near in magnitude
+	bool near(const Vec& v, T eps = T(1e-4)) const {
+		return (*this - v).magSqr() < (eps*eps);
+	}
+
 	/// Returns index of first occurrence of value or -1 if no match
 	int find(const T& v) const {
 		IT(N){ if(v == at(i)) return i; }
