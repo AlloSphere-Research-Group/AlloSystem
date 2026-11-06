@@ -1954,17 +1954,17 @@ void Mesh::print(FILE * dst) const {
 bool Mesh::debug(FILE * dst) const {
 
 	bool ok = true;
-	#define ALERT(...) if(dst){ fprintf(dst, __VA_ARGS__); ok=false; }
+	#define ALERT(...) if(dst){ fprintf(dst, __VA_ARGS__); fprintf(dst,"\n"); ok=false; }
 
 	const int Nv = mVertices.size();
-	if(!Nv){ ALERT("No vertices\n"); }
+	if(!Nv){ ALERT("No vertices"); }
 
 	const int Ni = mIndices.size();
 
 	#define CHECK_ARR(arr, oneOkay)\
 	if(arr.size() && arr.size() != Nv){\
 		if(!oneOkay || arr.size()!=1){\
-			ALERT("%d " #arr ", but %d vertices\n", (int)arr.size(), Nv);\
+			ALERT("%d " #arr ", but %d vertices", (int)arr.size(), Nv);\
 		}\
 	}
 	CHECK_ARR(mNormals, false);
@@ -1978,7 +1978,7 @@ bool Mesh::debug(FILE * dst) const {
 
 	// Check for clashing attributes
 	if(mColors.size() && mColoris.size()){
-		ALERT("More than one color array populated\n");
+		ALERT("More than one color array populated");
 	}
 	{
 		int Nt1 = mTexCoord1s.size();
@@ -1986,7 +1986,7 @@ bool Mesh::debug(FILE * dst) const {
 		int Nt3 = mTexCoord3s.size();
 		int n = (Nt1?1:0) + (Nt2?1:0) + (Nt3?1:0);
 		if(n > 1){
-			ALERT("More than one tex coord array populated: %d %d %d\n", Nt1, Nt2, Nt3);
+			ALERT("More than one tex coord array populated: %d %d %d", Nt1, Nt2, Nt3);
 		}
 	}
 
@@ -1994,7 +1994,7 @@ bool Mesh::debug(FILE * dst) const {
 	if(Ni){
 		for(auto i : mIndices){
 			if(i >= Nv){
-				ALERT("Index out of bounds: %d (must be in [0,%d))\n", i, Nv);
+				ALERT("Index out of bounds: %d (must be in [0,%d))", i, Nv);
 				break;
 			}
 		}
@@ -2004,18 +2004,26 @@ bool Mesh::debug(FILE * dst) const {
 	// Misc primitive specific checks
 	if(isPoints()){
 		if(Ni){
-			ALERT("Using indexed points: did you forget to set the primitive?\n");
+			ALERT("Using indexed points: did you forget to set the primitive?");
 		}
 	} else if(isLines()){
 		auto extra = (Ni ? Ni : Nv) % 2;
 		if(extra){
-			ALERT("%s count not multiple of 2 for lines\n", Ni ? "Index" : "Vertex");
+			ALERT("%s count not multiple of 2 for lines", Ni ? "Index" : "Vertex");
 		}
 	} else if(isTriangles()){
 		auto extra = (Ni ? Ni : Nv) % 3;
 		if(extra){
-			ALERT("%s count not multiple of 3 for triangles (%d extra)\n", Ni ? "Index" : "Vertex", extra);
+			ALERT("%s count not multiple of 3 for triangles (%d extra)", Ni ? "Index" : "Vertex", extra);
 		}
+		forEachFace([&](int v0, int v1, int v2){
+			auto p0 = vertices()[v0];
+			auto p1 = vertices()[v1];
+			auto p2 = vertices()[v2];
+			bool uniqueIndices = v0!=v1 && v1!=v2;
+			if(uniqueIndices && (p0==p1 || p1==p2))
+				ALERT("Triangle has unique indices, but equal positions (%d %d %d)", v0,v1,v2);
+		});
 	}
 
 	// Geometric checks
@@ -2027,7 +2035,7 @@ bool Mesh::debug(FILE * dst) const {
 		for(int i=0; i<arr.size(); ++i){\
 			auto mm = arr[i].magSqr();\
 			if(mm < lo || mm > hi){\
-				ALERT(#arr " vector not unit magnitude: %d is %f\n", i, std::sqrt(mm));\
+				ALERT(#arr " vector not unit magnitude: %d is %f", i, std::sqrt(mm));\
 				break;\
 			}\
 		}\
@@ -2040,7 +2048,7 @@ bool Mesh::debug(FILE * dst) const {
 		for(int i=0; i<mNormals.size(); ++i){
 			auto d = std::abs(dot(mNormals[i], mTangents[i]));
 			if(d > 0.001){
-				ALERT("Normal and tangent not orthogonal: %d\n", i);
+				ALERT("Normal and tangent not orthogonal: %d", i);
 				break;
 			}
 		}
