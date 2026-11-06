@@ -44,13 +44,15 @@ struct Graphics::RawMeshData{
 				* texCoord1s = nullptr, * texCoord2s = nullptr, * texCoord3s = nullptr,
 				* indices = nullptr;
 
+	int countMax() const { return Ni ? Ni : Nv; }
+
 	RawMeshData(){}
 
 	RawMeshData(const Mesh& m)
 	:	primitive(m.primitive()), stroke(m.stroke()),
 		Nv(m.vertices().size()), Nn(m.normals().size()), Nt(m.tangents().size()), Nc(m.colors().size()),	Nci(m.coloris().size()), Nt1(m.texCoord1s().size()), Nt2(m.texCoord2s().size()), Nt3(m.texCoord3s().size()), Ni(m.indices().size())
 	{
-		count = Ni ? Ni : Nv;
+		count = countMax();
 		if(Nv ) vertices = decltype(vertices)(&m.vertices()[0][0]);
 		if(Nn ) normals = decltype(normals)(&m.normals()[0][0]);
 		if(Nt ) tangents = decltype(tangents)(&m.tangents()[0][0]);
@@ -101,7 +103,6 @@ public:
 
 	void update(const Mesh& m){
 		Nv = m.vertices().size();
-		if(0 == Nv) return;
 		Nn = m.normals().size();
 		Nt = m.tangents().size();
 		Nc = m.colors().size();
@@ -113,7 +114,9 @@ public:
 
 		primitive = m.primitive();
 		stroke = m.stroke();
-		count = Ni ? Ni : Nv;
+		count = countMax();
+
+		//if(0 == count) return; // no early return on empty as GPU still needs to be updated
 
 		mVBO.usage(BufferObject::STATIC_DRAW);
 		mVBO.subDataClear();
