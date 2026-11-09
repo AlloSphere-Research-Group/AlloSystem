@@ -169,6 +169,10 @@ public:
 	virtual void onMouseWheel(const Mouse& m){}
 
 
+	/// Called when files dropped onto window
+	virtual void onDrop(const std::vector<std::string>& paths){}
+
+
 	/// Called upon creation of a window
 	virtual void onCreate(const ViewpointWindow& win){}
 

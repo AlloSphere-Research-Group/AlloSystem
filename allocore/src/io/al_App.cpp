@@ -99,6 +99,11 @@ struct SceneWindowHandler : public WindowEventHandler{
 	bool onDestroy() override { app.onDestroy(win); return true; }
 	bool onResize(int w, int h) override { app.onResize(win, w,h); return true; }
 
+	bool onDrop(const std::vector<std::string>& paths) override {
+		app.onDrop(paths);
+		return true;
+	}
+
 	bool onFrame() override;
 };
 
