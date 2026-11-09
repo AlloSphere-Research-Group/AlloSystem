@@ -31,6 +31,12 @@ struct MyWindow : Window {
 	bool onResize(int w, int h) override {		printf("onResize     %d, %d\n", w, h); return 1; }
 	bool onVisibility(bool v) override {		printf("onVisibility %s\n", v?"true":"false"); return 1; }
 
+	bool onDrop(const std::vector<std::string>& paths) override {
+		printf("onDrop\n");
+		for(auto p : paths) printf("  %s\n", p.c_str());
+		return 1;
+	}
+
 	bool onKeyDown(const Keyboard& k) override {printf("onKeyDown    "); printKey(); return 1; }
 	bool onKeyUp(const Keyboard& k) override {	printf("onKeyUp      "); printKey(); return 1;}
 
