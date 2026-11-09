@@ -7,7 +7,7 @@
 	Base class for common applications
 
 	Author(s):
-	Lance Putnam, 2010, putnam.lance@gmail.com
+	Lance Putnam, 2010
 */
 
 #include <functional>
@@ -38,8 +38,8 @@ namespace osc{
 	class Send;
 }
 
-/// @addtogroup allocore
-/// @{
+/// \addtogroup allocore
+/// \{
 
 /// A window with one or more Viewpoints
 class ViewpointWindow : public Window {
@@ -49,10 +49,10 @@ public:
 	///
 	ViewpointWindow();
 
-	/// @param[in] rect		Window rectangle
-	/// @param[in] title	Window title
-	/// @param[in] fps		Frames/second
-	/// @param[in] mode		Window display mode
+	/// \param[in] rect		Window rectangle
+	/// \param[in] title	Window title
+	/// \param[in] fps		Frames/second
+	/// \param[in] mode		Window display mode
 	ViewpointWindow(
 		const Rect& rect,
 		const std::string title="",
@@ -95,10 +95,10 @@ public:
 
 	/// Initialize audio
 
-	/// @param[in] sampleRate		Sample rate.  Unsupported values will use default rate of device.
-	/// @param[in] blockSize		Number of sample frames to process per callback
-	/// @param[in] outputChannels	Number of output channels to open or -1 for all
-	/// @param[in] inputChannels	Number of input channels to open or -1 for all
+	/// \param[in] sampleRate		Sample rate.  Unsupported values will use default rate of device.
+	/// \param[in] blockSize		Number of sample frames to process per callback
+	/// \param[in] outputChannels	Number of output channels to open or -1 for all
+	/// \param[in] inputChannels	Number of input channels to open or -1 for all
 	void initAudio(
 		double sampleRate=44100, int blockSize=128,
 		int outputChannels=2, int inputChannels=0
@@ -107,11 +107,11 @@ public:
 
 	/// Initialize a new window
 
-	/// @param[in] rect				Window rectangle
-	/// @param[in] title			Window title
-	/// @param[in] fps				Frames/second
-	/// @param[in] mode				Window display mode
-	/// @param[in] flags			Additional flags (unused)
+	/// \param[in] rect				Window rectangle
+	/// \param[in] title			Window title
+	/// \param[in] fps				Frames/second
+	/// \param[in] mode				Window display mode
+	/// \param[in] flags			Additional flags (unused)
 	ViewpointWindow * initWindow(
 		const Window::Rect& rect = Window::Rect(800,600),
 		const std::string title="",
@@ -288,7 +288,7 @@ public:
 
 	/// Add a window to the app
 
-	/// @param[in] win			The window to add
+	/// \param[in] win			The window to add
 	///
 	App& add(ViewpointWindow& win);
 
@@ -358,7 +358,7 @@ private:
 	void * mClockNav = nullptr;
 };
 
-/// @} // end allocore group
+/// \} // end allocore group
 
 } // al::
 #endif
