@@ -8,7 +8,8 @@ Author:
 Lance Putnam, 4/25/2011
 */
 
-#include <stdio.h>
+#include <cstdio>
+#include <fstream>
 #include "allocore/io/al_Window.hpp"
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
@@ -33,7 +34,19 @@ struct MyWindow : Window {
 
 	bool onDrop(const std::vector<std::string>& paths) override {
 		printf("onDrop\n");
-		for(auto p : paths) printf("  %s\n", p.c_str());
+		for(auto p : paths){
+			printf("  %s\n", p.c_str());
+			std::ifstream fs;
+			fs.open(p, std::ios::binary);
+			printf("    ");
+			for(int i=0; i<64 && fs.good(); ++i){
+				char c;
+				fs.read(&c,1);
+				if(c=='\n' || c=='\r') break;
+				printf("%c", c);
+			}
+			printf("\n");
+		}
 		return 1;
 	}
 
