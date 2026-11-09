@@ -678,5 +678,43 @@ Window& Window::show(){
 	return *this;
 }
 
+/*static*/ void Window::clipboard(const char * mime, const std::function<void(BlobRef)>& onData){
+#if defined USING_SDL3
+	/*
+	printf("Window::clipboard\n");
+	{
+		size_t n;
+		char ** mimes = SDL_GetClipboardMimeTypes(&n);
+		printf("clipboard: %lu mime types\n", n);
+		if(mimes){
+			for(size_t i=0; i<n; ++i)
+				printf("%s\n", mimes[i]);
+			SDL_free(mimes);
+		}
+	}
+
+	{
+		char * data = SDL_GetClipboardText();
+		if(data){
+			printf("clipboard text: \"%s\"\n", data);
+			SDL_free(data);
+		}
+	}//*/
+
+	// https://wiki.libsdl.org/SDL3/SDL_GetClipboardData
+	if(!SDL_HasClipboardData(mime)) return;
+	//printf("clipboard: has mime type %s\n", mime);
+	size_t size;
+	void * data = SDL_GetClipboardData(mime, &size);
+	if(!data) return;
+	//printf("clipboard: got %lu bytes\n", size);
+	onData({mime, data, size});
+	SDL_free(data);
+#elif defined USING_SDL2
+	// TODO: Only text available
+	// https://wiki.libsdl.org/SDL2/CategoryClipboard
+#endif
+}
+
 } // al::
 

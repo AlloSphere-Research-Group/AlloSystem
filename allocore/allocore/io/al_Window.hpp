@@ -14,6 +14,7 @@
 
 #include "allocore/graphics/al_GPUObject.hpp"
 #include <deque>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -454,6 +455,15 @@ public:
 
 	/// Remove all window event handlers matching argument
 	Window& remove(WindowEventHandler&);
+
+	struct BlobRef{
+		const char * mime = nullptr;
+		const void * data = nullptr;
+		unsigned size = 0;
+	};
+
+	/// Get clipboard data
+	static void clipboard(const char * mime, const std::function<void(BlobRef)>& onData);
 
 
 	/// Destroy all created windows

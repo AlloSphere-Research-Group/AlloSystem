@@ -806,5 +806,9 @@ Window& Window::show(){
 	return *this;
 }
 
+/*static*/ void Window::clipboard(const char * mime, const std::function<void(BlobRef)>& onData){
+	// Not supported :(
+}
+
 } // al::
 
