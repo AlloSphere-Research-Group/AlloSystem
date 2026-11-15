@@ -13,10 +13,10 @@
 */
 
 #include <algorithm>
-#include <cstddef>
-#include <iterator> // std::forward_iterator_tag
+#include <cstddef> // size_t, ptrdiff_t
+#include <iterator> // forward_iterator_tag
 #include <new> // placement new
-#include <utility> // std::forward
+#include <utility> // forward
 
 namespace al{
 
@@ -96,7 +96,7 @@ public:
 			delete[] oldData;
 		}
 		mEnd = mData+n;
-		for(auto& elem : *this){ new(&elem) T(v); }
+		for(auto& elem : *this) construct(&elem, v);
 	}
 
 	/// Get last element
@@ -109,22 +109,6 @@ public:
 
 	/// Resets size to zero while retaining capacity
 	void reset(){ resize(0); }
-
-	/// Ensure the buffer capacity is at least n
-
-	/// If n is smaller than the current capacity then nothing happens,
-	/// otherwise the buffer is extended and new elements are default-constructed.
-	void reserve(size_t n){
-		if(n > capacity()){
-			T* oldData = mData;
-			T* oldEnd = mEnd;
-			alloc(n);
-			if(oldData){
-				std::move(oldData, oldEnd, mData);
-				delete[] oldData;
-			}
-		}
-	}
 
 	/// Resize buffer
 
@@ -146,16 +130,24 @@ public:
 			reserve(n);
 			// construct new elements
 			for(auto it = mEnd; it != mData+n; ++it){
-				new(it) T(val);
+				construct(it, val);
 			}
 		}
 		else{ // sizing down
 			// destruct removed elements
-			for(auto it = mData+n; it != mEnd; ++it){
-				it->~T();
-			}
+			for(auto it = mData+n; it != mEnd; ++it)
+				destroy(it);
 		}
 		mEnd = mData+n;
+	}
+
+	/// Ensure the buffer capacity is at least n
+
+	/// If n is smaller than the current capacity then nothing happens,
+	/// otherwise the buffer is extended and new elements are default-constructed.
+	void reserve(size_t n){
+		if(n > capacity())
+			allocAndCopyData(n);
 	}
 
 	/// Match capacity to size
@@ -163,16 +155,8 @@ public:
 	/// If the size of the buffer is smaller than its capacity, then the
 	/// capacity is shrunk to match its size.
 	void shrink(){
-		if(size() < capacity()){
-			size_t shrinkTo = size() > 2 ? size() : 2;
-			T* oldData = mData;
-			T* oldEnd = mEnd;
-			alloc(shrinkTo);
-			if(oldData){
-				std::move(oldData, oldEnd, mData);
-				delete[] oldData;
-			}
-		}
+		if(size() < capacity())
+			allocAndCopyData(size() > 2 ? size() : 2);
 	}
 
 	/// Appends element to end of buffer growing its size if necessary
@@ -214,10 +198,9 @@ public:
 	/// Construct and append element
 	template <class... Args>
 	void emplace_back(Args&&... args){
-        if(mEnd == mCapEnd){ // Grow if out of memory
+        if(mEnd == mCapEnd) // Grow if out of memory
 			reserve(grow(capacity()));
-		}
-        new(mEnd++) T(std::forward<Args>(args)...);
+        construct(mEnd++, std::forward<Args>(args)...);
 	}
 
 	/// Insert new elements after each existing element
@@ -236,8 +219,8 @@ public:
 				for(size_t i = 0, iExp = 0; i < size(); i++, iExp+=n){
 					mData[iExp] = std::move(oldData[i]);
 					for(size_t j = 1; j < n; j++){
-						if(dup)	new(mData+(iExp +j)) T(mData[iExp]);
-						else	new(mData+(iExp +j)) T();
+						if(dup)	construct(mData+iExp+j, mData[iExp]);
+						else	construct(mData+iExp+j);
 					}
 				}
 				delete[] oldData;
@@ -245,8 +228,8 @@ public:
 			else{
 				for(size_t i = size()-1, iExp = newSize-1; i != static_cast<size_t>(-1); i--){
 					for(size_t k = 0; k < n; k++, iExp--){
-						if(k==n-1 || dup)	new(mData+iExp) T(mData[i]);
-						else				new(mData+iExp) T();
+						if(k==n-1 || dup)	construct(mData+iExp, mData[i]);
+						else				construct(mData+iExp);
 					}
 				}
 			}
@@ -275,13 +258,31 @@ private:
 
 	static size_t grow(size_t n){ return n>1 ? n*2 : 2; }
 
+	template <class... Args>
+	static void construct(T * p, Args&&... args){
+		new(p) T(std::forward<Args>(args)...);
+	}
+	static void destroy(T * p){ p->~T(); }
+
 	void alloc(size_t newCap){
 		if(newCap<=0){ newCap = 2; }
 		auto tmpSize = size();
 		mData = new T[newCap];
 		mCapEnd = mData + newCap;
-		if(tmpSize >= newCap){ mEnd = mCapEnd; }
-		else{ mEnd = mData + tmpSize; }
+		mEnd = tmpSize >= newCap
+			? mCapEnd
+			: mData + tmpSize;
+	}
+
+	// Allocate new data and copy over old data
+	void allocAndCopyData(size_t n){
+		T * oldData = mData;
+		T * oldEnd = mEnd;
+		alloc(n);
+		if(oldData){
+			std::move(oldData, oldEnd, mData);
+			delete[] oldData;
+		}
 	}
 };
 
