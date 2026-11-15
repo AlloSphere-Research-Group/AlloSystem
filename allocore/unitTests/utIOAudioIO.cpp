@@ -27,7 +27,7 @@ int utIOAudioIO(){
 
 	float SR = 44100;
 	int blockSize = 256;
-	int chansI = 1;
+	int chansI = 0;
 	int chansO = 1;
 
 	LowPass lpf;
@@ -37,14 +37,16 @@ int utIOAudioIO(){
 	AudioIO io;
 	io.configure([&](AudioIOData& io){
 		while(io()){
-			float s = io.in(0);
-			s = delay(lpf(s, 0.2));
+			float s = 0.f;
+			if(io.channelsIn() >= 1){
+				s += delay(lpf(io.in(0), 0.2));
+			}
 			//s = float(i)/io.framesPerBuffer();
 			//s = 0;
 			s += sine()*0.1;
 
 			io.out(0) = s;
-			io.out(1) = s;
+			//io.out(1) = s;
 		}
 	}, blockSize, SR, chansO, chansI);
 
