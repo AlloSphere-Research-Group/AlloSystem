@@ -69,6 +69,8 @@ class SoundSource;
 class AudioSceneObject{
 public:
 
+	using History = ShiftBuffer<4, Vec3d>;
+
 	/// Set current pose
 	void pose(const Pose& p) { mPose = p; }
 	Pose& pose(){ return mPose; }
@@ -84,13 +86,13 @@ public:
 	const Vec3d& pos() const { return mPose.pos(); }
 
 	/// Get history of positions
-	const ShiftBuffer<4, Vec3d>& posHistory() const { return mPosHistory; }
+	const History& posHistory() const { return mPosHistory; }
 
 	void updateHistory();
 
 protected:
-	Pose mPose;							// current position/orientation
-	ShiftBuffer<4, Vec3d> mPosHistory;	// previous positions
+	Pose mPose;				// current position/orientation
+	History mPosHistory;	// previous positions
 };
 
 
