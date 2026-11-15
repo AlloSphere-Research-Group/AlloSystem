@@ -48,10 +48,7 @@ public:
 
 	/// Copy constructor
 	Buffer(const Buffer& other){
-		if(this != &other){
-			reset();
-			append(other);
-		}
+		append(other);
 	}
 
 	/// Move constructor
