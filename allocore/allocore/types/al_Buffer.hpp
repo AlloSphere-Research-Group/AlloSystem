@@ -60,7 +60,7 @@ public:
 	}
 
 	~Buffer(){
-		delete[] mData;
+		destroyThenDeallocate(mData, mEnd);
 		mData = nullptr;
 		mEnd = nullptr;
 		mCapEnd = nullptr;
@@ -91,9 +91,10 @@ public:
 	/// is the same as the number of elements assigned. Old data may be lost.
 	void assign(size_t n, const T& v){
 		if(n > capacity()){
-			auto oldData = mData;
+			auto * oldData = mData;
+			auto * oldEnd = mEnd;
 			alloc(n);
-			delete[] oldData;
+			destroyThenDeallocate(oldData, oldEnd);
 		}
 		mEnd = mData+n;
 		for(auto& elem : *this) construct(&elem, v);
@@ -135,8 +136,7 @@ public:
 		}
 		else{ // sizing down
 			// destruct removed elements
-			for(auto it = mData+n; it != mEnd; ++it)
-				destroy(it);
+			destroy(mData+n, mEnd);
 		}
 		mEnd = mData+n;
 	}
@@ -214,7 +214,7 @@ public:
 		if(mData && size()>0){
 			auto newSize = size()*n;
 			if(newSize > capacity()){
-				T* oldData = mData;
+				auto * oldData = mData;
 				alloc(newSize);
 				for(size_t i = 0, iExp = 0; i < size(); i++, iExp+=n){
 					mData[iExp] = std::move(oldData[i]);
@@ -223,7 +223,7 @@ public:
 						else	construct(mData+iExp+j);
 					}
 				}
-				delete[] oldData;
+				deallocate(oldData);
 			}
 			else{
 				for(size_t i = size()-1, iExp = newSize-1; i != static_cast<size_t>(-1); i--){
@@ -258,30 +258,46 @@ private:
 
 	static size_t grow(size_t n){ return n>1 ? n*2 : 2; }
 
+	static T * allocate(size_t n){
+		return static_cast<T *>(::operator new(n * sizeof(T)));
+	}
+
+	static void deallocate(T * p){ ::operator delete(p); }
+
 	template <class... Args>
 	static void construct(T * p, Args&&... args){
 		new(p) T(std::forward<Args>(args)...);
 	}
+
 	static void destroy(T * p){ p->~T(); }
 
+	static void destroy(T * begin, T * end){
+		for(auto * p = begin; p != end; ++p) destroy(p);
+	}
+
+	static void destroyThenDeallocate(T * begin, T * end){
+		destroy(begin, end);
+		deallocate(begin);
+	}
+
 	void alloc(size_t newCap){
-		if(newCap<=0){ newCap = 2; }
-		auto tmpSize = size();
-		mData = new T[newCap];
+		if(newCap <= 0) newCap = 2;
+		auto oldSize = size();
+		mData = allocate(newCap);
 		mCapEnd = mData + newCap;
-		mEnd = tmpSize >= newCap
+		mEnd = oldSize >= newCap
 			? mCapEnd
-			: mData + tmpSize;
+			: mData + oldSize;
 	}
 
 	// Allocate new data and copy over old data
 	void allocAndCopyData(size_t n){
-		T * oldData = mData;
-		T * oldEnd = mEnd;
+		auto * oldData = mData;
+		auto * oldEnd = mEnd;
 		alloc(n);
 		if(oldData){
 			std::move(oldData, oldEnd, mData);
-			delete[] oldData;
+			deallocate(oldData);
 		}
 	}
 };
