@@ -14,6 +14,9 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator> // std::forward_iterator_tag
+#include <new> // placement new
+#include <utility> // std::forward
 
 namespace al{
 
