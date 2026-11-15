@@ -55,7 +55,7 @@ public:
 	}
 
 	/// Move constructor
-	Buffer(Buffer&& other){
+	Buffer(Buffer&& other) noexcept {
 		swap(other);
 	}
 
