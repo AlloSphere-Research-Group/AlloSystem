@@ -437,11 +437,12 @@ int utMath(){
 		CHECK(Mat3d::rotation90(),				0,-1,0, 1,0,0, 0,0,1);
 		CHECK(Mat3d::rotation180(),				-1,0,0, 0,-1,0, 0,0,1);
 		CHECK(Mat4d::identity().rotation(),		1,0,0, 0,1,0, 0,0,1);
+		assert(eq(c.translation(), Vec2d(3,6)));
+		//CHECK(Mat3d::identity().setTranslation(Vec2d(2,3)), 1,0,2, 0,1,3, 0,0,1);
 
 		assert(eq(Mat3d::translation(7,8).transformPoint(Vec2d(1,2)), Vec2d(8,10)));
 		assert(eq(Mat3d::translation(7,8).transformVector(Vec2d(1,2)), Vec2d(1,2)));
 
-		
 		{ // transform lumps
 			Vec3d t1( 8.8,-7.7,-8.0), t2( 4.9, 1.2, 7.4);
 			Vec3d s1(-5.1, 9.9,-1.4), s2(-7.1, 5.0,-9.7);
@@ -701,7 +702,6 @@ int utMath(){
 //			//printf("%f %f %f %f\n", t, x, y, z);
 //		}
 	}
-
 
 
 	// Simple Functions
