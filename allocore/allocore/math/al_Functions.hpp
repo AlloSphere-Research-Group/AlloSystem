@@ -234,9 +234,7 @@ T powN(T base, unsigned power){
 /// Sum of integers squared from 1 to n
 template<class T> T sumOfSquares(T n){
 	// 0^2 + 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6
-	static constexpr double c1_6 = 1./6.;
-	static constexpr double c2_6 = 2./6.;
-	return n*(n+T(1))*(c2_6*n+c1_6);
+	return n*(n+T(1))*(T(2)*n+T(1))/T(6);
 }
 
 /// Truncates floating point value at decimal
