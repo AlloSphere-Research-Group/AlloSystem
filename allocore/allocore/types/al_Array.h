@@ -303,10 +303,10 @@ static inline void allo_type_fromnumber(AlloTy t, double val, void * dst) {
 	case AlloUInt16Ty:	*(uint16_t *)dst = (uint16_t)(val * _allo_u16f_max()); break;
 	case AlloUInt32Ty:	*(uint32_t *)dst = (uint32_t)(val * _allo_u32f_max()); break;
 	case AlloUInt64Ty:	*(uint64_t *)dst = (uint64_t)(val * _allo_u64f_max()); break;
-	case AlloSInt8Ty:	*(  int8_t *)dst = (  int8_t)(val * _allo_u08f_max() - _allo_s08f_min()); break;
-	case AlloSInt16Ty:	*( int16_t *)dst = ( int16_t)(val * _allo_u16f_max() - _allo_s16f_min()); break;
-	case AlloSInt32Ty:	*( int32_t *)dst = ( int32_t)(val * _allo_u32f_max() - _allo_s32f_min()); break;
-	case AlloSInt64Ty:	*( int64_t *)dst = ( int64_t)(val * _allo_u64f_max() - _allo_s64f_min()); break;
+	case AlloSInt8Ty:	*(  int8_t *)dst = (  int8_t)(val * _allo_u08f_max() + _allo_s08f_min()); break;
+	case AlloSInt16Ty:	*( int16_t *)dst = ( int16_t)(val * _allo_u16f_max() + _allo_s16f_min()); break;
+	case AlloSInt32Ty:	*( int32_t *)dst = ( int32_t)(val * _allo_u32f_max() + _allo_s32f_min()); break;
+	case AlloSInt64Ty:	*( int64_t *)dst = ( int64_t)(val * _allo_u64f_max() + _allo_s64f_min()); break;
 	case AlloFloat32Ty:	*(float *)dst = (float)val; break;
 	case AlloFloat64Ty:	*(double *)dst = val; break;
 	default:			;//*dst = 0;
