@@ -362,7 +362,7 @@ public:
 	/// In 2D, this transform forms a complete "model" matrix. In 3D and above,
 	/// it may be multiplied on the right by additional rotation matrices.
 	template <unsigned Dim1=0, unsigned Dim2=1>
-	static Mat SRT(const Vec<N-1,T>& s, const Rotoscale<T>& r, const Vec<N-1,T>& t = T(0)){
+	static Mat SRT(const Vec<N-1,T>& s, const Rotoscale<T>& r, const Vec<N-1,T>& t){
 		return SR<Dim1,Dim2>(s,r).setTranslation(t);
 	}
 
