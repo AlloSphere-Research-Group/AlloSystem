@@ -371,7 +371,10 @@ template <typename T, typename... Ts>
 T gcd(const T& x, const Ts&... rest){ return gcd(x, gcd(rest...)); }
 
 /// Returns least common multiple
-template<class T> T lcm(const T& x, const T& y){ return (x*y)/al::gcd(x,y); }
+template<class T> T lcm(const T& x, const T& y){
+	auto p=x*y;
+	return p!=0 ? p/al::gcd(x,y) : 0;
+}
 
 /// Returns nearest integer division of one value to another
 template<class T> T nearestDiv(T of, T to){ return to / al::round(to/of); }
