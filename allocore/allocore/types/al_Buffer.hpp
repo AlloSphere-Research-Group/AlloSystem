@@ -20,8 +20,8 @@
 
 namespace al{
 
-/// @addtogroup allocore
-/// @{
+/// \addtogroup allocore
+/// \{
 
 /// Buffer
 
@@ -37,13 +37,13 @@ public:
 	typedef std::size_t size_t;
 	typedef T value_type;
 
-	/// @param[in] size			Initial size
+	/// \param[in] size			Initial size
 	explicit Buffer(size_t size=0)
 	:	Buffer(size,size)
 	{}
 
-	/// @param[in] size			Initial size
-	/// @param[in] capacity		Initial capacity
+	/// \param[in] size			Initial size
+	/// \param[in] capacity		Initial capacity
 	Buffer(size_t size, size_t capacity){
 		reserve(capacity);
 		resize(size);
@@ -84,22 +84,6 @@ public:
 	/// Get element at index (read-only)
 	const T& operator[](size_t i) const { return mData[i]; }
 
-	/// Assign value to elements
-
-	/// This function fills a Buffer with n copies of the given value. Note that
-	/// the assignment completely changes the buffer and that the resulting size
-	/// is the same as the number of elements assigned. Old data may be lost.
-	void assign(size_t n, const T& v){
-		if(n > capacity()){
-			auto * oldData = mData;
-			auto * oldEnd = mEnd;
-			alloc(n);
-			destroyThenDeallocate(oldData, oldEnd);
-		}
-		mEnd = mData+n;
-		for(auto& elem : *this) construct(&elem, v);
-	}
-
 	/// Get last element
 	const T& last() const { return const_cast<Buffer*>(this)->last(); }
 	T& last(){ return *(mEnd-1); }
@@ -108,13 +92,34 @@ public:
 	const T& back() const { return last(); }
 	T& back(){ return last(); }
 
+	/// Assign value to elements
+
+	/// This function fills a Buffer with n copies of the given value. Note that
+	/// the assignment completely changes the buffer and that the resulting size
+	/// is the same as the number of elements assigned.
+	void assign(size_t n, const T& v){
+		if(n > capacity()){ // Realloc necessary
+			auto * oldData = mData;
+			auto * oldEnd = mEnd;
+			alloc(n);
+			for(auto& elem : *this) construct(&elem, v);
+			destroyThenDeallocate(oldData, oldEnd);
+		} else { // No realloc
+			auto * newEnd = mData + n;
+			destroy(newEnd, mEnd); // destruct any excess
+			mEnd = newEnd;
+			for(auto& elem : *this) elem = v; // copy value
+		}
+	}
+
 	/// Resets size to zero while retaining capacity
 	void reset(){ resize(0); }
 
 	/// Resize buffer
 
-	/// If the new size is smaller than the current size the buffer is truncated, 
-	/// otherwise the buffer is extended and new elements are default-constructed.
+	/// If the new size is smaller than the current size, the buffer is simply
+	/// truncated and excess elements destroyed. Otherwise, the buffer is 
+	/// extended and new elements are default-constructed.
 	/// If n is also larger than the capacity, then the capacity is increased.
 	void resize(size_t n){
 		resize(n, T());
@@ -122,17 +127,16 @@ public:
 
 	/// Resize buffer
 
-	/// If the new size is smaller than the current size the buffer is truncated,
-	/// otherwise the buffer is extended and new elements are copy-constructed 
-	/// from the provided val.
+	/// If the new size is smaller than the current size, the buffer is simply
+	/// truncated and excess elements destroyed. Otherwise, the buffer is 
+	/// extended and new elements are copy-constructed from the provided val.
 	/// If n is also larger than the capacity, then the capacity is increased.
 	void resize(size_t n, const T& val){
 		if(n > size()){ // sizing up
 			reserve(n);
 			// construct new elements
-			for(auto it = mEnd; it != mData+n; ++it){
+			for(auto * it = mEnd; it < mData+n; ++it)
 				construct(it, val);
-			}
 		}
 		else{ // sizing down
 			// destruct removed elements
@@ -144,7 +148,9 @@ public:
 	/// Ensure the buffer capacity is at least n
 
 	/// If n is smaller than the current capacity then nothing happens,
-	/// otherwise the buffer is extended and new elements are default-constructed.
+	/// otherwise the buffer is reallocated to fit n elements and existing
+	/// elements are copied over. The capacity may change, but the size remains
+	/// unchanged.
 	void reserve(size_t n){
 		if(n > capacity())
 			allocAndCopyData(n);
@@ -159,12 +165,21 @@ public:
 			allocAndCopyData(size() > 2 ? size() : 2);
 	}
 
+	/// Construct and append element
+	template <class... Args>
+	void emplace_back(Args&&... args){
+        if(mEnd == mCapEnd) // Grow if out of memory
+			reserve(grow(capacity()));
+        construct(mEnd++, std::forward<Args>(args)...);
+	}
+
+	/// synonym for append()
+	void push_back(const T& v){ append(v); }
+
 	/// Appends element to end of buffer growing its size if necessary
 	void append(const T& v){
 		emplace_back(v);
 	}
-	/// synonym for append():
-	void push_back(const T& v){ append(v); }
 
 	/// Append elements of another Buffer
 
@@ -195,18 +210,10 @@ public:
 	void repeatLast(){ append(T(last())); }
 	template <int N> void repeatLast(){ for(int i=0;i<N;++i) append(T(last())); }
 
-	/// Construct and append element
-	template <class... Args>
-	void emplace_back(Args&&... args){
-        if(mEnd == mCapEnd) // Grow if out of memory
-			reserve(grow(capacity()));
-        construct(mEnd++, std::forward<Args>(args)...);
-	}
-
 	/// Insert new elements after each existing element
 
-	/// @tparam n		Expansion factor; new size is n times old size
-	/// @tparam dup		If true, new elements are duplicates of existing elements.
+	/// \tparam n		Expansion factor; new size is n times old size
+	/// \tparam dup		If true, new elements are duplicates of existing elements.
 	///					If false, new elements are default constructed.
 	template <size_t n, bool dup>
 	void expand(){
@@ -272,7 +279,7 @@ private:
 	static void destroy(T * p){ p->~T(); }
 
 	static void destroy(T * begin, T * end){
-		for(auto * p = begin; p != end; ++p) destroy(p);
+		for(auto * p = begin; p < end; ++p) destroy(p);
 	}
 
 	static void destroyThenDeallocate(T * begin, T * end){
@@ -280,14 +287,14 @@ private:
 		deallocate(begin);
 	}
 
-	void alloc(size_t newCap){
-		if(newCap <= 0) newCap = 2;
+	// Allocates new memory
+	// Does not construct objects nor deallocate old memory.
+	void alloc(size_t n){
+		if(n <= 0) n = 2;
 		auto oldSize = size();
-		mData = allocate(newCap);
-		mCapEnd = mData + newCap;
-		mEnd = oldSize >= newCap
-			? mCapEnd
-			: mData + oldSize;
+		mData = allocate(n);
+		mCapEnd = mData + n;
+		mEnd = oldSize >= n ? mCapEnd : mData + oldSize;
 	}
 
 	// Allocate new data and copy over old data
@@ -296,8 +303,11 @@ private:
 		auto * oldEnd = mEnd;
 		alloc(n);
 		if(oldData){
-			std::move(oldData, oldEnd, mData);
-			deallocate(oldData);
+			// copy over the maximum number of old elements
+			auto ncopy = oldEnd - oldData;
+			if(ncopy > size()) ncopy = size();
+			for(size_t i=0; i<ncopy; ++i) construct(mData+i, *(oldData+i));
+			destroyThenDeallocate(oldData, oldEnd);
 		}
 	}
 };
@@ -317,8 +327,8 @@ public:
 	/// Default constructor; does not allocate memory
 	RingBuffer(): mPos(-1){}
 
-	/// @param[in] size		number of elements
-	/// @param[in] v		value to initialize elements to
+	/// \param[in] size		number of elements
+	/// \param[in] v		value to initialize elements to
 	explicit RingBuffer(unsigned size, const T& v=T())
 	:	mPos(size)
 	{
@@ -375,8 +385,8 @@ public:
 
 	/// Get reference to older element relative to some newer element 
 
-	/// @param[in] from		absolute index the read is relative to
-	/// @param[in] dist		distance into past relative to 'from' of the returned element
+	/// \param[in] from		absolute index the read is relative to
+	/// \param[in] dist		distance into past relative to 'from' of the returned element
 	const T& readFrom(int from, int dist) const {
 		return mut().readFrom(from,dist);
 	}
@@ -408,8 +418,8 @@ public:
 
 	/// Resize buffer
 
-	/// @param[in] n	number of elements
-	/// @param[in] v	initialization value of newly allocated elements
+	/// \param[in] n	number of elements
+	/// \param[in] v	initialization value of newly allocated elements
 	void resize(int n, const T& v=T()){
 		mData.resize(n,v);
 		if(mPos >=n) mPos = n-1;
@@ -437,7 +447,7 @@ public:
 		int len, tap, idx;
 	};
 
-	/// @param[in] i	start index past oldest element
+	/// \param[in] i	start index past oldest element
 	iterator begin(int i=0){ return iterator(&mData[0], mData.size(), posOldest(), i); }
 	iterator end(){ return iterator(&mData[0], mData.size(), posOldest(), fill()); }
 
@@ -473,7 +483,7 @@ public:
 
 	typedef T value_type;
 
-	/// @param[in] v	Value to initialize all elements to
+	/// \param[in] v	Value to initialize all elements to
 	ShiftBuffer(const T& v=T()){ assign(v); }
 
 	/// Get number of elements
@@ -503,7 +513,7 @@ protected:
 	T mData[N];
 };
 
-/// @} // end allocore group
+/// \} // end allocore group
 
 } // al::
 #endif
