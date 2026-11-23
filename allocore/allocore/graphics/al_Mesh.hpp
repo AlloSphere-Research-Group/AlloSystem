@@ -118,11 +118,16 @@ public:
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0);
 
-	/// Copy constructor
-	Mesh(const Mesh& cpy);
-
 	/// Callback constructor (default constructs, then calls function passing self)
 	Mesh(const std::function<void(Mesh&)>& f);
+
+	/// Copy constructor
+	Mesh(const Mesh& m) = default;
+	Mesh& operator=(const Mesh& m) = default;
+
+	/// Move constructor
+	Mesh(Mesh&& m) = default;
+	Mesh& operator=(Mesh&& m) = default;
 
 
 	/// Set geometric primitive

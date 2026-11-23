@@ -20,18 +20,6 @@ Mesh::Mesh(int primitive)
 :	mPrimitive(primitive)
 {}
 
-Mesh::Mesh(const Mesh& cpy)
-:	mVertices(cpy.mVertices),
-	mNormals(cpy.mNormals),
-	mColors(cpy.mColors),
-	mColoris(cpy.mColoris),
-	mTexCoord1s(cpy.mTexCoord1s),
-	mTexCoord2s(cpy.mTexCoord2s),
-	mTexCoord3s(cpy.mTexCoord3s),
-	mIndices(cpy.mIndices),
-	mPrimitive(cpy.mPrimitive)
-{}
-
 Mesh::Mesh(const std::function<void(Mesh&)>& f)
 :	Mesh()
 {
