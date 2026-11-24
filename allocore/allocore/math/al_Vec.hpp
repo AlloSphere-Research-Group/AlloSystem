@@ -637,6 +637,20 @@ public:
 		return *this;
 	}
 
+	/// Move element to another position
+	Vec& move(int from, int to){
+		if(from<0) from += size();
+		if(  to<0)   to += size();
+		if(indexValid(from) && indexValid(to)){
+			if(from<to){
+				for(int i=from; i<to; ++i) swap(i,i+1);
+			} else {
+				for(int i=from; i>to; --i) swap(i,i-1);
+			}
+		}
+		return *this;
+	}
+
 	/// Apply circular shift to elements
 
 	/// Element i is moved to element (i+D)%N.
