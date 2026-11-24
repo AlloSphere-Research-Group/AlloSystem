@@ -76,6 +76,13 @@ Vec<1,V> toVec(const V& v);
 template <class V, class... Vs>
 Vec<1+sizeof...(Vs),V> toVec(const V& v, Vs... vs);
 
+// defined here due to clash with member function
+template <class T>
+static void vecSwap(T& a, T& b){
+	using namespace std;
+	swap(a,b);
+}
+
 
 /// Fixed-size n-vector
 
@@ -656,13 +663,13 @@ public:
 	}
 
 	/// Swap elements within vector
-	Vec& swap(int i, int j){ std::swap(at(i), at(j)); return *this; }
+	Vec& swap(int i, int j){ vecSwap(at(i), at(j)); return *this; }
 
 	template <int i=0, int j=1>
-	Vec& swap(){ std::swap(at<i>(), at<j>()); return *this; }
+	Vec& swap(){ vecSwap(at<i>(), at<j>()); return *this; }
 
 	/// Swap elements with another vector
-	Vec& swap(Vec& v){ IT(N) std::swap(at(i), v[i]); return *this; }
+	Vec& swap(Vec& v){ IT(N) vecSwap(at(i), v[i]); return *this; }
 
 	friend void swap(Vec& a, Vec& b){ a.swap(b); }
 
