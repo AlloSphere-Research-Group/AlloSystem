@@ -273,14 +273,6 @@ int utMath(){
 		assert(toVec(1,2,8,9).nest<1>().at<1>() == toVec(2));
 		assert(toVec(1,2,8,9).nest<4>().at<0>() == toVec(1,2,8,9));
 
-		assert(toVec(1,2,3,4).reverse() == toVec(4,3,2,1));
-
-		assert(toVec(1,2,3,4).cshift<+1>() == toVec(4,1,2,3));
-		assert(toVec(1,2,3,4).cshift<-1>() == toVec(2,3,4,1));
-		assert(toVec(1,2,3,4).cshift<+0>() == toVec(1,2,3,4));
-
-		assert(toVec(9,2,-7,-1).sort() == toVec(-7,-1,2,9));
-
 		assert(toVec(1,2,3,4).swap(0,2) == toVec(3,2,1,4));
 		assert((toVec(1,2,3,4).swap<1,3>() == toVec(1,4,3,2)));
 		{	auto a = toVec(1,2,3); auto b = toVec(7,8,9);
@@ -291,6 +283,19 @@ int utMath(){
 			assert(a == toVec(1,2,3));
 			assert(b == toVec(7,8,9));
 		}
+
+		assert(toVec(1,2,3,4).reverse() == toVec(4,3,2,1));
+
+		assert(toVec(1,2,3,4).cshift<+1>() == toVec(4,1,2,3));
+		assert(toVec(1,2,3,4).cshift<-1>() == toVec(2,3,4,1));
+		assert(toVec(1,2,3,4).cshift<+0>() == toVec(1,2,3,4));
+
+		assert(toVec(1,2,3,4).move(0,2) == toVec(2,3,1,4));
+		assert(toVec(1,2,3,4).move(1,3) == toVec(1,3,4,2));
+		assert(toVec(1,2,3,4).move(2,0) == toVec(3,1,2,4));
+		assert(toVec(1,2,3,4).move(1,1) == toVec(1,2,3,4));
+
+		assert(toVec(9,2,-7,-1).sort() == toVec(-7,-1,2,9));
 	}
 
 	{ // Vec2 specials
