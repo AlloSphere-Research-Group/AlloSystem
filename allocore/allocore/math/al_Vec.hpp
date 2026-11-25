@@ -16,6 +16,7 @@
 #include <initializer_list>
 #include <ostream>
 #include <type_traits> //remove_reference, integral_constant, is_polymorphic
+#include "allocore/math/al_Rotoscale.hpp"
 
 namespace al {
 
@@ -1096,38 +1097,26 @@ public:
 	template <int Dim1=0, int Dim2=1>
 	Vec& fromPolar(double ang, double mag = 1.){
 		static_assert_dims<Dim1,Dim2>();
-		at<Dim1>() = mag * std::cos(ang);
-		at<Dim2>() = mag * std::sin(ang);
-		return *this;
-	}
-
-	Vec& rotate(double cosAng, double sinAng, int dim1, int dim2){
-		T t = at(dim1);
-		T u = at(dim2);
-		at(dim1) = t*cosAng - u*sinAng;
-		at(dim2) = t*sinAng + u*cosAng;
-		return *this;
-	}
-
-	template <unsigned Dim1=0, unsigned Dim2=1>
-	Vec& rotate(double cosAng, double sinAng){
-		static_assert_dims<Dim1,Dim2>();
-		return rotate(cosAng,sinAng, Dim1,Dim2);
+		auto rs = Rotoscaled(ang)*mag;
+		return set<Dim1>(rs.r).template set<Dim2>(rs.i);
 	}
 
 	/// Rotate vector on a global plane
 
-	/// \param[in] angle	angle of right-handed rotation, in radians
+	/// \param[in] r		angle of right-handed rotation, in radians
 	/// \param[in] dim1		dimension to rotate from
 	/// \param[in] dim2		dimension to rotate towards
-	Vec& rotate(double angle, int dim1, int dim2){
-		return rotate(std::cos(angle),std::sin(angle), dim1,dim2);
+	Vec& rotate(const Rotoscale<T>& r, int dim1, int dim2){
+		auto t = Rotoscale<T>(at(dim1), at(dim2)) * r;
+		at(dim1) = t.r;
+		at(dim2) = t.i;
+		return *this;
 	}
 
 	template <unsigned Dim1=0, unsigned Dim2=1>
-	Vec& rotate(double angle){
+	Vec& rotate(const Rotoscale<T>& r){
 		static_assert_dims<Dim1,Dim2>();
-		return rotate(angle, Dim1,Dim2);
+		return rotate(r, Dim1,Dim2);
 	}
 
 	/// Rotate vector 45 degrees on a global plane
@@ -1511,33 +1500,16 @@ inline T dot(const Vec<N,T>& a, const Vec<N,T>& b){
 
 /// \param[in,out]	vec		Vector to rotate
 /// \param[in]		normal	Normal perpendicular to the plane of rotation
-/// \param[in]		cosAng	Cosine of the rotation angle
-/// \param[in]		sinAng	Sine of the rotation angle
+/// \param[in]		r		Rotation amount
 template <class T>
-void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng){
-	T c = cosAng, s = sinAng;
-
+void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, const Rotoscale<T>& r){
 	// Rodrigues' rotation formula:
-	vec = vec*c + cross(normal, vec)*s + normal*(normal.dot(vec)*(T(1)-c));
-}
-
-/// Rotate a vector around a normal vector
-
-/// \param[in,out]	vec			Vector to rotate
-/// \param[in]		normal		Normal perpendicular to the plane of rotation
-/// \param[in]		angle		Rotation angle, in radians
-template <class T>
-void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
-	rotate(vec, normal, cos(angle), sin(angle));
+	vec = vec*r.r + cross(normal, vec)*r.i + normal*(normal.dot(vec)*(T(1)-r.r));
 }
 
 template <class T>
-Vec<3,T> rotated(const Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng){
-	auto r = vec; rotate(r, normal, cosAng, sinAng); return r;
-}
-template <class T>
-Vec<3,T> rotated(const Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
-	return rotated(vec, normal, cos(angle), sin(angle));
+Vec<3,T> rotated(const Vec<3,T>& vec, const Vec<3,T>& normal, const Rotoscale<T>& r){
+	auto v = vec; rotate(v, normal, r); return v;
 }
 
 /// Rotate a vector 90 degrees around a normal vector
