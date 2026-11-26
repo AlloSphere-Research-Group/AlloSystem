@@ -137,8 +137,8 @@ public:
 	bool right() const;			///< Get whether right button is down
 	bool any() const;			///< Get whether any button is down
 
-	short wheelX() const;		///< Get wheel change in x direction (+ right, - left)
-	short wheelY() const;		///< Get wheel change in y direction (+ up, - down)
+	float wheelX() const;		///< Get wheel change in x direction (+ right, - left)
+	float wheelY() const;		///< Get wheel change in y direction (+ up, - down)
 	
 protected:
 	friend class Window;
@@ -147,14 +147,14 @@ protected:
 	int mX, mY;						// x,y positions
 	int mDX, mDY;					// change in x,y positions
 	int mButton;					// most recent button changed
-	short mWheelX, mWheelY;			// wheel delta values
+	float mWheelX, mWheelY;			// wheel delta values in "ticks"
 	int mBX[AL_MOUSE_MAX_BUTTONS];	// button down xs
 	int mBY[AL_MOUSE_MAX_BUTTONS];	// button down ys
 	bool mB[AL_MOUSE_MAX_BUTTONS];	// button states
 
 	void position(int x, int y);
 	void button(int b, bool v);
-	void wheel(short dx, short dy);
+	void wheel(float dx, float dy);
 };
 
 

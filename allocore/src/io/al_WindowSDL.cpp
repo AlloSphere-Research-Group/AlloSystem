@@ -295,8 +295,8 @@ private:
 			}	break;
 
 			case EV_MOUSE_WHEEL:{ //printf("Mouse wheel: %f %f\n", ev.wheel.x, ev.wheel.y);
-				auto sgn = [](float v){ return v==0.f?0:v>0.f?1:-1; };
-				win.mMouse.wheel(sgn(ev.wheel.x), sgn(ev.wheel.y));
+				win.mMouse.wheel(ev.wheel.x, ev.wheel.y);
+				//win.mMouse.wheel(ev.wheel.integer_x, ev.wheel.integer_y); // reqs 3.2.12
 				win.callHandlersOnMouseWheel();
 				} break;
 

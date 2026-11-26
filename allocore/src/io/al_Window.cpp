@@ -70,12 +70,12 @@ bool Mouse::any() const {
 	return false;
 }
 
-short Mouse::wheelX() const { return mWheelX; }
-short Mouse::wheelY() const { return mWheelY; }
+float Mouse::wheelX() const { return mWheelX; }
+float Mouse::wheelY() const { return mWheelY; }
 
 void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=mY; } }
-void Mouse::wheel(short dx, short dy){ mWheelX=dx; mWheelY=dy; }
+void Mouse::wheel(float dx, float dy){ mWheelX=dx; mWheelY=dy; }
 
 
 

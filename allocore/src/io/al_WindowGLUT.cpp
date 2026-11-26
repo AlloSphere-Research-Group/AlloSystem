@@ -381,7 +381,7 @@ public:
 			// Mouse wheel typically on 3-6
 			if(3<=btn && btn<=6){
 				if(GLUT_UP == state) return; // redundant
-				int dx, dy;
+				float dx, dy;
 				     if(3==btn) dx= 0, dy= 1;
 				else if(4==btn) dx= 0, dy=-1;
 				else if(5==btn) dx= 1, dy= 0;
